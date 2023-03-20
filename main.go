@@ -3,11 +3,16 @@ package main
 import (
 	"os"
 
+	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/stardict"
 
 	// "github.com/therecipe/qt/webengine"
+
+	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
+
+var conf = config.MustLoad()
 
 func main() {
 	stardict.Init()
@@ -60,6 +65,15 @@ func main() {
 			webview.SetHtml(s)
 		})
 	})
+
+	font := gui.NewQFont()
+	if conf.FontFamily != "" {
+		font.SetFamily(conf.FontFamily)
+	}
+	if conf.FontSize > 0 {
+		font.SetPixelSize(conf.FontSize)
+	}
+	app.SetFont(font, "")
 
 	window.SetCentralWidget(centralWidget)
 	window.Show()
