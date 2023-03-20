@@ -4,6 +4,8 @@ import (
 	"os"
 
 	"github.com/ilius/ayandict/pkg/stardict"
+
+	// "github.com/therecipe/qt/webengine"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -17,20 +19,15 @@ func main() {
 	window.Resize2(600, 400)
 
 	webview := widgets.NewQTextBrowser(nil)
+	// webview := webengine.NewQWebEngineView(nil)
 	webview.SetReadOnly(true)
 	webview.SetOpenExternalLinks(true)
 
 	entry := widgets.NewQLineEdit(nil)
 	entry.SetPlaceholderText("")
 	entry.SetFixedHeight(25)
-	entry.ConnectReturnPressed(func() {
-		onQuery(entry.Text(), webview)
-	})
 
 	okButton := widgets.NewQPushButton2("OK", nil)
-	okButton.ConnectClicked(func(bool) {
-		onQuery(entry.Text(), webview)
-	})
 
 	frame1 := widgets.NewQFrame(nil, 0)
 	frame1Layout := widgets.NewQHBoxLayout2(frame1)
@@ -50,6 +47,19 @@ func main() {
 
 	centralWidget := widgets.NewQWidget(nil, 0)
 	centralWidget.SetLayout(mainLayout)
+
+	entry.ConnectReturnPressed(func() {
+		onQuery(entry.Text(), func(s string) {
+			// webview.SetHtml(s, core.NewQUrl())
+			webview.SetHtml(s)
+		})
+	})
+	okButton.ConnectClicked(func(bool) {
+		onQuery(entry.Text(), func(s string) {
+			// webview.SetHtml(s, core.NewQUrl())
+			webview.SetHtml(s)
+		})
+	})
 
 	window.SetCentralWidget(centralWidget)
 	window.Show()

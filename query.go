@@ -6,10 +6,12 @@ import (
 	"strings"
 
 	"github.com/ilius/ayandict/pkg/stardict"
-	"github.com/therecipe/qt/widgets"
 )
 
-func onQuery(query string, webview *widgets.QTextBrowser) {
+func onQuery(
+	query string,
+	setHtml func(string),
+) {
 	fmt.Printf("Query: %s\n", query)
 	results := stardict.LookupHTML(query)
 	parts := []string{}
@@ -20,8 +22,7 @@ func onQuery(query string, webview *widgets.QTextBrowser) {
 		))
 		parts = append(parts, res.Definitions...)
 	}
-	// webview.Clear()
 	htmlStr := strings.Join(parts, "\n<br/>\n")
+	setHtml(htmlStr)
 	fmt.Println(htmlStr)
-	webview.SetHtml(htmlStr)
 }
