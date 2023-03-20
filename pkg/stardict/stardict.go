@@ -24,15 +24,18 @@ func Init() {
 	}
 }
 
-func LookupHTML(query string) []*common.QueryResult {
+func LookupHTML(query string, title bool) []*common.QueryResult {
 	results := []*common.QueryResult{}
 	for _, dic := range dicList {
 		definitions := []string{}
 		for _, res := range dic.SearchAuto(query) {
-			defi := fmt.Sprintf(
-				"<b>%s</b>\n",
-				html.EscapeString(res.Keyword),
-			)
+			defi := ""
+			if title {
+				defi = fmt.Sprintf(
+					"<b>%s</b>\n",
+					html.EscapeString(res.Keyword),
+				)
+			}
 			for _, item := range res.Items {
 				if item.Type == 'h' {
 					defi += string(item.Data) + "<br/>\n"

@@ -13,7 +13,7 @@ func onQuery(
 	setHtml func(string),
 ) {
 	fmt.Printf("Query: %s\n", query)
-	results := stardict.LookupHTML(query)
+	results := stardict.LookupHTML(query, false)
 	parts := []string{}
 	for _, res := range results {
 		parts = append(parts, fmt.Sprintf(
