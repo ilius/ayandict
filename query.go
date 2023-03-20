@@ -8,13 +8,13 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
-func onQuery(query string, textview *widgets.QPlainTextEdit) {
+func onQuery(query string, webview *widgets.QTextBrowser) {
 	fmt.Printf("Query: %s\n", query)
-	results := stardict.LookupPlaintext(query)
-	textview.Clear()
+	results := stardict.LookupHTML(query)
 	parts := []string{}
 	for _, res := range results {
 		parts = append(parts, res.Definitions...)
 	}
-	textview.Document().SetPlainText(strings.Join(parts, "\n"))
+	webview.Clear()
+	webview.SetHtml(strings.Join(parts, "\n"))
 }

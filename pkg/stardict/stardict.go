@@ -44,6 +44,27 @@ func LookupPlaintext(query string) []*common.QueryResult {
 	return results
 }
 
+func LookupHTML(query string) []*common.QueryResult {
+	results := []*common.QueryResult{}
+	for _, dic := range dicList {
+		definitions := []string{}
+		meaningList := dic.GetWord(query)
+		for _, meaning := range meaningList {
+			for _, defi := range meaning {
+				definitions = append(definitions, string(defi))
+			}
+		}
+		if len(definitions) == 0 {
+			continue
+		}
+		results = append(results, &common.QueryResult{
+			DictName:    dic.GetBookName(),
+			Definitions: definitions,
+		})
+	}
+	return results
+}
+
 type Dictionary struct {
 	*parser.Dictionary
 }
