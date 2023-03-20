@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html"
 	"strings"
 
 	"github.com/ilius/ayandict/pkg/stardict"
@@ -13,8 +14,14 @@ func onQuery(query string, webview *widgets.QTextBrowser) {
 	results := stardict.LookupHTML(query)
 	parts := []string{}
 	for _, res := range results {
+		parts = append(parts, fmt.Sprintf(
+			"<h3>Dictionary: %s</h3>\n",
+			html.EscapeString(res.DictName),
+		))
 		parts = append(parts, res.Definitions...)
 	}
-	webview.Clear()
-	webview.SetHtml(strings.Join(parts, "\n"))
+	// webview.Clear()
+	htmlStr := strings.Join(parts, "\n<br/>\n")
+	fmt.Println(htmlStr)
+	webview.SetHtml(htmlStr)
 }
