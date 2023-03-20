@@ -15,9 +15,11 @@ const fileName = "config.toml"
 // html definition view using mouse scroll
 
 type Config struct {
-	FontFamily   string `toml:"font_family"`
-	FontSize     int    `toml:"font_size"`
-	SearchOnType bool   `toml:"search_on_type"`
+	FontFamily string `toml:"font_family"`
+	FontSize   int    `toml:"font_size"`
+
+	SearchOnType          bool `toml:"search_on_type"`
+	SearchOnTypeMinLength int  `toml:"search_on_type_min_length"`
 }
 
 func Load() (*Config, error) {

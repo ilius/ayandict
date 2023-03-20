@@ -28,6 +28,11 @@ func main() {
 	webview.SetReadOnly(true)
 	webview.SetOpenExternalLinks(true)
 
+	updateWebView := func(s string) {
+		// webview.SetHtml(s, core.NewQUrl())
+		webview.SetHtml(s)
+	}
+
 	entry := widgets.NewQLineEdit(nil)
 	entry.SetPlaceholderText("")
 	entry.SetFixedHeight(25)
@@ -55,16 +60,10 @@ func main() {
 	window.SetCentralWidget(centralWidget)
 
 	entry.ConnectReturnPressed(func() {
-		onQuery(entry.Text(), func(s string) {
-			// webview.SetHtml(s, core.NewQUrl())
-			webview.SetHtml(s)
-		})
+		onQuery(entry.Text(), updateWebView)
 	})
 	okButton.ConnectClicked(func(bool) {
-		onQuery(entry.Text(), func(s string) {
-			// webview.SetHtml(s, core.NewQUrl())
-			webview.SetHtml(s)
-		})
+		onQuery(entry.Text(), updateWebView)
 	})
 
 	font := gui.NewQFont()
@@ -77,6 +76,21 @@ func main() {
 	app.SetFont(font, "")
 
 	LoadUserStyle(app)
+
+	if conf.SearchOnType {
+		minLength := conf.SearchOnTypeMinLength
+		entry.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
+			entry.KeyPressEventDefault(event)
+			if event.Text() == "" {
+				return
+			}
+			text := entry.Text()
+			if len(text) < minLength {
+				return
+			}
+			onQuery(text, updateWebView)
+		})
+	}
 
 	window.Show()
 	app.Exec()
