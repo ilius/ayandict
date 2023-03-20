@@ -3,10 +3,12 @@ package main
 import (
 	"os"
 
+	"github.com/ilius/ayandict/pkg/stardict"
 	"github.com/therecipe/qt/widgets"
 )
 
 func main() {
+	stardict.Init()
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 	// icon := gui.NewQIcon5("./img/icon.png")
 
@@ -14,19 +16,20 @@ func main() {
 	window.SetWindowTitle("AyanDict")
 	window.Resize2(600, 400)
 
+	textview := widgets.NewQPlainTextEdit(nil)
+	textview.SetReadOnly(true)
+
 	entry := widgets.NewQLineEdit(nil)
 	entry.SetPlaceholderText("")
 	entry.SetFixedHeight(25)
 	entry.ConnectReturnPressed(func() {
-		onQuery(entry.Text())
+		onQuery(entry.Text(), textview)
 	})
 
 	okButton := widgets.NewQPushButton2("OK", nil)
 	okButton.ConnectClicked(func(bool) {
-		onQuery(entry.Text())
+		onQuery(entry.Text(), textview)
 	})
-
-	textview := widgets.NewQTextBrowser(nil)
 
 	frame1 := widgets.NewQFrame(nil, 0)
 	frame1Layout := widgets.NewQHBoxLayout2(frame1)
