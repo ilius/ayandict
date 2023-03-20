@@ -52,6 +52,7 @@ func main() {
 
 	centralWidget := widgets.NewQWidget(nil, 0)
 	centralWidget.SetLayout(mainLayout)
+	window.SetCentralWidget(centralWidget)
 
 	entry.ConnectReturnPressed(func() {
 		onQuery(entry.Text(), func(s string) {
@@ -75,7 +76,8 @@ func main() {
 	}
 	app.SetFont(font, "")
 
-	window.SetCentralWidget(centralWidget)
+	LoadUserStyle(app)
+
 	window.Show()
 	app.Exec()
 }

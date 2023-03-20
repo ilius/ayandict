@@ -24,5 +24,5 @@ func onQuery(
 	}
 	htmlStr := strings.Join(parts, "\n<br/>\n")
 	setHtml(htmlStr)
-	fmt.Println(htmlStr)
+	// fmt.Println(htmlStr)
 }
