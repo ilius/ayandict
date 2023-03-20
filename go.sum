@@ -6,8 +6,12 @@ github.com/gopherjs/gopherjs v0.0.0-20190411002643-bd77b112433e h1:XWcjeEtTFTOVA
 github.com/gopherjs/gopherjs v0.0.0-20190411002643-bd77b112433e/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
 github.com/ilius/go-stardict v0.3.0 h1:HrpcyKzoB7CQHgSjS2J9+pdwYyuay4aJMFOoAvTRFr8=
 github.com/ilius/go-stardict v0.3.0/go.mod h1:Qm21oeajfTFcpZg5vJUzWvLK3fUhfQQgzVIVn6JgfTE=
+github.com/ilius/go-stardict v0.3.1-0.20230320204436-4d61152e661d h1:JaDqXDIpkI+HkNdhChXCQeAfLhnA16iav0g0dv0wRM4=
+github.com/ilius/go-stardict v0.3.1-0.20230320204436-4d61152e661d/go.mod h1:Qm21oeajfTFcpZg5vJUzWvLK3fUhfQQgzVIVn6JgfTE=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.2/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
+github.com/ozeidan/fuzzy-patricia v3.0.0+incompatible h1:Pl61eMyfJqgY/wytiI4vamqPYribq6d8VxeP1CNyg9M=
+github.com/ozeidan/fuzzy-patricia v3.0.0+incompatible/go.mod h1:zgvuCcYS7wB7fVCGblsaFFmEe8+aAH13dTYm8FbrpsM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sirupsen/logrus v1.4.1/go.mod h1:ni0Sbl8bgC9z8RoU9G6nDWqqs/fq4eDPysMBDgk/93Q=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

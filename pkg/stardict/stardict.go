@@ -8,6 +8,7 @@ import (
 
 	"github.com/ilius/ayandict/pkg/common"
 	stardict "github.com/ilius/go-stardict"
+	"github.com/ozeidan/fuzzy-patricia/patricia"
 )
 
 var dicList []*stardict.Dictionary
@@ -22,21 +23,31 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
+	BuildFuzzyTrie(dicList)
 }
 
 func LookupHTML(query string, title bool) []*common.QueryResult {
 	results := []*common.QueryResult{}
-	for _, dic := range dicList {
-		definitions := []string{}
-		for _, res := range dic.SearchAuto(query) {
-			defi := ""
-			if title {
-				defi = fmt.Sprintf(
-					"<b>%s</b>\n",
-					html.EscapeString(res.Keyword),
-				)
-			}
-			for _, item := range res.Items {
+	caseInsensitive := true
+
+	checked := map[string]bool{}
+
+	visitor := func(prefix patricia.Prefix, dicIn patricia.Item) error {
+		keyword := string(prefix)
+		if checked[keyword] {
+			return nil
+		}
+		checked[keyword] = true
+		dic := dicIn.(*stardict.Dictionary)
+		defi := ""
+		if title {
+			defi = fmt.Sprintf(
+				"<b>%s</b>\n",
+				html.EscapeString(keyword),
+			)
+		}
+		for _, translation := range dic.Translate(keyword) {
+			for _, item := range translation.Parts {
 				if item.Type == 'h' {
 					defi += string(item.Data) + "<br/>\n"
 					continue
@@ -46,16 +57,30 @@ func LookupHTML(query string, title bool) []*common.QueryResult {
 					html.EscapeString(string(item.Data)),
 				)
 			}
-			definitions = append(definitions, defi)
-		}
-		fmt.Printf("%d results from %s\n", len(definitions), dic.GetBookName())
-		if len(definitions) == 0 {
-			continue
 		}
 		results = append(results, &common.QueryResult{
 			DictName:    dic.GetBookName(),
-			Definitions: definitions,
+			Definitions: []string{defi},
 		})
+		return nil
 	}
+
+	// trie.VisitFuzzy(
+	// 	patricia.Prefix(query),
+	// 	caseInsensitive,
+	// 	func(prefix patricia.Prefix, dicIn patricia.Item, skipped int) error {
+	// 		return visitor(prefix, dicIn)
+	// 	},
+	// )
+	trie.VisitSubtree(
+		patricia.Prefix(query),
+		visitor,
+	)
+	trie.VisitSubstring(
+		patricia.Prefix(query),
+		caseInsensitive,
+		visitor,
+	)
+
 	return results
 }

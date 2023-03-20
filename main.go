@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"time"
 
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/stardict"
@@ -88,7 +90,9 @@ func main() {
 			if len(text) < minLength {
 				return
 			}
+			t := time.Now()
 			onQuery(text, updateWebView)
+			fmt.Printf("Query %#v took %v\n", text, time.Now().Sub(t))
 		})
 	}
 
