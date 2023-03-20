@@ -17,7 +17,7 @@ func onQuery(
 	parts := []string{}
 	for _, res := range results {
 		parts = append(parts, fmt.Sprintf(
-			"<h3>Dictionary: %s</h3>\n",
+			"<h4>Dictionary: %s</h4>\n",
 			html.EscapeString(res.DictName),
 		))
 		parts = append(parts, res.Definitions...)
