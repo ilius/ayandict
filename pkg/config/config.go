@@ -33,6 +33,21 @@ type Config struct {
 	HistoryMaxSize  int  `toml:"history_max_size"`
 }
 
+func Default() *Config {
+	return &Config{
+		Style:      "",
+		FontFamily: "",
+		FontSize:   0,
+
+		SearchOnType:          false,
+		SearchOnTypeMinLength: 3,
+
+		HistoryDisable:  false,
+		HistoryAutoSave: false,
+		HistoryMaxSize:  100,
+	}
+}
+
 func Path() string {
 	return filepath.Join(GetConfigDir(), fileName)
 }
@@ -58,10 +73,10 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 	if tomlBytes == nil {
-		return &Config{}, nil
+		return Default(), nil
 	}
-	conf := &Config{}
-	_, err = toml.Decode(string(tomlBytes), &conf)
+	conf := Default()
+	_, err = toml.Decode(string(tomlBytes), conf)
 	if err != nil {
 		return nil, err
 	}
@@ -74,6 +89,17 @@ func MustLoad() *Config {
 		panic(err)
 	}
 	return conf
+}
+
+func EnsureExists(conf *Config) error {
+	_, err := os.Stat(filepath.Join(GetConfigDir(), fileName))
+	if err == nil {
+		return nil
+	}
+	if os.IsNotExist(err) {
+		return Save(conf)
+	}
+	return err
 }
 
 func Save(conf *Config) error {

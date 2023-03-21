@@ -130,6 +130,10 @@ func main() {
 		reloadDicts()
 	})
 	openConfigButton.ConnectClicked(func(checked bool) {
+		err := config.EnsureExists(conf)
+		if err != nil {
+			fmt.Println(err)
+		}
 		url := core.NewQUrl()
 		url.SetScheme("file")
 		url.SetPath(config.Path(), core.QUrl__TolerantMode)
