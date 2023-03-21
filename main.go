@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/ilius/ayandict/pkg/config"
@@ -65,6 +66,8 @@ func main() {
 	miscLayout.AddWidget(reloadConfigButton, 0, 0)
 	reloadStyleButton := widgets.NewQPushButton2("Reload Style", nil)
 	miscLayout.AddWidget(reloadStyleButton, 0, 0)
+	saveHistoryButton := widgets.NewQPushButton2("Save History", nil)
+	miscLayout.AddWidget(saveHistoryButton, 0, 0)
 
 	sideBar := widgets.NewQTabWidget(nil)
 	sideBar.AddTab(historyView, "History")
@@ -127,6 +130,9 @@ func main() {
 	reloadStyleButton.ConnectClicked(func(checked bool) {
 		LoadUserStyle(app)
 	})
+	saveHistoryButton.ConnectClicked(func(checked bool) {
+		SaveHistory()
+	})
 
 	font := gui.NewQFont()
 	if conf.FontFamily != "" {
@@ -138,6 +144,16 @@ func main() {
 	app.SetFont(font, "")
 
 	LoadUserStyle(app)
+	{
+		err := LoadHistory()
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			for _, query := range history {
+				addHistoryGUI(query)
+			}
+		}
+	}
 
 	entry.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
 		entry.KeyPressEventDefault(event)

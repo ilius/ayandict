@@ -4,33 +4,9 @@ import (
 	"fmt"
 	"html"
 	"strings"
-	"sync"
 
 	"github.com/ilius/ayandict/pkg/stardict"
 )
-
-var (
-	history      = []string{}
-	historyMutex sync.Mutex
-)
-
-var addHistoryGUI func(string)
-
-func addHistoryLow(query string) {
-	historyMutex.Lock()
-	history = append(history, query)
-	historyMutex.Unlock()
-}
-
-func addHistory(query string) {
-	if len(history) > 0 && query == history[len(history)-1] {
-		return
-	}
-	addHistoryLow(query)
-	if addHistoryGUI != nil {
-		addHistoryGUI(query)
-	}
-}
 
 func onQuery(
 	query string,
