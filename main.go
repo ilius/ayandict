@@ -80,6 +80,11 @@ func main() {
 		entry.SetText(query)
 	}
 
+	resetQuery := func() {
+		entry.SetText("")
+		updateWebView("")
+	}
+
 	entry.ConnectReturnPressed(func() {
 		onQuery(entry.Text(), updateWebView, false)
 	})
@@ -113,10 +118,15 @@ func main() {
 		minLength := conf.SearchOnTypeMinLength
 		entry.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
 			entry.KeyPressEventDefault(event)
-			if event.Text() == "" {
+			switch event.Text() {
+			case "", "\b":
+				return
+			case "\x1b":
+				// Escape, is there a more elegant way?
+				resetQuery()
 				return
 			}
-			// FIXME: ignore if it's backspace
+			// fmt.Printf("event.Text() = %#v\n", event.Text())
 			text := entry.Text()
 			if len(text) < minLength {
 				return
