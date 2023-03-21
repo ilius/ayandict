@@ -13,6 +13,7 @@ import (
 
 var (
 	history          = []string{}
+	historyMaxSize   = 100
 	historyMutex     sync.Mutex
 	historySaveMutex sync.Mutex
 )
@@ -21,19 +22,33 @@ const historyFileName = "history.json"
 
 var addHistoryGUI func(string)
 
+var trimHistoryGUI func(int)
+
 func addHistoryLow(query string) {
 	historyMutex.Lock()
 	history = append(history, query)
+	if len(history) > historyMaxSize {
+		history = history[len(history)-historyMaxSize:]
+	}
 	historyMutex.Unlock()
 }
 
 func addHistory(query string) {
+	if conf.HistoryDisable {
+		return
+	}
 	if len(history) > 0 && query == history[len(history)-1] {
 		return
 	}
 	addHistoryLow(query)
 	if addHistoryGUI != nil {
 		addHistoryGUI(query)
+	}
+	if trimHistoryGUI != nil {
+		trimHistoryGUI(historyMaxSize)
+	}
+	if conf.HistoryAutoSave {
+		SaveHistory()
 	}
 }
 

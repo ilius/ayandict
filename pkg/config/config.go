@@ -27,6 +27,10 @@ type Config struct {
 
 	SearchOnType          bool `toml:"search_on_type"`
 	SearchOnTypeMinLength int  `toml:"search_on_type_min_length"`
+
+	HistoryDisable  bool `toml:"history_disable"`
+	HistoryAutoSave bool `toml:"history_auto_save"`
+	HistoryMaxSize  int  `toml:"history_max_size"`
 }
 
 func Path() string {

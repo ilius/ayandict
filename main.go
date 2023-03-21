@@ -55,6 +55,15 @@ func main() {
 	addHistoryGUI = func(query string) {
 		historyView.InsertItem2(0, query)
 	}
+	trimHistoryGUI = func(maxSize int) {
+		count := historyView.Count()
+		if count <= maxSize {
+			return
+		}
+		for i := maxSize; i < count; i++ {
+			historyView.TakeItem(maxSize)
+		}
+	}
 
 	miscBox := widgets.NewQFrame(nil, 0)
 	miscLayout := widgets.NewQVBoxLayout2(miscBox)
@@ -127,7 +136,7 @@ func main() {
 		gui.QDesktopServices_OpenUrl(url)
 	})
 	reloadConfigButton.ConnectClicked(func(checked bool) {
-		ReloadConfig(app)
+		LoadConfig(app)
 	})
 	reloadStyleButton.ConnectClicked(func(checked bool) {
 		LoadUserStyle(app)
@@ -149,8 +158,8 @@ func main() {
 	}
 	app.SetFont(font, "")
 
-	LoadUserStyle(app)
-	{
+	LoadConfig(app)
+	if !conf.HistoryDisable {
 		err := LoadHistory()
 		if err != nil {
 			fmt.Println(err)
