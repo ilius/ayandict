@@ -5,7 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
+	"time"
 
 	"github.com/BurntSushi/toml"
 )
@@ -84,6 +86,9 @@ func Save(conf *Config) error {
 	err = ioutil.WriteFile(pathStr, buf.Bytes(), 0o644)
 	if err != nil {
 		return err
+	}
+	if runtime.GOOS == "windows" {
+		time.Sleep(100 * time.Millisecond)
 	}
 	return nil
 }
