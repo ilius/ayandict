@@ -63,6 +63,8 @@ func main() {
 	miscLayout.AddWidget(openConfigButton, 0, 0)
 	reloadConfigButton := widgets.NewQPushButton2("Reload Config", nil)
 	miscLayout.AddWidget(reloadConfigButton, 0, 0)
+	reloadStyleButton := widgets.NewQPushButton2("Reload Style", nil)
+	miscLayout.AddWidget(reloadStyleButton, 0, 0)
 
 	sideBar := widgets.NewQTabWidget(nil)
 	sideBar.AddTab(historyView, "History")
@@ -121,6 +123,9 @@ func main() {
 	})
 	reloadConfigButton.ConnectClicked(func(checked bool) {
 		ReloadConfig(app)
+	})
+	reloadStyleButton.ConnectClicked(func(checked bool) {
+		LoadUserStyle(app)
 	})
 
 	font := gui.NewQFont()
