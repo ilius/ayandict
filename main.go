@@ -114,26 +114,24 @@ func main() {
 
 	LoadUserStyle(app)
 
-	if conf.SearchOnType {
-		minLength := conf.SearchOnTypeMinLength
-		entry.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
-			entry.KeyPressEventDefault(event)
-			switch event.Text() {
-			case "", "\b":
-				return
-			case "\x1b":
-				// Escape, is there a more elegant way?
-				resetQuery()
-				return
-			}
-			// fmt.Printf("event.Text() = %#v\n", event.Text())
+	entry.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
+		entry.KeyPressEventDefault(event)
+		switch event.Text() {
+		case "", "\b":
+			return
+		case "\x1b":
+			// Escape, is there a more elegant way?
+			resetQuery()
+			return
+		}
+		if conf.SearchOnType {
 			text := entry.Text()
-			if len(text) < minLength {
+			if len(text) < conf.SearchOnTypeMinLength {
 				return
 			}
 			onQuery(text, updateWebView, true)
-		})
-	}
+		}
+	})
 
 	window.Show()
 	app.Exec()
