@@ -68,6 +68,8 @@ func main() {
 	miscLayout.AddWidget(reloadStyleButton, 0, 0)
 	saveHistoryButton := widgets.NewQPushButton2("Save History", nil)
 	miscLayout.AddWidget(saveHistoryButton, 0, 0)
+	clearHistoryButton := widgets.NewQPushButton2("Clear History", nil)
+	miscLayout.AddWidget(clearHistoryButton, 0, 0)
 
 	sideBar := widgets.NewQTabWidget(nil)
 	sideBar.AddTab(historyView, "History")
@@ -132,6 +134,10 @@ func main() {
 	})
 	saveHistoryButton.ConnectClicked(func(checked bool) {
 		SaveHistory()
+	})
+	clearHistoryButton.ConnectClicked(func(checked bool) {
+		clearHistory()
+		historyView.Clear()
 	})
 
 	font := gui.NewQFont()

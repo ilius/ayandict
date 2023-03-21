@@ -72,3 +72,11 @@ func SaveHistory() {
 		fmt.Printf("Error saving history: %v\n", err)
 	}
 }
+
+func clearHistory() {
+	historyMutex.Lock()
+	history = []string{}
+	historyMutex.Unlock()
+
+	SaveHistory()
+}
