@@ -12,12 +12,17 @@ import (
 
 func LoadUserStyle(app *widgets.QApplication) {
 	configDir := config.GetConfigDir()
-	stylePath := filepath.Join(configDir, "style.qss")
+	stylePath := conf.Style
+	if stylePath == "" {
+		return
+	}
+	stylePath = PathFromUnix(stylePath)
+	if !filepath.IsAbs(stylePath) {
+		stylePath = filepath.Join(configDir, stylePath)
+	}
 	_, err := os.Stat(stylePath)
 	if err != nil {
-		if !os.IsNotExist(err) {
-			fmt.Printf("Error loading %s: %v\n", stylePath, err)
-		}
+		fmt.Printf("Error loading style file %#v: %v\n", stylePath, err)
 		return
 	}
 	fmt.Println("Loading", stylePath)

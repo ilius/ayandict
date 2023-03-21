@@ -20,6 +20,8 @@ var mutex sync.Mutex
 // html definition view using mouse scroll
 
 type Config struct {
+	Style string `toml:"style"`
+
 	FontFamily string `toml:"font_family"`
 	FontSize   int    `toml:"font_size"`
 
