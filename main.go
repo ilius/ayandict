@@ -13,8 +13,6 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
-var conf = config.MustLoad()
-
 var expanding = widgets.QSizePolicy__Expanding
 
 func main() {
@@ -58,9 +56,13 @@ func main() {
 	}
 
 	miscBox := widgets.NewQFrame(nil, 0)
-	miscLayout := widgets.NewQHBoxLayout2(miscBox)
+	miscLayout := widgets.NewQVBoxLayout2(miscBox)
 	reloadDictsButton := widgets.NewQPushButton2("Reload Dictionaries", nil)
 	miscLayout.AddWidget(reloadDictsButton, 0, 0)
+	openConfigButton := widgets.NewQPushButton2("Open Config", nil)
+	miscLayout.AddWidget(openConfigButton, 0, 0)
+	reloadConfigButton := widgets.NewQPushButton2("Reload Config", nil)
+	miscLayout.AddWidget(reloadConfigButton, 0, 0)
 
 	sideBar := widgets.NewQTabWidget(nil)
 	sideBar.AddTab(historyView, "History")
@@ -110,6 +112,15 @@ func main() {
 	})
 	reloadDictsButton.ConnectClicked(func(checked bool) {
 		reloadDicts()
+	})
+	openConfigButton.ConnectClicked(func(checked bool) {
+		url := core.NewQUrl()
+		url.SetScheme("file")
+		url.SetPath(config.Path(), core.QUrl__TolerantMode)
+		gui.QDesktopServices_OpenUrl(url)
+	})
+	reloadConfigButton.ConnectClicked(func(checked bool) {
+		ReloadConfig(app)
 	})
 
 	font := gui.NewQFont()

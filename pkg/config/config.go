@@ -29,6 +29,10 @@ type Config struct {
 	SearchOnTypeMinLength int  `toml:"search_on_type_min_length"`
 }
 
+func Path() string {
+	return filepath.Join(GetConfigDir(), fileName)
+}
+
 func loadFile() ([]byte, error) {
 	mutex.Lock()
 	defer mutex.Unlock()

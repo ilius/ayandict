@@ -10,6 +10,9 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
+// the current conf.Style value (unchanged config value)
+var currentStyle = ""
+
 func LoadUserStyle(app *widgets.QApplication) {
 	configDir := config.GetConfigDir()
 	stylePath := conf.Style
@@ -30,4 +33,5 @@ func LoadUserStyle(app *widgets.QApplication) {
 	file.Open(core.QIODevice__ReadOnly | core.QIODevice__Text)
 	stream := core.NewQTextStream2(file)
 	app.SetStyleSheet(stream.ReadAll())
+	currentStyle = conf.Style
 }
