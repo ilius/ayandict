@@ -57,8 +57,14 @@ func main() {
 		historyView.InsertItem2(0, query)
 	}
 
+	miscBox := widgets.NewQFrame(nil, 0)
+	miscLayout := widgets.NewQHBoxLayout2(miscBox)
+	reloadDictsButton := widgets.NewQPushButton2("Reload Dictionaries", nil)
+	miscLayout.AddWidget(reloadDictsButton, 0, 0)
+
 	sideBar := widgets.NewQTabWidget(nil)
 	sideBar.AddTab(historyView, "History")
+	sideBar.AddTab(miscBox, "Misc")
 
 	mainSplitter := widgets.NewQSplitter(nil)
 	mainSplitter.SetSizePolicy2(expanding, expanding)
@@ -101,6 +107,9 @@ func main() {
 	})
 	historyView.ConnectItemClicked(func(item *widgets.QListWidgetItem) {
 		doQuery(item.Text())
+	})
+	reloadDictsButton.ConnectClicked(func(checked bool) {
+		reloadDicts()
 	})
 
 	font := gui.NewQFont()
