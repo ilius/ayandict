@@ -5,11 +5,14 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/BurntSushi/toml"
 )
 
 const fileName = "config.toml"
+
+var mutex sync.Mutex
 
 // if you set FontSize, you can not change font size of
 // html definition view using mouse scroll
@@ -22,14 +25,28 @@ type Config struct {
 	SearchOnTypeMinLength int  `toml:"search_on_type_min_length"`
 }
 
-func Load() (*Config, error) {
+func loadFile() ([]byte, error) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	pathStr := filepath.Join(GetConfigDir(), fileName)
 	tomlBytes, err := ioutil.ReadFile(pathStr)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return &Config{}, nil
+			return nil, nil
 		}
 		return nil, err
+	}
+	return tomlBytes, nil
+}
+
+func Load() (*Config, error) {
+	tomlBytes, err := loadFile()
+	if err != nil {
+		return nil, err
+	}
+	if tomlBytes == nil {
+		return &Config{}, nil
 	}
 	conf := &Config{}
 	_, err = toml.Decode(string(tomlBytes), &conf)
@@ -60,6 +77,10 @@ func Save(conf *Config) error {
 	if err != nil {
 		return err
 	}
+
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	err = ioutil.WriteFile(pathStr, buf.Bytes(), 0o644)
 	if err != nil {
 		return err
