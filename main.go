@@ -15,6 +15,8 @@ import (
 
 var conf = config.MustLoad()
 
+var expanding = widgets.QSizePolicy__Expanding
+
 func main() {
 	stardict.Init()
 	app := widgets.NewQApplication(len(os.Args), os.Args)
@@ -41,40 +43,59 @@ func main() {
 
 	okButton := widgets.NewQPushButton2("OK", nil)
 
-	frame1 := widgets.NewQFrame(nil, 0)
-	frame1Layout := widgets.NewQHBoxLayout2(frame1)
-	frame1Layout.AddWidget(widgets.NewQLabel2("Query:", nil, 0), 0, 0)
-	frame1Layout.AddSpacing(10)
-	frame1Layout.AddWidget(entry, 0, 0)
-	frame1Layout.AddSpacing(10)
-	frame1Layout.AddWidget(okButton, 0, 0)
+	queryBox := widgets.NewQFrame(nil, 0)
+	queryBoxLayout := widgets.NewQHBoxLayout2(queryBox)
+	queryBoxLayout.AddWidget(widgets.NewQLabel2("Query:", nil, 0), 0, 0)
+	// queryBoxLayout.AddSpacing(10)
+	queryBoxLayout.AddWidget(entry, 0, 0)
+	// queryBoxLayout.AddSpacing(10)
+	queryBoxLayout.AddWidget(okButton, 0, 0)
 
-	frame2 := widgets.NewQFrame(nil, 0)
-	frame2Layout := widgets.NewQHBoxLayout2(frame2)
-	frame2Layout.AddWidget(webview, 0, 0)
+	historyView := widgets.NewQListWidget(nil)
+
+	addHistoryGUI = func(query string) {
+		historyView.InsertItem2(0, query)
+	}
+
+	sideBar := widgets.NewQTabWidget(nil)
+	sideBar.AddTab(historyView, "History")
+
+	mainSplitter := widgets.NewQSplitter(nil)
+	mainSplitter.SetSizePolicy2(expanding, expanding)
+	mainSplitter.AddWidget(webview)
+	mainSplitter.AddWidget(sideBar)
+	mainSplitter.SetStretchFactor(0, 5)
+	mainSplitter.SetStretchFactor(1, 1)
 
 	mainLayout := widgets.NewQVBoxLayout()
-	mainLayout.AddWidget(frame1, 0, 0)
-	mainLayout.AddWidget(frame2, 0, 0)
+	mainLayout.AddWidget(queryBox, 0, 0)
+	mainLayout.AddWidget(mainSplitter, 0, 0)
 
 	centralWidget := widgets.NewQWidget(nil, 0)
 	centralWidget.SetLayout(mainLayout)
 	window.SetCentralWidget(centralWidget)
 
+	doQuery := func(query string) {
+		onQuery(entry.Text(), updateWebView, false)
+		entry.SetText(query)
+	}
+
 	entry.ConnectReturnPressed(func() {
-		onQuery(entry.Text(), updateWebView)
+		onQuery(entry.Text(), updateWebView, false)
 	})
 	okButton.ConnectClicked(func(bool) {
-		onQuery(entry.Text(), updateWebView)
+		onQuery(entry.Text(), updateWebView, false)
 	})
 	webview.ConnectAnchorClicked(func(link *core.QUrl) {
 		if link.Scheme() == "bword" {
 			word := link.Host(core.QUrl__FullyDecoded)
-			entry.SetText(word)
-			onQuery(word, updateWebView)
+			doQuery(word)
 			return
 		}
 		gui.QDesktopServices_OpenUrl(link)
+	})
+	historyView.ConnectItemClicked(func(item *widgets.QListWidgetItem) {
+		doQuery(item.Text())
 	})
 
 	font := gui.NewQFont()
@@ -95,11 +116,12 @@ func main() {
 			if event.Text() == "" {
 				return
 			}
+			// FIXME: ignore if it's backspace
 			text := entry.Text()
 			if len(text) < minLength {
 				return
 			}
-			onQuery(text, updateWebView)
+			onQuery(text, updateWebView, true)
 		})
 	}
 
