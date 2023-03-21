@@ -8,6 +8,7 @@ import (
 
 	// "github.com/therecipe/qt/webengine"
 
+	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
@@ -27,6 +28,7 @@ func main() {
 	// webview := webengine.NewQWebEngineView(nil)
 	webview.SetReadOnly(true)
 	webview.SetOpenExternalLinks(true)
+	webview.SetOpenLinks(false)
 
 	updateWebView := func(s string) {
 		// webview.SetHtml(s, core.NewQUrl())
@@ -64,6 +66,15 @@ func main() {
 	})
 	okButton.ConnectClicked(func(bool) {
 		onQuery(entry.Text(), updateWebView)
+	})
+	webview.ConnectAnchorClicked(func(link *core.QUrl) {
+		if link.Scheme() == "bword" {
+			word := link.Host(core.QUrl__FullyDecoded)
+			entry.SetText(word)
+			onQuery(word, updateWebView)
+			return
+		}
+		gui.QDesktopServices_OpenUrl(link)
 	})
 
 	font := gui.NewQFont()
