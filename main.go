@@ -69,7 +69,7 @@ func main() {
 
 	miscBox := widgets.NewQFrame(nil, 0)
 	miscLayout := widgets.NewQVBoxLayout2(miscBox)
-	reloadDictsButton := widgets.NewQPushButton2("Reload Dictionaries", nil)
+	reloadDictsButton := widgets.NewQPushButton2("Reload Dicts", nil)
 	miscLayout.AddWidget(reloadDictsButton, 0, 0)
 	openConfigButton := widgets.NewQPushButton2("Open Config", nil)
 	miscLayout.AddWidget(openConfigButton, 0, 0)
