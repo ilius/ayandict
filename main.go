@@ -100,7 +100,7 @@ func main() {
 	window.SetCentralWidget(centralWidget)
 
 	doQuery := func(query string) {
-		onQuery(entry.Text(), updateWebView, false)
+		onQuery(query, updateWebView, false)
 		entry.SetText(query)
 	}
 
