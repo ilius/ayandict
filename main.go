@@ -201,6 +201,18 @@ func main() {
 		}
 	})
 
+	const mainWinGeoKey = "mainwin_geo"
+
+	qsettings := core.NewQSettings("ilius", "ayandict", window)
+	{
+		geo := qsettings.Value(mainWinGeoKey, core.NewQVariant1(nil))
+		geoBytes := geo.ToByteArray()
+		window.RestoreGeometry(geoBytes)
+	}
+	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		qsettings.SetValue(mainWinGeoKey, core.NewQVariant13(window.SaveGeometry()))
+	})
+
 	window.Show()
 	app.Exec()
 }
