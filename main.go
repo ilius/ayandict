@@ -116,11 +116,21 @@ func main() {
 		onQuery(entry.Text(), updateWebView, false)
 	})
 	webview.ConnectAnchorClicked(func(link *core.QUrl) {
+		host := link.Host(core.QUrl__FullyDecoded)
 		if link.Scheme() == "bword" {
-			word := link.Host(core.QUrl__FullyDecoded)
-			doQuery(word)
+			doQuery(host)
 			return
 		}
+		path := link.Path(core.QUrl__FullyDecoded)
+		fmt.Printf("scheme=%#v, host=%#v, path=%#v", link.Scheme(), host, path)
+		// if path == "" {
+		// 	ext := filepath.Ext(host)
+		// 	// fmt.Printf("host=%#v, ext=%#v", host, ext)
+		// 	switch ext {
+		// 	case ".wav", ".mp3", ".ogg":
+
+		// 	}
+		// }
 		gui.QDesktopServices_OpenUrl(link)
 	})
 	historyView.ConnectItemClicked(func(item *widgets.QListWidgetItem) {

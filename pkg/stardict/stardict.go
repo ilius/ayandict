@@ -3,8 +3,13 @@ package stardict
 import (
 	"fmt"
 	"html"
+	"net/url"
 	"os"
 	"path"
+	"regexp"
+	"runtime"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ilius/ayandict/pkg/common"
@@ -12,6 +17,8 @@ import (
 )
 
 var dicList []*stardict.Dictionary
+
+var srcRE = regexp.MustCompile(` src="([^<>"]*?)"`)
 
 func Init() {
 	homeDir, err := os.UserHomeDir()
@@ -27,11 +34,56 @@ func Init() {
 	fmt.Println("Loading dictionaries took", time.Now().Sub(t))
 }
 
+func fixResURL(quoted string, resDir string) *url.URL {
+	// resDir must be Unix-style
+	urlStr, err := strconv.Unquote(quoted)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	_url, err := url.Parse(urlStr)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	if _url.Scheme != "" || _url.Host != "" {
+		return nil
+	}
+	_url.Scheme = "file"
+	_url.Path = resDir + "/" + _url.Path
+	return _url
+}
+
+func fixDefiHTML(defi string, resDir string) string {
+	// resDir must be Unix-style
+	srcSub := func(match string) string {
+		_url := fixResURL(match[5:], resDir)
+		if _url == nil {
+			return match
+		}
+		newStr := " src=" + strconv.Quote(_url.String())
+		fmt.Println(newStr)
+		return newStr
+	}
+
+	defi = srcRE.ReplaceAllStringFunc(defi, srcSub)
+	return defi
+}
+
+func resourceDirUnix(dic *stardict.Dictionary) string {
+	resDir := dic.ResourceDir()
+	if runtime.GOOS != "windows" {
+		return resDir
+	}
+	return "/" + strings.Replace(resDir, `\`, `/`, -1)
+}
+
 func LookupHTML(query string, title bool) []*common.QueryResult {
 	results := []*common.QueryResult{}
 	for _, dic := range dicList {
 		definitions := []string{}
 		for _, res := range dic.SearchAuto(query) {
+			resDir := resourceDirUnix(dic)
 			defi := ""
 			if title {
 				defi = fmt.Sprintf(
@@ -41,7 +93,11 @@ func LookupHTML(query string, title bool) []*common.QueryResult {
 			}
 			for _, item := range res.Items {
 				if item.Type == 'h' {
-					defi += string(item.Data) + "<br/>\n"
+					itemDefi := string(item.Data)
+					if resDir != "" {
+						itemDefi = fixDefiHTML(itemDefi, resDir)
+					}
+					defi += itemDefi + "<br/>\n"
 					continue
 				}
 				defi += fmt.Sprintf(
