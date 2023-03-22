@@ -5,6 +5,7 @@ import (
 	"html"
 	"os"
 	"path"
+	"time"
 
 	"github.com/ilius/ayandict/pkg/common"
 	stardict "github.com/ilius/go-stardict"
@@ -18,10 +19,12 @@ func Init() {
 		panic(err)
 	}
 	dicDir := path.Join(homeDir, ".stardict", "dic")
+	t := time.Now()
 	dicList, err = stardict.Open(dicDir)
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println("Loading dictionaries took", time.Now().Sub(t))
 }
 
 func LookupHTML(query string, title bool) []*common.QueryResult {
