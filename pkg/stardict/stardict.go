@@ -1,17 +1,21 @@
 package stardict
 
 import (
+	"bytes"
 	"fmt"
-	"html"
+	std_html "html"
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ilius/ayandict/pkg/common"
 	stardict "github.com/ilius/go-stardict"
+	"golang.org/x/net/html"
 )
 
 var dicList []*stardict.Dictionary
@@ -19,6 +23,8 @@ var dicList []*stardict.Dictionary
 var (
 	srcRE       = regexp.MustCompile(` src="[^<>"]*?"`)
 	hrefSoundRE = regexp.MustCompile(` href="sound://[^<>"]*?"`)
+	audioRE     = regexp.MustCompile(`<audio[ >].*?</audio>`)
+	sourceRE    = regexp.MustCompile(`<source [^<>]*?>`)
 )
 
 func Init() {
@@ -63,16 +69,79 @@ func fixSoundURL(quoted string, resURL string) (bool, string) {
 
 func fixHrefSound(defi string, resURL string) string {
 	subFunc := func(match string) string {
-		fmt.Println("hrefSoundSub: match:", match)
+		// fmt.Println("hrefSoundSub: match:", match)
 		ok, _url := fixSoundURL(match[6:], resURL)
 		if !ok {
 			return match
 		}
 		newStr := " href=" + strconv.Quote(_url)
-		fmt.Println("hrefSoundSub:", newStr)
+		// fmt.Println("hrefSoundSub:", newStr)
 		return newStr
 	}
 	return hrefSoundRE.ReplaceAllStringFunc(defi, subFunc)
+}
+
+func findParsedTags(node *html.Node, tagName string) []*html.Node {
+	result := []*html.Node{}
+
+	var recurse func(argNode *html.Node)
+
+	recurse = func(argNode *html.Node) {
+		if argNode.Data == tagName {
+			result = append(result, argNode)
+			return
+		}
+		child := argNode.FirstChild
+		for child != nil {
+			recurse(child)
+			child = child.NextSibling
+		}
+	}
+
+	recurse(node)
+	return result
+}
+
+func getAttr(node *html.Node, attrName string) string {
+	for _, attr := range node.Attr {
+		if attr.Key == attrName {
+			return attr.Val
+		}
+	}
+	return ""
+}
+
+func fixAudioTag(defi string, resURL string) string {
+	// fix <audio ...><source src="..."></audio>
+	// value for src= is already fixed
+	// just need to replace `<source ...>` with `<a ...>Audio</a>`
+	// and remove <audio ...> and </audio>
+	// but I decided to use an html parsing library
+	// I only found golang.org/x/net/html
+	// which always starts from <html><body>...
+	// so I had to resursivly find all <source> tags
+	// and the extract src attributes
+	// there might be multiple <source> tags, with mp3, ogg etc
+	// but QMediaPlayer does not play ogg for me
+	subFunc := func(match string) string {
+		root, err := html.Parse(bytes.NewBufferString(match))
+		if err != nil {
+			return match
+		}
+		parts := []string{}
+		for _, sourceNode := range findParsedTags(root, "source") {
+			src := getAttr(sourceNode, "src")
+			if src == "" {
+				continue
+			}
+			parts = append(parts, "<a href="+
+				strconv.Quote(std_html.EscapeString(src))+
+				">"+filepath.Base(src)+"</a>")
+		}
+		return strings.Join(parts, ", ")
+	}
+	defi = audioRE.ReplaceAllStringFunc(defi, subFunc)
+	return defi
 }
 
 func fixDefiHTML(defi string, resURL string) string {
@@ -82,11 +151,12 @@ func fixDefiHTML(defi string, resURL string) string {
 			return match
 		}
 		newStr := " src=" + strconv.Quote(_url)
-		fmt.Println("srcSub:", newStr)
+		// fmt.Println("srcSub:", newStr)
 		return newStr
 	}
 	defi = srcRE.ReplaceAllStringFunc(defi, srcSub)
 	defi = fixHrefSound(defi, resURL)
+	defi = fixAudioTag(defi, resURL)
 	return defi
 }
 
@@ -100,7 +170,7 @@ func LookupHTML(query string, title bool) []*common.QueryResult {
 			if title {
 				defi = fmt.Sprintf(
 					"<b>%s</b>\n",
-					html.EscapeString(res.Keyword),
+					std_html.EscapeString(res.Keyword),
 				)
 			}
 			for _, item := range res.Items {
@@ -114,7 +184,7 @@ func LookupHTML(query string, title bool) []*common.QueryResult {
 				}
 				defi += fmt.Sprintf(
 					"<pre>%s</pre>\n<br/>\n",
-					html.EscapeString(string(item.Data)),
+					std_html.EscapeString(string(item.Data)),
 				)
 			}
 			definitions = append(definitions, defi)

@@ -127,11 +127,12 @@ func main() {
 		}
 		path := link.Path(core.QUrl__FullyDecoded)
 		// fmt.Printf("scheme=%#v, host=%#v, path=%#v", link.Scheme(), host, path)
-		if link.Scheme() == "file" {
+		switch link.Scheme() {
+		case "file", "http", "https":
 			// fmt.Printf("host=%#v, ext=%#v", host, ext)
 			switch filepath.Ext(path) {
 			case ".wav", ".mp3", ".ogg":
-				fmt.Println("Playing audio", path)
+				fmt.Println("Playing audio", link.ToString(core.QUrl__None))
 				mediaPlayer.SetMedia(multimedia.NewQMediaContent2(link), nil)
 				mediaPlayer.Play()
 				return
