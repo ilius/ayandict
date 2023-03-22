@@ -58,17 +58,7 @@ func fixSoundURL(quoted string, resURL string) (bool, string) {
 		fmt.Println(err)
 		return false, ""
 	}
-	_url, err := url.Parse(urlStr)
-	if err != nil {
-		fmt.Println(err)
-		return false, ""
-	}
-	switch _url.Scheme {
-	case "", "sound":
-	default:
-		return false, ""
-	}
-	return true, resURL + "/" + _url.Host + "/" + _url.Path
+	return true, resURL + "/" + urlStr[len("sound://"):]
 }
 
 func fixDefiHTML(defi string, resURL string) string {
