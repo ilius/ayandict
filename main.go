@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/stardict"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
+	"github.com/therecipe/qt/multimedia"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -99,6 +101,8 @@ func main() {
 	centralWidget.SetLayout(mainLayout)
 	window.SetCentralWidget(centralWidget)
 
+	mediaPlayer := multimedia.NewQMediaPlayer(nil, 0)
+
 	doQuery := func(query string) {
 		onQuery(query, updateWebView, false)
 		entry.SetText(query)
@@ -122,15 +126,17 @@ func main() {
 			return
 		}
 		path := link.Path(core.QUrl__FullyDecoded)
-		fmt.Printf("scheme=%#v, host=%#v, path=%#v", link.Scheme(), host, path)
-		// if path == "" {
-		// 	ext := filepath.Ext(host)
-		// 	// fmt.Printf("host=%#v, ext=%#v", host, ext)
-		// 	switch ext {
-		// 	case ".wav", ".mp3", ".ogg":
-
-		// 	}
-		// }
+		// fmt.Printf("scheme=%#v, host=%#v, path=%#v", link.Scheme(), host, path)
+		if link.Scheme() == "file" {
+			// fmt.Printf("host=%#v, ext=%#v", host, ext)
+			switch filepath.Ext(path) {
+			case ".wav", ".mp3", ".ogg":
+				fmt.Println("Playing audio", path)
+				mediaPlayer.SetMedia(multimedia.NewQMediaContent2(link), nil)
+				mediaPlayer.Play()
+				return
+			}
+		}
 		gui.QDesktopServices_OpenUrl(link)
 	})
 	historyView.ConnectItemClicked(func(item *widgets.QListWidgetItem) {
