@@ -153,15 +153,6 @@ func main() {
 		historyView.Clear()
 	})
 
-	font := gui.NewQFont()
-	if conf.FontFamily != "" {
-		font.SetFamily(conf.FontFamily)
-	}
-	if conf.FontSize > 0 {
-		font.SetPixelSize(conf.FontSize)
-	}
-	app.SetFont(font, "")
-
 	LoadConfig(app)
 	if !conf.HistoryDisable {
 		err := LoadHistory()

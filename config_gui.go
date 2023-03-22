@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/ilius/ayandict/pkg/config"
+	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -25,6 +26,16 @@ func LoadConfig(app *widgets.QApplication) {
 	if conf.Style != currentStyle {
 		LoadUserStyle(app)
 	}
+
+	font := gui.NewQFont()
+	if conf.FontFamily != "" {
+		font.SetFamily(conf.FontFamily)
+	}
+	if conf.FontSize > 0 {
+		font.SetPixelSize(conf.FontSize)
+	}
+	app.SetFont(font, "")
+
 	if conf.HistoryMaxSize > 0 {
 		historyMaxSize = conf.HistoryMaxSize
 	}
