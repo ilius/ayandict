@@ -18,7 +18,10 @@ import (
 
 var dicList []*stardict.Dictionary
 
-var srcRE = regexp.MustCompile(` src="([^<>"]*?)"`)
+var (
+	srcRE       = regexp.MustCompile(` src="[^<>"]*?"`)
+	hrefSoundRE = regexp.MustCompile(` href="sound://[^<>"]*?"`)
+)
 
 func Init() {
 	homeDir, err := os.UserHomeDir()
@@ -54,6 +57,30 @@ func fixResURL(quoted string, resDir string) *url.URL {
 	return _url
 }
 
+func fixSoundURL(quoted string, resDir string) *url.URL {
+	// resDir must be Unix-style
+	urlStr, err := strconv.Unquote(quoted)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	_url, err := url.Parse(urlStr)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	switch _url.Scheme {
+	case "", "sound":
+	default:
+		return nil
+	}
+	_url.Scheme = "file"
+	host := _url.Host
+	_url.Host = ""
+	_url.Path = resDir + "/" + host + "/" + _url.Path
+	return _url
+}
+
 func fixDefiHTML(defi string, resDir string) string {
 	// resDir must be Unix-style
 	srcSub := func(match string) string {
@@ -62,11 +89,22 @@ func fixDefiHTML(defi string, resDir string) string {
 			return match
 		}
 		newStr := " src=" + strconv.Quote(_url.String())
-		fmt.Println(newStr)
+		fmt.Println("srcSub:", newStr)
+		return newStr
+	}
+	hrefSoundSub := func(match string) string {
+		fmt.Println("hrefSoundSub: match:", match)
+		_url := fixSoundURL(match[6:], resDir)
+		if _url == nil {
+			return match
+		}
+		newStr := " href=" + strconv.Quote(strings.TrimRight(_url.String(), "/"))
+		fmt.Println("hrefSoundSub:", newStr)
 		return newStr
 	}
 
 	defi = srcRE.ReplaceAllStringFunc(defi, srcSub)
+	defi = hrefSoundRE.ReplaceAllStringFunc(defi, hrefSoundSub)
 	return defi
 }
 
