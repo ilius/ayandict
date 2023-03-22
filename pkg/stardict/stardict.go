@@ -7,9 +7,7 @@ import (
 	"os"
 	"path"
 	"regexp"
-	"runtime"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/ilius/ayandict/pkg/common"
@@ -37,68 +35,59 @@ func Init() {
 	fmt.Println("Loading dictionaries took", time.Now().Sub(t))
 }
 
-func fixResURL(quoted string, resDir string) *url.URL {
-	// resDir must be Unix-style
+func fixResURL(quoted string, resURL string) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
 		fmt.Println(err)
-		return nil
+		return false, ""
 	}
 	_url, err := url.Parse(urlStr)
 	if err != nil {
 		fmt.Println(err)
-		return nil
+		return false, ""
 	}
 	if _url.Scheme != "" || _url.Host != "" {
-		return nil
+		return false, ""
 	}
-	_url.Scheme = "file"
-	_url.Path = resDir + "/" + _url.Path
-	return _url
+	return true, resURL + "/" + _url.Path
 }
 
-func fixSoundURL(quoted string, resDir string) *url.URL {
-	// resDir must be Unix-style
+func fixSoundURL(quoted string, resURL string) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
 		fmt.Println(err)
-		return nil
+		return false, ""
 	}
 	_url, err := url.Parse(urlStr)
 	if err != nil {
 		fmt.Println(err)
-		return nil
+		return false, ""
 	}
 	switch _url.Scheme {
 	case "", "sound":
 	default:
-		return nil
+		return false, ""
 	}
-	_url.Scheme = "file"
-	host := _url.Host
-	_url.Host = ""
-	_url.Path = resDir + "/" + host + "/" + _url.Path
-	return _url
+	return true, resURL + "/" + _url.Host + "/" + _url.Path
 }
 
-func fixDefiHTML(defi string, resDir string) string {
-	// resDir must be Unix-style
+func fixDefiHTML(defi string, resURL string) string {
 	srcSub := func(match string) string {
-		_url := fixResURL(match[5:], resDir)
-		if _url == nil {
+		ok, _url := fixResURL(match[5:], resURL)
+		if !ok {
 			return match
 		}
-		newStr := " src=" + strconv.Quote(_url.String())
+		newStr := " src=" + strconv.Quote(_url)
 		fmt.Println("srcSub:", newStr)
 		return newStr
 	}
 	hrefSoundSub := func(match string) string {
 		fmt.Println("hrefSoundSub: match:", match)
-		_url := fixSoundURL(match[6:], resDir)
-		if _url == nil {
+		ok, _url := fixSoundURL(match[6:], resURL)
+		if !ok {
 			return match
 		}
-		newStr := " href=" + strconv.Quote(strings.TrimRight(_url.String(), "/"))
+		newStr := " href=" + strconv.Quote(_url)
 		fmt.Println("hrefSoundSub:", newStr)
 		return newStr
 	}
@@ -108,20 +97,12 @@ func fixDefiHTML(defi string, resDir string) string {
 	return defi
 }
 
-func resourceDirUnix(dic *stardict.Dictionary) string {
-	resDir := dic.ResourceDir()
-	if runtime.GOOS != "windows" {
-		return resDir
-	}
-	return "/" + strings.Replace(resDir, `\`, `/`, -1)
-}
-
 func LookupHTML(query string, title bool) []*common.QueryResult {
 	results := []*common.QueryResult{}
 	for _, dic := range dicList {
 		definitions := []string{}
 		for _, res := range dic.SearchAuto(query) {
-			resDir := resourceDirUnix(dic)
+			resURL := dic.ResourceURL()
 			defi := ""
 			if title {
 				defi = fmt.Sprintf(
@@ -132,8 +113,8 @@ func LookupHTML(query string, title bool) []*common.QueryResult {
 			for _, item := range res.Items {
 				if item.Type == 'h' {
 					itemDefi := string(item.Data)
-					if resDir != "" {
-						itemDefi = fixDefiHTML(itemDefi, resDir)
+					if resURL != "" {
+						itemDefi = fixDefiHTML(itemDefi, resURL)
 					}
 					defi += itemDefi + "<br/>\n"
 					continue
