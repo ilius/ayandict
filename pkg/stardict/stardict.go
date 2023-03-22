@@ -61,6 +61,20 @@ func fixSoundURL(quoted string, resURL string) (bool, string) {
 	return true, resURL + "/" + urlStr[len("sound://"):]
 }
 
+func fixHrefSound(defi string, resURL string) string {
+	subFunc := func(match string) string {
+		fmt.Println("hrefSoundSub: match:", match)
+		ok, _url := fixSoundURL(match[6:], resURL)
+		if !ok {
+			return match
+		}
+		newStr := " href=" + strconv.Quote(_url)
+		fmt.Println("hrefSoundSub:", newStr)
+		return newStr
+	}
+	return hrefSoundRE.ReplaceAllStringFunc(defi, subFunc)
+}
+
 func fixDefiHTML(defi string, resURL string) string {
 	srcSub := func(match string) string {
 		ok, _url := fixResURL(match[5:], resURL)
@@ -71,19 +85,8 @@ func fixDefiHTML(defi string, resURL string) string {
 		fmt.Println("srcSub:", newStr)
 		return newStr
 	}
-	hrefSoundSub := func(match string) string {
-		fmt.Println("hrefSoundSub: match:", match)
-		ok, _url := fixSoundURL(match[6:], resURL)
-		if !ok {
-			return match
-		}
-		newStr := " href=" + strconv.Quote(_url)
-		fmt.Println("hrefSoundSub:", newStr)
-		return newStr
-	}
-
 	defi = srcRE.ReplaceAllStringFunc(defi, srcSub)
-	defi = hrefSoundRE.ReplaceAllStringFunc(defi, hrefSoundSub)
+	defi = fixHrefSound(defi, resURL)
 	return defi
 }
 
