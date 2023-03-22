@@ -14,7 +14,7 @@ func onQuery(
 	isAuto bool,
 ) {
 	fmt.Printf("Query: %s\n", query)
-	results := stardict.LookupHTML(query, false)
+	results := stardict.LookupHTML(query, false, conf)
 	if len(results) == 0 {
 		if !isAuto {
 			setHtml(fmt.Sprintf("No results for %#v", query))

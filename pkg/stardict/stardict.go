@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/ilius/ayandict/pkg/common"
+	"github.com/ilius/ayandict/pkg/config"
 	stardict "github.com/ilius/go-stardict"
 	"golang.org/x/net/html"
 )
@@ -144,7 +145,7 @@ func fixAudioTag(defi string, resURL string) string {
 	return defi
 }
 
-func fixDefiHTML(defi string, resURL string) string {
+func fixFileSrc(defi string, resURL string) string {
 	srcSub := func(match string) string {
 		ok, _url := fixResURL(match[5:], resURL)
 		if !ok {
@@ -154,13 +155,21 @@ func fixDefiHTML(defi string, resURL string) string {
 		// fmt.Println("srcSub:", newStr)
 		return newStr
 	}
-	defi = srcRE.ReplaceAllStringFunc(defi, srcSub)
-	defi = fixHrefSound(defi, resURL)
-	defi = fixAudioTag(defi, resURL)
+	return srcRE.ReplaceAllStringFunc(defi, srcSub)
+}
+
+func fixDefiHTML(defi string, resURL string, conf *config.Config) string {
+	if resURL != "" {
+		defi = fixFileSrc(defi, resURL)
+		defi = fixHrefSound(defi, resURL)
+	}
+	if conf.Audio {
+		defi = fixAudioTag(defi, resURL)
+	}
 	return defi
 }
 
-func LookupHTML(query string, title bool) []*common.QueryResult {
+func LookupHTML(query string, title bool, conf *config.Config) []*common.QueryResult {
 	results := []*common.QueryResult{}
 	for _, dic := range dicList {
 		definitions := []string{}
@@ -176,9 +185,7 @@ func LookupHTML(query string, title bool) []*common.QueryResult {
 			for _, item := range res.Items {
 				if item.Type == 'h' {
 					itemDefi := string(item.Data)
-					if resURL != "" {
-						itemDefi = fixDefiHTML(itemDefi, resURL)
-					}
+					itemDefi = fixDefiHTML(itemDefi, resURL, conf)
 					defi += itemDefi + "<br/>\n"
 					continue
 				}
