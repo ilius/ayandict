@@ -43,9 +43,9 @@ func (d *Dictionary) ResourceURL() string {
 	return d.resURL
 }
 
-func (d *Dictionary) translate(senses [][2]uint64) (items []*Translation) {
+func (d *Dictionary) translate(senses [][2]uint32) (items []*Translation) {
 	for _, sense := range senses {
-		data := d.dict.GetSequence(sense[0], sense[1])
+		data := d.dict.GetSequence(int64(sense[0]), int(sense[1]))
 
 		var transItems []*TranslationItem
 
@@ -57,7 +57,23 @@ func (d *Dictionary) translate(senses [][2]uint64) (items []*Translation) {
 
 		items = append(items, &Translation{Parts: transItems})
 	}
+	return
+}
 
+func (d *Dictionary) translate64(senses [][2]uint64) (items []*Translation) {
+	for _, sense := range senses {
+		data := d.dict.GetSequence(int64(sense[0]), int(sense[1]))
+
+		var transItems []*TranslationItem
+
+		if _, ok := d.info.Options["sametypesequence"]; ok {
+			transItems = d.translateWithSametypesequence(data)
+		} else {
+			transItems = d.translateWithoutSametypesequence(data)
+		}
+
+		items = append(items, &Translation{Parts: transItems})
+	}
 	return
 }
 
@@ -73,17 +89,20 @@ func (d *Dictionary) searchVeryShort(query string) []*SearchResult {
 	}
 	results := []*SearchResult{}
 	for _, term := range terms {
-		senses := d.idx.items[term]
-		if senses == nil {
-			continue
+		if senses := d.idx.items[term]; len(senses) > 0 {
+			result := &SearchResult{Keyword: term}
+			for _, item := range d.translate(senses) {
+				result.Items = append(result.Items, item.Parts...)
+			}
+			results = append(results, result)
 		}
-		result := &SearchResult{
-			Keyword: term,
+		if senses := d.idx.items64[term]; len(senses) > 0 {
+			result := &SearchResult{Keyword: term}
+			for _, item := range d.translate64(senses) {
+				result.Items = append(result.Items, item.Parts...)
+			}
+			results = append(results, result)
 		}
-		for _, item := range d.translate(senses) {
-			result.Items = append(result.Items, item.Parts...)
-		}
-		results = append(results, result)
 	}
 	return results
 }
@@ -118,6 +137,31 @@ func (d *Dictionary) SearchAuto(query string) []*SearchResult {
 		if strings.Contains(keyword, query) {
 			result := &SearchResult{Keyword: keyword}
 			for _, item := range d.translate(senses) {
+				result.Items = append(result.Items, item.Parts...)
+			}
+			results2 = append(results2, result)
+		}
+	}
+	for keyword, senses := range d.idx.items64 {
+		if keyword == query {
+			result := &SearchResult{Keyword: keyword}
+			for _, item := range d.translate64(senses) {
+				result.Items = append(result.Items, item.Parts...)
+			}
+			results0 = append(results0, result)
+			continue
+		}
+		if strings.HasPrefix(keyword, query) {
+			result := &SearchResult{Keyword: keyword}
+			for _, item := range d.translate64(senses) {
+				result.Items = append(result.Items, item.Parts...)
+			}
+			results1 = append(results1, result)
+			continue
+		}
+		if strings.Contains(keyword, query) {
+			result := &SearchResult{Keyword: keyword}
+			for _, item := range d.translate64(senses) {
 				result.Items = append(result.Items, item.Parts...)
 			}
 			results2 = append(results2, result)

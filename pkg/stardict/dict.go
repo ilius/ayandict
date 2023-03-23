@@ -20,8 +20,8 @@ type Dict struct {
 }
 
 // GetSequence returns data at the given offset
-func (d Dict) GetSequence(offset uint64, size uint64) []byte {
-	d.r.Seek(int64(offset), 0)
+func (d Dict) GetSequence(offset int64, size int) []byte {
+	d.r.Seek(offset, 0)
 	p := make([]byte, size)
 	_, err := d.r.Read(p)
 	if err != nil {

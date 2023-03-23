@@ -8,23 +8,38 @@ import (
 
 // Idx implements an in-memory index for a dictionary
 type Idx struct {
-	items map[string][][2]uint64
+	items   map[string][][2]uint32
+	items64 map[string][][2]uint64
 }
 
 // NewIdx initializes idx struct
 func NewIdx(wordCount int) *Idx {
 	idx := new(Idx)
 	if wordCount > 0 {
-		idx.items = make(map[string][][2]uint64, wordCount)
+		idx.items = make(map[string][][2]uint32, wordCount)
 	} else {
-		idx.items = make(map[string][][2]uint64)
+		idx.items = make(map[string][][2]uint32)
+	}
+	return idx
+}
+func NewIdx64(wordCount int) *Idx {
+	idx := new(Idx)
+	if wordCount > 0 {
+		idx.items64 = make(map[string][][2]uint64, wordCount)
+	} else {
+		idx.items64 = make(map[string][][2]uint64)
 	}
 	return idx
 }
 
 // Add adds an item to in-memory index
-func (idx *Idx) Add(item string, offset uint64, size uint64) {
-	idx.items[item] = append(idx.items[item], [2]uint64{offset, size})
+func (idx *Idx) Add(item string, offset uint32, size uint32) {
+	idx.items[item] = append(idx.items[item], [2]uint32{offset, size})
+}
+
+// Add adds an item to in-memory index
+func (idx *Idx) Add64(item string, offset uint64, size uint64) {
+	idx.items64[item] = append(idx.items64[item], [2]uint64{offset, size})
 }
 
 // ReadIndex reads dictionary index into a memory and returns in-memory index structure
@@ -45,7 +60,11 @@ func ReadIndex(filename string, info *Info) (idx *Idx, err error) {
 		wordCount = int(n)
 	}
 
-	idx = NewIdx(wordCount)
+	if info.Is64 {
+		idx = NewIdx64(wordCount)
+	} else {
+		idx = NewIdx(wordCount)
+	}
 
 	var a [255]byte // temporary buffer
 	var aIdx int
@@ -102,7 +121,11 @@ func ReadIndex(filename string, info *Info) (idx *Idx, err error) {
 					expect = 0
 
 					// finished with one record
-					idx.Add(dataStr, dataOffset, dataSize)
+					if info.Is64 {
+						idx.Add64(dataStr, dataOffset, dataSize)
+					} else {
+						idx.Add(dataStr, uint32(dataOffset), uint32(dataSize))
+					}
 
 					continue
 				}
