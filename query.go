@@ -16,7 +16,7 @@ func onQuery(
 ) {
 	fmt.Printf("Query: %s\n", query)
 	t := time.Now()
-	results := stardict.LookupHTML(query, true, conf)
+	results := stardict.LookupHTML(query, conf)
 	fmt.Println("LookupHTML took", time.Now().Sub(t))
 	if len(results) == 0 {
 		if !isAuto {
@@ -27,10 +27,15 @@ func onQuery(
 	addHistory(query)
 	parts := []string{}
 	for _, res := range results {
-		parts = append(parts, fmt.Sprintf(
-			"<h4>Dictionary: %s</h4>\n",
-			html.EscapeString(res.DictName),
-		))
+		header := conf.DictHeaderTag
+		if header != "" {
+			parts = append(parts, fmt.Sprintf(
+				"<%s>Dictionary: %s</%s>\n",
+				header,
+				html.EscapeString(res.DictName),
+				header,
+			))
+		}
 		parts = append(parts, res.Definitions...)
 	}
 	htmlStr := strings.Join(parts, "\n<br/>\n")

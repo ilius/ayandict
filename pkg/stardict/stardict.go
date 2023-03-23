@@ -168,17 +168,20 @@ func fixDefiHTML(defi string, resURL string, conf *config.Config) string {
 	return defi
 }
 
-func LookupHTML(query string, title bool, conf *config.Config) []*common.QueryResult {
+func LookupHTML(query string, conf *config.Config) []*common.QueryResult {
 	results := []*common.QueryResult{}
 	for _, dic := range dicList {
 		definitions := []string{}
 		for _, res := range dic.SearchAuto(query) {
 			resURL := dic.ResourceURL()
 			defi := ""
-			if title {
+			header := conf.WordHeaderTag
+			if header != "" {
 				defi = fmt.Sprintf(
-					"<b>%s</b>\n",
+					"<%s>%s</%s>\n",
+					header,
 					std_html.EscapeString(res.Keyword),
+					header,
 				)
 			}
 			for _, item := range res.Items {
