@@ -8,4 +8,4 @@ require (
 	golang.org/x/net v0.8.0
 )
 
-require github.com/gopherjs/gopherjs v0.0.0-20190411002643-bd77b112433e // indirect
+require github.com/gopherjs/gopherjs v1.17.2 // indirect
