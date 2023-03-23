@@ -101,25 +101,18 @@ func (d *Dictionary) SearchAuto(query string) []*SearchResult {
 	if len(query) < 2 {
 		return d.searchVeryShort(query)
 	}
+	results0 := []*SearchResult{}
 	results1 := []*SearchResult{}
 	results2 := []*SearchResult{}
-	exactSenses, found := d.idx.items[query]
-	if found {
-		result := &SearchResult{
-			Keyword: query,
-		}
-		for _, item := range d.translate(exactSenses) {
-			result.Items = append(result.Items, item.Parts...)
-		}
-		results1 = append(results1, result)
-	}
+	// lquery := strings.ToLower(query)
 	for keyword, senses := range d.idx.items {
+		// lkeyword := strings.ToLower(keyword)
+		// exact := lkeyword == lquery
+		// prefix := strings.HasPrefix(lkeyword, lquery)
+		// contains := strings.Contains(lkeyword, lquery)
+		exact := keyword == query
 		prefix := strings.HasPrefix(keyword, query)
-		contains := strings.Contains(keyword, query)
-		if !(prefix || contains) {
-			continue
-		}
-		if keyword == query {
+		if !(exact || prefix || strings.Contains(keyword, query)) {
 			continue
 		}
 		result := &SearchResult{
@@ -128,13 +121,16 @@ func (d *Dictionary) SearchAuto(query string) []*SearchResult {
 		for _, item := range d.translate(senses) {
 			result.Items = append(result.Items, item.Parts...)
 		}
-		if prefix {
+		if exact {
+			results0 = append(results0, result)
+		} else if prefix {
 			results1 = append(results1, result)
 		} else {
 			results2 = append(results2, result)
 		}
 	}
-	return append(results1, results2...)
+	results := append(results0, results1...)
+	return append(results, results2...)
 }
 
 func (d *Dictionary) translateWithSametypesequence(data []byte) (items []*TranslationItem) {
