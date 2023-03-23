@@ -3,6 +3,7 @@ package stardict
 import (
 	"encoding/binary"
 	"io/ioutil"
+	"strconv"
 )
 
 // Sense has information belonging to single item position in dictionary
@@ -14,9 +15,13 @@ type Idx struct {
 }
 
 // NewIdx initializes idx struct
-func NewIdx() *Idx {
+func NewIdx(wordCount int) *Idx {
 	idx := new(Idx)
-	idx.items = make(map[string][]Sense)
+	if wordCount > 0 {
+		idx.items = make(map[string][]Sense, wordCount)
+	} else {
+		idx.items = make(map[string][]Sense)
+	}
 	return idx
 }
 
@@ -38,7 +43,17 @@ func ReadIndex(filename string, info *Info) (idx *Idx, err error) {
 		return
 	}
 
-	idx = NewIdx()
+	wordCount := 0
+	wordCountStr := info.Options["wordcount"]
+	if wordCountStr != "" {
+		n, err := strconv.ParseInt(wordCountStr, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		wordCount = int(n)
+	}
+
+	idx = NewIdx(wordCount)
 
 	var a [255]byte // temporary buffer
 	var aIdx int
