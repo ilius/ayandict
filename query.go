@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html"
 	"strings"
+	"time"
 
 	"github.com/ilius/ayandict/pkg/stardict"
 )
@@ -14,7 +15,9 @@ func onQuery(
 	isAuto bool,
 ) {
 	fmt.Printf("Query: %s\n", query)
-	results := stardict.LookupHTML(query, false, conf)
+	t := time.Now()
+	results := stardict.LookupHTML(query, true, conf)
+	fmt.Println("LookupHTML took", time.Now().Sub(t))
 	if len(results) == 0 {
 		if !isAuto {
 			setHtml(fmt.Sprintf("No results for %#v", query))

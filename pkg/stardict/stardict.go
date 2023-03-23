@@ -15,11 +15,10 @@ import (
 
 	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/config"
-	stardict "github.com/ilius/go-stardict"
 	"golang.org/x/net/html"
 )
 
-var dicList []*stardict.Dictionary
+var dicList []*Dictionary
 
 var (
 	srcRE       = regexp.MustCompile(` src="[^<>"]*?"`)
@@ -35,7 +34,7 @@ func Init() {
 	}
 	dicDir := path.Join(homeDir, ".stardict", "dic")
 	t := time.Now()
-	dicList, err = stardict.Open(dicDir)
+	dicList, err = Open(dicDir)
 	if err != nil {
 		panic(err)
 	}
