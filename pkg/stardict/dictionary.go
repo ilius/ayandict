@@ -98,28 +98,28 @@ func (d *Dictionary) SearchAuto(query string) []*SearchResult {
 	results0 := []*SearchResult{}
 	results1 := []*SearchResult{}
 	results2 := []*SearchResult{}
-	// lquery := strings.ToLower(query)
 	for keyword, senses := range d.idx.items {
-		// lkeyword := strings.ToLower(keyword)
-		// exact := lkeyword == lquery
-		// prefix := strings.HasPrefix(lkeyword, lquery)
-		// contains := strings.Contains(lkeyword, lquery)
-		exact := keyword == query
-		prefix := strings.HasPrefix(keyword, query)
-		if !(exact || prefix || strings.Contains(keyword, query)) {
+		if keyword == query {
+			result := &SearchResult{Keyword: keyword}
+			for _, item := range d.translate(senses) {
+				result.Items = append(result.Items, item.Parts...)
+			}
+			results0 = append(results0, result)
 			continue
 		}
-		result := &SearchResult{
-			Keyword: keyword,
-		}
-		for _, item := range d.translate(senses) {
-			result.Items = append(result.Items, item.Parts...)
-		}
-		if exact {
-			results0 = append(results0, result)
-		} else if prefix {
+		if strings.HasPrefix(keyword, query) {
+			result := &SearchResult{Keyword: keyword}
+			for _, item := range d.translate(senses) {
+				result.Items = append(result.Items, item.Parts...)
+			}
 			results1 = append(results1, result)
-		} else {
+			continue
+		}
+		if strings.Contains(keyword, query) {
+			result := &SearchResult{Keyword: keyword}
+			for _, item := range d.translate(senses) {
+				result.Items = append(result.Items, item.Parts...)
+			}
 			results2 = append(results2, result)
 		}
 	}
