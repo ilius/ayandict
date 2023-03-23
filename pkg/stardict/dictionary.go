@@ -67,42 +67,6 @@ func (d *Dictionary) translate(senses []Sense) (items []*Translation) {
 	return
 }
 
-// SearchContains: search all translations for keywords that contain the query
-func (d *Dictionary) SearchContains(query string) []*SearchResult {
-	results := []*SearchResult{}
-	for keyword, senses := range d.idx.items {
-		if !strings.Contains(keyword, query) {
-			continue
-		}
-		result := &SearchResult{
-			Keyword: keyword,
-		}
-		for _, item := range d.translate(senses) {
-			result.Items = append(result.Items, item.Parts...)
-		}
-		results = append(results, result)
-	}
-	return results
-}
-
-// SearchPrefix: search all translations for keywords that start with query
-func (d *Dictionary) SearchPrefix(query string) []*SearchResult {
-	results := []*SearchResult{}
-	for keyword, senses := range d.idx.items {
-		if !strings.HasPrefix(keyword, query) {
-			continue
-		}
-		result := &SearchResult{
-			Keyword: keyword,
-		}
-		for _, item := range d.translate(senses) {
-			result.Items = append(result.Items, item.Parts...)
-		}
-		results = append(results, result)
-	}
-	return results
-}
-
 func (d *Dictionary) searchVeryShort(query string) []*SearchResult {
 	terms := []string{query}
 	queryLower := strings.ToLower(query)
