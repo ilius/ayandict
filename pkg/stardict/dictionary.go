@@ -216,12 +216,6 @@ func (d *Dictionary) GetWordCount() uint64 {
 	return num
 }
 
-func (d *Dictionary) IterKeywords(f func(string)) {
-	for keyword := range d.idx.items {
-		f(keyword)
-	}
-}
-
 // NewDictionary returns a new Dictionary
 // path - path to dictionary files
 // name - name of dictionary to parse
