@@ -6,6 +6,30 @@ import (
 	"strconv"
 )
 
+type Senses interface {
+	Word() string
+	Next() (bool, uint64, uint64)
+}
+
+type Senses64 struct {
+	word  string
+	index int
+	items [][2]uint64
+}
+
+func (ss *Senses64) Word() string {
+	return ss.word
+}
+
+func (ss *Senses64) Next() (bool, uint64, uint64) {
+	if ss.index >= len(ss.items) {
+		return false, 0, 0
+	}
+	item := ss.items[ss.index]
+	ss.index += 1
+	return true, item[0], item[1]
+}
+
 // Idx implements an in-memory index for a dictionary
 type Idx struct {
 	items map[string][][2]uint64
@@ -20,6 +44,22 @@ func NewIdx(wordCount int) *Idx {
 		idx.items = make(map[string][][2]uint64)
 	}
 	return idx
+}
+
+func (idx *Idx) Get(word string) Senses {
+	return &Senses64{
+		word:  word,
+		items: idx.items[word],
+	}
+}
+
+func (idx *Idx) ForEach(run func(Senses)) {
+	for word, rawSenses := range idx.items {
+		run(&Senses64{
+			word:  word,
+			items: rawSenses,
+		})
+	}
 }
 
 // Add adds an item to in-memory index

@@ -43,13 +43,17 @@ func (d *Dictionary) ResourceURL() string {
 	return d.resURL
 }
 
-func (d *Dictionary) translate(senses [][2]uint64) (items []*Translation) {
-	for _, sense := range senses {
-		data := d.dict.GetSequence(sense[0], sense[1])
+func (d *Dictionary) translate(senses Senses) (items []*Translation) {
+	for {
+		_ok, offset, size := senses.Next()
+		if !_ok {
+			break
+		}
+		data := d.dict.GetSequence(offset, size)
 
 		var transItems []*TranslationItem
 
-		if _, ok := d.info.Options["sametypesequence"]; ok {
+		if _, found := d.info.Options["sametypesequence"]; found {
 			transItems = d.translateWithSametypesequence(data)
 		} else {
 			transItems = d.translateWithoutSametypesequence(data)
@@ -73,7 +77,7 @@ func (d *Dictionary) searchVeryShort(query string) []*SearchResult {
 	}
 	results := []*SearchResult{}
 	for _, term := range terms {
-		senses := d.idx.items[term]
+		senses := d.idx.Get(term)
 		if senses == nil {
 			continue
 		}
@@ -99,7 +103,8 @@ func (d *Dictionary) SearchAuto(query string) []*SearchResult {
 	results1 := []*SearchResult{}
 	results2 := []*SearchResult{}
 	// lquery := strings.ToLower(query)
-	for keyword, senses := range d.idx.items {
+	d.idx.ForEach(func(senses Senses) {
+		keyword := senses.Word()
 		// lkeyword := strings.ToLower(keyword)
 		// exact := lkeyword == lquery
 		// prefix := strings.HasPrefix(lkeyword, lquery)
@@ -107,7 +112,7 @@ func (d *Dictionary) SearchAuto(query string) []*SearchResult {
 		exact := keyword == query
 		prefix := strings.HasPrefix(keyword, query)
 		if !(exact || prefix || strings.Contains(keyword, query)) {
-			continue
+			return
 		}
 		result := &SearchResult{
 			Keyword: keyword,
@@ -122,7 +127,7 @@ func (d *Dictionary) SearchAuto(query string) []*SearchResult {
 		} else {
 			results2 = append(results2, result)
 		}
-	}
+	})
 	results := append(results0, results1...)
 	return append(results, results2...)
 }
