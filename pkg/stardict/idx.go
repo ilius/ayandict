@@ -30,11 +30,6 @@ func (idx *Idx) Add(item string, offset uint64, size uint64) {
 	idx.items[item] = append(idx.items[item], Sense{offset, size})
 }
 
-// Get gets all translations for an item
-func (idx Idx) Get(item string) []Sense {
-	return idx.items[item]
-}
-
 // ReadIndex reads dictionary index into a memory and returns in-memory index structure
 func ReadIndex(filename string, info *Info) (idx *Idx, err error) {
 	data, err := ioutil.ReadFile(filename)

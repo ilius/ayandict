@@ -43,12 +43,6 @@ func (d *Dictionary) ResourceURL() string {
 	return d.resURL
 }
 
-// Translate translates given item
-func (d *Dictionary) Translate(item string) (items []*Translation) {
-	senses := d.idx.Get(item)
-	return d.translate(senses)
-}
-
 func (d *Dictionary) translate(senses []Sense) (items []*Translation) {
 	for _, sense := range senses {
 		data := d.dict.GetSequence(sense[0], sense[1])
@@ -79,7 +73,7 @@ func (d *Dictionary) searchVeryShort(query string) []*SearchResult {
 	}
 	results := []*SearchResult{}
 	for _, term := range terms {
-		senses := d.idx.Get(term)
+		senses := d.idx.items[term]
 		if senses == nil {
 			continue
 		}
