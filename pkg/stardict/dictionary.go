@@ -43,7 +43,7 @@ func (d *Dictionary) ResourceURL() string {
 	return d.resURL
 }
 
-func (d *Dictionary) translate(senses []Sense) (items []*Translation) {
+func (d *Dictionary) translate(senses [][2]uint64) (items []*Translation) {
 	for _, sense := range senses {
 		data := d.dict.GetSequence(sense[0], sense[1])
 
