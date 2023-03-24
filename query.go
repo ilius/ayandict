@@ -31,12 +31,16 @@ func onQuery(
 		if header == "" {
 			header = "b"
 		}
+		term := html.EscapeString(res.Term)
+		if conf.ShowScore {
+			term += fmt.Sprintf(" [%%%d]", int(res.Score*100))
+		}
 		// TODO: configure style of res.Term and res.DictName
 		// with <span style=...>
 		parts = append(parts, fmt.Sprintf(
 			"<%s>%s (from %s)</%s>\n",
 			header,
-			html.EscapeString(res.Term),
+			term,
 			html.EscapeString(res.DictName),
 			header,
 		))

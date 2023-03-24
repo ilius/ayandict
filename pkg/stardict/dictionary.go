@@ -55,9 +55,9 @@ func (d *Dictionary) translate(offset uint64, size uint64) (items []*Translation
 	return d.translateWithoutSametypesequence(d.dict.GetSequence(offset, size))
 }
 
-func similarity(target string, test string) float64 {
-	total := float64(len(target) + len(test))
-	return total / (total + float64(levenshtein.ComputeDistance(target, test)))
+func similarity(a string, b string) float64 {
+	length := float64(len(a)+len(b)) / 2
+	return (length - float64(levenshtein.ComputeDistance(a, b))) / length
 }
 
 // Search: first try an exact match
