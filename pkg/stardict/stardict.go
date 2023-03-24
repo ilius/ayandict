@@ -9,6 +9,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -171,45 +172,31 @@ func fixDefiHTML(defi string, resURL string, conf *config.Config) string {
 func LookupHTML(query string, conf *config.Config) []*common.QueryResult {
 	results := []*common.QueryResult{}
 	for _, dic := range dicList {
-		definitions := []string{}
 		for _, res := range dic.Search(query) {
+			definitions := []string{}
 			resURL := dic.ResourceURL()
-			defi := ""
-			tag := conf.TermHeaderTag
-			if tag != "" {
-				title := std_html.EscapeString(res.Term)
-				if conf.ShowScore {
-					title += fmt.Sprintf(" (%.2f)", res.Score)
-				}
-				defi = fmt.Sprintf(
-					"<%s>%s</%s>\n",
-					tag,
-					title,
-					tag,
-				)
-			}
 			for _, item := range res.Items {
 				if item.Type == 'h' {
 					itemDefi := string(item.Data)
 					itemDefi = fixDefiHTML(itemDefi, resURL, conf)
-					defi += itemDefi + "<br/>\n"
+					definitions = append(definitions, itemDefi+"<br/>\n")
 					continue
 				}
-				defi += fmt.Sprintf(
+				definitions = append(definitions, fmt.Sprintf(
 					"<pre>%s</pre>\n<br/>\n",
 					std_html.EscapeString(string(item.Data)),
-				)
+				))
 			}
-			definitions = append(definitions, defi)
+			results = append(results, &common.QueryResult{
+				Score:       res.Score,
+				Term:        res.Term,
+				DictName:    dic.BookName(),
+				Definitions: definitions,
+			})
 		}
-		fmt.Printf("%d results from %s\n", len(definitions), dic.BookName())
-		if len(definitions) == 0 {
-			continue
-		}
-		results = append(results, &common.QueryResult{
-			DictName:    dic.BookName(),
-			Definitions: definitions,
-		})
 	}
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Score > results[j].Score
+	})
 	return results
 }

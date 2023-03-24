@@ -27,15 +27,19 @@ func onQuery(
 	addHistory(query)
 	parts := []string{}
 	for _, res := range results {
-		header := conf.DictHeaderTag
-		if header != "" {
-			parts = append(parts, fmt.Sprintf(
-				"<%s>Dictionary: %s</%s>\n",
-				header,
-				html.EscapeString(res.DictName),
-				header,
-			))
+		header := conf.HeaderTag
+		if header == "" {
+			header = "b"
 		}
+		// TODO: configure style of res.Term and res.DictName
+		// with <span style=...>
+		parts = append(parts, fmt.Sprintf(
+			"<%s>%s (from %s)</%s>\n",
+			header,
+			html.EscapeString(res.Term),
+			html.EscapeString(res.DictName),
+			header,
+		))
 		parts = append(parts, res.Definitions...)
 	}
 	htmlStr := strings.Join(parts, "\n<br/>\n")
