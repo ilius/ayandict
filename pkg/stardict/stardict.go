@@ -175,13 +175,17 @@ func LookupHTML(query string, conf *config.Config) []*common.QueryResult {
 		for _, res := range dic.Search(query) {
 			resURL := dic.ResourceURL()
 			defi := ""
-			header := conf.TermHeaderTag
-			if header != "" {
+			tag := conf.TermHeaderTag
+			if tag != "" {
+				title := std_html.EscapeString(res.Term)
+				if conf.ShowScore {
+					title += fmt.Sprintf(" (%.2f)", res.Score)
+				}
 				defi = fmt.Sprintf(
 					"<%s>%s</%s>\n",
-					header,
-					std_html.EscapeString(res.Term),
-					header,
+					tag,
+					title,
+					tag,
 				)
 			}
 			for _, item := range res.Items {

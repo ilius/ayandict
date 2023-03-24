@@ -36,6 +36,8 @@ type Config struct {
 	HistoryMaxSize  int  `toml:"history_max_size"`
 
 	Audio bool `toml:"audio"`
+
+	ShowScore bool `toml:"show_score"`
 }
 
 func Default() *Config {
@@ -55,6 +57,8 @@ func Default() *Config {
 		HistoryMaxSize:  100,
 
 		Audio: true,
+
+		ShowScore: false,
 	}
 }
 
