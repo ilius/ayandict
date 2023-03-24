@@ -21,8 +21,8 @@ type TranslationItem struct {
 }
 
 type SearchResult struct {
-	Keyword string
-	Items   []*TranslationItem
+	Term  string
+	Items []*TranslationItem
 }
 
 // Dictionary stardict dictionary
@@ -43,7 +43,7 @@ func (d *Dictionary) ResourceURL() string {
 	return d.resURL
 }
 
-func (d *Dictionary) translate(senses [][2]uint64) (items []*Translation) {
+func (d *Dictionary) translate(senses [][2]uint64) (items []*TranslationItem) {
 	for _, sense := range senses {
 		data := d.dict.GetSequence(sense[0], sense[1])
 
@@ -55,7 +55,7 @@ func (d *Dictionary) translate(senses [][2]uint64) (items []*Translation) {
 			transItems = d.translateWithoutSametypesequence(data)
 		}
 
-		items = append(items, &Translation{Parts: transItems})
+		items = append(items, transItems...)
 	}
 
 	return
@@ -73,23 +73,20 @@ func (d *Dictionary) searchVeryShort(query string) []*SearchResult {
 	}
 	results := []*SearchResult{}
 	for _, term := range terms {
-		senses := d.idx.items[term]
+		senses := d.idx.terms[term]
 		if senses == nil {
 			continue
 		}
-		result := &SearchResult{
-			Keyword: term,
-		}
-		for _, item := range d.translate(senses) {
-			result.Items = append(result.Items, item.Parts...)
-		}
-		results = append(results, result)
+		results = append(results, &SearchResult{
+			Term:  term,
+			Items: d.translate(senses),
+		})
 	}
 	return results
 }
 
 // SearchAuto: first try an exact match
-// then search all translations for keywords that contain the query
+// then search all translations for terms that contain the query
 // but sort the one that have it as prefix first
 func (d *Dictionary) SearchAuto(query string) []*SearchResult {
 	if len(query) < 2 {
@@ -98,29 +95,26 @@ func (d *Dictionary) SearchAuto(query string) []*SearchResult {
 	results0 := []*SearchResult{}
 	results1 := []*SearchResult{}
 	results2 := []*SearchResult{}
-	for keyword, senses := range d.idx.items {
-		if keyword == query {
-			result := &SearchResult{Keyword: keyword}
-			for _, item := range d.translate(senses) {
-				result.Items = append(result.Items, item.Parts...)
-			}
-			results0 = append(results0, result)
+	for term, senses := range d.idx.terms {
+		if term == query {
+			results0 = append(results0, &SearchResult{
+				Term:  term,
+				Items: d.translate(senses),
+			})
 			continue
 		}
-		if strings.HasPrefix(keyword, query) {
-			result := &SearchResult{Keyword: keyword}
-			for _, item := range d.translate(senses) {
-				result.Items = append(result.Items, item.Parts...)
-			}
-			results1 = append(results1, result)
+		if strings.HasPrefix(term, query) {
+			results1 = append(results1, &SearchResult{
+				Term:  term,
+				Items: d.translate(senses),
+			})
 			continue
 		}
-		if strings.Contains(keyword, query) {
-			result := &SearchResult{Keyword: keyword}
-			for _, item := range d.translate(senses) {
-				result.Items = append(result.Items, item.Parts...)
-			}
-			results2 = append(results2, result)
+		if strings.Contains(term, query) {
+			results2 = append(results2, &SearchResult{
+				Term:  term,
+				Items: d.translate(senses),
+			})
 		}
 	}
 	results := append(results0, results1...)
@@ -194,13 +188,13 @@ func (d *Dictionary) translateWithoutSametypesequence(data []byte) (items []*Tra
 	return
 }
 
-// GetBookName returns book name
-func (d *Dictionary) GetBookName() string {
+// BookName returns book name
+func (d *Dictionary) BookName() string {
 	return d.info.Options["bookname"]
 }
 
-// GetWordCount returns number of words in the dictionary
-func (d *Dictionary) GetWordCount() uint64 {
+// EntryCount returns number of entries in the dictionary
+func (d *Dictionary) EntryCount() uint64 {
 	num, _ := strconv.ParseUint(d.info.Options["wordcount"], 10, 64)
 
 	return num

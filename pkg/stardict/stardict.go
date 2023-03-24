@@ -180,7 +180,7 @@ func LookupHTML(query string, conf *config.Config) []*common.QueryResult {
 				defi = fmt.Sprintf(
 					"<%s>%s</%s>\n",
 					header,
-					std_html.EscapeString(res.Keyword),
+					std_html.EscapeString(res.Term),
 					header,
 				)
 			}
@@ -198,12 +198,12 @@ func LookupHTML(query string, conf *config.Config) []*common.QueryResult {
 			}
 			definitions = append(definitions, defi)
 		}
-		fmt.Printf("%d results from %s\n", len(definitions), dic.GetBookName())
+		fmt.Printf("%d results from %s\n", len(definitions), dic.BookName())
 		if len(definitions) == 0 {
 			continue
 		}
 		results = append(results, &common.QueryResult{
-			DictName:    dic.GetBookName(),
+			DictName:    dic.BookName(),
 			Definitions: definitions,
 		})
 	}

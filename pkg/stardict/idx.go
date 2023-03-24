@@ -8,23 +8,23 @@ import (
 
 // Idx implements an in-memory index for a dictionary
 type Idx struct {
-	items map[string][][2]uint64
+	terms map[string][][2]uint64
 }
 
 // NewIdx initializes idx struct
-func NewIdx(wordCount int) *Idx {
+func NewIdx(entryCount int) *Idx {
 	idx := new(Idx)
-	if wordCount > 0 {
-		idx.items = make(map[string][][2]uint64, wordCount)
+	if entryCount > 0 {
+		idx.terms = make(map[string][][2]uint64, entryCount)
 	} else {
-		idx.items = make(map[string][][2]uint64)
+		idx.terms = make(map[string][][2]uint64)
 	}
 	return idx
 }
 
 // Add adds an item to in-memory index
-func (idx *Idx) Add(item string, offset uint64, size uint64) {
-	idx.items[item] = append(idx.items[item], [2]uint64{offset, size})
+func (idx *Idx) Add(term string, offset uint64, size uint64) {
+	idx.terms[term] = append(idx.terms[term], [2]uint64{offset, size})
 }
 
 // ReadIndex reads dictionary index into a memory and returns in-memory index structure
@@ -35,17 +35,17 @@ func ReadIndex(filename string, info *Info) (idx *Idx, err error) {
 		return
 	}
 
-	wordCount := 0
-	wordCountStr := info.Options["wordcount"]
-	if wordCountStr != "" {
-		n, err := strconv.ParseInt(wordCountStr, 10, 64)
+	entryCount := 0
+	entryCountStr := info.Options["wordcount"]
+	if entryCountStr != "" {
+		n, err := strconv.ParseInt(entryCountStr, 10, 64)
 		if err != nil {
 			return nil, err
 		}
-		wordCount = int(n)
+		entryCount = int(n)
 	}
 
-	idx = NewIdx(wordCount)
+	idx = NewIdx(entryCount)
 
 	var a [255]byte // temporary buffer
 	var aIdx int
