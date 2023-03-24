@@ -66,7 +66,9 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 	queryWords := strings.Split(query, " ")
 
 	mainWordIndex := 0
-	// we can change this by allowing a query like '* case' to match 'test case' etc
+	if queryWords[0] == "*" {
+		mainWordIndex = 1
+	}
 
 	queryMainWord := queryWords[mainWordIndex]
 	prefix := queryMainWord
