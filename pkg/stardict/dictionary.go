@@ -43,82 +43,83 @@ func (d *Dictionary) ResourceURL() string {
 	return d.resURL
 }
 
-func (d *Dictionary) translate(senses [][2]uint64) (items []*TranslationItem) {
-	for _, sense := range senses {
-		data := d.dict.GetSequence(sense[0], sense[1])
-
-		var transItems []*TranslationItem
-
-		if _, ok := d.info.Options["sametypesequence"]; ok {
-			transItems = d.translateWithSametypesequence(data)
-		} else {
-			transItems = d.translateWithoutSametypesequence(data)
-		}
-
-		items = append(items, transItems...)
+func (d *Dictionary) translate(offset uint64, size uint64) (items []*TranslationItem) {
+	if _, ok := d.info.Options["sametypesequence"]; ok {
+		return d.translateWithSametypesequence(d.dict.GetSequence(offset, size))
 	}
-
-	return
+	return d.translateWithoutSametypesequence(d.dict.GetSequence(offset, size))
 }
 
-func (d *Dictionary) searchVeryShort(query string) []*SearchResult {
-	terms := []string{query}
-	queryLower := strings.ToLower(query)
-	if queryLower != query {
-		terms = append(terms, queryLower)
-	}
-	queryUpper := strings.ToUpper(query)
-	if queryUpper != query {
-		terms = append(terms, queryUpper)
-	}
-	results := []*SearchResult{}
-	for _, term := range terms {
-		senses := d.idx.terms[term]
-		if senses == nil {
-			continue
-		}
-		results = append(results, &SearchResult{
-			Term:  term,
-			Items: d.translate(senses),
-		})
-	}
-	return results
-}
-
-// SearchAuto: first try an exact match
+// Search: first try an exact match
 // then search all translations for terms that contain the query
 // but sort the one that have it as prefix first
-func (d *Dictionary) SearchAuto(query string) []*SearchResult {
-	if len(query) < 2 {
-		return d.searchVeryShort(query)
-	}
+func (d *Dictionary) Search(query string) []*SearchResult {
+	// if len(query) < 2 {
+	// 	return d.searchVeryShort(query)
+	// }
+	idx := d.idx
 	results0 := []*SearchResult{}
 	results1 := []*SearchResult{}
 	results2 := []*SearchResult{}
-	for term, senses := range d.idx.terms {
-		if term == query {
+
+	query = strings.ToLower(strings.TrimSpace(query))
+	queryWords := strings.Split(query, " ")
+
+	mainWordIndex := 0
+	// we can change this by allowing a query like '* case' to match 'test case' etc
+
+	queryMainWord := queryWords[mainWordIndex]
+	prefix := queryMainWord
+	if len(queryMainWord) > 2 {
+		prefix = queryMainWord[:2]
+	}
+Loop:
+	for _, termIndex := range idx.byWordPrefix[prefix] {
+		entry := idx.terms[termIndex]
+		term := strings.ToLower(entry.Term)
+		if query == term {
 			results0 = append(results0, &SearchResult{
 				Term:  term,
-				Items: d.translate(senses),
+				Items: d.translate(entry.Offset, entry.Size),
 			})
 			continue
 		}
-		if strings.HasPrefix(term, query) {
+		termWords := strings.Split(term, " ")
+		if len(termWords) <= mainWordIndex {
+			continue
+		}
+		if queryMainWord == termWords[mainWordIndex] {
 			results1 = append(results1, &SearchResult{
 				Term:  term,
-				Items: d.translate(senses),
+				Items: d.translate(entry.Offset, entry.Size),
 			})
 			continue
 		}
-		if strings.Contains(term, query) {
+		for _, termWord := range termWords {
+			if queryMainWord == termWord {
+				results2 = append(results2, &SearchResult{
+					Term:  term,
+					Items: d.translate(entry.Offset, entry.Size),
+				})
+				continue Loop
+			}
+		}
+		if strings.Contains(termWords[mainWordIndex], queryMainWord) {
 			results2 = append(results2, &SearchResult{
 				Term:  term,
-				Items: d.translate(senses),
+				Items: d.translate(entry.Offset, entry.Size),
 			})
+			continue
 		}
 	}
-	results := append(results0, results1...)
-	return append(results, results2...)
+	results := results0
+	if len(results1) > 0 {
+		results = append(results, results1...)
+	}
+	if len(results2) > 0 {
+		results = append(results, results2...)
+	}
+	return results
 }
 
 func (d *Dictionary) translateWithSametypesequence(data []byte) (items []*TranslationItem) {

@@ -172,7 +172,7 @@ func LookupHTML(query string, conf *config.Config) []*common.QueryResult {
 	results := []*common.QueryResult{}
 	for _, dic := range dicList {
 		definitions := []string{}
-		for _, res := range dic.SearchAuto(query) {
+		for _, res := range dic.Search(query) {
 			resURL := dic.ResourceURL()
 			defi := ""
 			header := conf.TermHeaderTag

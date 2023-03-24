@@ -4,27 +4,51 @@ import (
 	"encoding/binary"
 	"io/ioutil"
 	"strconv"
+	"strings"
 )
+
+type IdxEntry struct {
+	Term   string
+	Offset uint64
+	Size   uint64
+}
 
 // Idx implements an in-memory index for a dictionary
 type Idx struct {
-	terms map[string][][2]uint64
+	terms []IdxEntry
+
+	byWordPrefix map[string][]int
 }
 
 // NewIdx initializes idx struct
 func NewIdx(entryCount int) *Idx {
 	idx := new(Idx)
 	if entryCount > 0 {
-		idx.terms = make(map[string][][2]uint64, entryCount)
+		idx.terms = make([]IdxEntry, entryCount)
 	} else {
-		idx.terms = make(map[string][][2]uint64)
+		idx.terms = []IdxEntry{}
 	}
+	idx.byWordPrefix = map[string][]int{}
 	return idx
 }
 
 // Add adds an item to in-memory index
 func (idx *Idx) Add(term string, offset uint64, size uint64) {
-	idx.terms[term] = append(idx.terms[term], [2]uint64{offset, size})
+	termIndex := len(idx.terms)
+	idx.terms = append(idx.terms, IdxEntry{
+		Term:   term,
+		Offset: offset,
+		Size:   size,
+	})
+	for _, word := range strings.Split(strings.ToLower(term), " ") {
+		var prefix string
+		if len(word) > 2 {
+			prefix = word[:2]
+		} else {
+			prefix = word
+		}
+		idx.byWordPrefix[prefix] = append(idx.byWordPrefix[prefix], termIndex)
+	}
 }
 
 // ReadIndex reads dictionary index into a memory and returns in-memory index structure
