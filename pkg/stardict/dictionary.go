@@ -3,10 +3,14 @@ package stardict
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/agnivade/levenshtein"
 )
 
 // Translation contains translation items
@@ -21,6 +25,7 @@ type TranslationItem struct {
 }
 
 type SearchResult struct {
+	Score float64
 	Term  string
 	Items []*TranslationItem
 }
@@ -50,6 +55,11 @@ func (d *Dictionary) translate(offset uint64, size uint64) (items []*Translation
 	return d.translateWithoutSametypesequence(d.dict.GetSequence(offset, size))
 }
 
+func similarity(target string, test string) float64 {
+	total := float64(len(target) + len(test))
+	return total / (total + float64(levenshtein.ComputeDistance(target, test)))
+}
+
 // Search: first try an exact match
 // then search all translations for terms that contain the query
 // but sort the one that have it as prefix first
@@ -58,9 +68,7 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 	// 	return d.searchVeryShort(query)
 	// }
 	idx := d.idx
-	results0 := []*SearchResult{}
-	results1 := []*SearchResult{}
-	results2 := []*SearchResult{}
+	results := []*SearchResult{}
 
 	query = strings.ToLower(strings.TrimSpace(query))
 	queryWords := strings.Split(query, " ")
@@ -75,51 +83,57 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 	if len(queryMainWord) > 2 {
 		prefix = queryMainWord[:2]
 	}
-Loop:
 	for _, termIndex := range idx.byWordPrefix[prefix] {
 		entry := idx.terms[termIndex]
-		term := strings.ToLower(entry.Term)
+		termOrig := entry.Term
+		term := strings.ToLower(termOrig)
 		if query == term {
-			results0 = append(results0, &SearchResult{
-				Term:  term,
+			results = append(results, &SearchResult{
+				Score: 1,
+				Term:  termOrig,
 				Items: d.translate(entry.Offset, entry.Size),
 			})
 			continue
 		}
-		termWords := strings.Split(term, " ")
-		if len(termWords) <= mainWordIndex {
+		score := similarity(query, term)
+		if score > 0.74 {
+			results = append(results, &SearchResult{
+				Score: score,
+				Term:  termOrig,
+				Items: d.translate(entry.Offset, entry.Size),
+			})
 			continue
 		}
-		for termWordI, termWord := range termWords {
-			if queryMainWord == termWord {
-				if termWordI == mainWordIndex {
-					results1 = append(results1, &SearchResult{
-						Term:  term,
-						Items: d.translate(entry.Offset, entry.Size),
-					})
-				} else {
-					results2 = append(results2, &SearchResult{
-						Term:  term,
-						Items: d.translate(entry.Offset, entry.Size),
-					})
-				}
-				continue Loop
+		if score < 0.33 {
+			continue
+		}
+		words := strings.Split(term, " ")
+		if len(words) <= mainWordIndex {
+			continue
+		}
+		for wordI, word := range words {
+			wordScore := similarity(queryMainWord, word)
+			if wordI == mainWordIndex {
+				wordScore *= 0.95
+			} else {
+				wordScore *= 0.85
 			}
-		}
-		if strings.Contains(termWords[mainWordIndex], queryMainWord) {
-			results2 = append(results2, &SearchResult{
-				Term:  term,
+			if wordScore < 0.7 {
+				continue
+			}
+			results = append(results, &SearchResult{
+				Score: wordScore,
+				Term:  termOrig,
 				Items: d.translate(entry.Offset, entry.Size),
 			})
-			continue
 		}
 	}
-	results := results0
-	if len(results1) > 0 {
-		results = append(results, results1...)
-	}
-	if len(results2) > 0 {
-		results = append(results, results2...)
+	fmt.Printf("len(results) = %d\n", len(results))
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Score > results[j].Score
+	})
+	if len(results) > 20 {
+		results = results[:20]
 	}
 	return results
 }
