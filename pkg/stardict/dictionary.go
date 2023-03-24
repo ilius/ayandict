@@ -128,7 +128,7 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 			})
 		}
 	}
-	fmt.Printf("len(results) = %d\n", len(results))
+	fmt.Printf("Search produced %d results for %#v on %s\n", len(results), query, d.BookName())
 	sort.Slice(results, func(i, j int) bool {
 		return results[i].Score > results[j].Score
 	})
