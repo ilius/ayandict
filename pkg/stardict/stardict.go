@@ -175,7 +175,7 @@ func LookupHTML(query string, conf *config.Config) []*common.QueryResult {
 		for _, res := range dic.SearchAuto(query) {
 			resURL := dic.ResourceURL()
 			defi := ""
-			header := conf.WordHeaderTag
+			header := conf.TermHeaderTag
 			if header != "" {
 				defi = fmt.Sprintf(
 					"<%s>%s</%s>\n",

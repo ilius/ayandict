@@ -29,7 +29,7 @@ type Config struct {
 	SearchOnTypeMinLength int  `toml:"search_on_type_min_length"`
 
 	DictHeaderTag string `toml:"dict_header_tag"`
-	WordHeaderTag string `toml:"word_header_tag"`
+	TermHeaderTag string `toml:"term_header_tag"`
 
 	HistoryDisable  bool `toml:"history_disable"`
 	HistoryAutoSave bool `toml:"history_auto_save"`
@@ -48,7 +48,7 @@ func Default() *Config {
 		SearchOnTypeMinLength: 3,
 
 		DictHeaderTag: "h1",
-		WordHeaderTag: "h2",
+		TermHeaderTag: "h2",
 
 		HistoryDisable:  false,
 		HistoryAutoSave: false,
