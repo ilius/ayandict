@@ -90,19 +90,19 @@ Loop:
 		if len(termWords) <= mainWordIndex {
 			continue
 		}
-		if queryMainWord == termWords[mainWordIndex] {
-			results1 = append(results1, &SearchResult{
-				Term:  term,
-				Items: d.translate(entry.Offset, entry.Size),
-			})
-			continue
-		}
-		for _, termWord := range termWords {
+		for termWordI, termWord := range termWords {
 			if queryMainWord == termWord {
-				results2 = append(results2, &SearchResult{
-					Term:  term,
-					Items: d.translate(entry.Offset, entry.Size),
-				})
+				if termWordI == mainWordIndex {
+					results1 = append(results1, &SearchResult{
+						Term:  term,
+						Items: d.translate(entry.Offset, entry.Size),
+					})
+				} else {
+					results2 = append(results2, &SearchResult{
+						Term:  term,
+						Items: d.translate(entry.Offset, entry.Size),
+					})
+				}
 				continue Loop
 			}
 		}
