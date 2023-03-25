@@ -21,6 +21,7 @@ func onQuery(
 	if len(results) == 0 {
 		if !isAuto {
 			setHtml(fmt.Sprintf("No results for %#v", query))
+			addHistory(query)
 		}
 		return
 	}
