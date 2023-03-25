@@ -56,8 +56,11 @@ func (d *Dictionary) translate(offset uint64, size uint64) (items []*Translation
 }
 
 func similarity(a string, b string) float64 {
-	length := float64(len(a)+len(b)) / 2
-	return (length - float64(levenshtein.ComputeDistance(a, b))) / length
+	n := len(a)
+	if len(b) > n {
+		n = len(b)
+	}
+	return float64(n-levenshtein.ComputeDistance(a, b)) / float64(n)
 }
 
 // Search: first try an exact match
@@ -132,8 +135,11 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 	sort.Slice(results, func(i, j int) bool {
 		return results[i].Score > results[j].Score
 	})
-	if len(results) > 20 {
-		results = results[:20]
+	cutoff := 20
+	if len(results) > cutoff {
+		for ; cutoff < len(results) && results[cutoff].Score > 0.9; cutoff++ {
+		}
+		results = results[:cutoff]
 	}
 	return results
 }
