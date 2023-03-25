@@ -171,8 +171,9 @@ func fixDefiHTML(defi string, resURL string, conf *config.Config) string {
 
 func LookupHTML(query string, conf *config.Config) []*common.QueryResult {
 	results := []*common.QueryResult{}
+	maxResultsPerDict := conf.MaxResultsPerDict
 	for _, dic := range dicList {
-		for _, res := range dic.Search(query) {
+		for _, res := range dic.Search(query, maxResultsPerDict) {
 			definitions := []string{}
 			resURL := dic.ResourceURL()
 			for _, item := range res.Items {
@@ -198,5 +199,9 @@ func LookupHTML(query string, conf *config.Config) []*common.QueryResult {
 	sort.Slice(results, func(i, j int) bool {
 		return results[i].Score > results[j].Score
 	})
+	cutoff := conf.MaxResultsTotal
+	if cutoff > 0 && len(results) > cutoff {
+		results = results[:cutoff]
+	}
 	return results
 }

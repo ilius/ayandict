@@ -34,6 +34,9 @@ type Config struct {
 	HistoryAutoSave bool `toml:"history_auto_save"`
 	HistoryMaxSize  int  `toml:"history_max_size"`
 
+	MaxResultsPerDict int `toml:"max_results_per_dict"`
+	MaxResultsTotal   int `toml:"max_results_total"`
+
 	Audio bool `toml:"audio"`
 
 	ShowScore bool `toml:"show_score"`
@@ -53,6 +56,9 @@ func Default() *Config {
 		HistoryDisable:  false,
 		HistoryAutoSave: false,
 		HistoryMaxSize:  100,
+
+		MaxResultsPerDict: 20,
+		MaxResultsTotal:   40,
 
 		Audio: true,
 
