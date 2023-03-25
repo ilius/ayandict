@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/agnivade/levenshtein"
 )
@@ -82,10 +83,7 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 	}
 
 	queryMainWord := queryWords[mainWordIndex]
-	prefix := queryMainWord
-	if len(queryMainWord) > 2 {
-		prefix = queryMainWord[:2]
-	}
+	prefix, _ := utf8.DecodeRuneInString(queryMainWord)
 	for _, termIndex := range idx.byWordPrefix[prefix] {
 		entry := idx.terms[termIndex]
 		termOrig := entry.Term

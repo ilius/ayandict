@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 type IdxEntry struct {
@@ -17,7 +18,7 @@ type IdxEntry struct {
 type Idx struct {
 	terms []IdxEntry
 
-	byWordPrefix map[string][]int
+	byWordPrefix map[rune][]int
 }
 
 // NewIdx initializes idx struct
@@ -28,7 +29,7 @@ func NewIdx(entryCount int) *Idx {
 	} else {
 		idx.terms = []IdxEntry{}
 	}
-	idx.byWordPrefix = map[string][]int{}
+	idx.byWordPrefix = map[rune][]int{}
 	return idx
 }
 
@@ -41,12 +42,7 @@ func (idx *Idx) Add(term string, offset uint64, size uint64) {
 		Size:   size,
 	})
 	for _, word := range strings.Split(strings.ToLower(term), " ") {
-		var prefix string
-		if len(word) > 2 {
-			prefix = word[:2]
-		} else {
-			prefix = word
-		}
+		prefix, _ := utf8.DecodeRuneInString(word)
 		idx.byWordPrefix[prefix] = append(idx.byWordPrefix[prefix], termIndex)
 	}
 }
