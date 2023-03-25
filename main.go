@@ -18,6 +18,15 @@ import (
 
 var expanding = widgets.QSizePolicy__Expanding
 
+const (
+	QS_mainwindow = "mainwindow"
+	QS_geometry   = "geometry"
+	QS_savestate  = "savestate"
+	QS_maximized  = "maximized"
+	QS_pos        = "pos"
+	QS_size       = "size"
+)
+
 func main() {
 	stardict.Init()
 	app := widgets.NewQApplication(len(os.Args), os.Args)
@@ -201,18 +210,73 @@ func main() {
 		}
 	})
 
-	const mainWinGeoKey = "mainwin_geo"
-
 	qsettings := core.NewQSettings("ilius", "ayandict", window)
-	{
-		geo := qsettings.Value(mainWinGeoKey, core.NewQVariant1(nil))
-		geoBytes := geo.ToByteArray()
-		window.RestoreGeometry(geoBytes)
-	}
+	reastoreMainWinGeometry(qsettings, window)
 	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		qsettings.SetValue(mainWinGeoKey, core.NewQVariant13(window.SaveGeometry()))
+		saveMainWinGeometry(qsettings, window)
+	})
+	window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
+		saveMainWinGeometry(qsettings, window)
 	})
 
 	window.Show()
 	app.Exec()
+}
+
+func reastoreSetting(qsettings *core.QSettings, key string, apply func(*core.QVariant)) {
+	if !qsettings.Contains(key) {
+		return
+	}
+	apply(qsettings.Value(key, core.NewQVariant1(nil)))
+}
+
+func reastoreBoolSetting(
+	qsettings *core.QSettings,
+	key string, _default bool,
+	apply func(bool),
+) {
+	if !qsettings.Contains(key) {
+		apply(_default)
+		return
+	}
+	apply(qsettings.Value(key, core.NewQVariant1(nil)).ToBool())
+}
+
+func saveMainWinGeometry(qsettings *core.QSettings, window *widgets.QMainWindow) {
+	qsettings.BeginGroup(QS_mainwindow)
+
+	qsettings.SetValue(QS_geometry, core.NewQVariant13(window.SaveGeometry()))
+	qsettings.SetValue(QS_savestate, core.NewQVariant13(window.SaveState(0)))
+	qsettings.SetValue(QS_maximized, core.NewQVariant9(window.IsMaximized()))
+	if !window.IsMaximized() {
+		qsettings.SetValue(QS_pos, core.NewQVariant27(window.Pos()))
+		qsettings.SetValue(QS_size, core.NewQVariant25(window.Size()))
+	}
+
+	qsettings.EndGroup()
+}
+
+func reastoreMainWinGeometry(qsettings *core.QSettings, window *widgets.QMainWindow) {
+	qsettings.BeginGroup(QS_mainwindow)
+
+	reastoreSetting(qsettings, QS_geometry, func(value *core.QVariant) {
+		window.RestoreGeometry(value.ToByteArray())
+	})
+	reastoreSetting(qsettings, QS_savestate, func(value *core.QVariant) {
+		window.RestoreState(value.ToByteArray(), 0)
+	})
+	reastoreBoolSetting(qsettings, QS_maximized, false, func(maximized bool) {
+		if maximized {
+			window.ShowMaximized()
+			return
+		}
+		reastoreSetting(qsettings, QS_pos, func(value *core.QVariant) {
+			window.Move(value.ToPoint())
+		})
+		reastoreSetting(qsettings, QS_size, func(value *core.QVariant) {
+			window.Resize(value.ToSize())
+		})
+	})
+
+	qsettings.EndGroup()
 }
