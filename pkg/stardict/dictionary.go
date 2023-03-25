@@ -76,28 +76,32 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 
 	query = strings.ToLower(strings.TrimSpace(query))
 	queryWords := strings.Split(query, " ")
+	queryWordCount := len(queryWords)
 
 	mainWordIndex := 0
-	if queryWords[0] == "*" {
-		mainWordIndex = 1
+	for mainWordIndex < len(queryWords)-1 && queryWords[mainWordIndex] == "*" {
+		mainWordIndex++
+	}
+	queryMainWord := queryWords[mainWordIndex]
+
+	minWordCount := 1
+	for _, word := range queryWords {
+		if word == "*" {
+			minWordCount++
+		}
 	}
 
-	queryMainWord := queryWords[mainWordIndex]
 	prefix, _ := utf8.DecodeRuneInString(queryMainWord)
 	for _, termIndex := range idx.byWordPrefix[prefix] {
 		entry := idx.terms[termIndex]
 		termOrig := entry.Term
 		term := strings.ToLower(termOrig)
-		if query == term {
-			results = append(results, &SearchResult{
-				Score: 1,
-				Term:  termOrig,
-				Items: d.translate(entry.Offset, entry.Size),
-			})
+		words := strings.Split(term, " ")
+		score := similarity(query, term)
+		if len(words) < minWordCount {
 			continue
 		}
-		score := similarity(query, term)
-		if score > 0.74 {
+		if score > 0.6 {
 			results = append(results, &SearchResult{
 				Score: score,
 				Term:  termOrig,
@@ -108,22 +112,22 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 		if score < 0.33 {
 			continue
 		}
-		words := strings.Split(term, " ")
-		if len(words) <= mainWordIndex {
-			continue
-		}
+		bestWordScore := 0.0
 		for wordI, word := range words {
 			wordScore := similarity(queryMainWord, word)
-			if wordI == mainWordIndex {
-				wordScore *= 0.95
-			} else {
-				wordScore *= 0.85
+			if wordI != mainWordIndex {
+				wordScore *= 0.9
 			}
 			if wordScore < 0.7 {
 				continue
 			}
+			if wordScore > bestWordScore {
+				bestWordScore = wordScore
+			}
+		}
+		if bestWordScore >= 0.7 {
 			results = append(results, &SearchResult{
-				Score: wordScore,
+				Score: bestWordScore * 1.9 / float64(queryWordCount+1),
 				Term:  termOrig,
 				Items: d.translate(entry.Offset, entry.Size),
 			})
