@@ -76,7 +76,6 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 
 	query = strings.ToLower(strings.TrimSpace(query))
 	queryWords := strings.Split(query, " ")
-	queryWordCount := len(queryWords)
 
 	mainWordIndex := 0
 	for mainWordIndex < len(queryWords)-1 && queryWords[mainWordIndex] == "*" {
@@ -85,10 +84,13 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 	queryMainWord := queryWords[mainWordIndex]
 
 	minWordCount := 1
+	queryWordCount := 0
 	for _, word := range queryWords {
 		if word == "*" {
 			minWordCount++
+			continue
 		}
+		queryWordCount++
 	}
 
 	prefix, _ := utf8.DecodeRuneInString(queryMainWord)
@@ -97,6 +99,14 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 		termOrig := entry.Term
 		term := strings.ToLower(termOrig)
 		words := strings.Split(term, " ")
+		if strings.Contains(term, query) {
+			results = append(results, &SearchResult{
+				Score: float64(1+len(query)) / float64(1+len(term)),
+				Term:  termOrig,
+				Items: d.translate(entry.Offset, entry.Size),
+			})
+			continue
+		}
 		score := similarity(query, term)
 		if len(words) < minWordCount {
 			continue
@@ -107,9 +117,6 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 				Term:  termOrig,
 				Items: d.translate(entry.Offset, entry.Size),
 			})
-			continue
-		}
-		if score < 0.33 {
 			continue
 		}
 		bestWordScore := 0.0
@@ -125,9 +132,15 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 				bestWordScore = wordScore
 			}
 		}
-		if bestWordScore >= 0.7 {
+		if queryWordCount > 1 {
+			bestWordScore *= 0.63
+		}
+		if bestWordScore > score {
+			score = bestWordScore
+		}
+		if score >= 0.5 {
 			results = append(results, &SearchResult{
-				Score: bestWordScore * 1.9 / float64(queryWordCount+1),
+				Score: score,
 				Term:  termOrig,
 				Items: d.translate(entry.Offset, entry.Size),
 			})
