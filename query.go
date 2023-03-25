@@ -34,7 +34,7 @@ func onQuery(
 		}
 		term := html.EscapeString(res.Term)
 		if conf.ShowScore {
-			term += fmt.Sprintf(" [%%%d]", int(res.Score*100))
+			term += fmt.Sprintf(" [%%%d]", res.Score/2)
 		}
 		// TODO: configure style of res.Term and res.DictName
 		// with <span style=...>

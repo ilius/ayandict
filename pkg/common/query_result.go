@@ -1,7 +1,7 @@
 package common
 
 type QueryResult struct {
-	Score       float64
+	Score       uint8
 	Term        string
 	DictName    string
 	Definitions []string

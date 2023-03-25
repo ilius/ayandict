@@ -26,7 +26,7 @@ type TranslationItem struct {
 }
 
 type SearchResult struct {
-	Score float64
+	Score uint8
 	Term  string
 	Items []*TranslationItem
 }
@@ -56,12 +56,12 @@ func (d *Dictionary) translate(offset uint64, size uint64) (items []*Translation
 	return d.translateWithoutSametypesequence(d.dict.GetSequence(offset, size))
 }
 
-func similarity(a string, b string) float64 {
+func similarity(a string, b string) uint8 {
 	n := len(a)
 	if len(b) > n {
 		n = len(b)
 	}
-	return float64(n-levenshtein.ComputeDistance(a, b)) / float64(n)
+	return uint8(200 * (n - levenshtein.ComputeDistance(a, b)) / n)
 }
 
 // Search: first try an exact match
@@ -101,7 +101,7 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 		words := strings.Split(term, " ")
 		if strings.Contains(term, query) {
 			results = append(results, &SearchResult{
-				Score: float64(1+len(query)) / float64(1+len(term)),
+				Score: uint8(200 * (1 + len(query)) / (1 + len(term))),
 				Term:  termOrig,
 				Items: d.translate(entry.Offset, entry.Size),
 			})
@@ -111,7 +111,7 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 		if len(words) < minWordCount {
 			continue
 		}
-		if score > 0.6 {
+		if score > 120 {
 			results = append(results, &SearchResult{
 				Score: score,
 				Term:  termOrig,
@@ -119,26 +119,28 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 			})
 			continue
 		}
-		bestWordScore := 0.0
+		bestWordScore := uint8(0)
 		for wordI, word := range words {
 			wordScore := similarity(queryMainWord, word)
 			if wordI != mainWordIndex {
-				wordScore *= 0.9
+				wordScore -= wordScore / 10
 			}
-			if wordScore < 0.7 {
+			if wordScore < 140 {
 				continue
 			}
 			if wordScore > bestWordScore {
 				bestWordScore = wordScore
 			}
 		}
-		if queryWordCount > 1 {
-			bestWordScore *= 0.63
+		if bestWordScore > 50 {
+			if queryWordCount > 1 {
+				bestWordScore = bestWordScore/2 + bestWordScore/7
+			}
+			if bestWordScore > score {
+				score = bestWordScore
+			}
 		}
-		if bestWordScore > score {
-			score = bestWordScore
-		}
-		if score >= 0.5 {
+		if score > 100 {
 			results = append(results, &SearchResult{
 				Score: score,
 				Term:  termOrig,
@@ -152,7 +154,7 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 	})
 	cutoff := 20
 	if len(results) > cutoff {
-		for ; cutoff < len(results) && results[cutoff].Score > 0.9; cutoff++ {
+		for ; cutoff < len(results) && results[cutoff].Score > 180; cutoff++ {
 		}
 		results = results[:cutoff]
 	}
