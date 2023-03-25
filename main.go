@@ -28,8 +28,10 @@ const (
 )
 
 func main() {
-	stardict.Init()
 	app := widgets.NewQApplication(len(os.Args), os.Args)
+	LoadConfig(app)
+	stardict.Init(conf.DirectoryList)
+
 	// icon := gui.NewQIcon5("./img/icon.png")
 
 	window := widgets.NewQMainWindow(nil, 0)
@@ -179,7 +181,6 @@ func main() {
 		historyView.Clear()
 	})
 
-	LoadConfig(app)
 	if !conf.HistoryDisable {
 		err := LoadHistory()
 		if err != nil {

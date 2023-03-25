@@ -20,6 +20,8 @@ var mutex sync.Mutex
 // html definition view using mouse scroll
 
 type Config struct {
+	DirectoryList []string `toml:"directory_list"`
+
 	Style string `toml:"style"`
 
 	FontFamily string `toml:"font_family"`
@@ -44,6 +46,10 @@ type Config struct {
 
 func Default() *Config {
 	return &Config{
+		DirectoryList: []string{
+			".stardict/dic",
+		},
+
 		Style:      "",
 		FontFamily: "",
 		FontSize:   0,

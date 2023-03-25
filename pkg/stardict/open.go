@@ -17,10 +17,11 @@ func isDir(pathStr string) bool {
 }
 
 // Open open directories
-func Open(d string) ([]*Dictionary, error) {
+func Open(dirPathList []string) ([]*Dictionary, error) {
 	var dicList []*Dictionary
 	const ext = ".ifo"
-	filepath.Walk(d, func(path string, info os.FileInfo, err error) error {
+
+	walkFunc := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -35,7 +36,6 @@ func Open(d string) ([]*Dictionary, error) {
 		dirPath := filepath.Dir(path)
 		dic, err := NewDictionary(dirPath, name[:len(name)-len(ext)])
 		if err != nil {
-			fmt.Println(err)
 			return err
 		}
 		resDir := filepath.Join(dirPath, "res")
@@ -46,7 +46,21 @@ func Open(d string) ([]*Dictionary, error) {
 		}
 		dicList = append(dicList, dic)
 		return nil
-	})
+	}
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+	for _, dirPath := range dirPathList {
+		// dirPath = pathFromUnix(dirPath) // not needed for relative paths
+		if !filepath.IsAbs(dirPath) {
+			dirPath = filepath.Join(homeDir, dirPath)
+		}
+		err := filepath.Walk(dirPath, walkFunc)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
 	return dicList, nil
 }
 

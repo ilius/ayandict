@@ -5,8 +5,6 @@ import (
 	"fmt"
 	std_html "html"
 	"net/url"
-	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -28,14 +26,10 @@ var (
 	sourceRE    = regexp.MustCompile(`<source [^<>]*?>`)
 )
 
-func Init() {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		panic(err)
-	}
-	dicDir := path.Join(homeDir, ".stardict", "dic")
+func Init(directoryList []string) {
 	t := time.Now()
-	dicList, err = Open(dicDir)
+	var err error
+	dicList, err = Open(directoryList)
 	if err != nil {
 		panic(err)
 	}
