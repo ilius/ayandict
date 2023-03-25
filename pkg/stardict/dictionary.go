@@ -21,14 +21,14 @@ type Translation struct {
 
 // TranslationItem contain single translation item
 type TranslationItem struct {
-	Type rune
 	Data []byte
+	Type rune
 }
 
 type SearchResult struct {
-	Score uint8
 	Term  string
 	Items []*TranslationItem
+	Score uint8
 }
 
 // Dictionary stardict dictionary

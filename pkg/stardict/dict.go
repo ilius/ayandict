@@ -15,8 +15,8 @@ type t_ReadSeekerCloser interface {
 
 // Dict implements in-memory dictionary
 type Dict struct {
-	filename string
 	r        t_ReadSeekerCloser
+	filename string
 }
 
 // GetSequence returns data at the given offset

@@ -16,9 +16,8 @@ type IdxEntry struct {
 
 // Idx implements an in-memory index for a dictionary
 type Idx struct {
-	terms []*IdxEntry
-
 	byWordPrefix map[rune][]int
+	terms        []*IdxEntry
 }
 
 // NewIdx initializes idx struct
