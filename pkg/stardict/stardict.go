@@ -14,7 +14,7 @@ import (
 
 	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/config"
-	"golang.org/x/net/html"
+	"github.com/ilius/ayandict/pkg/html"
 )
 
 var dicList []*Dictionary
