@@ -14,6 +14,12 @@ func onQuery(
 	setHtml func(string),
 	isAuto bool,
 ) {
+	if query == "" {
+		if !isAuto {
+			setHtml("")
+		}
+		return
+	}
 	fmt.Printf("Query: %s\n", query)
 	t := time.Now()
 	results := stardict.LookupHTML(query, conf)

@@ -169,6 +169,7 @@ func main() {
 	})
 	reloadConfigButton.ConnectClicked(func(checked bool) {
 		LoadConfig(app)
+		onQuery(entry.Text(), updateWebView, false)
 	})
 	reloadStyleButton.ConnectClicked(func(checked bool) {
 		LoadUserStyle(app)
