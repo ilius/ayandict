@@ -11,7 +11,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/agnivade/levenshtein"
+	"github.com/ilius/ayandict/pkg/levenshtein"
 )
 
 // Translation contains translation items
