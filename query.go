@@ -27,11 +27,11 @@ func onQuery(
 	if len(results) == 0 {
 		if !isAuto {
 			setHtml(fmt.Sprintf("No results for %#v", query))
-			addHistory(query)
+			addHistoryAndFrequency(query)
 		}
 		return
 	}
-	addHistory(query)
+	addHistoryAndFrequency(query)
 	parts := []string{}
 	for _, res := range results {
 		header := conf.HeaderTag

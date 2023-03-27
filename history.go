@@ -12,17 +12,34 @@ import (
 )
 
 var (
-	history          = []string{}
-	historyMaxSize   = 100
-	historyMutex     sync.Mutex
-	historySaveMutex sync.Mutex
+	history            = []string{}
+	historyMaxSize     = 100
+	historyMutex       sync.Mutex
+	historySaveMutex   sync.Mutex
+	frequencyMutex     sync.Mutex
+	frequencySaveMutex sync.Mutex
 )
 
-const historyFileName = "history.json"
+const (
+	historyFileName   = "history.json"
+	frequencyFileName = "frequent.json"
+)
 
 var addHistoryGUI func(string)
 
 var trimHistoryGUI func(int)
+
+func addHistoryAndFrequency(query string) {
+	if !conf.HistoryDisable {
+		addHistory(query)
+	}
+	if !conf.MostFrequentDisable {
+		frequencyView.Add(query, 1)
+		if conf.MostFrequentAutoSave {
+			SaveFrequency()
+		}
+	}
+}
 
 func addHistoryLow(query string) {
 	historyMutex.Lock()
@@ -34,9 +51,6 @@ func addHistoryLow(query string) {
 }
 
 func addHistory(query string) {
-	if conf.HistoryDisable {
-		return
-	}
 	if len(history) > 0 && query == history[len(history)-1] {
 		return
 	}
@@ -54,6 +68,10 @@ func addHistory(query string) {
 
 func historyFilePath() string {
 	return filepath.Join(config.GetConfigDir(), historyFileName)
+}
+
+func frequencyFilePath() string {
+	return filepath.Join(config.GetConfigDir(), frequencyFileName)
 }
 
 func LoadHistory() error {
@@ -77,12 +95,20 @@ func LoadHistory() error {
 func SaveHistory() {
 	historySaveMutex.Lock()
 	defer historySaveMutex.Unlock()
-	pathStr := historyFilePath()
 	jsonBytes, err := json.MarshalIndent(history, "", "\t")
 	if err != nil {
 		panic(err)
 	}
-	err = ioutil.WriteFile(pathStr, jsonBytes, 0o644)
+	err = ioutil.WriteFile(historyFilePath(), jsonBytes, 0o644)
+	if err != nil {
+		fmt.Printf("Error saving history: %v\n", err)
+	}
+}
+
+func SaveFrequency() {
+	frequencySaveMutex.Lock()
+	defer frequencySaveMutex.Unlock()
+	err := frequencyView.SaveToFile(frequencyFilePath())
 	if err != nil {
 		fmt.Printf("Error saving history: %v\n", err)
 	}
@@ -93,5 +119,8 @@ func clearHistory() {
 	history = []string{}
 	historyMutex.Unlock()
 
+	frequencyView.Clear()
+
 	SaveHistory()
+	SaveFrequency()
 }

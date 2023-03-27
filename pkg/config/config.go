@@ -36,6 +36,10 @@ type Config struct {
 	HistoryAutoSave bool `toml:"history_auto_save"`
 	HistoryMaxSize  int  `toml:"history_max_size"`
 
+	MostFrequentDisable  bool `toml:"most_frequent_disable"`
+	MostFrequentAutoSave bool `toml:"most_frequent_auto_save"`
+	MostFrequentMaxSize  int  `toml:"most_frequent_max_size"`
+
 	MaxResultsPerDict int `toml:"max_results_per_dict"`
 	MaxResultsTotal   int `toml:"max_results_total"`
 
@@ -60,8 +64,12 @@ func Default() *Config {
 		HeaderTag: "h1",
 
 		HistoryDisable:  false,
-		HistoryAutoSave: false,
+		HistoryAutoSave: true,
 		HistoryMaxSize:  100,
+
+		MostFrequentDisable:  false,
+		MostFrequentAutoSave: true,
+		MostFrequentMaxSize:  20,
 
 		MaxResultsPerDict: 20,
 		MaxResultsTotal:   40,

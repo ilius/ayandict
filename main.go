@@ -9,6 +9,7 @@ import (
 
 	// "github.com/therecipe/qt/webengine"
 
+	"github.com/ilius/ayandict/pkg/frequency"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/multimedia"
@@ -16,6 +17,8 @@ import (
 )
 
 var expanding = widgets.QSizePolicy__Expanding
+
+var frequencyView *frequency.FrequencyView
 
 const (
 	QS_mainwindow = "mainwindow"
@@ -30,6 +33,8 @@ func main() {
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 	LoadConfig(app)
 	initDicts()
+
+	frequencyView = frequency.NewFrequencyView()
 
 	// icon := gui.NewQIcon5("./img/icon.png")
 
@@ -64,6 +69,19 @@ func main() {
 	queryBoxLayout.AddWidget(okButton, 0, 0)
 
 	historyView := widgets.NewQListWidget(nil)
+
+	frequencyView.SetHorizontalHeaderItem(
+		0,
+		widgets.NewQTableWidgetItem2("Term", 0),
+	)
+	frequencyView.SetHorizontalHeaderItem(
+		1,
+		widgets.NewQTableWidgetItem2("Count", 0),
+	)
+	if !conf.MostFrequentDisable {
+		frequencyView.LoadFromFile(frequencyFilePath())
+	}
+	// TODO: save the width of 2 columns
 
 	addHistoryGUI = func(query string) {
 		historyView.InsertItem2(0, query)
@@ -109,8 +127,34 @@ func main() {
 	leftMainLayout.AddWidget(webview, 0, 0)
 	leftMainLayout.AddLayout(bottomLayout, 0)
 
+	activityTypeCombo := widgets.NewQComboBox(nil)
+	activityTypeCombo.AddItems([]string{
+		"Recent",
+		"Most Frequent",
+	})
+
+	frequencyView.Hide()
+
+	activityWidget := widgets.NewQWidget(nil, 0)
+	activityLayout := widgets.NewQVBoxLayout2(activityWidget)
+	activityLayout.SetContentsMargins(5, 5, 5, 5)
+	activityLayout.AddWidget(activityTypeCombo, 0, 0)
+	activityLayout.AddWidget(historyView, 0, 0)
+	activityLayout.AddWidget(frequencyView, 0, 0)
+
+	activityTypeCombo.ConnectCurrentIndexChanged(func(index int) {
+		switch index {
+		case 0:
+			historyView.Show()
+			frequencyView.Hide()
+		case 1:
+			historyView.Hide()
+			frequencyView.Show()
+		}
+	})
+
 	sideBar := widgets.NewQTabWidget(nil)
-	sideBar.AddTab(historyView, "History")
+	sideBar.AddTab(activityWidget, "Activity")
 	sideBar.AddTab(miscBox, "Misc")
 
 	mainSplitter := widgets.NewQSplitter(nil)
@@ -210,6 +254,11 @@ func main() {
 	historyView.ConnectItemClicked(func(item *widgets.QListWidgetItem) {
 		doQuery(item.Text())
 	})
+	frequencyView.ConnectItemClicked(func(item *widgets.QTableWidgetItem) {
+		index := item.Row()
+		key := frequencyView.Keys[index]
+		doQuery(key)
+	})
 	reloadDictsButton.ConnectClicked(func(checked bool) {
 		reloadDicts()
 	})
@@ -232,10 +281,12 @@ func main() {
 	})
 	saveHistoryButton.ConnectClicked(func(checked bool) {
 		SaveHistory()
+		SaveFrequency()
 	})
 	clearHistoryButton.ConnectClicked(func(checked bool) {
 		clearHistory()
 		historyView.Clear()
+		// frequencyView.Clear()
 	})
 	clearButton.ConnectClicked(func(checked bool) {
 		resetQuery()
