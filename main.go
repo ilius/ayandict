@@ -175,6 +175,29 @@ func main() {
 			return
 		}
 	})
+	webview.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
+		switch event.Text() {
+		case " ":
+			entry.SetFocus(core.Qt__ShortcutFocusReason)
+		}
+	})
+	historyView.ConnectEnterEvent(func(event *core.QEvent) {
+		// TODO:
+		// items := historyView.SelectedItems() // panics!
+		// if len(items) < 1 {
+		// 	return
+		// }
+		// doQuery(items[0].Text())
+	})
+	// TODO: activate on mouse-press
+	// historyView.ConnectMousePressEvent()
+	historyView.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
+		switch event.Text() {
+		case " ":
+			entry.SetFocus(core.Qt__ShortcutFocusReason)
+		}
+		historyView.KeyPressEventDefault(event)
+	})
 	historyView.ConnectItemClicked(func(item *widgets.QListWidgetItem) {
 		doQuery(item.Text())
 	})
