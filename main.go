@@ -168,6 +168,13 @@ func main() {
 		}
 		gui.QDesktopServices_OpenUrl(link)
 	})
+	webview.ConnectMouseReleaseEvent(func(event *gui.QMouseEvent) {
+		switch event.Button() {
+		case core.Qt__MiddleButton:
+			doQuery(webview.TextCursor().SelectedText())
+			return
+		}
+	})
 	historyView.ConnectItemClicked(func(item *widgets.QListWidgetItem) {
 		doQuery(item.Text())
 	})
