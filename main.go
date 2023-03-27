@@ -181,20 +181,29 @@ func main() {
 			entry.SetFocus(core.Qt__ShortcutFocusReason)
 		}
 	})
-	historyView.ConnectEnterEvent(func(event *core.QEvent) {
-		// TODO:
-		// items := historyView.SelectedItems() // panics!
-		// if len(items) < 1 {
-		// 	return
-		// }
-		// doQuery(items[0].Text())
+
+	// historyView.SelectedItems() panics
+	// and even after fixing panic, doesn't return anything
+	// you have to use historyView.CurrentIndex()
+
+	historyView.ConnectMousePressEvent(func(event *gui.QMouseEvent) {
+		historyView.MousePressEventDefault(event)
+		index := historyView.CurrentIndex()
+		if index == nil {
+			return
+		}
+		historyView.Activated(index)
 	})
-	// TODO: activate on mouse-press
-	// historyView.ConnectMousePressEvent()
+
+	historyView.ConnectItemActivated(func(item *widgets.QListWidgetItem) {
+		doQuery(item.Text())
+	})
+
 	historyView.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
 		switch event.Text() {
 		case " ":
 			entry.SetFocus(core.Qt__ShortcutFocusReason)
+			return
 		}
 		historyView.KeyPressEventDefault(event)
 	})
