@@ -17,25 +17,36 @@ func isDir(pathStr string) bool {
 }
 
 // Open open directories
-func Open(dirPathList []string) ([]*Dictionary, error) {
+func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 	var dicList []*Dictionary
 	const ext = ".ifo"
 
-	walkFunc := func(path string, info os.FileInfo, err error) error {
+	walkFunc := func(path string, fi os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if info.IsDir() {
+		if fi.IsDir() {
 			return nil
 		}
-		name := info.Name()
-		if filepath.Ext(info.Name()) != ext {
+		name := fi.Name()
+		if filepath.Ext(fi.Name()) != ext {
 			return nil
 		}
 		fmt.Printf("Loading %#v\n", path)
 		dirPath := filepath.Dir(path)
 		dic, err := NewDictionary(dirPath, name[:len(name)-len(ext)])
 		if err != nil {
+			return err
+		}
+		if order[dic.BookName()] < 0 {
+			dic.disabled = true
+			dic.info.Disabled = true
+			dicList = append(dicList, dic)
+			return nil
+		}
+		err = dic.load()
+		if err != nil {
+			fmt.Println(err)
 			return err
 		}
 		resDir := filepath.Join(dirPath, "res")

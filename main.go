@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/ilius/ayandict/pkg/config"
-	"github.com/ilius/ayandict/pkg/stardict"
 
 	// "github.com/therecipe/qt/webengine"
 
@@ -30,7 +29,7 @@ const (
 func main() {
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 	LoadConfig(app)
-	stardict.Init(conf.DirectoryList)
+	initDicts()
 
 	// icon := gui.NewQIcon5("./img/icon.png")
 
@@ -43,6 +42,7 @@ func main() {
 	webview.SetReadOnly(true)
 	webview.SetOpenExternalLinks(true)
 	webview.SetOpenLinks(false)
+	// webview.SetContentsMargins(0, 0, 0, 0)
 
 	updateWebView := func(s string) {
 		// webview.SetHtml(s, core.NewQUrl())
@@ -57,10 +57,10 @@ func main() {
 
 	queryBox := widgets.NewQFrame(nil, 0)
 	queryBoxLayout := widgets.NewQHBoxLayout2(queryBox)
+	queryBoxLayout.SetContentsMargins(5, 5, 5, 0)
+	queryBoxLayout.SetSpacing(10)
 	queryBoxLayout.AddWidget(widgets.NewQLabel2("Query:", nil, 0), 0, 0)
-	// queryBoxLayout.AddSpacing(10)
 	queryBoxLayout.AddWidget(entry, 0, 0)
-	// queryBoxLayout.AddSpacing(10)
 	queryBoxLayout.AddWidget(okButton, 0, 0)
 
 	historyView := widgets.NewQListWidget(nil)
@@ -80,6 +80,7 @@ func main() {
 
 	miscBox := widgets.NewQFrame(nil, 0)
 	miscLayout := widgets.NewQVBoxLayout2(miscBox)
+	miscLayout.SetContentsMargins(0, 0, 0, 0)
 	reloadDictsButton := widgets.NewQPushButton2("Reload Dicts", nil)
 	miscLayout.AddWidget(reloadDictsButton, 0, 0)
 	openConfigButton := widgets.NewQPushButton2("Open Config", nil)
@@ -93,20 +94,36 @@ func main() {
 	clearHistoryButton := widgets.NewQPushButton2("Clear History", nil)
 	miscLayout.AddWidget(clearHistoryButton, 0, 0)
 
+	bottomLayout := widgets.NewQHBoxLayout2(nil)
+	bottomLayout.SetContentsMargins(0, 0, 0, 0)
+	bottomLayout.SetSpacing(10)
+	dictsButton := widgets.NewQPushButton2("Dictionaries", nil)
+	bottomLayout.AddWidget(dictsButton, 0, core.Qt__AlignLeft)
+	clearButton := widgets.NewQPushButton2("Clear", nil)
+	bottomLayout.AddWidget(clearButton, 0, core.Qt__AlignRight)
+
+	leftMainWidget := widgets.NewQWidget(nil, 0)
+	leftMainLayout := widgets.NewQVBoxLayout2(leftMainWidget)
+	leftMainLayout.SetContentsMargins(0, 0, 0, 0)
+	leftMainLayout.AddWidget(webview, 0, 0)
+	leftMainLayout.AddLayout(bottomLayout, 0)
+
 	sideBar := widgets.NewQTabWidget(nil)
 	sideBar.AddTab(historyView, "History")
 	sideBar.AddTab(miscBox, "Misc")
 
 	mainSplitter := widgets.NewQSplitter(nil)
 	mainSplitter.SetSizePolicy2(expanding, expanding)
-	mainSplitter.AddWidget(webview)
+	mainSplitter.AddWidget(leftMainWidget)
 	mainSplitter.AddWidget(sideBar)
 	mainSplitter.SetStretchFactor(0, 5)
 	mainSplitter.SetStretchFactor(1, 1)
 
 	mainLayout := widgets.NewQVBoxLayout()
+	mainLayout.SetContentsMargins(5, 5, 5, 5)
 	mainLayout.AddWidget(queryBox, 0, 0)
 	mainLayout.AddWidget(mainSplitter, 0, 0)
+	mainLayout.AddLayout(bottomLayout, 0)
 
 	centralWidget := widgets.NewQWidget(nil, 0)
 	centralWidget.SetLayout(mainLayout)
@@ -180,6 +197,18 @@ func main() {
 	clearHistoryButton.ConnectClicked(func(checked bool) {
 		clearHistory()
 		historyView.Clear()
+	})
+	clearButton.ConnectClicked(func(checked bool) {
+		resetQuery()
+	})
+
+	var dictManager *widgets.QDialog
+	dictsButton.ConnectClicked(func(checked bool) {
+		if dictManager == nil {
+			dictManager = NewDictManagerDialog(app, window)
+		}
+		dictManager.Exec()
+		// TODO: set dictsOrder from dicList and save dicts.json
 	})
 
 	if !conf.HistoryDisable {

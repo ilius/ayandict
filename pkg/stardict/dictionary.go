@@ -33,6 +33,12 @@ type SearchResult struct {
 
 // Dictionary stardict dictionary
 type Dictionary struct {
+	disabled bool
+
+	ifoPath  string
+	idxPath  string
+	dictPath string
+
 	dict *Dict
 	idx  *Idx
 	info *Info
@@ -251,9 +257,9 @@ func NewDictionary(path string, name string) (*Dictionary, error) {
 	dictPath := filepath.Join(path, name+".dict")
 
 	idxPath := filepath.Join(path, name+".idx")
-	infoPath := filepath.Join(path, name+".ifo")
+	ifoPath := filepath.Join(path, name+".ifo")
 
-	if _, err := os.Stat(infoPath); os.IsNotExist(err) {
+	if _, err := os.Stat(ifoPath); os.IsNotExist(err) {
 		return nil, err
 	}
 
@@ -270,24 +276,29 @@ func NewDictionary(path string, name string) (*Dictionary, error) {
 		dictPath = dictDzPath
 	}
 
-	info, err := ReadInfo(infoPath)
+	info, err := ReadInfo(ifoPath)
 	if err != nil {
 		return nil, err
 	}
-
-	idx, err := ReadIndex(idxPath, info)
-	if err != nil {
-		return nil, err
-	}
-
-	dict, err := ReadDict(dictPath, info)
-	if err != nil {
-		return nil, err
-	}
-
 	d.info = info
-	d.idx = idx
-	d.dict = dict
+
+	d.ifoPath = ifoPath
+	d.idxPath = idxPath
+	d.dictPath = dictPath
 
 	return d, nil
+}
+
+func (d *Dictionary) load() error {
+	idx, err := ReadIndex(d.idxPath, d.info)
+	if err != nil {
+		return err
+	}
+	d.idx = idx
+	dict, err := ReadDict(d.dictPath, d.info)
+	if err != nil {
+		return err
+	}
+	d.dict = dict
+	return nil
 }

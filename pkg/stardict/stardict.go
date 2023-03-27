@@ -17,8 +17,6 @@ import (
 	"github.com/ilius/ayandict/pkg/html"
 )
 
-var dicList []*Dictionary
-
 var (
 	srcRE       = regexp.MustCompile(` src="[^<>"]*?"`)
 	hrefSoundRE = regexp.MustCompile(` href="sound://[^<>"]*?"`)
@@ -26,14 +24,58 @@ var (
 	sourceRE    = regexp.MustCompile(`<source [^<>]*?>`)
 )
 
-func Init(directoryList []string) {
+var dicList []*Dictionary
+
+type DicListSorter struct {
+	List  []*Dictionary
+	Order map[string]int
+}
+
+func (s DicListSorter) Len() int {
+	return len(s.List)
+}
+
+func (s DicListSorter) Swap(i, j int) {
+	s.List[i], s.List[j] = s.List[j], s.List[i]
+}
+
+func absInt(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
+func (s DicListSorter) Less(i, j int) bool {
+	return absInt(s.Order[s.List[i].BookName()]) < absInt(s.Order[s.List[j].BookName()])
+}
+
+func Init(directoryList []string, order map[string]int) {
 	t := time.Now()
 	var err error
-	dicList, err = Open(directoryList)
+	dicList, err = Open(directoryList, order)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("Loading dictionaries took", time.Now().Sub(t))
+	if order != nil {
+		Reorder(order)
+	}
+}
+
+func GetInfoList() []Info {
+	infos := make([]Info, len(dicList))
+	for i, dic := range dicList {
+		infos[i] = *dic.info
+	}
+	return infos
+}
+
+func Reorder(order map[string]int) {
+	sort.Sort(DicListSorter{
+		List:  dicList,
+		Order: order,
+	})
 }
 
 func fixResURL(quoted string, resURL string) (bool, string) {
@@ -167,6 +209,9 @@ func LookupHTML(query string, conf *config.Config) []*common.QueryResult {
 	results := []*common.QueryResult{}
 	maxResultsPerDict := conf.MaxResultsPerDict
 	for _, dic := range dicList {
+		if dic.disabled {
+			continue
+		}
 		for _, res := range dic.Search(query, maxResultsPerDict) {
 			definitions := []string{}
 			resURL := dic.ResourceURL()
