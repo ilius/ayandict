@@ -241,13 +241,17 @@ func main() {
 		resetQuery()
 	})
 
-	var dictManager *widgets.QDialog
+	const dialogAccepted = int(widgets.QDialog__Accepted)
+
+	var dictManager *DictManager
 	dictsButton.ConnectClicked(func(checked bool) {
 		if dictManager == nil {
-			dictManager = NewDictManagerDialog(app, window)
+			dictManager = NewDictManager(app, window)
 		}
-		dictManager.Exec()
-		// TODO: set dictsOrder from dicList and save dicts.json
+		if dictManager.Dialog.Exec() == dialogAccepted {
+			SaveDictManagerDialog(dictManager)
+			onQuery(entry.Text(), updateWebView, false)
+		}
 	})
 
 	if !conf.HistoryDisable {

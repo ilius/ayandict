@@ -78,6 +78,17 @@ func Reorder(order map[string]int) {
 	})
 }
 
+func ApplyDictsOrder(order map[string]int) {
+	Reorder(order)
+	for _, dic := range dicList {
+		disabled := dic.disabled
+		dic.disabled = order[dic.BookName()] < 0
+		if disabled && !dic.disabled {
+			dic.load()
+		}
+	}
+}
+
 func fixResURL(quoted string, resURL string) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
