@@ -105,6 +105,7 @@ func main() {
 	leftMainWidget := widgets.NewQWidget(nil, 0)
 	leftMainLayout := widgets.NewQVBoxLayout2(leftMainWidget)
 	leftMainLayout.SetContentsMargins(0, 0, 0, 0)
+	leftMainLayout.AddWidget(queryBox, 0, 0)
 	leftMainLayout.AddWidget(webview, 0, 0)
 	leftMainLayout.AddLayout(bottomLayout, 0)
 
@@ -121,7 +122,6 @@ func main() {
 
 	mainLayout := widgets.NewQVBoxLayout()
 	mainLayout.SetContentsMargins(5, 5, 5, 5)
-	mainLayout.AddWidget(queryBox, 0, 0)
 	mainLayout.AddWidget(mainSplitter, 0, 0)
 	mainLayout.AddLayout(bottomLayout, 0)
 
