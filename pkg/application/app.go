@@ -260,9 +260,14 @@ func Run() {
 		doQuery(item.Text())
 	})
 	frequencyTable.ConnectItemClicked(func(item *widgets.QTableWidgetItem) {
-		index := item.Row()
-		key := frequencyTable.Keys[index]
+		doQuery(frequencyTable.Keys[item.Row()])
+	})
+	frequencyTable.ConnectItemActivated(func(item *widgets.QTableWidgetItem) {
+		key := frequencyTable.Keys[item.Row()]
 		doQuery(key)
+		newRow := frequencyTable.KeyMap[key]
+		// item.Column() panics!
+		frequencyTable.SetCurrentCell(newRow, 0)
 	})
 	reloadDictsButton.ConnectClicked(func(checked bool) {
 		reloadDicts()
