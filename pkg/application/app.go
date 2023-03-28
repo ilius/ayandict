@@ -201,6 +201,9 @@ func Run() {
 		path := link.Path(core.QUrl__FullyDecoded)
 		// fmt.Printf("scheme=%#v, host=%#v, path=%#v", link.Scheme(), host, path)
 		switch link.Scheme() {
+		case "":
+			doQuery(path)
+			return
 		case "file", "http", "https":
 			// fmt.Printf("host=%#v, ext=%#v", host, ext)
 			switch filepath.Ext(path) {

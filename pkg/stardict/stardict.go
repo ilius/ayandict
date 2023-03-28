@@ -21,7 +21,8 @@ var (
 	srcRE       = regexp.MustCompile(` src="[^<>"]*?"`)
 	hrefSoundRE = regexp.MustCompile(` href="sound://[^<>"]*?"`)
 	audioRE     = regexp.MustCompile(`<audio[ >].*?</audio>`)
-	sourceRE    = regexp.MustCompile(`<source [^<>]*?>`)
+
+	hrefBwordSpaceRE = regexp.MustCompile(` href="bword://[^<>"]*?( |%20)[^<>" ]*?"`)
 )
 
 var dicList []*Dictionary
@@ -205,6 +206,17 @@ func fixFileSrc(defi string, resURL string) string {
 	return srcRE.ReplaceAllStringFunc(defi, srcSub)
 }
 
+// work around qt bug on internal entry links with space
+// for example: <a href="bword://abscisic acid">
+// clicking on these link do not work
+// ConnectAnchorClicked will get an empty url
+// link.ToString(core.QUrl__None) == ""
+// unless I remove `bword://` prefix
+// also tried replacing space with %20
+func hrefBwordSpaceSub(match string) string {
+	return ` href="` + match[len(` href="bword://`):]
+}
+
 func fixDefiHTML(defi string, resURL string, conf *config.Config) string {
 	if resURL != "" {
 		defi = fixFileSrc(defi, resURL)
@@ -213,6 +225,7 @@ func fixDefiHTML(defi string, resURL string, conf *config.Config) string {
 	if conf.Audio {
 		defi = fixAudioTag(defi, resURL)
 	}
+	defi = hrefBwordSpaceRE.ReplaceAllStringFunc(defi, hrefBwordSpaceSub)
 	return defi
 }
 
