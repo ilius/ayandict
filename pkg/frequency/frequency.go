@@ -51,19 +51,18 @@ func (view *FrequencyView) addNew(key string, count int) {
 	view.KeyMap[key] = index
 	view.Keys = append(view.Keys, key)
 	view.Counts[key] = count
+
+	for index > 0 && count >= view.Counts[view.Keys[index-1]] {
+		index = view.moveUp(key)
+	}
+
 	view.InsertRow(index)
-	qKeyItem := view.newItem(key)
-	view.SetItem(index, 0, qKeyItem)
-	qCountItem := view.newItem(
-		strconv.FormatInt(int64(count), 10),
-	)
-	view.SetItem(index, 1, qCountItem)
+	view.setItemForKey(index, key)
 	view.Trim()
 }
 
 func (view *FrequencyView) moveUp(key string) int {
 	index := view.KeyMap[key]
-
 	prevKey := view.Keys[index-1]
 
 	view.Keys[index-1] = key
@@ -71,16 +70,14 @@ func (view *FrequencyView) moveUp(key string) int {
 	view.KeyMap[key] = index - 1
 	view.KeyMap[prevKey] = index
 
-	view.SetItem(index-1, 0, view.newItem(key))
-	view.SetItem(index-1, 1, view.newItem(
+	return index - 1
+}
+
+func (view *FrequencyView) setItemForKey(index int, key string) {
+	view.SetItem(index, 0, view.newItem(key))
+	view.SetItem(index, 1, view.newItem(
 		strconv.FormatInt(int64(view.Counts[key]), 10),
 	))
-	view.SetItem(index, 0, view.newItem(prevKey))
-	view.SetItem(index, 1, view.newItem(
-		strconv.FormatInt(int64(view.Counts[prevKey]), 10),
-	))
-
-	return index - 1
 }
 
 func (view *FrequencyView) Add(key string, plus int) {
@@ -92,14 +89,14 @@ func (view *FrequencyView) Add(key string, plus int) {
 	count := view.Counts[key] + plus
 	view.Counts[key] = count
 
-	if index < 1 || count <= view.Counts[view.Keys[index-1]] {
-		view.Item(index, 1).SetText(strconv.FormatInt(int64(count), 10))
-		return
-	}
-	index = view.moveUp(key)
-	for index > 0 && count > view.Counts[view.Keys[index-1]] {
+	view.RemoveRow(index)
+
+	for index > 0 && count >= view.Counts[view.Keys[index-1]] {
 		index = view.moveUp(key)
 	}
+
+	view.InsertRow(index)
+	view.setItemForKey(index, key)
 }
 
 func (view *FrequencyView) LoadFromFile(pathStr string) error {
