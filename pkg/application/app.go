@@ -184,8 +184,18 @@ func Run() {
 	})
 	webview.ConnectAnchorClicked(func(link *core.QUrl) {
 		host := link.Host(core.QUrl__FullyDecoded)
+		// fmt.Printf(
+		// 	"AnchorClicked: %#v, host=%#v = %#v\n",
+		// 	link.ToString(core.QUrl__None),
+		// 	host,
+		// 	link.Host(core.QUrl__FullyEncoded),
+		// )
 		if link.Scheme() == "bword" {
-			doQuery(host)
+			if host != "" {
+				doQuery(host)
+			} else {
+				fmt.Printf("AnchorClicked: %#v\n", link.ToString(core.QUrl__None))
+			}
 			return
 		}
 		path := link.Path(core.QUrl__FullyDecoded)
@@ -209,6 +219,7 @@ func Run() {
 			doQuery(webview.TextCursor().SelectedText())
 			return
 		}
+		webview.MouseReleaseEventDefault(event)
 	})
 	webview.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
 		switch event.Text() {
