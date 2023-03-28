@@ -18,23 +18,14 @@ import (
 
 var expanding = widgets.QSizePolicy__Expanding
 
-var frequencyView *frequency.FrequencyView
-
-const (
-	QS_mainwindow = "mainwindow"
-	QS_geometry   = "geometry"
-	QS_savestate  = "savestate"
-	QS_maximized  = "maximized"
-	QS_pos        = "pos"
-	QS_size       = "size"
-)
+var frequencyTable *frequency.FrequencyTable
 
 func Run() {
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 	LoadConfig(app)
 	initDicts()
 
-	frequencyView = frequency.NewFrequencyView(conf.MostFrequentMaxSize)
+	frequencyTable = frequency.NewFrequencyView(conf.MostFrequentMaxSize)
 
 	// icon := gui.NewQIcon5("./img/icon.png")
 
@@ -70,16 +61,16 @@ func Run() {
 
 	historyView := widgets.NewQListWidget(nil)
 
-	frequencyView.SetHorizontalHeaderItem(
+	frequencyTable.SetHorizontalHeaderItem(
 		0,
 		widgets.NewQTableWidgetItem2("Query", 0),
 	)
-	frequencyView.SetHorizontalHeaderItem(
+	frequencyTable.SetHorizontalHeaderItem(
 		1,
 		widgets.NewQTableWidgetItem2("Count", 0),
 	)
 	if !conf.MostFrequentDisable {
-		frequencyView.LoadFromFile(frequencyFilePath())
+		frequencyTable.LoadFromFile(frequencyFilePath())
 	}
 	// TODO: save the width of 2 columns
 
@@ -133,23 +124,23 @@ func Run() {
 		"Most Frequent",
 	})
 
-	frequencyView.Hide()
+	frequencyTable.Hide()
 
 	activityWidget := widgets.NewQWidget(nil, 0)
 	activityLayout := widgets.NewQVBoxLayout2(activityWidget)
 	activityLayout.SetContentsMargins(5, 5, 5, 5)
 	activityLayout.AddWidget(activityTypeCombo, 0, 0)
 	activityLayout.AddWidget(historyView, 0, 0)
-	activityLayout.AddWidget(frequencyView, 0, 0)
+	activityLayout.AddWidget(frequencyTable, 0, 0)
 
 	activityTypeCombo.ConnectCurrentIndexChanged(func(index int) {
 		switch index {
 		case 0:
 			historyView.Show()
-			frequencyView.Hide()
+			frequencyTable.Hide()
 		case 1:
 			historyView.Hide()
-			frequencyView.Show()
+			frequencyTable.Show()
 		}
 	})
 
@@ -254,9 +245,9 @@ func Run() {
 	historyView.ConnectItemClicked(func(item *widgets.QListWidgetItem) {
 		doQuery(item.Text())
 	})
-	frequencyView.ConnectItemClicked(func(item *widgets.QTableWidgetItem) {
+	frequencyTable.ConnectItemClicked(func(item *widgets.QTableWidgetItem) {
 		index := item.Row()
-		key := frequencyView.Keys[index]
+		key := frequencyTable.Keys[index]
 		doQuery(key)
 	})
 	reloadDictsButton.ConnectClicked(func(checked bool) {
@@ -286,7 +277,7 @@ func Run() {
 	clearHistoryButton.ConnectClicked(func(checked bool) {
 		clearHistory()
 		historyView.Clear()
-		// frequencyView.Clear()
+		// frequencyTable.Clear()
 	})
 	clearButton.ConnectClicked(func(checked bool) {
 		resetQuery()
@@ -335,13 +326,22 @@ func Run() {
 		}
 	})
 
-	qsettings := core.NewQSettings("ilius", "ayandict", window)
-	reastoreMainWinGeometry(qsettings, window)
+	qs := core.NewQSettings("ilius", "ayandict", window)
+	reastoreMainWinGeometry(qs, window)
 	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		saveMainWinGeometry(qsettings, window)
+		saveMainWinGeometry(qs, window)
 	})
 	window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
-		saveMainWinGeometry(qsettings, window)
+		saveMainWinGeometry(qs, window)
+	})
+	restoreTableColumnsWidth(
+		qs,
+		frequencyTable.QTableWidget,
+		QS_frequencyTable,
+	)
+	// frequencyTable.ConnectColumnResized does not work
+	frequencyTable.HorizontalHeader().ConnectSectionResized(func(logicalIndex int, oldSize int, newSize int) {
+		saveTableColumnsWidth(qs, frequencyTable.QTableWidget, QS_frequencyTable)
 	})
 
 	window.Show()

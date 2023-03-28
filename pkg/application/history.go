@@ -34,7 +34,7 @@ func addHistoryAndFrequency(query string) {
 		addHistory(query)
 	}
 	if !conf.MostFrequentDisable {
-		frequencyView.Add(query, 1)
+		frequencyTable.Add(query, 1)
 		if conf.MostFrequentAutoSave {
 			SaveFrequency()
 		}
@@ -108,7 +108,7 @@ func SaveHistory() {
 func SaveFrequency() {
 	frequencySaveMutex.Lock()
 	defer frequencySaveMutex.Unlock()
-	err := frequencyView.SaveToFile(frequencyFilePath())
+	err := frequencyTable.SaveToFile(frequencyFilePath())
 	if err != nil {
 		fmt.Printf("Error saving history: %v\n", err)
 	}
@@ -119,7 +119,7 @@ func clearHistory() {
 	history = []string{}
 	historyMutex.Unlock()
 
-	frequencyView.Clear()
+	frequencyTable.Clear()
 
 	SaveHistory()
 	SaveFrequency()

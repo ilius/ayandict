@@ -12,10 +12,10 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
-func NewFrequencyView(maxSize int) *FrequencyView {
+func NewFrequencyView(maxSize int) *FrequencyTable {
 	widget := widgets.NewQTableWidget(nil)
 	widget.SetColumnCount(2)
-	return &FrequencyView{
+	return &FrequencyTable{
 		QTableWidget: widget,
 		maxSize:      maxSize,
 		KeyMap:       map[string]int{},
@@ -23,7 +23,7 @@ func NewFrequencyView(maxSize int) *FrequencyView {
 	}
 }
 
-type FrequencyView struct {
+type FrequencyTable struct {
 	*widgets.QTableWidget
 
 	maxSize int
@@ -33,20 +33,20 @@ type FrequencyView struct {
 	KeyMap map[string]int
 }
 
-func (view *FrequencyView) Clear() {
+func (view *FrequencyTable) Clear() {
 	view.Counts = map[string]int{}
 	view.Keys = []string{}
 	view.KeyMap = map[string]int{}
 	view.QTableWidget.SetRowCount(0)
 }
 
-func (view *FrequencyView) newItem(text string) *widgets.QTableWidgetItem {
+func (view *FrequencyTable) newItem(text string) *widgets.QTableWidgetItem {
 	item := widgets.NewQTableWidgetItem2(text, 0)
 	item.SetFlags(core.Qt__ItemIsSelectable | core.Qt__ItemIsEnabled)
 	return item
 }
 
-func (view *FrequencyView) addNew(key string, count int) {
+func (view *FrequencyTable) addNew(key string, count int) {
 	index := len(view.Keys)
 	view.KeyMap[key] = index
 	view.Keys = append(view.Keys, key)
@@ -61,7 +61,7 @@ func (view *FrequencyView) addNew(key string, count int) {
 	view.Trim()
 }
 
-func (view *FrequencyView) moveUp(key string) int {
+func (view *FrequencyTable) moveUp(key string) int {
 	index := view.KeyMap[key]
 	prevKey := view.Keys[index-1]
 
@@ -73,14 +73,14 @@ func (view *FrequencyView) moveUp(key string) int {
 	return index - 1
 }
 
-func (view *FrequencyView) setItemForKey(index int, key string) {
+func (view *FrequencyTable) setItemForKey(index int, key string) {
 	view.SetItem(index, 0, view.newItem(key))
 	view.SetItem(index, 1, view.newItem(
 		strconv.FormatInt(int64(view.Counts[key]), 10),
 	))
 }
 
-func (view *FrequencyView) Add(key string, plus int) {
+func (view *FrequencyTable) Add(key string, plus int) {
 	index, ok := view.KeyMap[key]
 	if !ok {
 		view.addNew(key, plus)
@@ -99,7 +99,7 @@ func (view *FrequencyView) Add(key string, plus int) {
 	view.setItemForKey(index, key)
 }
 
-func (view *FrequencyView) LoadFromFile(pathStr string) error {
+func (view *FrequencyTable) LoadFromFile(pathStr string) error {
 	jsonBytes, err := ioutil.ReadFile(pathStr)
 	if err != nil {
 		if !os.IsNotExist(err) {
@@ -125,7 +125,7 @@ func (view *FrequencyView) LoadFromFile(pathStr string) error {
 	return nil
 }
 
-func (view *FrequencyView) Trim() {
+func (view *FrequencyTable) Trim() {
 	if len(view.Counts) <= view.maxSize {
 		return
 	}
@@ -150,7 +150,7 @@ func (view *FrequencyView) Trim() {
 	view.SetRowCount(maxSize)
 }
 
-func (view *FrequencyView) SaveToFile(pathStr string) error {
+func (view *FrequencyTable) SaveToFile(pathStr string) error {
 	jsonBytes, err := json.MarshalIndent(view.Counts, "", "\t")
 	if err != nil {
 		panic(err)
