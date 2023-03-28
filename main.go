@@ -34,7 +34,7 @@ func main() {
 	LoadConfig(app)
 	initDicts()
 
-	frequencyView = frequency.NewFrequencyView()
+	frequencyView = frequency.NewFrequencyView(conf.MostFrequentMaxSize)
 
 	// icon := gui.NewQIcon5("./img/icon.png")
 
@@ -72,7 +72,7 @@ func main() {
 
 	frequencyView.SetHorizontalHeaderItem(
 		0,
-		widgets.NewQTableWidgetItem2("Term", 0),
+		widgets.NewQTableWidgetItem2("Query", 0),
 	)
 	frequencyView.SetHorizontalHeaderItem(
 		1,

@@ -12,18 +12,21 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
-func NewFrequencyView() *FrequencyView {
-	view := &FrequencyView{}
+func NewFrequencyView(maxSize int) *FrequencyView {
 	widget := widgets.NewQTableWidget(nil)
-	view.QTableWidget = widget
-	view.KeyMap = map[string]int{}
-	view.Counts = map[string]int{}
 	widget.SetColumnCount(2)
-	return view
+	return &FrequencyView{
+		QTableWidget: widget,
+		maxSize:      maxSize,
+		KeyMap:       map[string]int{},
+		Counts:       map[string]int{},
+	}
 }
 
 type FrequencyView struct {
 	*widgets.QTableWidget
+
+	maxSize int
 
 	Counts map[string]int
 	Keys   []string
@@ -55,6 +58,7 @@ func (view *FrequencyView) addNew(key string, count int) {
 		strconv.FormatInt(int64(count), 10),
 	)
 	view.SetItem(index, 1, qCountItem)
+	view.Trim()
 }
 
 func (view *FrequencyView) moveUp(key string) int {
@@ -122,6 +126,31 @@ func (view *FrequencyView) LoadFromFile(pathStr string) error {
 		view.addNew(item[0].(string), item[1].(int))
 	}
 	return nil
+}
+
+func (view *FrequencyView) Trim() {
+	if len(view.Counts) <= view.maxSize {
+		return
+	}
+	maxSize := view.maxSize
+	// to avoid trimming on every new item
+	if maxSize > 20 {
+		maxSize -= 10
+	} else {
+		maxSize = maxSize * 2 / 3
+	}
+	// fmt.Printf("Triming %d items to %d\n", len(view.Counts), maxSize)
+	newKeys := view.Keys[:maxSize]
+	newKeyMap := map[string]int{}
+	newCounts := map[string]int{}
+	for _, key := range newKeys {
+		newKeyMap[key] = view.KeyMap[key]
+		newCounts[key] = view.Counts[key]
+	}
+	view.Keys = newKeys
+	view.KeyMap = newKeyMap
+	view.Counts = newCounts
+	view.SetRowCount(maxSize)
 }
 
 func (view *FrequencyView) SaveToFile(pathStr string) error {

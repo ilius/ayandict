@@ -69,7 +69,7 @@ func Default() *Config {
 
 		MostFrequentDisable:  false,
 		MostFrequentAutoSave: true,
-		MostFrequentMaxSize:  20,
+		MostFrequentMaxSize:  100,
 
 		MaxResultsPerDict: 20,
 		MaxResultsTotal:   40,
