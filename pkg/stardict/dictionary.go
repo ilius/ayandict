@@ -14,11 +14,6 @@ import (
 	"github.com/ilius/ayandict/pkg/levenshtein"
 )
 
-// Translation contains translation items
-type Translation struct {
-	Parts []*TranslationItem
-}
-
 // TranslationItem contain single translation item
 type TranslationItem struct {
 	Data []byte
@@ -27,7 +22,7 @@ type TranslationItem struct {
 
 type SearchResult struct {
 	Terms []string
-	Items []*TranslationItem
+	Items func() []*TranslationItem
 	Score uint8
 }
 
@@ -159,7 +154,9 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 			results = append(results, &SearchResult{
 				Score: score,
 				Terms: entry.Terms,
-				Items: d.translate(entry.Offset, entry.Size),
+				Items: func() []*TranslationItem {
+					return d.translate(entry.Offset, entry.Size)
+				},
 			})
 		}
 	}

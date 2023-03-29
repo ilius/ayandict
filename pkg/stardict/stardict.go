@@ -243,7 +243,7 @@ func LookupHTML(
 		for _, res := range dic.Search(query, maxResultsPerDict) {
 			definitions := []string{}
 			resURL := dic.ResourceURL()
-			for _, item := range res.Items {
+			for _, item := range res.Items() {
 				if item.Type == 'h' {
 					itemDefi := string(item.Data)
 					itemDefi = fixDefiHTML(itemDefi, resURL, conf)
