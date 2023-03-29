@@ -21,26 +21,23 @@ type SearchResultItem struct {
 }
 
 type SearchResult struct {
-	terms []string
 	items func() []*SearchResultItem
+	terms []string
 	score uint8
 }
 
 // Dictionary stardict dictionary
 type Dictionary struct {
-	disabled bool
-
+	dict     *Dict
+	idx      *Idx
+	info     *Info
 	ifoPath  string
 	idxPath  string
 	dictPath string
 	synPath  string
-
-	dict *Dict
-	idx  *Idx
-	info *Info
-
-	resDir string
-	resURL string
+	resDir   string
+	resURL   string
+	disabled bool
 }
 
 func (d *Dictionary) ResourceDir() string {
@@ -95,9 +92,9 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 		queryWordCount++
 	}
 
-	chechEntry := func(entry *IdxEntry) uint8 {
+	chechEntry := func(terms []string) uint8 {
 		bestScore := uint8(0)
-		for _, termOrig := range entry.Terms {
+		for _, termOrig := range terms {
 			term := strings.ToLower(termOrig)
 			if term == query {
 				return 200
@@ -149,16 +146,18 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 	prefix, _ := utf8.DecodeRuneInString(queryMainWord)
 	for _, termIndex := range idx.byWordPrefix[prefix] {
 		entry := idx.terms[termIndex]
-		score := chechEntry(entry)
-		if score > 100 {
-			results = append(results, &SearchResult{
-				score: score,
-				terms: entry.Terms,
-				items: func() []*SearchResultItem {
-					return d.translate(entry.Offset, entry.Size)
-				},
-			})
+		score := chechEntry(entry.Terms)
+		if score <= 100 {
+			continue
 		}
+		results = append(results, &SearchResult{
+			score: score,
+			terms: entry.Terms,
+			items: func() []*SearchResultItem {
+				return d.translate(entry.Offset, entry.Size)
+			},
+		})
+
 	}
 	fmt.Printf("Search produced %d results for %#v on %s\n", len(results), query, d.DictName())
 	sort.Slice(results, func(i, j int) bool {

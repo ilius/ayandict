@@ -170,7 +170,6 @@ func ReadIndex(filename string, synPath string, info *Info) (*Idx, error) {
 			alt := string(b_alt)
 			entry := idx.terms[termIndex]
 			entry.Terms = append(entry.Terms, alt)
-			// fmt.Printf("alt: %#v, index: %v, target: %#v\n", alt, termIndex, idx.terms[termIndex].Terms)
 			addTermPrefix(alt, termIndex)
 		}
 	}

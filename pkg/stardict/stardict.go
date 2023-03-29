@@ -73,8 +73,8 @@ func (r *QueryResultImp) ResourceDir() string {
 }
 
 type DicListSorter struct {
-	List  []*Dictionary
 	Order map[string]int
+	List  []*Dictionary
 }
 
 func (s DicListSorter) Len() int {
