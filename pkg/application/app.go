@@ -144,16 +144,29 @@ func Run() {
 		}
 	})
 
-	sideBar := widgets.NewQTabWidget(nil)
-	sideBar.AddTab(activityWidget, "Activity")
-	sideBar.AddTab(miscBox, "Misc")
+	leftPanel := widgets.NewQWidget(nil, 0)
+	leftPanelLayout := widgets.NewQVBoxLayout2(leftPanel)
+	leftPanelLayout.AddWidget(widgets.NewQLabel2("Results", nil, 0), 0, 0)
+	resultList := NewResultListWidget(webview)
+	leftPanelLayout.AddWidget(resultList, 0, 0)
+
+	queryWidgets := &QueryWidgets{
+		Webview:    webview,
+		ResultList: resultList,
+	}
+
+	rightPanel := widgets.NewQTabWidget(nil)
+	rightPanel.AddTab(activityWidget, "Activity")
+	rightPanel.AddTab(miscBox, "Misc")
 
 	mainSplitter := widgets.NewQSplitter(nil)
 	mainSplitter.SetSizePolicy2(expanding, expanding)
+	mainSplitter.AddWidget(leftPanel)
 	mainSplitter.AddWidget(leftMainWidget)
-	mainSplitter.AddWidget(sideBar)
-	mainSplitter.SetStretchFactor(0, 5)
-	mainSplitter.SetStretchFactor(1, 1)
+	mainSplitter.AddWidget(rightPanel)
+	mainSplitter.SetStretchFactor(0, 1)
+	mainSplitter.SetStretchFactor(1, 5)
+	mainSplitter.SetStretchFactor(2, 1)
 
 	mainLayout := widgets.NewQVBoxLayout()
 	mainLayout.SetContentsMargins(5, 5, 5, 5)
@@ -167,20 +180,29 @@ func Run() {
 	mediaPlayer := multimedia.NewQMediaPlayer(nil, 0)
 
 	doQuery := func(query string) {
-		onQuery(query, updateWebView, false)
+		onQuery(query, queryWidgets, false)
 		entry.SetText(query)
 	}
 
 	resetQuery := func() {
 		entry.SetText("")
+		resultList.Clear()
 		updateWebView("")
 	}
 
 	entry.ConnectReturnPressed(func() {
-		onQuery(entry.Text(), updateWebView, false)
+		onQuery(entry.Text(), queryWidgets, false)
 	})
 	okButton.ConnectClicked(func(bool) {
-		onQuery(entry.Text(), updateWebView, false)
+		onQuery(entry.Text(), queryWidgets, false)
+	})
+	resultList.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
+		switch event.Text() {
+		case " ":
+			entry.SetFocus(core.Qt__ShortcutFocusReason)
+			return
+		}
+		resultList.KeyPressEventDefault(event)
 	})
 	webview.ConnectAnchorClicked(func(link *core.QUrl) {
 		host := link.Host(core.QUrl__FullyDecoded)
@@ -234,7 +256,6 @@ func Run() {
 	// historyView.SelectedItems() panics
 	// and even after fixing panic, doesn't return anything
 	// you have to use historyView.CurrentIndex()
-
 	historyView.ConnectMousePressEvent(func(event *gui.QMouseEvent) {
 		historyView.MousePressEventDefault(event)
 		index := historyView.CurrentIndex()
@@ -284,7 +305,7 @@ func Run() {
 	})
 	reloadConfigButton.ConnectClicked(func(checked bool) {
 		LoadConfig(app)
-		onQuery(entry.Text(), updateWebView, false)
+		onQuery(entry.Text(), queryWidgets, false)
 	})
 	reloadStyleButton.ConnectClicked(func(checked bool) {
 		LoadUserStyle(app)
@@ -311,7 +332,7 @@ func Run() {
 		}
 		if dictManager.Dialog.Exec() == dialogAccepted {
 			SaveDictManagerDialog(dictManager)
-			onQuery(entry.Text(), updateWebView, false)
+			onQuery(entry.Text(), queryWidgets, false)
 		}
 	})
 
@@ -341,7 +362,7 @@ func Run() {
 			if len(text) < conf.SearchOnTypeMinLength {
 				return
 			}
-			onQuery(text, updateWebView, true)
+			onQuery(text, queryWidgets, true)
 		}
 	})
 
