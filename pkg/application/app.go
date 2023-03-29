@@ -315,7 +315,7 @@ func Run() {
 		doQuery(item.Text())
 	})
 	frequencyTable.ConnectItemClicked(func(item *widgets.QTableWidgetItem) {
-		doQuery(frequencyTable.Keys[item.Row()])
+		frequencyTable.ItemActivated(item)
 	})
 	frequencyTable.ConnectItemActivated(func(item *widgets.QTableWidgetItem) {
 		key := frequencyTable.Keys[item.Row()]
