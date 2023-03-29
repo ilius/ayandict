@@ -43,6 +43,13 @@ func (info Info) IndexFileSize() uint64 {
 	return num
 }
 
+func (info Info) MaxIdxBytes() int {
+	if info.Is64 {
+		return 8
+	}
+	return 4
+}
+
 func decodeOption(str string) (key string, value string, err error) {
 	a := strings.Split(str, "=")
 

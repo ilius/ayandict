@@ -1,7 +1,9 @@
 package stardict
 
 import (
+	"bytes"
 	"encoding/binary"
+	"fmt"
 	"io/ioutil"
 	"strconv"
 	"strings"
@@ -9,7 +11,7 @@ import (
 )
 
 type IdxEntry struct {
-	Term   string
+	Terms  []string
 	Offset uint64
 	Size   uint64
 }
@@ -24,7 +26,7 @@ type Idx struct {
 func NewIdx(entryCount int) *Idx {
 	idx := new(Idx)
 	if entryCount > 0 {
-		idx.terms = make([]*IdxEntry, entryCount)
+		idx.terms = make([]*IdxEntry, 0, entryCount)
 	} else {
 		idx.terms = []*IdxEntry{}
 	}
@@ -36,7 +38,7 @@ func NewIdx(entryCount int) *Idx {
 func (idx *Idx) Add(term string, offset uint64, size uint64) int {
 	termIndex := len(idx.terms)
 	idx.terms = append(idx.terms, &IdxEntry{
-		Term:   term,
+		Terms:  []string{term},
 		Offset: offset,
 		Size:   size,
 	})
@@ -44,11 +46,11 @@ func (idx *Idx) Add(term string, offset uint64, size uint64) int {
 }
 
 // ReadIndex reads dictionary index into a memory and returns in-memory index structure
-func ReadIndex(filename string, info *Info) (idx *Idx, err error) {
+func ReadIndex(filename string, synPath string, info *Info) (*Idx, error) {
 	data, err := ioutil.ReadFile(filename)
 	// unable to read index
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	entryCount := 0
@@ -61,7 +63,7 @@ func ReadIndex(filename string, info *Info) (idx *Idx, err error) {
 		entryCount = int(n)
 	}
 
-	idx = NewIdx(entryCount)
+	idx := NewIdx(entryCount)
 
 	var a [255]byte // temporary buffer
 	var aIdx int
@@ -71,14 +73,22 @@ func ReadIndex(filename string, info *Info) (idx *Idx, err error) {
 	var dataOffset uint64
 	var dataSize uint64
 
-	var maxIntBytes int
+	maxIntBytes := info.MaxIdxBytes()
 
-	if info.Is64 == true {
-		maxIntBytes = 8
-	} else {
-		maxIntBytes = 4
-	}
 	byWordPrefix := map[rune]map[int]bool{}
+
+	addTermPrefix := func(term string, termIndex int) {
+		for _, word := range strings.Split(strings.ToLower(term), " ") {
+			prefix, _ := utf8.DecodeRuneInString(word)
+			m, ok := byWordPrefix[prefix]
+			if !ok {
+				m = map[int]bool{}
+				byWordPrefix[prefix] = m
+			}
+			m[termIndex] = true
+		}
+	}
+
 	for _, b := range data {
 		if expect == 0 {
 			a[aIdx] = b
@@ -122,21 +132,49 @@ func ReadIndex(filename string, info *Info) (idx *Idx, err error) {
 			// finished with one record
 			termIndex := idx.Add(term, dataOffset, dataSize)
 
-			for _, word := range strings.Split(strings.ToLower(term), " ") {
-				prefix, _ := utf8.DecodeRuneInString(word)
-				m, ok := byWordPrefix[prefix]
-				if !ok {
-					m = map[int]bool{}
-					byWordPrefix[prefix] = m
-				}
-				m[termIndex] = true
-			}
+			addTermPrefix(term, termIndex)
 
 			continue
 		}
 		aIdx++
-
 	}
+	if synPath != "" {
+		data, err := ioutil.ReadFile(synPath)
+		// unable to read index
+		if err != nil {
+			return nil, err
+		}
+		dataLen := len(data)
+		pos := 0
+		for pos < dataLen {
+			beg := pos
+			// Python: pos = data.find("\x00", beg)
+			offset := bytes.Index(data[beg:], []byte{0})
+			if offset < 0 {
+				return nil, fmt.Errorf("Synonym file is corrupted")
+			}
+			pos = offset + beg
+			b_alt := data[beg:pos]
+			pos += 1
+			if pos+4 > len(data) {
+				return nil, fmt.Errorf("Synonym file is corrupted")
+			}
+			termIndex := int(binary.BigEndian.Uint32(data[pos : pos+4]))
+			pos += 4
+			if termIndex >= len(idx.terms) {
+				return nil, fmt.Errorf(
+					"Corrupted synonym file. Word %#v references invalid item",
+					string(b_alt),
+				)
+			}
+			alt := string(b_alt)
+			entry := idx.terms[termIndex]
+			entry.Terms = append(entry.Terms, alt)
+			// fmt.Printf("alt: %#v, index: %v, target: %#v\n", alt, termIndex, idx.terms[termIndex].Terms)
+			addTermPrefix(alt, termIndex)
+		}
+	}
+
 	for prefix, indexMap := range byWordPrefix {
 		indexList := make([]int, 0, len(indexMap))
 		for i := range indexMap {

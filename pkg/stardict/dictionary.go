@@ -26,6 +26,7 @@ type TranslationItem struct {
 }
 
 type SearchResult struct {
+	// TODO: Terms []string
 	Term  string
 	Items []*TranslationItem
 	Score uint8
@@ -38,6 +39,7 @@ type Dictionary struct {
 	ifoPath  string
 	idxPath  string
 	dictPath string
+	synPath  string
 
 	dict *Dict
 	idx  *Idx
@@ -99,59 +101,65 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 		queryWordCount++
 	}
 
-	prefix, _ := utf8.DecodeRuneInString(queryMainWord)
-	for _, termIndex := range idx.byWordPrefix[prefix] {
-		entry := idx.terms[termIndex]
-		termOrig := entry.Term
-		term := strings.ToLower(termOrig)
-		words := strings.Split(term, " ")
-		if strings.Contains(term, query) {
-			results = append(results, &SearchResult{
-				Score: uint8(200 * (1 + len(query)) / (1 + len(term))),
-				Term:  termOrig,
-				Items: d.translate(entry.Offset, entry.Size),
-			})
-			continue
-		}
-		score := similarity(query, term)
-		if len(words) < minWordCount {
-			continue
-		}
-		if score > 120 {
-			results = append(results, &SearchResult{
-				Score: score,
-				Term:  termOrig,
-				Items: d.translate(entry.Offset, entry.Size),
-			})
-			continue
-		}
-		bestWordScore := uint8(0)
-		for wordI, word := range words {
-			wordScore := similarity(queryMainWord, word)
-			if wordI != mainWordIndex {
-				wordScore -= wordScore / 10
+	chechEntry := func(entry *IdxEntry) *SearchResult {
+		for _, termOrig := range entry.Terms {
+			term := strings.ToLower(termOrig)
+			words := strings.Split(term, " ")
+			if strings.Contains(term, query) {
+				return &SearchResult{
+					Score: uint8(200 * (1 + len(query)) / (1 + len(term))),
+					Term:  termOrig,
+					Items: d.translate(entry.Offset, entry.Size),
+				}
 			}
-			if wordScore < 140 {
+			score := similarity(query, term)
+			if len(words) < minWordCount {
 				continue
 			}
-			if wordScore > bestWordScore {
-				bestWordScore = wordScore
+			if score > 120 {
+				return &SearchResult{
+					Score: score,
+					Term:  termOrig,
+					Items: d.translate(entry.Offset, entry.Size),
+				}
+			}
+			bestWordScore := uint8(0)
+			for wordI, word := range words {
+				wordScore := similarity(queryMainWord, word)
+				if wordI != mainWordIndex {
+					wordScore -= wordScore / 10
+				}
+				if wordScore < 140 {
+					continue
+				}
+				if wordScore > bestWordScore {
+					bestWordScore = wordScore
+				}
+			}
+			if bestWordScore > 50 {
+				if queryWordCount > 1 {
+					bestWordScore = bestWordScore/2 + bestWordScore/7
+				}
+				if bestWordScore > score {
+					score = bestWordScore
+				}
+			}
+			if score > 100 {
+				return &SearchResult{
+					Score: score,
+					Term:  termOrig,
+					Items: d.translate(entry.Offset, entry.Size),
+				}
 			}
 		}
-		if bestWordScore > 50 {
-			if queryWordCount > 1 {
-				bestWordScore = bestWordScore/2 + bestWordScore/7
-			}
-			if bestWordScore > score {
-				score = bestWordScore
-			}
-		}
-		if score > 100 {
-			results = append(results, &SearchResult{
-				Score: score,
-				Term:  termOrig,
-				Items: d.translate(entry.Offset, entry.Size),
-			})
+		return nil
+	}
+
+	prefix, _ := utf8.DecodeRuneInString(queryMainWord)
+	for _, termIndex := range idx.byWordPrefix[prefix] {
+		result := chechEntry(idx.terms[termIndex])
+		if result != nil {
+			results = append(results, result)
 		}
 	}
 	fmt.Printf("Search produced %d results for %#v on %s\n", len(results), query, d.BookName())
@@ -253,18 +261,21 @@ func NewDictionary(path string, name string) (*Dictionary, error) {
 
 	path = filepath.Clean(path)
 
+	ifoPath := filepath.Join(path, name+".ifo")
+	idxPath := filepath.Join(path, name+".idx")
+	synPath := filepath.Join(path, name+".syn")
+
 	dictDzPath := filepath.Join(path, name+".dict.dz")
 	dictPath := filepath.Join(path, name+".dict")
 
-	idxPath := filepath.Join(path, name+".idx")
-	ifoPath := filepath.Join(path, name+".ifo")
-
-	if _, err := os.Stat(ifoPath); os.IsNotExist(err) {
+	if _, err := os.Stat(ifoPath); err != nil {
 		return nil, err
 	}
-
-	if _, err := os.Stat(idxPath); os.IsNotExist(err) {
+	if _, err := os.Stat(idxPath); err != nil {
 		return nil, err
+	}
+	if _, err := os.Stat(synPath); err != nil {
+		synPath = ""
 	}
 
 	// we should have either .dict.dz or .dict file
@@ -284,21 +295,26 @@ func NewDictionary(path string, name string) (*Dictionary, error) {
 
 	d.ifoPath = ifoPath
 	d.idxPath = idxPath
+	d.synPath = synPath
 	d.dictPath = dictPath
 
 	return d, nil
 }
 
 func (d *Dictionary) load() error {
-	idx, err := ReadIndex(d.idxPath, d.info)
-	if err != nil {
-		return err
+	{
+		idx, err := ReadIndex(d.idxPath, d.synPath, d.info)
+		if err != nil {
+			return err
+		}
+		d.idx = idx
 	}
-	d.idx = idx
-	dict, err := ReadDict(d.dictPath, d.info)
-	if err != nil {
-		return err
+	{
+		dict, err := ReadDict(d.dictPath, d.info)
+		if err != nil {
+			return err
+		}
+		d.dict = dict
 	}
-	d.dict = dict
 	return nil
 }
