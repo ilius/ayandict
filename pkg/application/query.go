@@ -97,10 +97,14 @@ func (w *ResultListWidget) OnActivate(row int) {
 		html.EscapeString(res.DictName()),
 		header,
 	))
-	w.Webview.SetHtml(strings.Join(
+	text := strings.Join(
 		res.DefinitionsHTML(),
 		"\n<br/>\n",
-	))
+	)
+	if definitionStyleString != "" {
+		text = definitionStyleString + text
+	}
+	w.Webview.SetHtml(text)
 	resDir := res.ResourceDir()
 	if resDir == "" {
 		w.Webview.SetSearchPaths([]string{})

@@ -24,6 +24,8 @@ type Config struct {
 
 	Style string `toml:"style"`
 
+	DefinitionStyle string `toml:"definition_style"`
+
 	FontFamily string `toml:"font_family"`
 	FontSize   int    `toml:"font_size"`
 
@@ -54,7 +56,10 @@ func Default() *Config {
 			".stardict/dic",
 		},
 
-		Style:      "",
+		Style: "",
+
+		DefinitionStyle: "",
+
 		FontFamily: "",
 		FontSize:   0,
 

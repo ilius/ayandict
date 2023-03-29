@@ -343,6 +343,7 @@ func Run() {
 	})
 	reloadStyleButton.ConnectClicked(func(checked bool) {
 		LoadUserStyle(app)
+		onQuery(entry.Text(), queryWidgets, false)
 	})
 	saveHistoryButton.ConnectClicked(func(checked bool) {
 		SaveHistory()
