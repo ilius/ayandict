@@ -245,10 +245,37 @@ func Run() {
 		}
 		gui.QDesktopServices_OpenUrl(link)
 	})
+
+	// menuStyleOpt := widgets.NewQStyleOptionMenuItem()
+	// style := app.Style()
+	// queryMenuIcon := style.StandardIcon(widgets.QStyle__SP_ArrowUp, menuStyleOpt, nil)
+
+	webview.ConnectContextMenuEvent(func(event *gui.QContextMenuEvent) {
+		event.Ignore()
+		// menu := webview.CreateStandardContextMenu2(event.GlobalPos())
+		menu := webview.CreateStandardContextMenu()
+		// actions := menu.Actions()
+		// fmt.Println("actions", actions)
+		// menu.Actions() panic
+		// https://github.com/therecipe/qt/issues/1286
+		// firstAction := menu.ActiveAction()
+		action := widgets.NewQAction2("Query", webview)
+		action.ConnectTriggered(func(checked bool) {
+			text := webview.TextCursor().SelectedText()
+			if text != "" {
+				doQuery(text)
+			}
+		})
+		menu.InsertAction(nil, action)
+		menu.Popup(event.GlobalPos(), nil)
+	})
 	webview.ConnectMouseReleaseEvent(func(event *gui.QMouseEvent) {
 		switch event.Button() {
 		case core.Qt__MiddleButton:
-			doQuery(webview.TextCursor().SelectedText())
+			text := webview.TextCursor().SelectedText()
+			if text != "" {
+				doQuery(text)
+			}
 			return
 		}
 		webview.MouseReleaseEventDefault(event)
