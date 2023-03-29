@@ -33,17 +33,18 @@ func Run() {
 	window.SetWindowTitle("AyanDict")
 	window.Resize2(600, 400)
 
+	defiTitleLabel := widgets.NewQLabel(nil, 0)
+	// defiTitleLabel.SetFont()
+	defiTitleLabel.SetAlignment(core.Qt__AlignVCenter)
+	defiTitleLabel.SetContentsMargins(20, 0, 0, 0)
+	// defiTitleLabel.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
+	defiTitleLabel.SetTextFormat(core.Qt__RichText)
+
 	webview := widgets.NewQTextBrowser(nil)
 	// webview := webengine.NewQWebEngineView(nil)
 	webview.SetReadOnly(true)
 	webview.SetOpenExternalLinks(true)
 	webview.SetOpenLinks(false)
-	// webview.SetContentsMargins(0, 0, 0, 0)
-
-	updateWebView := func(s string) {
-		// webview.SetHtml(s, core.NewQUrl())
-		webview.SetHtml(s)
-	}
 
 	entry := widgets.NewQLineEdit(nil)
 	entry.SetPlaceholderText("")
@@ -114,8 +115,13 @@ func Run() {
 	leftMainWidget := widgets.NewQWidget(nil, 0)
 	leftMainLayout := widgets.NewQVBoxLayout2(leftMainWidget)
 	leftMainLayout.SetContentsMargins(0, 0, 0, 0)
+	leftMainLayout.SetSpacing(0)
 	leftMainLayout.AddWidget(queryBox, 0, 0)
+	leftMainLayout.AddSpacing(5)
+	leftMainLayout.AddWidget(defiTitleLabel, 0, core.Qt__AlignVCenter)
+	leftMainLayout.AddSpacing(5)
 	leftMainLayout.AddWidget(webview, 0, 0)
+	leftMainLayout.AddSpacing(5)
 	leftMainLayout.AddLayout(bottomLayout, 0)
 
 	activityTypeCombo := widgets.NewQComboBox(nil)
@@ -147,7 +153,7 @@ func Run() {
 	leftPanel := widgets.NewQWidget(nil, 0)
 	leftPanelLayout := widgets.NewQVBoxLayout2(leftPanel)
 	leftPanelLayout.AddWidget(widgets.NewQLabel2("Results", nil, 0), 0, 0)
-	resultList := NewResultListWidget(webview)
+	resultList := NewResultListWidget(webview, defiTitleLabel)
 	leftPanelLayout.AddWidget(resultList, 0, 0)
 
 	queryWidgets := &QueryWidgets{
@@ -187,7 +193,8 @@ func Run() {
 	resetQuery := func() {
 		entry.SetText("")
 		resultList.Clear()
-		updateWebView("")
+		webview.SetHtml("")
+		defiTitleLabel.SetText("")
 	}
 
 	entry.ConnectReturnPressed(func() {

@@ -16,10 +16,14 @@ type QueryWidgets struct {
 	ResultList *ResultListWidget
 }
 
-func NewResultListWidget(webview *widgets.QTextBrowser) *ResultListWidget {
+func NewResultListWidget(
+	webview *widgets.QTextBrowser,
+	titleLabel *widgets.QLabel,
+) *ResultListWidget {
 	widget := widgets.NewQListWidget(nil)
 	resultList := &ResultListWidget{
 		QListWidget: widget,
+		TitleLabel:  titleLabel,
 		Webview:     webview,
 	}
 	widget.ConnectCurrentRowChanged(func(row int) {
@@ -40,8 +44,9 @@ func NewResultListWidget(webview *widgets.QTextBrowser) *ResultListWidget {
 
 type ResultListWidget struct {
 	*widgets.QListWidget
-	Webview *widgets.QTextBrowser
-	results []common.QueryResult
+	TitleLabel *widgets.QLabel
+	Webview    *widgets.QTextBrowser
+	results    []common.QueryResult
 }
 
 func (w *ResultListWidget) SetResults(results []common.QueryResult) {
@@ -71,7 +76,6 @@ func (w *ResultListWidget) SetResults(results []common.QueryResult) {
 func (w *ResultListWidget) OnActivate(row int) {
 	// row := item.
 	res := w.results[row]
-	parts := []string{}
 	header := conf.HeaderTag
 	if header == "" {
 		header = "b"
@@ -82,16 +86,17 @@ func (w *ResultListWidget) OnActivate(row int) {
 	}
 	// TODO: configure style of res.Term and res.DictName
 	// with <span style=...>
-	parts = append(parts, fmt.Sprintf(
+	w.TitleLabel.SetText(fmt.Sprintf(
 		"<%s>%s (from %s)</%s>\n",
 		header,
 		term,
 		html.EscapeString(res.DictName()),
 		header,
 	))
-	parts = append(parts, res.DefinitionsHTML()...)
-	htmlStr := strings.Join(parts, "\n<br/>\n")
-	w.Webview.SetHtml(htmlStr)
+	w.Webview.SetHtml(strings.Join(
+		res.DefinitionsHTML(),
+		"\n<br/>\n",
+	))
 }
 
 func onQuery(
