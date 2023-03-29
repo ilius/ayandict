@@ -253,7 +253,7 @@ func LookupHTML(query string, conf *config.Config) []*common.QueryResult {
 			}
 			results = append(results, &common.QueryResult{
 				Score:       res.Score,
-				Term:        res.Term,
+				Term:        strings.Join(res.Terms, " | "),
 				DictName:    dic.BookName(),
 				Definitions: definitions,
 			})

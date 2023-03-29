@@ -26,8 +26,7 @@ type TranslationItem struct {
 }
 
 type SearchResult struct {
-	// TODO: Terms []string
-	Term  string
+	Terms []string
 	Items []*TranslationItem
 	Score uint8
 }
@@ -101,27 +100,19 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 		queryWordCount++
 	}
 
-	chechEntry := func(entry *IdxEntry) *SearchResult {
+	chechEntry := func(entry *IdxEntry) uint8 {
 		for _, termOrig := range entry.Terms {
 			term := strings.ToLower(termOrig)
 			words := strings.Split(term, " ")
 			if strings.Contains(term, query) {
-				return &SearchResult{
-					Score: uint8(200 * (1 + len(query)) / (1 + len(term))),
-					Term:  termOrig,
-					Items: d.translate(entry.Offset, entry.Size),
-				}
+				return uint8(200 * (1 + len(query)) / (1 + len(term)))
 			}
 			score := similarity(query, term)
 			if len(words) < minWordCount {
 				continue
 			}
 			if score > 120 {
-				return &SearchResult{
-					Score: score,
-					Term:  termOrig,
-					Items: d.translate(entry.Offset, entry.Size),
-				}
+				return score
 			}
 			bestWordScore := uint8(0)
 			for wordI, word := range words {
@@ -145,21 +136,22 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 				}
 			}
 			if score > 100 {
-				return &SearchResult{
-					Score: score,
-					Term:  termOrig,
-					Items: d.translate(entry.Offset, entry.Size),
-				}
+				return score
 			}
 		}
-		return nil
+		return 0
 	}
 
 	prefix, _ := utf8.DecodeRuneInString(queryMainWord)
 	for _, termIndex := range idx.byWordPrefix[prefix] {
-		result := chechEntry(idx.terms[termIndex])
-		if result != nil {
-			results = append(results, result)
+		entry := idx.terms[termIndex]
+		score := chechEntry(entry)
+		if score > 0 {
+			results = append(results, &SearchResult{
+				Score: score,
+				Terms: entry.Terms,
+				Items: d.translate(entry.Offset, entry.Size),
+			})
 		}
 	}
 	fmt.Printf("Search produced %d results for %#v on %s\n", len(results), query, d.BookName())
