@@ -29,8 +29,9 @@ var dicList []*Dictionary
 
 type QueryResultImp struct {
 	*SearchResult
-	dic  *Dictionary
-	conf *config.Config
+	dic    *Dictionary
+	conf   *config.Config
+	hDefis []string
 }
 
 func (r *QueryResultImp) DictName() string {
@@ -46,6 +47,9 @@ func (r *QueryResultImp) Terms() []string {
 }
 
 func (r *QueryResultImp) DefinitionsHTML() []string {
+	if r.hDefis != nil {
+		return r.hDefis
+	}
 	definitions := []string{}
 	resURL := r.dic.ResourceURL()
 	for _, item := range r.items() {
@@ -60,6 +64,7 @@ func (r *QueryResultImp) DefinitionsHTML() []string {
 			std_html.EscapeString(string(item.Data)),
 		))
 	}
+	r.hDefis = definitions
 	return definitions
 }
 
