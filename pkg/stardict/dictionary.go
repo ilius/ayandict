@@ -101,18 +101,27 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 	}
 
 	chechEntry := func(entry *IdxEntry) uint8 {
+		bestScore := uint8(0)
 		for _, termOrig := range entry.Terms {
 			term := strings.ToLower(termOrig)
-			words := strings.Split(term, " ")
-			if strings.Contains(term, query) {
-				return uint8(200 * (1 + len(query)) / (1 + len(term)))
+			if term == query {
+				return 200
 			}
-			score := similarity(query, term)
+			if strings.Contains(term, query) {
+				score := uint8(200 * (1 + len(query)) / (1 + len(term)))
+				if score > bestScore {
+					bestScore = score
+					continue
+				}
+			}
+			words := strings.Split(term, " ")
 			if len(words) < minWordCount {
 				continue
 			}
-			if score > 120 {
-				return score
+			score := similarity(query, term)
+			if score > bestScore {
+				bestScore = score
+				continue
 			}
 			bestWordScore := uint8(0)
 			for wordI, word := range words {
@@ -135,18 +144,18 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 					score = bestWordScore
 				}
 			}
-			if score > 100 {
-				return score
+			if score > bestScore {
+				bestScore = score
 			}
 		}
-		return 0
+		return bestScore
 	}
 
 	prefix, _ := utf8.DecodeRuneInString(queryMainWord)
 	for _, termIndex := range idx.byWordPrefix[prefix] {
 		entry := idx.terms[termIndex]
 		score := chechEntry(entry)
-		if score > 0 {
+		if score > 100 {
 			results = append(results, &SearchResult{
 				Score: score,
 				Terms: entry.Terms,
