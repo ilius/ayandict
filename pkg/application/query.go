@@ -22,7 +22,11 @@ func onQuery(
 	}
 	fmt.Printf("Query: %s\n", query)
 	t := time.Now()
-	results := stardict.LookupHTML(query, conf)
+	results := stardict.LookupHTML(
+		query,
+		conf,
+		dictsOrder,
+	)
 	fmt.Println("LookupHTML took", time.Now().Sub(t))
 	if len(results) == 0 {
 		if !isAuto {

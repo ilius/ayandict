@@ -229,7 +229,11 @@ func fixDefiHTML(defi string, resURL string, conf *config.Config) string {
 	return defi
 }
 
-func LookupHTML(query string, conf *config.Config) []*common.QueryResult {
+func LookupHTML(
+	query string,
+	conf *config.Config,
+	dictsOrder map[string]int,
+) []*common.QueryResult {
 	results := []*common.QueryResult{}
 	maxResultsPerDict := conf.MaxResultsPerDict
 	for _, dic := range dicList {
@@ -260,7 +264,14 @@ func LookupHTML(query string, conf *config.Config) []*common.QueryResult {
 		}
 	}
 	sort.Slice(results, func(i, j int) bool {
-		return results[i].Score > results[j].Score
+		res1 := results[i]
+		res2 := results[j]
+		score1 := res1.Score
+		score2 := res2.Score
+		if score1 != score2 {
+			return score1 > score2
+		}
+		return dictsOrder[res1.DictName] < dictsOrder[res2.DictName]
 	})
 	cutoff := conf.MaxResultsTotal
 	if cutoff > 0 && len(results) > cutoff {
