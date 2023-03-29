@@ -68,6 +68,10 @@ func (r *QueryResultImp) DefinitionsHTML() []string {
 	return definitions
 }
 
+func (r *QueryResultImp) ResourceDir() string {
+	return r.dic.resDir
+}
+
 type DicListSorter struct {
 	List  []*Dictionary
 	Order map[string]int

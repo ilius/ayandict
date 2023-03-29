@@ -101,6 +101,12 @@ func (w *ResultListWidget) OnActivate(row int) {
 		res.DefinitionsHTML(),
 		"\n<br/>\n",
 	))
+	resDir := res.ResourceDir()
+	if resDir == "" {
+		w.Webview.SetSearchPaths([]string{})
+	} else {
+		w.Webview.SetSearchPaths([]string{resDir})
+	}
 }
 
 func (w *ResultListWidget) Clear() {
