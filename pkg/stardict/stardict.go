@@ -27,6 +27,42 @@ var (
 
 var dicList []*Dictionary
 
+type QueryResultImp struct {
+	*SearchResult
+	dic  *Dictionary
+	conf *config.Config
+}
+
+func (r *QueryResultImp) DictName() string {
+	return r.dic.DictName()
+}
+
+func (r *QueryResultImp) Score() uint8 {
+	return r.score
+}
+
+func (r *QueryResultImp) Terms() []string {
+	return r.terms
+}
+
+func (r *QueryResultImp) DefinitionsHTML() []string {
+	definitions := []string{}
+	resURL := r.dic.ResourceURL()
+	for _, item := range r.items() {
+		if item.Type == 'h' {
+			itemDefi := string(item.Data)
+			itemDefi = fixDefiHTML(itemDefi, resURL, r.conf)
+			definitions = append(definitions, itemDefi+"<br/>\n")
+			continue
+		}
+		definitions = append(definitions, fmt.Sprintf(
+			"<pre>%s</pre>\n<br/>\n",
+			std_html.EscapeString(string(item.Data)),
+		))
+	}
+	return definitions
+}
+
 type DicListSorter struct {
 	List  []*Dictionary
 	Order map[string]int
@@ -48,7 +84,7 @@ func absInt(x int) int {
 }
 
 func (s DicListSorter) Less(i, j int) bool {
-	return absInt(s.Order[s.List[i].BookName()]) < absInt(s.Order[s.List[j].BookName()])
+	return absInt(s.Order[s.List[i].DictName()]) < absInt(s.Order[s.List[j].DictName()])
 }
 
 func Init(directoryList []string, order map[string]int) {
@@ -83,7 +119,7 @@ func ApplyDictsOrder(order map[string]int) {
 	Reorder(order)
 	for _, dic := range dicList {
 		disabled := dic.disabled
-		dic.disabled = order[dic.BookName()] < 0
+		dic.disabled = order[dic.DictName()] < 0
 		if disabled && !dic.disabled {
 			dic.load()
 		}
@@ -233,45 +269,30 @@ func LookupHTML(
 	query string,
 	conf *config.Config,
 	dictsOrder map[string]int,
-) []*common.QueryResult {
-	results := []*common.QueryResult{}
+) []common.QueryResult {
+	results := []common.QueryResult{}
 	maxResultsPerDict := conf.MaxResultsPerDict
 	for _, dic := range dicList {
 		if dic.disabled {
 			continue
 		}
 		for _, res := range dic.Search(query, maxResultsPerDict) {
-			definitions := []string{}
-			resURL := dic.ResourceURL()
-			for _, item := range res.Items() {
-				if item.Type == 'h' {
-					itemDefi := string(item.Data)
-					itemDefi = fixDefiHTML(itemDefi, resURL, conf)
-					definitions = append(definitions, itemDefi+"<br/>\n")
-					continue
-				}
-				definitions = append(definitions, fmt.Sprintf(
-					"<pre>%s</pre>\n<br/>\n",
-					std_html.EscapeString(string(item.Data)),
-				))
-			}
-			results = append(results, &common.QueryResult{
-				Score:       res.Score,
-				Term:        strings.Join(res.Terms, " | "),
-				DictName:    dic.BookName(),
-				Definitions: definitions,
+			results = append(results, &QueryResultImp{
+				SearchResult: res,
+				dic:          dic,
+				conf:         conf,
 			})
 		}
 	}
 	sort.Slice(results, func(i, j int) bool {
 		res1 := results[i]
 		res2 := results[j]
-		score1 := res1.Score
-		score2 := res2.Score
+		score1 := res1.Score()
+		score2 := res2.Score()
 		if score1 != score2 {
 			return score1 > score2
 		}
-		return dictsOrder[res1.DictName] < dictsOrder[res2.DictName]
+		return dictsOrder[res1.DictName()] < dictsOrder[res2.DictName()]
 	})
 	cutoff := conf.MaxResultsTotal
 	if cutoff > 0 && len(results) > cutoff {

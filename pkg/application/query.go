@@ -42,9 +42,9 @@ func onQuery(
 		if header == "" {
 			header = "b"
 		}
-		term := html.EscapeString(res.Term)
+		term := html.EscapeString(strings.Join(res.Terms(), " | "))
 		if conf.ShowScore {
-			term += fmt.Sprintf(" [%%%d]", res.Score/2)
+			term += fmt.Sprintf(" [%%%d]", res.Score()/2)
 		}
 		// TODO: configure style of res.Term and res.DictName
 		// with <span style=...>
@@ -52,10 +52,10 @@ func onQuery(
 			"<%s>%s (from %s)</%s>\n",
 			header,
 			term,
-			html.EscapeString(res.DictName),
+			html.EscapeString(res.DictName()),
 			header,
 		))
-		parts = append(parts, res.Definitions...)
+		parts = append(parts, res.DefinitionsHTML()...)
 	}
 	htmlStr := strings.Join(parts, "\n<br/>\n")
 	setHtml(htmlStr)

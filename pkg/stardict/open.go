@@ -38,7 +38,7 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 		if err != nil {
 			return err
 		}
-		if order[dic.BookName()] < 0 {
+		if order[dic.DictName()] < 0 {
 			dic.disabled = true
 			dic.info.Disabled = true
 			dicList = append(dicList, dic)

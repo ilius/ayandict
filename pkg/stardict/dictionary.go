@@ -14,16 +14,16 @@ import (
 	"github.com/ilius/ayandict/pkg/levenshtein"
 )
 
-// TranslationItem contain single translation item
-type TranslationItem struct {
+// SearchResultItem contain single translation item
+type SearchResultItem struct {
 	Data []byte
 	Type rune
 }
 
 type SearchResult struct {
-	Terms []string
-	Items func() []*TranslationItem
-	Score uint8
+	terms []string
+	items func() []*SearchResultItem
+	score uint8
 }
 
 // Dictionary stardict dictionary
@@ -51,7 +51,7 @@ func (d *Dictionary) ResourceURL() string {
 	return d.resURL
 }
 
-func (d *Dictionary) translate(offset uint64, size uint64) (items []*TranslationItem) {
+func (d *Dictionary) translate(offset uint64, size uint64) []*SearchResultItem {
 	if _, ok := d.info.Options["sametypesequence"]; ok {
 		return d.translateWithSametypesequence(d.dict.GetSequence(offset, size))
 	}
@@ -152,27 +152,27 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 		score := chechEntry(entry)
 		if score > 100 {
 			results = append(results, &SearchResult{
-				Score: score,
-				Terms: entry.Terms,
-				Items: func() []*TranslationItem {
+				score: score,
+				terms: entry.Terms,
+				items: func() []*SearchResultItem {
 					return d.translate(entry.Offset, entry.Size)
 				},
 			})
 		}
 	}
-	fmt.Printf("Search produced %d results for %#v on %s\n", len(results), query, d.BookName())
+	fmt.Printf("Search produced %d results for %#v on %s\n", len(results), query, d.DictName())
 	sort.Slice(results, func(i, j int) bool {
-		return results[i].Score > results[j].Score
+		return results[i].score > results[j].score
 	})
 	if cutoff > 0 && len(results) > cutoff {
-		for ; cutoff < len(results) && results[cutoff].Score > 180; cutoff++ {
+		for ; cutoff < len(results) && results[cutoff].score > 180; cutoff++ {
 		}
 		results = results[:cutoff]
 	}
 	return results
 }
 
-func (d *Dictionary) translateWithSametypesequence(data []byte) (items []*TranslationItem) {
+func (d *Dictionary) translateWithSametypesequence(data []byte) (items []*SearchResultItem) {
 	seq := d.info.Options["sametypesequence"]
 
 	seqLen := len(seq)
@@ -185,18 +185,18 @@ func (d *Dictionary) translateWithSametypesequence(data []byte) (items []*Transl
 		case 'm', 'l', 'g', 't', 'x', 'y', 'k', 'w', 'h', 'r':
 			// if last seq item
 			if i == seqLen-1 {
-				items = append(items, &TranslationItem{Type: t, Data: data[dataPos:dataSize]})
+				items = append(items, &SearchResultItem{Type: t, Data: data[dataPos:dataSize]})
 			} else {
 				end := bytes.IndexRune(data[dataPos:], '\000')
-				items = append(items, &TranslationItem{Type: t, Data: data[dataPos : dataPos+end+1]})
+				items = append(items, &SearchResultItem{Type: t, Data: data[dataPos : dataPos+end+1]})
 				dataPos += end + 1
 			}
 		case 'W', 'P':
 			if i == seqLen-1 {
-				items = append(items, &TranslationItem{Type: t, Data: data[dataPos:dataSize]})
+				items = append(items, &SearchResultItem{Type: t, Data: data[dataPos:dataSize]})
 			} else {
 				size := binary.BigEndian.Uint32(data[dataPos : dataPos+4])
-				items = append(items, &TranslationItem{Type: t, Data: data[dataPos+4 : dataPos+int(size)+5]})
+				items = append(items, &SearchResultItem{Type: t, Data: data[dataPos+4 : dataPos+int(size)+5]})
 				dataPos += int(size) + 5
 			}
 		}
@@ -205,7 +205,7 @@ func (d *Dictionary) translateWithSametypesequence(data []byte) (items []*Transl
 	return
 }
 
-func (d *Dictionary) translateWithoutSametypesequence(data []byte) (items []*TranslationItem) {
+func (d *Dictionary) translateWithoutSametypesequence(data []byte) (items []*SearchResultItem) {
 	var dataPos int
 	dataSize := len(data)
 
@@ -219,15 +219,15 @@ func (d *Dictionary) translateWithoutSametypesequence(data []byte) (items []*Tra
 			end := bytes.IndexRune(data[dataPos:], '\000')
 
 			if end < 0 { // last item
-				items = append(items, &TranslationItem{Type: rune(t), Data: data[dataPos:dataSize]})
+				items = append(items, &SearchResultItem{Type: rune(t), Data: data[dataPos:dataSize]})
 				dataPos = dataSize
 			} else {
-				items = append(items, &TranslationItem{Type: rune(t), Data: data[dataPos : dataPos+end+1]})
+				items = append(items, &SearchResultItem{Type: rune(t), Data: data[dataPos : dataPos+end+1]})
 				dataPos += end + 1
 			}
 		case 'W', 'P':
 			size := binary.BigEndian.Uint32(data[dataPos : dataPos+4])
-			items = append(items, &TranslationItem{Type: rune(t), Data: data[dataPos+4 : dataPos+int(size)+5]})
+			items = append(items, &SearchResultItem{Type: rune(t), Data: data[dataPos+4 : dataPos+int(size)+5]})
 			dataPos += int(size) + 5
 		}
 
@@ -239,8 +239,8 @@ func (d *Dictionary) translateWithoutSametypesequence(data []byte) (items []*Tra
 	return
 }
 
-// BookName returns book name
-func (d *Dictionary) BookName() string {
+// DictName returns book name
+func (d *Dictionary) DictName() string {
 	return d.info.Options["bookname"]
 }
 

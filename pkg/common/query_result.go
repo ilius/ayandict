@@ -1,8 +1,8 @@
 package common
 
-type QueryResult struct {
-	Term        string
-	DictName    string
-	Definitions []string
-	Score       uint8
+type QueryResult interface {
+	Terms() []string
+	DictName() string
+	DefinitionsHTML() []string
+	Score() uint8
 }
