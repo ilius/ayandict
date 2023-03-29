@@ -34,10 +34,10 @@ func Run() {
 	window.Resize2(600, 400)
 
 	defiTitleLabel := widgets.NewQLabel(nil, 0)
-	// defiTitleLabel.SetFont()
+	defiTitleLabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
+	// | core.Qt__TextSelectableByKeyboard
 	defiTitleLabel.SetAlignment(core.Qt__AlignVCenter)
 	defiTitleLabel.SetContentsMargins(20, 0, 0, 0)
-	// defiTitleLabel.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
 	defiTitleLabel.SetTextFormat(core.Qt__RichText)
 
 	webview := widgets.NewQTextBrowser(nil)
