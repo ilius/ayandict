@@ -50,8 +50,8 @@ type ResultListWidget struct {
 }
 
 func (w *ResultListWidget) SetResults(results []common.QueryResult) {
+	w.QListWidget.Clear()
 	w.results = results
-	w.Clear()
 	for _, res := range results {
 		terms := res.Terms()
 		var text string
@@ -74,6 +74,10 @@ func (w *ResultListWidget) SetResults(results []common.QueryResult) {
 }
 
 func (w *ResultListWidget) OnActivate(row int) {
+	if row >= len(w.results) {
+		fmt.Printf("ResultListWidget: OnActivate: row index %v out of range\n", row)
+		return
+	}
 	// row := item.
 	res := w.results[row]
 	header := conf.HeaderTag
@@ -97,6 +101,11 @@ func (w *ResultListWidget) OnActivate(row int) {
 		res.DefinitionsHTML(),
 		"\n<br/>\n",
 	))
+}
+
+func (w *ResultListWidget) Clear() {
+	w.QListWidget.Clear()
+	w.results = nil
 }
 
 func onQuery(
