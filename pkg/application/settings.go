@@ -72,6 +72,17 @@ func setWinPosition(window *widgets.QMainWindow, pos *core.QPoint) {
 	window.Move(pos)
 }
 
+func setWinSize(window *widgets.QMainWindow, size *core.QSize) {
+	// TODO: check with screen size
+	if size.Width() > 2000 {
+		size.SetWidth(2000)
+	}
+	if size.Height() > 2000 {
+		size.SetHeight(2000)
+	}
+	window.Resize(size)
+}
+
 func restoreMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
 	qs.BeginGroup(QS_mainwindow)
 	defer qs.EndGroup()
@@ -91,7 +102,7 @@ func restoreMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
 			setWinPosition(window, value.ToPoint())
 		})
 		restoreSetting(qs, QS_size, func(value *core.QVariant) {
-			window.Resize(value.ToSize())
+			setWinSize(window, value.ToSize())
 		})
 	})
 }
