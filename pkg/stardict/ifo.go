@@ -29,9 +29,12 @@ func (info Info) BookName() string {
 }
 
 // WordCount returns number of words in the dictionary
-func (info Info) WordCount() uint64 {
-	num, _ := strconv.ParseUint(info.Options[I_wordcount], 10, 64)
-	return num
+func (info Info) WordCount() (int, error) {
+	num, err := strconv.ParseUint(info.Options[I_wordcount], 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return int(num), nil
 }
 
 func (info Info) Description() string {

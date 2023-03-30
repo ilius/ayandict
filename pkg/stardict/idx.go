@@ -5,7 +5,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io/ioutil"
-	"strconv"
 )
 
 type IdxEntry struct {
@@ -59,14 +58,9 @@ func ReadIndex(filename string, synPath string, info *Info) (*Idx, error) {
 		return nil, err
 	}
 
-	entryCount := 0
-	entryCountStr := info.Options["wordcount"]
-	if entryCountStr != "" {
-		n, err := strconv.ParseInt(entryCountStr, 10, 64)
-		if err != nil {
-			return nil, err
-		}
-		entryCount = int(n)
+	entryCount, err := info.WordCount()
+	if err != nil {
+		return nil, err
 	}
 	idx := NewIdx(entryCount)
 
