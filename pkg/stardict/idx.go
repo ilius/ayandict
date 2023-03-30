@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strconv"
-	"strings"
-	"unicode/utf8"
 )
 
 type IdxEntry struct {
@@ -45,6 +43,14 @@ func (idx *Idx) Add(term string, offset uint64, size uint64) int {
 	return termIndex
 }
 
+type t_state int
+
+const (
+	termState t_state = iota
+	offsetState
+	sizeState
+)
+
 // ReadIndex reads dictionary index into a memory and returns in-memory index structure
 func ReadIndex(filename string, synPath string, info *Info) (*Idx, error) {
 	data, err := ioutil.ReadFile(filename)
@@ -62,119 +68,60 @@ func ReadIndex(filename string, synPath string, info *Info) (*Idx, error) {
 		}
 		entryCount = int(n)
 	}
-
 	idx := NewIdx(entryCount)
 
-	var a [255]byte // temporary buffer
-	var aIdx int
-	var expect int
+	wordPrefixMap := WordPrefixMap{}
+
+	var buf [255]byte // temporary buffer
+	var bufPos int
+	state := termState
 
 	var term string
 	var dataOffset uint64
-	var dataSize uint64
 
 	maxIntBytes := info.MaxIdxBytes()
 
-	byWordPrefix := map[rune]map[int]bool{}
-
-	addTermPrefix := func(term string, termIndex int) {
-		for _, word := range strings.Split(strings.ToLower(term), " ") {
-			prefix, _ := utf8.DecodeRuneInString(word)
-			m, ok := byWordPrefix[prefix]
-			if !ok {
-				m = map[int]bool{}
-				byWordPrefix[prefix] = m
-			}
-			m[termIndex] = true
-		}
-	}
-
 	for _, b := range data {
-		if expect == 0 {
-			a[aIdx] = b
-			if b == 0 {
-				term = string(a[:aIdx])
-
-				aIdx = 0
-				expect++
+		buf[bufPos] = b
+		if state == termState {
+			if b > 0 {
+				bufPos++
 				continue
 			}
-			aIdx++
+			term = string(buf[:bufPos])
+			bufPos = 0
+			state = offsetState
 			continue
 		}
-		if expect == 1 {
-			a[aIdx] = b
-			if aIdx == maxIntBytes-1 {
-				if info.Is64 {
-					dataOffset = binary.BigEndian.Uint64(a[:maxIntBytes])
-				} else {
-					dataOffset = uint64(binary.BigEndian.Uint32(a[:maxIntBytes]))
-				}
-
-				aIdx = 0
-				expect++
-				continue
-			}
-			aIdx++
+		if bufPos < maxIntBytes-1 {
+			bufPos++
 			continue
 		}
-		a[aIdx] = b
-		if aIdx == maxIntBytes-1 {
-			if info.Is64 {
-				dataSize = binary.BigEndian.Uint64(a[:maxIntBytes])
-			} else {
-				dataSize = uint64(binary.BigEndian.Uint32(a[:maxIntBytes]))
-			}
-
-			aIdx = 0
-			expect = 0
-
-			// finished with one record
-			termIndex := idx.Add(term, dataOffset, dataSize)
-
-			addTermPrefix(term, termIndex)
-
+		var num uint64
+		if info.Is64 {
+			num = binary.BigEndian.Uint64(buf[:maxIntBytes])
+		} else {
+			num = uint64(binary.BigEndian.Uint32(buf[:maxIntBytes]))
+		}
+		if state == offsetState {
+			dataOffset = num
+			bufPos = 0
+			state = sizeState
 			continue
 		}
-		aIdx++
+		// finished with one record
+		bufPos = 0
+		state = termState
+		termIndex := idx.Add(term, dataOffset, num)
+		wordPrefixMap.Add(term, termIndex)
 	}
 	if synPath != "" {
-		data, err := ioutil.ReadFile(synPath)
-		// unable to read index
+		err := readSyn(idx, synPath, wordPrefixMap)
 		if err != nil {
 			return nil, err
 		}
-		dataLen := len(data)
-		pos := 0
-		for pos < dataLen {
-			beg := pos
-			// Python: pos = data.find("\x00", beg)
-			offset := bytes.Index(data[beg:], []byte{0})
-			if offset < 0 {
-				return nil, fmt.Errorf("Synonym file is corrupted")
-			}
-			pos = offset + beg
-			b_alt := data[beg:pos]
-			pos += 1
-			if pos+4 > len(data) {
-				return nil, fmt.Errorf("Synonym file is corrupted")
-			}
-			termIndex := int(binary.BigEndian.Uint32(data[pos : pos+4]))
-			pos += 4
-			if termIndex >= len(idx.terms) {
-				return nil, fmt.Errorf(
-					"Corrupted synonym file. Word %#v references invalid item",
-					string(b_alt),
-				)
-			}
-			alt := string(b_alt)
-			entry := idx.terms[termIndex]
-			entry.Terms = append(entry.Terms, alt)
-			addTermPrefix(alt, termIndex)
-		}
 	}
-
-	for prefix, indexMap := range byWordPrefix {
+	for prefix, indexMap := range wordPrefixMap {
 		indexList := make([]int, 0, len(indexMap))
 		for i := range indexMap {
 			indexList = append(indexList, i)
@@ -183,4 +130,41 @@ func ReadIndex(filename string, synPath string, info *Info) (*Idx, error) {
 	}
 
 	return idx, err
+}
+
+func readSyn(idx *Idx, synPath string, wordPrefixMap WordPrefixMap) error {
+	data, err := ioutil.ReadFile(synPath)
+	// unable to read index
+	if err != nil {
+		return err
+	}
+	dataLen := len(data)
+	pos := 0
+	for pos < dataLen {
+		beg := pos
+		// Python: pos = data.find("\x00", beg)
+		offset := bytes.Index(data[beg:], []byte{0})
+		if offset < 0 {
+			return fmt.Errorf("Synonym file is corrupted")
+		}
+		pos = offset + beg
+		b_alt := data[beg:pos]
+		pos += 1
+		if pos+4 > len(data) {
+			return fmt.Errorf("Synonym file is corrupted")
+		}
+		termIndex := int(binary.BigEndian.Uint32(data[pos : pos+4]))
+		pos += 4
+		if termIndex >= len(idx.terms) {
+			return fmt.Errorf(
+				"Corrupted synonym file. Word %#v references invalid item",
+				string(b_alt),
+			)
+		}
+		alt := string(b_alt)
+		entry := idx.terms[termIndex]
+		entry.Terms = append(entry.Terms, alt)
+		wordPrefixMap.Add(alt, termIndex)
+	}
+	return nil
 }
