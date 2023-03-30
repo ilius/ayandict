@@ -46,6 +46,8 @@ type Config struct {
 	MaxResultsTotal   int `toml:"max_results_total"`
 
 	Audio bool `toml:"audio"`
+
+	EmbedExternalStylesheet bool `toml:"embed_external_stylesheet"`
 }
 
 func Default() *Config {
@@ -78,6 +80,8 @@ func Default() *Config {
 		MaxResultsTotal:   40,
 
 		Audio: true,
+
+		EmbedExternalStylesheet: false,
 	}
 }
 

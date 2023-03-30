@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	std_html "html"
+	"io/ioutil"
 	"net/url"
+	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -21,6 +23,7 @@ var (
 	srcRE       = regexp.MustCompile(` src="[^<>"]*?"`)
 	hrefSoundRE = regexp.MustCompile(` href="sound://[^<>"]*?"`)
 	audioRE     = regexp.MustCompile(`<audio[ >].*?</audio>`)
+	linkRE      = regexp.MustCompile(`<link [^<>]+>`)
 
 	hrefBwordSpaceRE = regexp.MustCompile(` href="bword://[^<>"]*?( |%20)[^<>" ]*?"`)
 )
@@ -55,7 +58,7 @@ func (r *QueryResultImp) DefinitionsHTML() []string {
 	for _, item := range r.items() {
 		if item.Type == 'h' {
 			itemDefi := string(item.Data)
-			itemDefi = fixDefiHTML(itemDefi, resURL, r.conf)
+			itemDefi = fixDefiHTML(itemDefi, resURL, r.conf, r.dic)
 			definitions = append(definitions, itemDefi+"<br/>\n")
 			continue
 		}
@@ -262,13 +265,56 @@ func hrefBwordSpaceSub(match string) string {
 	return ` href="` + match[len(` href="bword://`):]
 }
 
-func fixDefiHTML(defi string, resURL string, conf *config.Config) string {
+func embedExternalStyle(defi string, resDir string) string {
+	const pre = len(` href=`)
+
+	subFunc := func(match string) string {
+		i := strings.Index(match, ` href=`)
+		if i < 0 {
+			return match
+		}
+		q_href := match[i+pre:]
+		j := strings.Index(q_href[1:], q_href[:1])
+		if j < 0 {
+			fmt.Printf("linkSub: did not find quote end in q_href=%#v\n", q_href)
+			return match
+		}
+		href := q_href[1 : j+1]
+		// fmt.Printf("linkSub: href=%#v\n", href)
+		if strings.Contains(href, "://") {
+			// TODO: download?
+			return match
+		}
+		data, err := ioutil.ReadFile(filepath.Join(resDir, href))
+		if err != nil {
+			if !os.IsNotExist(err) {
+				fmt.Println(err)
+			}
+			return match
+		}
+		return fmt.Sprintf("<style>\n%s\n</style>", string(data))
+	}
+
+	defi = linkRE.ReplaceAllStringFunc(defi, subFunc)
+	// fmt.Println(defi)
+	return defi
+}
+
+func fixDefiHTML(
+	defi string,
+	resURL string,
+	conf *config.Config,
+	dic *Dictionary,
+) string {
 	if resURL != "" {
 		defi = fixFileSrc(defi, resURL)
 		defi = fixHrefSound(defi, resURL)
 	}
 	if conf.Audio {
 		defi = fixAudioTag(defi, resURL)
+	}
+	if conf.EmbedExternalStylesheet {
+		defi = embedExternalStyle(defi, dic.resDir)
 	}
 	defi = hrefBwordSpaceRE.ReplaceAllStringFunc(defi, hrefBwordSpaceSub)
 	return defi
