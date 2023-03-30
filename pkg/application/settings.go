@@ -21,14 +21,14 @@ const (
 	QS_columnwidth    = "columnwidth"
 )
 
-func reastoreSetting(qs *core.QSettings, key string, apply func(*core.QVariant)) {
+func restoreSetting(qs *core.QSettings, key string, apply func(*core.QVariant)) {
 	if !qs.Contains(key) {
 		return
 	}
 	apply(qs.Value(key, core.NewQVariant1(nil)))
 }
 
-func reastoreBoolSetting(
+func restoreBoolSetting(
 	qs *core.QSettings,
 	key string, _default bool,
 	apply func(bool),
@@ -53,25 +53,44 @@ func saveMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
 	}
 }
 
-func reastoreMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
+func setWinPosition(window *widgets.QMainWindow, pos *core.QPoint) {
+	x := pos.X()
+	y := pos.Y()
+	// TODO: check with screen size
+	switch {
+	case x < 0:
+		pos.SetX(0)
+	case x > 1000:
+		pos.SetX(1000)
+	}
+	switch {
+	case y < 0:
+		pos.SetY(0)
+	case y > 1000:
+		pos.SetY(1000)
+	}
+	window.Move(pos)
+}
+
+func restoreMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
 	qs.BeginGroup(QS_mainwindow)
 	defer qs.EndGroup()
 
-	reastoreSetting(qs, QS_geometry, func(value *core.QVariant) {
+	restoreSetting(qs, QS_geometry, func(value *core.QVariant) {
 		window.RestoreGeometry(value.ToByteArray())
 	})
-	reastoreSetting(qs, QS_savestate, func(value *core.QVariant) {
+	restoreSetting(qs, QS_savestate, func(value *core.QVariant) {
 		window.RestoreState(value.ToByteArray(), 0)
 	})
-	reastoreBoolSetting(qs, QS_maximized, false, func(maximized bool) {
+	restoreBoolSetting(qs, QS_maximized, false, func(maximized bool) {
 		if maximized {
 			window.ShowMaximized()
 			return
 		}
-		reastoreSetting(qs, QS_pos, func(value *core.QVariant) {
-			window.Move(value.ToPoint())
+		restoreSetting(qs, QS_pos, func(value *core.QVariant) {
+			setWinPosition(window, value.ToPoint())
 		})
-		reastoreSetting(qs, QS_size, func(value *core.QVariant) {
+		restoreSetting(qs, QS_size, func(value *core.QVariant) {
 			window.Resize(value.ToSize())
 		})
 	})
