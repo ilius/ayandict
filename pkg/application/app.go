@@ -93,6 +93,8 @@ func Run() {
 	miscLayout.SetContentsMargins(0, 0, 0, 0)
 	reloadDictsButton := widgets.NewQPushButton2("Reload Dicts", nil)
 	miscLayout.AddWidget(reloadDictsButton, 0, 0)
+	closeDictsButton := widgets.NewQPushButton2("Close Dicts", nil)
+	miscLayout.AddWidget(closeDictsButton, 0, 0)
 	openConfigButton := widgets.NewQPushButton2("Open Config", nil)
 	miscLayout.AddWidget(openConfigButton, 0, 0)
 	reloadConfigButton := widgets.NewQPushButton2("Reload Config", nil)
@@ -326,6 +328,9 @@ func Run() {
 	})
 	reloadDictsButton.ConnectClicked(func(checked bool) {
 		reloadDicts()
+	})
+	closeDictsButton.ConnectClicked(func(checked bool) {
+		closeDicts()
 	})
 	openConfigButton.ConnectClicked(func(checked bool) {
 		err := config.EnsureExists(conf)

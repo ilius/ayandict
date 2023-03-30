@@ -21,3 +21,7 @@ func reloadDicts() {
 	// do we need mutex for this?
 	stardict.Init(conf.DirectoryList, dictsOrder)
 }
+
+func closeDicts() {
+	stardict.CloseDictFiles()
+}

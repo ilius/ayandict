@@ -355,3 +355,12 @@ func LookupHTML(
 	}
 	return results
 }
+
+func CloseDictFiles() {
+	for _, dic := range dicList {
+		if dic.disabled {
+			continue
+		}
+		dic.dict.Close()
+	}
+}

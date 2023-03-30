@@ -38,6 +38,8 @@ type Dictionary struct {
 	resDir   string
 	resURL   string
 	disabled bool
+
+	decodeData func(data []byte) []*SearchResultItem
 }
 
 func (d *Dictionary) ResourceDir() string {
@@ -46,13 +48,6 @@ func (d *Dictionary) ResourceDir() string {
 
 func (d *Dictionary) ResourceURL() string {
 	return d.resURL
-}
-
-func (d *Dictionary) translate(offset uint64, size uint64) []*SearchResultItem {
-	if _, ok := d.info.Options["sametypesequence"]; ok {
-		return d.translateWithSametypesequence(d.dict.GetSequence(offset, size))
-	}
-	return d.translateWithoutSametypesequence(d.dict.GetSequence(offset, size))
 }
 
 func similarity(a string, b string) uint8 {
@@ -154,7 +149,7 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 			score: score,
 			terms: entry.Terms,
 			items: func() []*SearchResultItem {
-				return d.translate(entry.Offset, entry.Size)
+				return d.decodeData(d.dict.GetSequence(entry.Offset, entry.Size))
 			},
 		})
 
@@ -171,7 +166,7 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 	return results
 }
 
-func (d *Dictionary) translateWithSametypesequence(data []byte) (items []*SearchResultItem) {
+func (d *Dictionary) decodeWithSametypesequence(data []byte) (items []*SearchResultItem) {
 	seq := d.info.Options["sametypesequence"]
 
 	seqLen := len(seq)
@@ -204,7 +199,7 @@ func (d *Dictionary) translateWithSametypesequence(data []byte) (items []*Search
 	return
 }
 
-func (d *Dictionary) translateWithoutSametypesequence(data []byte) (items []*SearchResultItem) {
+func (d *Dictionary) decodeWithoutSametypesequence(data []byte) (items []*SearchResultItem) {
 	var dataPos int
 	dataSize := len(data)
 
@@ -294,6 +289,12 @@ func NewDictionary(path string, name string) (*Dictionary, error) {
 	d.idxPath = idxPath
 	d.synPath = synPath
 	d.dictPath = dictPath
+
+	if _, ok := info.Options["sametypesequence"]; ok {
+		d.decodeData = d.decodeWithSametypesequence
+	} else {
+		d.decodeData = d.decodeWithoutSametypesequence
+	}
 
 	return d, nil
 }
