@@ -402,7 +402,7 @@ func Run() {
 	})
 
 	qs := core.NewQSettings("ilius", "ayandict", window)
-	restoreMainWinGeometry(qs, window)
+	restoreMainWinGeometry(app, qs, window)
 	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
 		saveMainWinGeometry(qs, window)
 	})

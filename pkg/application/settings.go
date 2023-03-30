@@ -53,37 +53,49 @@ func saveMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
 	}
 }
 
-func setWinPosition(window *widgets.QMainWindow, pos *core.QPoint) {
+func setWinPosition(
+	app *widgets.QApplication,
+	window *widgets.QMainWindow,
+	pos *core.QPoint,
+) {
+	screenSize := app.Desktop().AvailableGeometry(0)
 	x := pos.X()
 	y := pos.Y()
-	// TODO: check with screen size
 	switch {
 	case x < 0:
 		pos.SetX(0)
-	case x > 1000:
-		pos.SetX(1000)
+	case x > screenSize.Width():
+		pos.SetX(screenSize.Width() / 2)
 	}
 	switch {
 	case y < 0:
 		pos.SetY(0)
-	case y > 1000:
-		pos.SetY(1000)
+	case y > screenSize.Height():
+		pos.SetY(screenSize.Height() / 2)
 	}
 	window.Move(pos)
 }
 
-func setWinSize(window *widgets.QMainWindow, size *core.QSize) {
-	// TODO: check with screen size
-	if size.Width() > 2000 {
-		size.SetWidth(2000)
+func setWinSize(
+	app *widgets.QApplication,
+	window *widgets.QMainWindow,
+	size *core.QSize,
+) {
+	screenSize := app.Desktop().AvailableGeometry(0)
+	if size.Width() > screenSize.Width() {
+		size.SetWidth(screenSize.Width())
 	}
-	if size.Height() > 2000 {
-		size.SetHeight(2000)
+	if size.Height() > screenSize.Height() {
+		size.SetHeight(screenSize.Height())
 	}
 	window.Resize(size)
 }
 
-func restoreMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
+func restoreMainWinGeometry(
+	app *widgets.QApplication,
+	qs *core.QSettings,
+	window *widgets.QMainWindow,
+) {
 	qs.BeginGroup(QS_mainwindow)
 	defer qs.EndGroup()
 
@@ -99,10 +111,10 @@ func restoreMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
 			return
 		}
 		restoreSetting(qs, QS_pos, func(value *core.QVariant) {
-			setWinPosition(window, value.ToPoint())
+			setWinPosition(app, window, value.ToPoint())
 		})
 		restoreSetting(qs, QS_size, func(value *core.QVariant) {
-			setWinSize(window, value.ToSize())
+			setWinSize(app, window, value.ToSize())
 		})
 	})
 }
