@@ -1,6 +1,7 @@
 package application
 
 import (
+	"bytes"
 	"fmt"
 	"html"
 	"strings"
@@ -73,30 +74,33 @@ func (w *ResultListWidget) SetResults(results []common.QueryResult) {
 	}
 }
 
+type HeaderTemplateInput struct {
+	Terms    []string
+	Term     string
+	DictName string
+	Score    uint8
+}
+
 func (w *ResultListWidget) OnActivate(row int) {
 	if row >= len(w.results) {
 		fmt.Printf("ResultListWidget: OnActivate: row index %v out of range\n", row)
 		return
 	}
-	// row := item.
 	res := w.results[row]
-	header := conf.HeaderTag
-	if header == "" {
-		header = "b"
+	terms := res.Terms()
+	term := html.EscapeString(strings.Join(terms, " | "))
+	headerBuf := bytes.NewBuffer(nil)
+	err := headerTpl.Execute(headerBuf, HeaderTemplateInput{
+		Terms:    terms,
+		Term:     term,
+		DictName: html.EscapeString(res.DictName()),
+		Score:    res.Score() / 2,
+	})
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
-	term := html.EscapeString(strings.Join(res.Terms(), " | "))
-	if conf.ShowScore {
-		term += fmt.Sprintf(" [%%%d]", res.Score()/2)
-	}
-	// TODO: configure style of res.Term and res.DictName
-	// with <span style=...>
-	w.TitleLabel.SetText(fmt.Sprintf(
-		"<%s>%s (from %s)</%s>\n",
-		header,
-		term,
-		html.EscapeString(res.DictName()),
-		header,
-	))
+	w.TitleLabel.SetText(headerBuf.String())
 	text := strings.Join(
 		res.DefinitionsHTML(),
 		"\n<br/>\n",

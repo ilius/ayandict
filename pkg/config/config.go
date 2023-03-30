@@ -32,7 +32,7 @@ type Config struct {
 	SearchOnType          bool `toml:"search_on_type"`
 	SearchOnTypeMinLength int  `toml:"search_on_type_min_length"`
 
-	HeaderTag string `toml:"header_tag"`
+	HeaderTemplate string `toml:"header_template"`
 
 	HistoryDisable  bool `toml:"history_disable"`
 	HistoryAutoSave bool `toml:"history_auto_save"`
@@ -46,8 +46,6 @@ type Config struct {
 	MaxResultsTotal   int `toml:"max_results_total"`
 
 	Audio bool `toml:"audio"`
-
-	ShowScore bool `toml:"show_score"`
 }
 
 func Default() *Config {
@@ -66,7 +64,7 @@ func Default() *Config {
 		SearchOnType:          false,
 		SearchOnTypeMinLength: 3,
 
-		HeaderTag: "h1",
+		HeaderTemplate: `<h1>{{.Term}} (from {{.DictName}})</h1>`,
 
 		HistoryDisable:  false,
 		HistoryAutoSave: true,
@@ -80,8 +78,6 @@ func Default() *Config {
 		MaxResultsTotal:   40,
 
 		Audio: true,
-
-		ShowScore: false,
 	}
 }
 

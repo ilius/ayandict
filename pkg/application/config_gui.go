@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+	"html/template"
 	"sync"
 
 	"github.com/ilius/ayandict/pkg/config"
@@ -12,6 +13,8 @@ import (
 var (
 	conf      = &config.Config{}
 	confMutex sync.Mutex
+
+	headerTpl *template.Template
 )
 
 func LoadConfig(app *widgets.QApplication) {
@@ -43,6 +46,15 @@ func LoadConfig(app *widgets.QApplication) {
 		err := readDefinitionStyle(conf.DefinitionStyle)
 		if err != nil {
 			fmt.Println(err)
+		}
+	}
+	{
+		fmt.Println("Parsing:", conf.HeaderTemplate)
+		headerTplNew, err := template.New("header").Parse(conf.HeaderTemplate)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			headerTpl = headerTplNew
 		}
 	}
 }
