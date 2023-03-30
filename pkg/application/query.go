@@ -67,6 +67,10 @@ func (w *ResultListWidget) SetResults(results []common.QueryResult) {
 		default:
 			text += fmt.Sprintf("%s (+%d)", terms[0], len(terms)-1)
 		}
+		ds := dictSettingsMap[res.DictName()]
+		if ds != nil && ds.Symbol != "" {
+			text = fmt.Sprintf("%s %s", text, ds.Symbol)
+		}
 		w.AddItem(text)
 	}
 	if len(results) > 0 {

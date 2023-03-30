@@ -10,7 +10,7 @@ var dictsOrder map[string]int
 
 func initDicts() {
 	var err error
-	dictsOrder, err = loadDictsOrder()
+	dictSettingsMap, dictsOrder, err = loadDictsSettings()
 	if err != nil {
 		fmt.Println(err)
 	}

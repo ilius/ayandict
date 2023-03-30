@@ -49,7 +49,7 @@ func LoadConfig(app *widgets.QApplication) {
 		}
 	}
 	{
-		fmt.Println("Parsing:", conf.HeaderTemplate)
+		// fmt.Println("Parsing:", conf.HeaderTemplate)
 		headerTplNew, err := template.New("header").Parse(conf.HeaderTemplate)
 		if err != nil {
 			fmt.Println(err)
