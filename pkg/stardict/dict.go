@@ -45,6 +45,9 @@ func (d *Dict) Open() error {
 }
 
 func (d *Dict) Close() {
+	if d.r == nil {
+		return
+	}
 	fmt.Println("Closing", d.filename)
 	d.r.Close()
 	d.r = nil
