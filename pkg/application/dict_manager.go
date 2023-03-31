@@ -23,6 +23,11 @@ type DictSettings struct {
 
 var dictSettingsMap = map[string]*DictSettings{}
 
+func defaultDictSymbol(dictName string) string {
+	symbol, _ := utf8.DecodeRune([]byte(dictName))
+	return fmt.Sprintf("[%s]", string(symbol))
+}
+
 func loadDictsSettings() (map[string]*DictSettings, map[string]int, error) {
 	order := map[string]int{}
 	settingsMap := map[string]*DictSettings{}
@@ -38,11 +43,10 @@ func loadDictsSettings() (map[string]*DictSettings, map[string]int, error) {
 	if err != nil {
 		return settingsMap, order, err
 	}
-	for bookName, ds := range settingsMap {
-		order[bookName] = ds.Order
+	for dictName, ds := range settingsMap {
+		order[dictName] = ds.Order
 		if ds.Symbol == "" {
-			symbol, _ := utf8.DecodeRune([]byte(bookName))
-			ds.Symbol = fmt.Sprintf("[%s]", string(symbol))
+			ds.Symbol = defaultDictSymbol(dictName)
 		}
 	}
 	return settingsMap, order, nil
@@ -138,12 +142,19 @@ func NewDictManager(
 	}
 	setItem := func(index int, dictName string) {
 		ds := dictSettingsMap[dictName]
-		// fmt.Printf("dictName=%#v, ds=%#v\n", dictName, ds)
+		if ds == nil {
+			fmt.Printf("dictName=%#v, ds=%v\n", dictName, ds)
+			ds = &DictSettings{
+				Symbol: defaultDictSymbol(dictName),
+				Order:  index,
+			}
+			dictSettingsMap[dictName] = ds
+		}
 		checkItem := widgets.NewQTableWidgetItem(0)
-		if ds.Order >= 0 {
-			checkItem.SetCheckState(core.Qt__Checked)
-		} else {
+		if ds.Order < 0 {
 			checkItem.SetCheckState(core.Qt__Unchecked)
+		} else {
+			checkItem.SetCheckState(core.Qt__Checked)
 		}
 		table.SetItem(index, 0, checkItem)
 
