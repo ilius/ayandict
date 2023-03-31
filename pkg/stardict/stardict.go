@@ -112,10 +112,10 @@ func Init(directoryList []string, order map[string]int) {
 	}
 }
 
-func GetInfoList() []Info {
-	infos := make([]Info, len(dicList))
+func GetInfoList() []common.Info {
+	infos := make([]common.Info, len(dicList))
 	for i, dic := range dicList {
-		infos[i] = *dic.info
+		infos[i] = dic.info
 	}
 	return infos
 }

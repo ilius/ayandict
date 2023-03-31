@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"unicode/utf8"
 
+	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/stardict"
 	"github.com/therecipe/qt/core"
@@ -71,8 +72,8 @@ type DictManager struct {
 	TableWidget *widgets.QTableWidget
 }
 
-func makeDictInfoMap(infos []stardict.Info) map[string]stardict.Info {
-	infoMap := make(map[string]stardict.Info, len(infos))
+func makeDictInfoMap(infos []common.Info) map[string]common.Info {
+	infoMap := make(map[string]common.Info, len(infos))
 	for _, info := range infos {
 		infoMap[info.DictName()] = info
 	}
