@@ -252,6 +252,12 @@ func Run() {
 	// style := app.Style()
 	// queryMenuIcon := style.StandardIcon(widgets.QStyle__SP_ArrowUp, menuStyleOpt, nil)
 
+	// we set this on right-button MouseRelease when no text is selected
+	// and read it when Query is selected from context menu
+	// may not be pretty or concurrent-safe! but seems to work!
+	// although it would be better to trim punctuation characters from both ends
+	rightClickOnWord := ""
+
 	webview.ConnectContextMenuEvent(func(event *gui.QContextMenuEvent) {
 		event.Ignore()
 		// menu := webview.CreateStandardContextMenu2(event.GlobalPos())
@@ -261,12 +267,15 @@ func Run() {
 		// menu.Actions() panic
 		// https://github.com/therecipe/qt/issues/1286
 		// firstAction := menu.ActiveAction()
+
 		action := widgets.NewQAction2("Query", webview)
 		action.ConnectTriggered(func(checked bool) {
 			text := webview.TextCursor().SelectedText()
 			if text != "" {
 				doQuery(text)
+				return
 			}
+			doQuery(rightClickOnWord)
 		})
 		menu.InsertAction(nil, action)
 		menu.Popup(event.GlobalPos(), nil)
@@ -279,6 +288,11 @@ func Run() {
 				doQuery(text)
 			}
 			return
+		case core.Qt__RightButton:
+			cursor := webview.CursorForPosition(event.Pos())
+			cursor.Select(gui.QTextCursor__WordUnderCursor)
+			// it doesn't actually select the word in GUI
+			rightClickOnWord = cursor.SelectedText()
 		}
 		webview.MouseReleaseEventDefault(event)
 	})
