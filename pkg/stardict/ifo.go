@@ -24,12 +24,12 @@ type Info struct {
 	Disabled bool
 }
 
-func (info Info) BookName() string {
+func (info Info) DictName() string {
 	return info.Options[I_bookname]
 }
 
-// WordCount returns number of words in the dictionary
-func (info Info) WordCount() (int, error) {
+// EntryCount returns number of words in the dictionary
+func (info Info) EntryCount() (int, error) {
 	num, err := strconv.ParseUint(info.Options[I_wordcount], 10, 64)
 	if err != nil {
 		return 0, err

@@ -74,7 +74,7 @@ type DictManager struct {
 func makeDictInfoMap(infos []stardict.Info) map[string]stardict.Info {
 	infoMap := make(map[string]stardict.Info, len(infos))
 	for _, info := range infos {
-		infoMap[info.BookName()] = info
+		infoMap[info.DictName()] = info
 	}
 	return infoMap
 }
@@ -168,7 +168,7 @@ func NewDictManager(
 			core.Qt__ItemIsEditable)
 
 		table.SetItem(index, 1, symbolItem)
-		entries, err := info.WordCount()
+		entries, err := info.EntryCount()
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -232,7 +232,7 @@ func NewDictManager(
 
 	table.SetRowCount(len(infos))
 	for index, info := range infos {
-		setItem(index, info.BookName())
+		setItem(index, info.DictName())
 	}
 
 	return &DictManager{

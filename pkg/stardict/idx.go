@@ -58,7 +58,7 @@ func ReadIndex(filename string, synPath string, info *Info) (*Idx, error) {
 		return nil, err
 	}
 
-	entryCount, err := info.WordCount()
+	entryCount, err := info.EntryCount()
 	if err != nil {
 		return nil, err
 	}
