@@ -77,12 +77,14 @@ func NewDictManager(
 	window.Resize2(400, 400)
 	// window.SetSizePolicy2(expanding, expanding)
 
+	const columns = 3
+
 	table := widgets.NewQTableWidget(nil)
-	table.SetColumnCount(3)
+	table.SetColumnCount(columns)
 	header := table.HorizontalHeader()
 	header.ResizeSection(0, 10)
 	header.ResizeSection(1, 20)
-	header.ResizeSection(2, 300)
+	// header.ResizeSection(2, 300)
 
 	table.SetHorizontalHeaderItem(
 		0,
@@ -156,29 +158,33 @@ func NewDictManager(
 
 	// table.SelectedIndexes() panics/crashes
 	// so do methods in table.SelectionModel()
-	// you have to use table.CurrentIndex() or table.CurrentItem()
+	// you have to use table.CurrentRow(), table.CurrentIndex()
+	// or table.CurrentItem()
 	toolbarUp := func() {
-		// qIndex := table.CurrentIndex()
-		// index := qIndex.Row()
-		// if index < 1 {
-		// 	return
-		// }
-		// item := table.TakeItem(index)
-		// table.InsertRow(index-1)
-		// setItem(index-1)
-		// table.Item()
-		// table.InsertItem(index-1, item)
-		// table.SetCurrentRow(index - 1)
+		row := table.CurrentRow()
+		if row < 1 {
+			return
+		}
+		for col := 0; col < columns; col++ {
+			item1 := table.TakeItem(row, col)
+			item2 := table.TakeItem(row-1, col)
+			table.SetItem(row-1, col, item1)
+			table.SetItem(row, col, item2)
+		}
+		table.SetCurrentCell(row-1, table.CurrentColumn())
 	}
 	toolbarDown := func() {
-		// qIndex := table.CurrentIndex()
-		// index := qIndex.Row()
-		// if index > table.Count()-2 {
-		// 	return
-		// }
-		// item := table.TakeItem(index)
-		// table.InsertItem(index+1, item)
-		// table.SetCurrentRow(index + 1)
+		row := table.CurrentRow()
+		if row > table.RowCount()-2 {
+			return
+		}
+		for col := 0; col < columns; col++ {
+			item1 := table.TakeItem(row, col)
+			item2 := table.TakeItem(row+1, col)
+			table.SetItem(row+1, col, item1)
+			table.SetItem(row, col, item2)
+		}
+		table.SetCurrentCell(row+1, table.CurrentColumn())
 	}
 	toolbar.ConnectActionTriggered(func(action *widgets.QAction) {
 		switch action.Text() {
