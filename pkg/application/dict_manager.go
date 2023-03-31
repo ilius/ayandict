@@ -249,7 +249,7 @@ func dictsSettingsFromListWidget(table *widgets.QTableWidget) (map[string]*DictS
 	for index := 0; index < count; index++ {
 		disable := table.Item(index, 0).CheckState() != core.Qt__Checked
 		symbol := table.Item(index, 1).Text()
-		dictName := table.Item(index, 2).Text()
+		dictName := table.Item(index, 3).Text()
 		value := index + 1
 		if disable {
 			value = -value
