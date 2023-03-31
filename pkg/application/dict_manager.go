@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"unicode/utf8"
 
 	"github.com/ilius/ayandict/pkg/config"
@@ -70,25 +71,34 @@ type DictManager struct {
 	TableWidget *widgets.QTableWidget
 }
 
+func makeDictInfoMap(infos []stardict.Info) map[string]stardict.Info {
+	infoMap := make(map[string]stardict.Info, len(infos))
+	for _, info := range infos {
+		infoMap[info.BookName()] = info
+	}
+	return infoMap
+}
+
 func NewDictManager(
 	app *widgets.QApplication,
 	parent widgets.QWidget_ITF,
 ) *DictManager {
 	infos := stardict.GetInfoList()
+	infoMap := makeDictInfoMap(infos)
 
 	window := widgets.NewQDialog(parent, core.Qt__Dialog)
 	window.SetWindowTitle("Dictionaries")
-	window.Resize2(400, 400)
-	// window.SetSizePolicy2(expanding, expanding)
+	window.Resize2(800, 600)
 
-	const columns = 3
+	const columns = 4
 
 	table := widgets.NewQTableWidget(nil)
 	table.SetColumnCount(columns)
 	header := table.HorizontalHeader()
 	header.ResizeSection(0, 10)
 	header.ResizeSection(1, 20)
-	// header.ResizeSection(2, 300)
+	header.ResizeSection(2, 80)
+	header.ResizeSection(3, 500)
 
 	table.SetHorizontalHeaderItem(
 		0,
@@ -100,26 +110,15 @@ func NewDictManager(
 	)
 	table.SetHorizontalHeaderItem(
 		2,
+		widgets.NewQTableWidgetItem2("Entries", 0),
+	)
+	table.SetHorizontalHeaderItem(
+		3,
 		widgets.NewQTableWidgetItem2("Name", 0),
 	)
 
-	// table.SetSizePolicy2(expanding, expanding)
-	// table.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
-	// table.SetResizeMode(widgets.QListView__Adjust)
-	// table.SetSizeAdjustPolicy(widgets.QAbstractScrollArea__AdjustToContents)
-
-	// fmt.Println("Layout", window.Layout())
-	// window.Layout().DestroyQLayout()
-
-	// mainWidget := widgets.NewQWidget(nil, 0)
-	// mainWidget.SetLayout(mainHBox)
-	// window.SetLayout(mainHBox)
 	mainHBox := widgets.NewQHBoxLayout2(nil)
-	mainHBox.AddWidget(table, 10, core.Qt__AlignJustify)
-	// window.Layout().AddChildWidget(mainWidget)
-	// layout.SetStretch(0, 10)
-	// layout.SetSizeConstraint(widgets.QLayout__SetMaximumSize)
-	// layout.SetStretchFactor(table, 10)
+	mainHBox.AddWidget(table, 0, 0)
 
 	toolbar := widgets.NewQToolBar2(nil)
 	mainHBox.AddWidget(toolbar, 0, 0)
@@ -150,6 +149,11 @@ func NewDictManager(
 			}
 			dictSettingsMap[dictName] = ds
 		}
+		info, ok := infoMap[dictName]
+		if !ok {
+			fmt.Printf("dictName=%#v not in infoMap\n", dictName)
+			return
+		}
 		checkItem := widgets.NewQTableWidgetItem(0)
 		if ds.Order < 0 {
 			checkItem.SetCheckState(core.Qt__Unchecked)
@@ -164,7 +168,13 @@ func NewDictManager(
 			core.Qt__ItemIsEditable)
 
 		table.SetItem(index, 1, symbolItem)
-		table.SetItem(index, 2, newItem(dictName))
+		entries, err := info.WordCount()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		table.SetItem(index, 2, newItem(strconv.FormatInt(int64(entries), 10)))
+		table.SetItem(index, 3, newItem(dictName))
 	}
 
 	// table.SelectedIndexes() panics/crashes
