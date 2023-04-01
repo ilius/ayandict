@@ -122,15 +122,22 @@ func NewDictManager(
 	mainHBox.AddWidget(table, 0, 0)
 
 	toolbar := widgets.NewQToolBar2(nil)
-	mainHBox.AddWidget(toolbar, 0, 0)
+	toolbarVBox := widgets.NewQVBoxLayout2(nil)
+	toolbarVBox.AddSpacing(80)
+	toolbarVBox.AddWidget(toolbar, 0, 0)
+	toolbarVBox.SetContentsMargins(0, 0, 0, 0)
+
+	mainHBox.AddLayout(toolbarVBox, 0)
 	toolbar.SetOrientation(core.Qt__Vertical)
 
 	style := app.Style()
 	tbOpt := widgets.NewQStyleOptionToolBar()
+	toolbar.SetIconSize(core.NewQSize2(48, 48))
 	{
 		icon := style.StandardIcon(widgets.QStyle__SP_ArrowUp, tbOpt, nil)
 		toolbar.AddAction2(icon, "Up")
 	}
+	toolbar.AddSeparator()
 	{
 		icon := style.StandardIcon(widgets.QStyle__SP_ArrowDown, tbOpt, nil)
 		toolbar.AddAction2(icon, "Down")
