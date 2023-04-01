@@ -32,7 +32,7 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 		if filepath.Ext(fi.Name()) != ext {
 			return nil
 		}
-		fmt.Printf("Loading %#v\n", path)
+		fmt.Printf("Initializing %#v\n", path)
 		dirPath := filepath.Dir(path)
 		dic, err := NewDictionary(dirPath, name[:len(name)-len(ext)])
 		if err != nil {
@@ -44,6 +44,7 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 			dicList = append(dicList, dic)
 			return nil
 		}
+		fmt.Printf("Loading index for %#v\n", path)
 		err = dic.load()
 		if err != nil {
 			fmt.Println(err)
