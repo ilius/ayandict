@@ -9,35 +9,30 @@ import (
 	"sync"
 )
 
-type t_ReadSeekerCloser interface {
-	io.ReadSeeker
-	io.Closer
-}
-
 // Dict implements in-memory dictionary
 type Dict struct {
 	filename string
 
-	r    t_ReadSeekerCloser
+	file *os.File
 	lock sync.Mutex
 }
 
 func (d *Dict) Open() error {
-	reader, err := os.Open(d.filename)
+	file, err := os.Open(d.filename)
 	if err != nil {
 		return err
 	}
-	d.r = reader
+	d.file = file
 	return nil
 }
 
 func (d *Dict) Close() {
-	if d.r == nil {
+	if d.file == nil {
 		return
 	}
 	fmt.Println("Closing", d.filename)
-	d.r.Close()
-	d.r = nil
+	d.file.Close()
+	d.file = nil
 }
 
 func dictunzip(filename string) (string, error) {
