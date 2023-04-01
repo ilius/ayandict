@@ -3,6 +3,7 @@ ayandict
 qtbox
 *.exe
 *.exe~
+*.bin
 *.dll
 *.so
 *.dylib
