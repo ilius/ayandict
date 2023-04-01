@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 )
 
 type t_ReadSeekerCloser interface {
@@ -16,8 +17,10 @@ type t_ReadSeekerCloser interface {
 
 // Dict implements in-memory dictionary
 type Dict struct {
-	r        t_ReadSeekerCloser
 	filename string
+
+	r    t_ReadSeekerCloser
+	lock sync.Mutex
 }
 
 // GetSequence returns data at the given offset
@@ -26,6 +29,8 @@ func (d *Dict) GetSequence(offset uint64, size uint64) []byte {
 		log.Println("GetSequence: file is closed")
 		return nil
 	}
+	d.lock.Lock()
+	defer d.lock.Unlock()
 	d.r.Seek(int64(offset), 0)
 	p := make([]byte, size)
 	_, err := d.r.Read(p)
