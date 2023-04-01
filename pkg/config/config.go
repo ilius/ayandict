@@ -48,6 +48,8 @@ type Config struct {
 	Audio bool `toml:"audio"`
 
 	EmbedExternalStylesheet bool `toml:"embed_external_stylesheet"`
+
+	ColorMapping map[string]string `toml:"color_mapping"`
 }
 
 func Default() *Config {
@@ -82,6 +84,8 @@ func Default() *Config {
 		Audio: true,
 
 		EmbedExternalStylesheet: false,
+
+		ColorMapping: map[string]string{},
 	}
 }
 

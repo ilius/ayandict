@@ -25,6 +25,9 @@ var (
 	audioRE     = regexp.MustCompile(`<audio[ >].*?</audio>`)
 	linkRE      = regexp.MustCompile(`<link [^<>]+>`)
 
+	colorRE      = regexp.MustCompile(` color=["']#?[a-zA-Z0-9]+["']`)
+	styleColorRE = regexp.MustCompile(`color:#?[a-zA-Z0-9]+`)
+
 	hrefBwordSpaceRE = regexp.MustCompile(` href="bword://[^<>"]*?( |%20)[^<>" ]*?"`)
 )
 
@@ -300,6 +303,41 @@ func embedExternalStyle(defi string, resDir string) string {
 	return defi
 }
 
+func applyColorMapping(defi string, colorMapping map[string]string) string {
+	colorSub := func(match string) string {
+		key := match[len(` color="`) : len(match)-1]
+		if key == "" {
+			return match
+		}
+		if key[0] == '#' {
+			key = key[1:]
+		}
+		color, ok := colorMapping[key]
+		if !ok || color == "" {
+			return match
+		}
+		return match[:len(` color="`)] + color + match[len(match)-1:]
+	}
+	styleColorSub := func(match string) string {
+		key := match[len("color:"):]
+		if key == "" {
+			return match
+		}
+		if key[0] == '#' {
+			key = key[1:]
+		}
+		color, ok := colorMapping[key]
+		if !ok || color == "" {
+			return match
+		}
+		return "color:" + color
+	}
+
+	defi = colorRE.ReplaceAllStringFunc(defi, colorSub)
+	defi = styleColorRE.ReplaceAllStringFunc(defi, styleColorSub)
+	return defi
+}
+
 func fixDefiHTML(
 	defi string,
 	resURL string,
@@ -317,6 +355,9 @@ func fixDefiHTML(
 		defi = embedExternalStyle(defi, dic.resDir)
 	}
 	defi = hrefBwordSpaceRE.ReplaceAllStringFunc(defi, hrefBwordSpaceSub)
+	if len(conf.ColorMapping) > 0 {
+		defi = applyColorMapping(defi, conf.ColorMapping)
+	}
 	return defi
 }
 
