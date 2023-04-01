@@ -16,10 +16,6 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
-var expanding = widgets.QSizePolicy__Expanding
-
-var frequencyTable *frequency.FrequencyTable
-
 func Run() {
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 	LoadConfig(app)
@@ -52,6 +48,14 @@ func Run() {
 
 	okButton := widgets.NewQPushButton2("OK", nil)
 
+	aboutButton := widgets.NewQPushButton3(
+		app.Style().StandardIcon(
+			widgets.QStyle__SP_MessageBoxInformation,
+			widgets.NewQStyleOptionButton(), nil,
+		),
+		"", nil,
+	)
+
 	queryBox := widgets.NewQFrame(nil, 0)
 	queryBoxLayout := widgets.NewQHBoxLayout2(queryBox)
 	queryBoxLayout.SetContentsMargins(5, 5, 5, 0)
@@ -59,6 +63,8 @@ func Run() {
 	queryBoxLayout.AddWidget(widgets.NewQLabel2("Query:", nil, 0), 0, 0)
 	queryBoxLayout.AddWidget(entry, 0, 0)
 	queryBoxLayout.AddWidget(okButton, 0, 0)
+	queryBoxLayout.SetSpacing(10)
+	queryBoxLayout.AddWidget(aboutButton, 0, 0)
 
 	historyView := widgets.NewQListWidget(nil)
 
@@ -204,6 +210,9 @@ func Run() {
 	})
 	okButton.ConnectClicked(func(bool) {
 		onQuery(entry.Text(), queryWidgets, false)
+	})
+	aboutButton.ConnectClicked(func(bool) {
+		aboutClicked(window)
 	})
 	resultList.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
 		switch event.Text() {
