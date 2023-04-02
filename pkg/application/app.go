@@ -49,14 +49,6 @@ func Run() {
 
 	okButton := widgets.NewQPushButton2("OK", nil)
 
-	aboutButton := widgets.NewQPushButton3(
-		app.Style().StandardIcon(
-			widgets.QStyle__SP_MessageBoxInformation,
-			widgets.NewQStyleOptionButton(), nil,
-		),
-		"", nil,
-	)
-
 	queryBox := widgets.NewQFrame(nil, 0)
 	queryBoxLayout := widgets.NewQHBoxLayout2(queryBox)
 	queryBoxLayout.SetContentsMargins(5, 5, 5, 0)
@@ -64,8 +56,7 @@ func Run() {
 	queryBoxLayout.AddWidget(widgets.NewQLabel2("Query:", nil, 0), 0, 0)
 	queryBoxLayout.AddWidget(entry, 0, 0)
 	queryBoxLayout.AddWidget(okButton, 0, 0)
-	queryBoxLayout.SetSpacing(10)
-	queryBoxLayout.AddWidget(aboutButton, 0, 0)
+	// queryBoxLayout.SetSpacing(10)
 
 	historyView := widgets.NewQListWidget(nil)
 
@@ -116,8 +107,21 @@ func Run() {
 	bottomLayout := widgets.NewQHBoxLayout2(nil)
 	bottomLayout.SetContentsMargins(0, 0, 0, 0)
 	bottomLayout.SetSpacing(10)
+
 	dictsButton := widgets.NewQPushButton2("Dictionaries", nil)
 	bottomLayout.AddWidget(dictsButton, 0, core.Qt__AlignLeft)
+
+	aboutButton := widgets.NewQPushButton3(
+		app.Style().StandardIcon(
+			widgets.QStyle__SP_MessageBoxInformation,
+			widgets.NewQStyleOptionButton(), nil,
+		),
+		"About", nil,
+	)
+	bottomLayout.AddWidget(aboutButton, 0, core.Qt__AlignLeft)
+
+	bottomLayout.AddStretch(1)
+
 	clearButton := widgets.NewQPushButton2("Clear", nil)
 	bottomLayout.AddWidget(clearButton, 0, core.Qt__AlignRight)
 
