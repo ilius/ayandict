@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
@@ -19,6 +21,9 @@ const (
 
 	QS_frequencyTable = "frequencytable"
 	QS_columnwidth    = "columnwidth"
+
+	QS_mainSplitter = "main_splitter"
+	QS_sizes        = "sizes"
 )
 
 func restoreSetting(qs *core.QSettings, key string, apply func(*core.QVariant)) {
@@ -119,19 +124,19 @@ func restoreMainWinGeometry(
 	})
 }
 
-func saveTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, tableKey string) {
-	qs.BeginGroup(tableKey)
+func saveTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, mainKey string) {
+	qs.BeginGroup(mainKey)
 	defer qs.EndGroup()
 	count := table.ColumnCount()
-	widths := make([]string, count)
+	widths := make([]int, count)
 	for i := 0; i < count; i++ {
-		widths[i] = strconv.FormatInt(int64(table.ColumnWidth(i)), 10)
+		widths[i] = table.ColumnWidth(i)
 	}
-	qs.SetValue(QS_columnwidth, core.NewQVariant1(strings.Join(widths, ",")))
+	qs.SetValue(QS_columnwidth, core.NewQVariant1(joinIntList(widths)))
 }
 
-func restoreTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, tableKey string) {
-	qs.BeginGroup(tableKey)
+func restoreTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, mainKey string) {
+	qs.BeginGroup(mainKey)
 	defer qs.EndGroup()
 	if !qs.Contains(QS_columnwidth) {
 		return
@@ -148,4 +153,56 @@ func restoreTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, t
 		}
 		header.ResizeSection(index, int(width))
 	}
+}
+
+func saveSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
+	qs.BeginGroup(mainKey)
+	defer qs.EndGroup()
+	sizes := splitterSizes(splitter)
+	qs.SetValue(QS_sizes, core.NewQVariant1(joinIntList(sizes)))
+}
+
+func restoreSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
+	qs.BeginGroup(mainKey)
+	defer qs.EndGroup()
+	if !qs.Contains(QS_sizes) {
+		return
+	}
+	sizesStr := qs.Value(QS_sizes, core.NewQVariant1("")).ToString()
+	sizes, err := splitIntList(sizesStr)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	splitter.SetSizes(sizes)
+}
+
+func setupSplitterSizesSave(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
+	var mutex sync.Mutex
+	var lastSave time.Time
+	savedPos := make(map[int]int, 3)
+
+	onMove := func(pos int, index int) {
+		// log.Printf("---- splitter: moved: index=%v, pos=%v", index, pos)
+		eventTime := time.Now()
+		if !tryLockAsManyAs(&mutex, 5, 500*time.Millisecond) {
+			return
+		}
+		defer mutex.Unlock()
+		if eventTime.Before(lastSave) {
+			return
+		}
+		if savedPos[index] == pos {
+			return
+		}
+		// log.Printf("---- splitter: saving sizes: index=%v, pos=%v", index, pos)
+		saveSplitterSizes(qs, splitter, mainKey)
+		lastSave = time.Now()
+		savedPos[index] = pos
+		time.Sleep(500 * time.Millisecond)
+	}
+
+	splitter.ConnectSplitterMoved(func(pos int, index int) {
+		go onMove(pos, index)
+	})
 }

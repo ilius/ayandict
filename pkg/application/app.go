@@ -455,6 +455,7 @@ func Run() {
 	})
 
 	qs := core.NewQSettings("ilius", "ayandict", window)
+	restoreSplitterSizes(qs, mainSplitter, QS_mainSplitter)
 	restoreMainWinGeometry(app, qs, window)
 	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
 		saveMainWinGeometry(qs, window)
@@ -471,6 +472,11 @@ func Run() {
 	frequencyTable.HorizontalHeader().ConnectSectionResized(func(logicalIndex int, oldSize int, newSize int) {
 		saveTableColumnsWidth(qs, frequencyTable.QTableWidget, QS_frequencyTable)
 	})
+
+	// QSplitter.Sizes() panics:
+	// interface conversion: interface {} is []interface {}, not []int
+
+	setupSplitterSizesSave(qs, mainSplitter, QS_mainSplitter)
 
 	window.Show()
 	app.Exec()
