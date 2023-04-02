@@ -93,16 +93,18 @@ func Run() {
 	miscBox := widgets.NewQFrame(nil, 0)
 	miscLayout := widgets.NewQVBoxLayout2(miscBox)
 	miscLayout.SetContentsMargins(0, 0, 0, 0)
+
+	saveHistoryButton := widgets.NewQPushButton2("Save History", nil)
+	miscLayout.AddWidget(saveHistoryButton, 0, 0)
+	clearHistoryButton := widgets.NewQPushButton2("Clear History", nil)
+	miscLayout.AddWidget(clearHistoryButton, 0, 0)
+
 	reloadDictsButton := widgets.NewQPushButton2("Reload Dicts", nil)
 	miscLayout.AddWidget(reloadDictsButton, 0, 0)
 	closeDictsButton := widgets.NewQPushButton2("Close Dicts", nil)
 	miscLayout.AddWidget(closeDictsButton, 0, 0)
 	reloadStyleButton := widgets.NewQPushButton2("Reload Style", nil)
 	miscLayout.AddWidget(reloadStyleButton, 0, 0)
-	saveHistoryButton := widgets.NewQPushButton2("Save History", nil)
-	miscLayout.AddWidget(saveHistoryButton, 0, 0)
-	clearHistoryButton := widgets.NewQPushButton2("Clear History", nil)
-	miscLayout.AddWidget(clearHistoryButton, 0, 0)
 
 	bottomBox := widgets.NewQHBoxLayout2(nil)
 	bottomBox.SetContentsMargins(0, 0, 0, 0)
