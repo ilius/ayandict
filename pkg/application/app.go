@@ -17,6 +17,8 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
+var dictManager *DictManager
+
 func Run() {
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 	LoadConfig(app)
@@ -410,7 +412,6 @@ func Run() {
 
 	const dialogAccepted = int(widgets.QDialog__Accepted)
 
-	var dictManager *DictManager
 	dictsButton.ConnectClicked(func(checked bool) {
 		if dictManager == nil {
 			dictManager = NewDictManager(app, window)

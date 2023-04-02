@@ -20,6 +20,7 @@ func initDicts() {
 func reloadDicts() {
 	// do we need mutex for this?
 	stardict.Init(conf.DirectoryList, dictsOrder)
+	dictManager = nil
 }
 
 func closeDicts() {
