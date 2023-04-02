@@ -265,7 +265,6 @@ func Run() {
 	// we set this on right-button MouseRelease when no text is selected
 	// and read it when Query is selected from context menu
 	// may not be pretty or concurrent-safe! but seems to work!
-	// although it would be better to trim punctuation characters from both ends
 	rightClickOnWord := ""
 
 	webview.ConnectContextMenuEvent(func(event *gui.QContextMenuEvent) {
@@ -282,7 +281,7 @@ func Run() {
 		action.ConnectTriggered(func(checked bool) {
 			text := webview.TextCursor().SelectedText()
 			if text != "" {
-				doQuery(text)
+				doQuery(strings.Trim(text, queryForceTrimChars))
 				return
 			}
 			if rightClickOnWord != "" {
@@ -293,19 +292,23 @@ func Run() {
 		menu.Popup(event.GlobalPos(), nil)
 	})
 	webview.ConnectMouseReleaseEvent(func(event *gui.QMouseEvent) {
+		text := webview.TextCursor().SelectedText()
 		switch event.Button() {
 		case core.Qt__MiddleButton:
-			text := webview.TextCursor().SelectedText()
 			if text != "" {
-				doQuery(text)
+				doQuery(strings.Trim(text, queryForceTrimChars))
 			}
 			return
 		case core.Qt__RightButton:
-			cursor := webview.CursorForPosition(event.Pos())
-			cursor.Select(gui.QTextCursor__WordUnderCursor)
-			// it doesn't actually select the word in GUI
-			rightClickOnWord = strings.Trim(cursor.SelectedText(), punctuation)
-			fmt.Println(rightClickOnWord)
+			if text == "" {
+				cursor := webview.CursorForPosition(event.Pos())
+				cursor.Select(gui.QTextCursor__WordUnderCursor)
+				// it doesn't actually select the word in GUI
+				rightClickOnWord = strings.Trim(cursor.SelectedText(), punctuation)
+				if rightClickOnWord != "" {
+					fmt.Printf("Right-clicked on word %#v\n", rightClickOnWord)
+				}
+			}
 		}
 		webview.MouseReleaseEventDefault(event)
 	})
