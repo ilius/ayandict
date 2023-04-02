@@ -65,3 +65,12 @@ func LoadUserStyle(app *widgets.QApplication) {
 		}
 	}
 }
+
+func ReloadUserStyle(app *widgets.QApplication) {
+	if conf.Style == "" {
+		app.SetStyleSheet("")
+		currentStyle = ""
+		return
+	}
+	LoadUserStyle(app)
+}

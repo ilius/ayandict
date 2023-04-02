@@ -20,6 +20,7 @@ import (
 func Run() {
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 	LoadConfig(app)
+	LoadUserStyle(app)
 	initDicts()
 
 	frequencyTable = frequency.NewFrequencyView(conf.MostFrequentMaxSize)
@@ -387,7 +388,7 @@ func Run() {
 		gui.QDesktopServices_OpenUrl(url)
 	})
 	reloadConfigButton.ConnectClicked(func(checked bool) {
-		LoadConfig(app)
+		ReloadConfig(app)
 		onQuery(entry.Text(), queryWidgets, false)
 	})
 	reloadStyleButton.ConnectClicked(func(checked bool) {

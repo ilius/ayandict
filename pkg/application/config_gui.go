@@ -3,6 +3,7 @@ package application
 import (
 	"fmt"
 	"html/template"
+	"reflect"
 	"sync"
 
 	"github.com/ilius/ayandict/pkg/config"
@@ -26,9 +27,6 @@ func LoadConfig(app *widgets.QApplication) {
 		return
 	}
 	conf = newConf
-	if conf.Style != currentStyle {
-		LoadUserStyle(app)
-	}
 
 	font := gui.NewQFont()
 	if conf.FontFamily != "" {
@@ -56,5 +54,19 @@ func LoadConfig(app *widgets.QApplication) {
 		} else {
 			headerTpl = headerTplNew
 		}
+	}
+}
+
+func ReloadConfig(app *widgets.QApplication) {
+	currentDirList := conf.DirectoryList
+
+	LoadConfig(app)
+
+	if conf.Style != currentStyle {
+		ReloadUserStyle(app)
+	}
+
+	if !reflect.DeepEqual(conf.DirectoryList, currentDirList) {
+		reloadDicts()
 	}
 }
