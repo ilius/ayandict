@@ -97,7 +97,7 @@ func (w *ResultListWidget) OnActivate(row int) {
 	err := headerTpl.Execute(headerBuf, HeaderTemplateInput{
 		Terms:    terms,
 		Term:     term,
-		DictName: html.EscapeString(res.DictName()),
+		DictName: res.DictName(),
 		Score:    res.Score() / 2,
 	})
 	if err != nil {

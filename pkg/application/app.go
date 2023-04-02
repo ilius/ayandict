@@ -36,6 +36,7 @@ func Run() {
 	defiTitleLabel.SetAlignment(core.Qt__AlignVCenter)
 	defiTitleLabel.SetContentsMargins(20, 0, 0, 0)
 	defiTitleLabel.SetTextFormat(core.Qt__RichText)
+	defiTitleLabel.SetWordWrap(true)
 
 	webview := widgets.NewQTextBrowser(nil)
 	// webview := webengine.NewQWebEngineView(nil)
