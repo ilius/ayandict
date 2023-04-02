@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/ilius/ayandict/pkg/config"
 
@@ -284,7 +285,9 @@ func Run() {
 				doQuery(text)
 				return
 			}
-			doQuery(rightClickOnWord)
+			if rightClickOnWord != "" {
+				doQuery(rightClickOnWord)
+			}
 		})
 		menu.InsertAction(nil, action)
 		menu.Popup(event.GlobalPos(), nil)
@@ -301,7 +304,8 @@ func Run() {
 			cursor := webview.CursorForPosition(event.Pos())
 			cursor.Select(gui.QTextCursor__WordUnderCursor)
 			// it doesn't actually select the word in GUI
-			rightClickOnWord = cursor.SelectedText()
+			rightClickOnWord = strings.Trim(cursor.SelectedText(), punctuation)
+			fmt.Println(rightClickOnWord)
 		}
 		webview.MouseReleaseEventDefault(event)
 	})

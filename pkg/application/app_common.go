@@ -40,6 +40,8 @@ If not, see http://www.gnu.org/licenses/gpl.txt
 
 var expanding = widgets.QSizePolicy__Expanding
 
+const punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~،؛؟۔"
+
 var frequencyTable *frequency.FrequencyTable
 
 func loadIcon(filename string) *gui.QIcon {
