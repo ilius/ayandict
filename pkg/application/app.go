@@ -125,7 +125,7 @@ func Run() {
 
 	bottomBox.AddStretch(1)
 
-	openConfigButton := newIconTextButton("Config", widgets.QStyle__SP_FileIcon)
+	openConfigButton := newIconTextButton("Config", widgets.QStyle__SP_DialogOpenButton)
 	bottomBox.AddWidget(openConfigButton, 0, 0)
 	reloadConfigButton := newIconTextButton("Reload", widgets.QStyle__SP_BrowserReload)
 	bottomBox.AddWidget(reloadConfigButton, 0, 0)
