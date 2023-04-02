@@ -94,10 +94,6 @@ func Run() {
 	miscLayout.AddWidget(reloadDictsButton, 0, 0)
 	closeDictsButton := widgets.NewQPushButton2("Close Dicts", nil)
 	miscLayout.AddWidget(closeDictsButton, 0, 0)
-	openConfigButton := widgets.NewQPushButton2("Open Config", nil)
-	miscLayout.AddWidget(openConfigButton, 0, 0)
-	reloadConfigButton := widgets.NewQPushButton2("Reload Config", nil)
-	miscLayout.AddWidget(reloadConfigButton, 0, 0)
 	reloadStyleButton := widgets.NewQPushButton2("Reload Style", nil)
 	miscLayout.AddWidget(reloadStyleButton, 0, 0)
 	saveHistoryButton := widgets.NewQPushButton2("Save History", nil)
@@ -105,32 +101,39 @@ func Run() {
 	clearHistoryButton := widgets.NewQPushButton2("Clear History", nil)
 	miscLayout.AddWidget(clearHistoryButton, 0, 0)
 
-	bottomLayout := widgets.NewQHBoxLayout2(nil)
-	bottomLayout.SetContentsMargins(0, 0, 0, 0)
-	bottomLayout.SetSpacing(10)
+	bottomBox := widgets.NewQHBoxLayout2(nil)
+	bottomBox.SetContentsMargins(0, 0, 0, 0)
+	bottomBox.SetSpacing(10)
 
-	dictsButton := widgets.NewQPushButton3(
-		app.Style().StandardIcon(
-			widgets.QStyle__SP_FileDialogDetailedView,
-			widgets.NewQStyleOptionButton(), nil,
-		),
-		"Dictionaries", nil,
-	)
-	bottomLayout.AddWidget(dictsButton, 0, core.Qt__AlignLeft)
+	bottomBoxStyleOpt := widgets.NewQStyleOptionButton()
+	style := app.Style()
 
-	aboutButton := widgets.NewQPushButton3(
-		app.Style().StandardIcon(
-			widgets.QStyle__SP_MessageBoxInformation,
-			widgets.NewQStyleOptionButton(), nil,
-		),
-		"About", nil,
-	)
-	bottomLayout.AddWidget(aboutButton, 0, core.Qt__AlignLeft)
+	newIconTextButton := func(label string, pix widgets.QStyle__StandardPixmap) *widgets.QPushButton {
+		return widgets.NewQPushButton3(
+			style.StandardIcon(
+				pix, bottomBoxStyleOpt, nil,
+			),
+			label, nil,
+		)
+	}
 
-	bottomLayout.AddStretch(1)
+	dictsButton := newIconTextButton("Dictionaries", widgets.QStyle__SP_FileDialogDetailedView)
+	bottomBox.AddWidget(dictsButton, 0, core.Qt__AlignLeft)
+
+	aboutButton := newIconTextButton("About", widgets.QStyle__SP_MessageBoxInformation)
+	bottomBox.AddWidget(aboutButton, 0, core.Qt__AlignLeft)
+
+	bottomBox.AddStretch(1)
+
+	openConfigButton := newIconTextButton("Config", widgets.QStyle__SP_FileIcon)
+	bottomBox.AddWidget(openConfigButton, 0, 0)
+	reloadConfigButton := newIconTextButton("Reload", widgets.QStyle__SP_BrowserReload)
+	bottomBox.AddWidget(reloadConfigButton, 0, 0)
+
+	bottomBox.AddStretch(1)
 
 	clearButton := widgets.NewQPushButton2("Clear", nil)
-	bottomLayout.AddWidget(clearButton, 0, core.Qt__AlignRight)
+	bottomBox.AddWidget(clearButton, 0, core.Qt__AlignRight)
 
 	leftMainWidget := widgets.NewQWidget(nil, 0)
 	leftMainLayout := widgets.NewQVBoxLayout2(leftMainWidget)
@@ -142,7 +145,7 @@ func Run() {
 	leftMainLayout.AddSpacing(5)
 	leftMainLayout.AddWidget(webview, 0, 0)
 	leftMainLayout.AddSpacing(5)
-	leftMainLayout.AddLayout(bottomLayout, 0)
+	leftMainLayout.AddLayout(bottomBox, 0)
 
 	activityTypeCombo := widgets.NewQComboBox(nil)
 	activityTypeCombo.AddItems([]string{
@@ -197,7 +200,7 @@ func Run() {
 	mainLayout := widgets.NewQVBoxLayout()
 	mainLayout.SetContentsMargins(5, 5, 5, 5)
 	mainLayout.AddWidget(mainSplitter, 0, 0)
-	mainLayout.AddLayout(bottomLayout, 0)
+	mainLayout.AddLayout(bottomBox, 0)
 
 	centralWidget := widgets.NewQWidget(nil, 0)
 	centralWidget.SetLayout(mainLayout)
