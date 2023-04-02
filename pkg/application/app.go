@@ -109,7 +109,13 @@ func Run() {
 	bottomLayout.SetContentsMargins(0, 0, 0, 0)
 	bottomLayout.SetSpacing(10)
 
-	dictsButton := widgets.NewQPushButton2("Dictionaries", nil)
+	dictsButton := widgets.NewQPushButton3(
+		app.Style().StandardIcon(
+			widgets.QStyle__SP_FileDialogDetailedView,
+			widgets.NewQStyleOptionButton(), nil,
+		),
+		"Dictionaries", nil,
+	)
 	bottomLayout.AddWidget(dictsButton, 0, core.Qt__AlignLeft)
 
 	aboutButton := widgets.NewQPushButton3(
