@@ -5,6 +5,8 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io/ioutil"
+
+	"github.com/dolthub/swiss"
 )
 
 type IdxEntry struct {
@@ -15,7 +17,7 @@ type IdxEntry struct {
 
 // Idx implements an in-memory index for a dictionary
 type Idx struct {
-	byWordPrefix map[rune][]int
+	byWordPrefix *swiss.Map[rune, []int]
 	terms        []*IdxEntry
 }
 
@@ -27,7 +29,7 @@ func NewIdx(entryCount int) *Idx {
 	} else {
 		idx.terms = []*IdxEntry{}
 	}
-	idx.byWordPrefix = map[rune][]int{}
+	idx.byWordPrefix = swiss.NewMap[rune, []int](100)
 	return idx
 }
 
@@ -120,7 +122,7 @@ func ReadIndex(filename string, synPath string, info *Info) (*Idx, error) {
 		for i := range indexMap {
 			indexList = append(indexList, i)
 		}
-		idx.byWordPrefix[prefix] = indexList
+		idx.byWordPrefix.Put(prefix, indexList)
 	}
 
 	return idx, err

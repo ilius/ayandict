@@ -139,7 +139,8 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 	}
 
 	prefix, _ := utf8.DecodeRuneInString(queryMainWord)
-	for _, termIndex := range idx.byWordPrefix[prefix] {
+	termIndexList, _ := idx.byWordPrefix.Get(prefix)
+	for _, termIndex := range termIndexList {
 		entry := idx.terms[termIndex]
 		score := chechEntry(entry.Terms)
 		if score <= 100 {
