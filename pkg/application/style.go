@@ -16,7 +16,7 @@ var currentStyle = ""
 
 var definitionStyleString = ""
 
-func readDefinitionStyle(stylePath string) error {
+func readArticleStyle(stylePath string) error {
 	if stylePath == "" {
 		return nil
 	}
@@ -59,7 +59,7 @@ func LoadUserStyle(app *widgets.QApplication) {
 	app.SetStyleSheet(stream.ReadAll())
 	currentStyle = conf.Style
 	{
-		err := readDefinitionStyle(conf.DefinitionStyle)
+		err := readArticleStyle(conf.ArticleStyle)
 		if err != nil {
 			fmt.Println(err)
 		}

@@ -41,7 +41,7 @@ func LoadConfig(app *widgets.QApplication) {
 		historyMaxSize = conf.HistoryMaxSize
 	}
 	{
-		err := readDefinitionStyle(conf.DefinitionStyle)
+		err := readArticleStyle(conf.ArticleStyle)
 		if err != nil {
 			fmt.Println(err)
 		}
