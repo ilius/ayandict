@@ -16,6 +16,19 @@ type QueryWidgets struct {
 	ArticleView *ArticleView
 	ResultList  *ResultListWidget
 	HeaderLabel *widgets.QLabel
+	HistoryView *HistoryView
+}
+
+func (w *QueryWidgets) AddHistoryAndFrequency(query string) {
+	if !conf.HistoryDisable {
+		w.HistoryView.AddHistory(query)
+	}
+	if !conf.MostFrequentDisable {
+		frequencyTable.Add(query, 1)
+		if conf.MostFrequentAutoSave {
+			SaveFrequency()
+		}
+	}
 }
 
 func NewResultListWidget(
@@ -151,10 +164,10 @@ func onQuery(
 		if !isAuto {
 			queryWidgets.ArticleView.SetHtml(fmt.Sprintf("No results for %#v", query))
 			queryWidgets.HeaderLabel.SetText("")
-			addHistoryAndFrequency(query)
+			queryWidgets.AddHistoryAndFrequency(query)
 		}
 		return
 	}
-	addHistoryAndFrequency(query)
+	queryWidgets.AddHistoryAndFrequency(query)
 	// fmt.Println(htmlStr)
 }

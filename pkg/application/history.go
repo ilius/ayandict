@@ -25,22 +25,6 @@ const (
 	frequencyFileName = "frequent.json"
 )
 
-var addHistoryGUI func(string)
-
-var trimHistoryGUI func(int)
-
-func addHistoryAndFrequency(query string) {
-	if !conf.HistoryDisable {
-		addHistory(query)
-	}
-	if !conf.MostFrequentDisable {
-		frequencyTable.Add(query, 1)
-		if conf.MostFrequentAutoSave {
-			SaveFrequency()
-		}
-	}
-}
-
 func addHistoryLow(query string) {
 	historyMutex.Lock()
 	history = append(history, query)
@@ -48,22 +32,6 @@ func addHistoryLow(query string) {
 		history = history[len(history)-historyMaxSize:]
 	}
 	historyMutex.Unlock()
-}
-
-func addHistory(query string) {
-	if len(history) > 0 && query == history[len(history)-1] {
-		return
-	}
-	addHistoryLow(query)
-	if addHistoryGUI != nil {
-		addHistoryGUI(query)
-	}
-	if trimHistoryGUI != nil {
-		trimHistoryGUI(historyMaxSize)
-	}
-	if conf.HistoryAutoSave {
-		SaveHistory()
-	}
 }
 
 func historyFilePath() string {
@@ -112,15 +80,4 @@ func SaveFrequency() {
 	if err != nil {
 		fmt.Printf("Error saving history: %v\n", err)
 	}
-}
-
-func clearHistory() {
-	historyMutex.Lock()
-	history = []string{}
-	historyMutex.Unlock()
-
-	frequencyTable.Clear()
-
-	SaveHistory()
-	SaveFrequency()
 }

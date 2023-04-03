@@ -18,6 +18,42 @@ func NewHistoryView() *HistoryView {
 	}
 }
 
+func (view *HistoryView) AddHistory(query string) {
+	if len(history) > 0 && query == history[len(history)-1] {
+		return
+	}
+	addHistoryLow(query)
+	view.InsertItem2(0, query)
+	view.TrimHistory(historyMaxSize)
+	if conf.HistoryAutoSave {
+		SaveHistory()
+	}
+}
+
+func (view *HistoryView) AddHistoryList(list []string) {
+	for _, query := range list {
+		view.InsertItem2(0, query)
+	}
+}
+
+func (view *HistoryView) TrimHistory(maxSize int) {
+	count := view.Count()
+	if count <= maxSize {
+		return
+	}
+	for i := maxSize; i < count; i++ {
+		view.TakeItem(maxSize)
+	}
+}
+
+func (view *HistoryView) ClearHistory() {
+	historyMutex.Lock()
+	history = []string{}
+	historyMutex.Unlock()
+
+	SaveHistory()
+}
+
 func (view *HistoryView) SetupCustomHandlers() {
 	doQuery := view.doQuery
 	if doQuery == nil {
@@ -40,4 +76,7 @@ func (view *HistoryView) SetupCustomHandlers() {
 		doQuery(item.Text())
 	})
 
+	view.ConnectItemClicked(func(item *widgets.QListWidgetItem) {
+		doQuery(item.Text())
+	})
 }

@@ -70,19 +70,6 @@ func Run() {
 	}
 	// TODO: save the width of 2 columns
 
-	addHistoryGUI = func(query string) {
-		historyView.InsertItem2(0, query)
-	}
-	trimHistoryGUI = func(maxSize int) {
-		count := historyView.Count()
-		if count <= maxSize {
-			return
-		}
-		for i := maxSize; i < count; i++ {
-			historyView.TakeItem(maxSize)
-		}
-	}
-
 	miscBox := widgets.NewQFrame(nil, 0)
 	miscLayout := widgets.NewQVBoxLayout2(miscBox)
 	miscLayout.SetContentsMargins(0, 0, 0, 0)
@@ -181,6 +168,7 @@ func Run() {
 		ArticleView: articleView,
 		ResultList:  resultList,
 		HeaderLabel: headerLabel,
+		HistoryView: historyView,
 	}
 
 	doQuery := func(query string) {
@@ -255,9 +243,6 @@ func Run() {
 		historyView.KeyPressEventDefault(event)
 	})
 
-	historyView.ConnectItemClicked(func(item *widgets.QListWidgetItem) {
-		doQuery(item.Text())
-	})
 	frequencyTable.ConnectItemClicked(func(item *widgets.QTableWidgetItem) {
 		frequencyTable.ItemActivated(item)
 	})
@@ -297,9 +282,9 @@ func Run() {
 		SaveFrequency()
 	})
 	clearHistoryButton.ConnectClicked(func(checked bool) {
-		clearHistory()
-		historyView.Clear()
-		// frequencyTable.Clear()
+		historyView.ClearHistory()
+		frequencyTable.Clear()
+		SaveFrequency()
 	})
 	clearButton.ConnectClicked(func(checked bool) {
 		resetQuery()
@@ -322,9 +307,7 @@ func Run() {
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			for _, query := range history {
-				addHistoryGUI(query)
-			}
+			historyView.AddHistoryList(history)
 		}
 	}
 
