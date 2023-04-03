@@ -13,18 +13,19 @@ import (
 )
 
 type QueryWidgets struct {
-	Webview    *widgets.QTextBrowser
-	ResultList *ResultListWidget
+	Webview     *widgets.QTextBrowser
+	ResultList  *ResultListWidget
+	HeaderLabel *widgets.QLabel
 }
 
 func NewResultListWidget(
 	webview *widgets.QTextBrowser,
-	titleLabel *widgets.QLabel,
+	headerLabel *widgets.QLabel,
 ) *ResultListWidget {
 	widget := widgets.NewQListWidget(nil)
 	resultList := &ResultListWidget{
 		QListWidget: widget,
-		TitleLabel:  titleLabel,
+		HeaderLabel: headerLabel,
 		Webview:     webview,
 	}
 	widget.ConnectCurrentRowChanged(func(row int) {
@@ -45,9 +46,9 @@ func NewResultListWidget(
 
 type ResultListWidget struct {
 	*widgets.QListWidget
-	TitleLabel *widgets.QLabel
-	Webview    *widgets.QTextBrowser
-	results    []common.QueryResult
+	HeaderLabel *widgets.QLabel
+	Webview     *widgets.QTextBrowser
+	results     []common.QueryResult
 }
 
 func (w *ResultListWidget) SetResults(results []common.QueryResult) {
@@ -104,7 +105,7 @@ func (w *ResultListWidget) OnActivate(row int) {
 		fmt.Println(err)
 		return
 	}
-	w.TitleLabel.SetText(headerBuf.String())
+	w.HeaderLabel.SetText(headerBuf.String())
 	text := strings.Join(
 		res.DefinitionsHTML(),
 		"\n<br/>\n",
@@ -149,6 +150,7 @@ func onQuery(
 	if len(results) == 0 {
 		if !isAuto {
 			queryWidgets.Webview.SetHtml(fmt.Sprintf("No results for %#v", query))
+			queryWidgets.HeaderLabel.SetText("")
 			addHistoryAndFrequency(query)
 		}
 		return

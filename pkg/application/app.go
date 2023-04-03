@@ -33,13 +33,13 @@ func Run() {
 	window.SetWindowTitle("AyanDict")
 	window.Resize2(600, 400)
 
-	defiTitleLabel := widgets.NewQLabel(nil, 0)
-	defiTitleLabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
+	headerLabel := widgets.NewQLabel(nil, 0)
+	headerLabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
 	// | core.Qt__TextSelectableByKeyboard
-	defiTitleLabel.SetAlignment(core.Qt__AlignVCenter)
-	defiTitleLabel.SetContentsMargins(20, 0, 0, 0)
-	defiTitleLabel.SetTextFormat(core.Qt__RichText)
-	defiTitleLabel.SetWordWrap(true)
+	headerLabel.SetAlignment(core.Qt__AlignVCenter)
+	headerLabel.SetContentsMargins(20, 0, 0, 0)
+	headerLabel.SetTextFormat(core.Qt__RichText)
+	headerLabel.SetWordWrap(true)
 
 	webview := widgets.NewQTextBrowser(nil)
 	// webview := webengine.NewQWebEngineView(nil)
@@ -146,7 +146,7 @@ func Run() {
 	leftMainLayout.SetSpacing(0)
 	leftMainLayout.AddWidget(queryBox, 0, 0)
 	leftMainLayout.AddSpacing(5)
-	leftMainLayout.AddWidget(defiTitleLabel, 0, core.Qt__AlignVCenter)
+	leftMainLayout.AddWidget(headerLabel, 0, core.Qt__AlignVCenter)
 	leftMainLayout.AddSpacing(5)
 	leftMainLayout.AddWidget(webview, 0, 0)
 	leftMainLayout.AddSpacing(5)
@@ -181,12 +181,13 @@ func Run() {
 	leftPanel := widgets.NewQWidget(nil, 0)
 	leftPanelLayout := widgets.NewQVBoxLayout2(leftPanel)
 	leftPanelLayout.AddWidget(widgets.NewQLabel2("Results", nil, 0), 0, 0)
-	resultList := NewResultListWidget(webview, defiTitleLabel)
+	resultList := NewResultListWidget(webview, headerLabel)
 	leftPanelLayout.AddWidget(resultList, 0, 0)
 
 	queryWidgets := &QueryWidgets{
-		Webview:    webview,
-		ResultList: resultList,
+		Webview:     webview,
+		ResultList:  resultList,
+		HeaderLabel: headerLabel,
 	}
 
 	rightPanel := widgets.NewQTabWidget(nil)
@@ -222,7 +223,7 @@ func Run() {
 		entry.SetText("")
 		resultList.Clear()
 		webview.SetHtml("")
-		defiTitleLabel.SetText("")
+		headerLabel.SetText("")
 	}
 
 	entry.ConnectReturnPressed(func() {
