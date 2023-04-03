@@ -76,7 +76,10 @@ func (view *HistoryView) SetupCustomHandlers() {
 		doQuery(item.Text())
 	})
 
-	view.ConnectItemClicked(func(item *widgets.QListWidgetItem) {
-		doQuery(item.Text())
-	})
+	// we are doing query on MousePressEvent (before release, with any button)
+	// so we don't need ConnectItemClicked
+	// unless we decide to have right-click do something else
+	// view.ConnectItemClicked(func(item *widgets.QListWidgetItem) {
+	// 	doQuery(item.Text())
+	// })
 }
