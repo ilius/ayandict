@@ -28,7 +28,7 @@ func NewArticleView() *ArticleView {
 	}
 }
 
-func (view *ArticleView) ConnectCustomHandlers() {
+func (view *ArticleView) SetupCustomHandlers() {
 	doQuery := view.doQuery
 	if doQuery == nil {
 		panic("doQuery is not set")

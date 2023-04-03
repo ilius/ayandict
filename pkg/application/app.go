@@ -55,7 +55,7 @@ func Run() {
 	queryBoxLayout.AddWidget(okButton, 0, 0)
 	// queryBoxLayout.SetSpacing(10)
 
-	historyView := widgets.NewQListWidget(nil)
+	historyView := NewHistoryView()
 
 	frequencyTable.SetHorizontalHeaderItem(
 		0,
@@ -188,6 +188,7 @@ func Run() {
 		entry.SetText(query)
 	}
 	articleView.doQuery = doQuery
+	historyView.doQuery = doQuery
 
 	rightPanel := widgets.NewQTabWidget(nil)
 	rightPanel.AddTab(activityWidget, "Activity")
@@ -236,7 +237,7 @@ func Run() {
 		resultList.KeyPressEventDefault(event)
 	})
 
-	articleView.ConnectCustomHandlers()
+	articleView.SetupCustomHandlers()
 	articleView.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
 		switch event.Text() {
 		case " ":
@@ -244,22 +245,7 @@ func Run() {
 		}
 	})
 
-	// historyView.SelectedItems() panics
-	// and even after fixing panic, doesn't return anything
-	// you have to use historyView.CurrentIndex()
-	historyView.ConnectMousePressEvent(func(event *gui.QMouseEvent) {
-		historyView.MousePressEventDefault(event)
-		index := historyView.CurrentIndex()
-		if index == nil {
-			return
-		}
-		historyView.Activated(index)
-	})
-
-	historyView.ConnectItemActivated(func(item *widgets.QListWidgetItem) {
-		doQuery(item.Text())
-	})
-
+	historyView.SetupCustomHandlers()
 	historyView.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
 		switch event.Text() {
 		case " ":
@@ -268,6 +254,7 @@ func Run() {
 		}
 		historyView.KeyPressEventDefault(event)
 	})
+
 	historyView.ConnectItemClicked(func(item *widgets.QListWidgetItem) {
 		doQuery(item.Text())
 	})
