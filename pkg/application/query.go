@@ -148,6 +148,7 @@ func onQuery(
 	if query == "" {
 		if !isAuto {
 			queryWidgets.ArticleView.SetHtml("")
+			queryWidgets.HeaderLabel.SetText("")
 		}
 		return
 	}
