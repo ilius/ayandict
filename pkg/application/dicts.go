@@ -1,7 +1,7 @@
 package application
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/ilius/ayandict/pkg/stardict"
 )
@@ -12,7 +12,7 @@ func initDicts() {
 	var err error
 	dictSettingsMap, dictsOrder, err = loadDictsSettings()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	stardict.Init(conf.DirectoryList, dictsOrder)
 }

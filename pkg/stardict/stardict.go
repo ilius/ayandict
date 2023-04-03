@@ -5,6 +5,7 @@ import (
 	"fmt"
 	std_html "html"
 	"io/ioutil"
+	"log"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -109,7 +110,7 @@ func Init(directoryList []string, order map[string]int) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Loading dictionaries took", time.Now().Sub(t))
+	log.Println("Loading dictionaries took", time.Now().Sub(t))
 	if order != nil {
 		Reorder(order)
 	}
@@ -144,12 +145,12 @@ func ApplyDictsOrder(order map[string]int) {
 func fixResURL(quoted string, resURL string) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false, ""
 	}
 	_url, err := url.Parse(urlStr)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false, ""
 	}
 	if _url.Scheme != "" || _url.Host != "" {
@@ -161,7 +162,7 @@ func fixResURL(quoted string, resURL string) (bool, string) {
 func fixSoundURL(quoted string, resURL string) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return false, ""
 	}
 	return true, resURL + "/" + urlStr[len("sound://"):]
@@ -169,13 +170,13 @@ func fixSoundURL(quoted string, resURL string) (bool, string) {
 
 func fixHrefSound(defi string, resURL string) string {
 	subFunc := func(match string) string {
-		// fmt.Println("hrefSoundSub: match:", match)
+		// log.Println("hrefSoundSub: match:", match)
 		ok, _url := fixSoundURL(match[6:], resURL)
 		if !ok {
 			return match
 		}
 		newStr := " href=" + strconv.Quote(_url)
-		// fmt.Println("hrefSoundSub:", newStr)
+		// log.Println("hrefSoundSub:", newStr)
 		return newStr
 	}
 	return hrefSoundRE.ReplaceAllStringFunc(defi, subFunc)
@@ -251,7 +252,7 @@ func fixFileSrc(defi string, resURL string) string {
 			return match
 		}
 		newStr := " src=" + strconv.Quote(_url)
-		// fmt.Println("srcSub:", newStr)
+		// log.Println("srcSub:", newStr)
 		return newStr
 	}
 	return srcRE.ReplaceAllStringFunc(defi, srcSub)
@@ -279,11 +280,11 @@ func embedExternalStyle(defi string, resDir string) string {
 		q_href := match[i+pre:]
 		j := strings.Index(q_href[1:], q_href[:1])
 		if j < 0 {
-			fmt.Printf("linkSub: did not find quote end in q_href=%#v\n", q_href)
+			log.Printf("linkSub: did not find quote end in q_href=%#v\n", q_href)
 			return match
 		}
 		href := q_href[1 : j+1]
-		// fmt.Printf("linkSub: href=%#v\n", href)
+		// log.Printf("linkSub: href=%#v\n", href)
 		if strings.Contains(href, "://") {
 			// TODO: download?
 			return match
@@ -291,7 +292,7 @@ func embedExternalStyle(defi string, resDir string) string {
 		data, err := ioutil.ReadFile(filepath.Join(resDir, href))
 		if err != nil {
 			if !os.IsNotExist(err) {
-				fmt.Println(err)
+				log.Println(err)
 			}
 			return match
 		}
@@ -299,7 +300,7 @@ func embedExternalStyle(defi string, resDir string) string {
 	}
 
 	defi = linkRE.ReplaceAllStringFunc(defi, subFunc)
-	// fmt.Println(defi)
+	// log.Println(defi)
 	return defi
 }
 

@@ -1,7 +1,7 @@
 package stardict
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -32,7 +32,7 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 		if filepath.Ext(fi.Name()) != ext {
 			return nil
 		}
-		fmt.Printf("Initializing %#v\n", path)
+		log.Printf("Initializing %#v\n", path)
 		dirPath := filepath.Dir(path)
 		dic, err := NewDictionary(dirPath, name[:len(name)-len(ext)])
 		if err != nil {
@@ -44,10 +44,10 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 			dicList = append(dicList, dic)
 			return nil
 		}
-		fmt.Printf("Loading index for %#v\n", path)
+		log.Printf("Loading index for %#v\n", path)
 		err = dic.load()
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return err
 		}
 		resDir := filepath.Join(dirPath, "res")
@@ -70,7 +70,7 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 		}
 		err := filepath.Walk(dirPath, walkFunc)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}
 	return dicList, nil

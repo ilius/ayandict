@@ -1,7 +1,7 @@
 package application
 
 import (
-	"fmt"
+	"log"
 	"path/filepath"
 	"strings"
 
@@ -37,7 +37,7 @@ func (view *ArticleView) SetupCustomHandlers() {
 
 	view.ConnectAnchorClicked(func(link *core.QUrl) {
 		host := link.Host(core.QUrl__FullyDecoded)
-		// fmt.Printf(
+		// log.Printf(
 		// 	"AnchorClicked: %#v, host=%#v = %#v\n",
 		// 	link.ToString(core.QUrl__None),
 		// 	host,
@@ -47,21 +47,21 @@ func (view *ArticleView) SetupCustomHandlers() {
 			if host != "" {
 				doQuery(host)
 			} else {
-				fmt.Printf("AnchorClicked: %#v\n", link.ToString(core.QUrl__None))
+				log.Printf("AnchorClicked: %#v\n", link.ToString(core.QUrl__None))
 			}
 			return
 		}
 		path := link.Path(core.QUrl__FullyDecoded)
-		// fmt.Printf("scheme=%#v, host=%#v, path=%#v", link.Scheme(), host, path)
+		// log.Printf("scheme=%#v, host=%#v, path=%#v", link.Scheme(), host, path)
 		switch link.Scheme() {
 		case "":
 			doQuery(path)
 			return
 		case "file", "http", "https":
-			// fmt.Printf("host=%#v, ext=%#v", host, ext)
+			// log.Printf("host=%#v, ext=%#v", host, ext)
 			switch filepath.Ext(path) {
 			case ".wav", ".mp3", ".ogg":
-				fmt.Println("Playing audio", link.ToString(core.QUrl__None))
+				log.Println("Playing audio", link.ToString(core.QUrl__None))
 				mediaPlayer.SetMedia(multimedia.NewQMediaContent2(link), nil)
 				mediaPlayer.Play()
 				return
@@ -83,7 +83,7 @@ func (view *ArticleView) SetupCustomHandlers() {
 		// menu := webview.CreateStandardContextMenu2(event.GlobalPos())
 		menu := view.CreateStandardContextMenu()
 		// actions := menu.Actions()
-		// fmt.Println("actions", actions)
+		// log.Println("actions", actions)
 		// menu.Actions() panic
 		// https://github.com/therecipe/qt/issues/1286
 		// firstAction := menu.ActiveAction()
@@ -117,7 +117,7 @@ func (view *ArticleView) SetupCustomHandlers() {
 				// it doesn't actually select the word in GUI
 				rightClickOnWord = strings.Trim(cursor.SelectedText(), punctuation)
 				if rightClickOnWord != "" {
-					fmt.Printf("Right-clicked on word %#v\n", rightClickOnWord)
+					log.Printf("Right-clicked on word %#v\n", rightClickOnWord)
 				}
 			}
 		}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -69,7 +70,7 @@ func SaveHistory() {
 	}
 	err = ioutil.WriteFile(historyFilePath(), jsonBytes, 0o644)
 	if err != nil {
-		fmt.Printf("Error saving history: %v\n", err)
+		log.Printf("Error saving history: %v\n", err)
 	}
 }
 
@@ -78,6 +79,6 @@ func SaveFrequency() {
 	defer frequencySaveMutex.Unlock()
 	err := frequencyTable.SaveToFile(frequencyFilePath())
 	if err != nil {
-		fmt.Printf("Error saving history: %v\n", err)
+		log.Printf("Error saving history: %v\n", err)
 	}
 }

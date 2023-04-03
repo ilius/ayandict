@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"html"
+	"log"
 	"strings"
 	"time"
 
@@ -73,7 +74,7 @@ func (w *ResultListWidget) SetResults(results []common.QueryResult) {
 		switch len(terms) {
 		case 0:
 			text = ""
-			fmt.Printf("empty terms, res=%#v\n", res)
+			log.Printf("empty terms, res=%#v\n", res)
 		case 1:
 			text = terms[0]
 		case 2:
@@ -101,7 +102,7 @@ type HeaderTemplateInput struct {
 
 func (w *ResultListWidget) OnActivate(row int) {
 	if row >= len(w.results) {
-		fmt.Printf("ResultListWidget: OnActivate: row index %v out of range\n", row)
+		log.Printf("ResultListWidget: OnActivate: row index %v out of range\n", row)
 		return
 	}
 	res := w.results[row]
@@ -115,7 +116,7 @@ func (w *ResultListWidget) OnActivate(row int) {
 		Score:    res.Score() / 2,
 	})
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 	w.HeaderLabel.SetText(headerBuf.String())
@@ -152,14 +153,14 @@ func onQuery(
 		}
 		return
 	}
-	fmt.Printf("Query: %s\n", query)
+	log.Printf("Query: %s\n", query)
 	t := time.Now()
 	results := stardict.LookupHTML(
 		query,
 		conf,
 		dictsOrder,
 	)
-	fmt.Println("LookupHTML took", time.Now().Sub(t))
+	log.Println("LookupHTML took", time.Now().Sub(t))
 	queryWidgets.ResultList.SetResults(results)
 	if len(results) == 0 {
 		if !isAuto {
@@ -170,5 +171,5 @@ func onQuery(
 		return
 	}
 	queryWidgets.AddHistoryAndFrequency(query)
-	// fmt.Println(htmlStr)
+	// log.Println(htmlStr)
 }

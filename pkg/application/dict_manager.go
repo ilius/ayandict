@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -150,7 +151,7 @@ func NewDictManager(
 	setItem := func(index int, dictName string) {
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
-			fmt.Printf("dictName=%#v, ds=%v\n", dictName, ds)
+			log.Printf("dictName=%#v, ds=%v\n", dictName, ds)
 			ds = &DictSettings{
 				Symbol: defaultDictSymbol(dictName),
 				Order:  index,
@@ -159,7 +160,7 @@ func NewDictManager(
 		}
 		info, ok := infoMap[dictName]
 		if !ok {
-			fmt.Printf("dictName=%#v not in infoMap\n", dictName)
+			log.Printf("dictName=%#v not in infoMap\n", dictName)
 			return
 		}
 		checkItem := widgets.NewQTableWidgetItem(0)
@@ -178,7 +179,7 @@ func NewDictManager(
 		table.SetItem(index, 1, symbolItem)
 		entries, err := info.EntryCount()
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return
 		}
 		table.SetItem(index, 2, newItem(strconv.FormatInt(int64(entries), 10)))
@@ -277,6 +278,6 @@ func SaveDictManagerDialog(manager *DictManager) {
 
 	err := saveDictsSettings(dictSettingsMap)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 }

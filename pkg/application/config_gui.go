@@ -1,8 +1,8 @@
 package application
 
 import (
-	"fmt"
 	"html/template"
+	"log"
 	"reflect"
 	"sync"
 
@@ -24,7 +24,7 @@ func LoadConfig(app *widgets.QApplication) {
 	defer confMutex.Unlock()
 	newConf, err := config.Load()
 	if err != nil {
-		fmt.Printf("Failed to load config: %v\n", err)
+		log.Printf("Failed to load config: %v\n", err)
 		return
 	}
 	conf = newConf
@@ -44,14 +44,14 @@ func LoadConfig(app *widgets.QApplication) {
 	{
 		err := readArticleStyle(conf.ArticleStyle)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}
 	{
-		// fmt.Println("Parsing:", conf.HeaderTemplate)
+		// log.Println("Parsing:", conf.HeaderTemplate)
 		headerTplNew, err := template.New("header").Parse(conf.HeaderTemplate)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		} else {
 			headerTpl = headerTplNew
 		}
@@ -75,7 +75,7 @@ func ReloadConfig(app *widgets.QApplication) {
 func OpenConfig() {
 	err := config.EnsureExists(conf)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	url := core.NewQUrl()
 	url.SetScheme("file")

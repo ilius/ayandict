@@ -1,7 +1,7 @@
 package application
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	// "github.com/therecipe/qt/webengine"
@@ -291,7 +291,7 @@ func Run() {
 	if !conf.HistoryDisable {
 		err := LoadHistory()
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		} else {
 			historyView.AddHistoryList(history)
 		}

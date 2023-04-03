@@ -1,7 +1,7 @@
 package application
 
 import (
-	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"sync"
@@ -148,7 +148,7 @@ func restoreTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, m
 	for index, widthStr := range widthList {
 		width, err := strconv.ParseInt(widthStr, 10, 64)
 		if err != nil {
-			fmt.Printf("invalid column width=%#v\n", widthStr)
+			log.Printf("invalid column width=%#v\n", widthStr)
 			continue
 		}
 		header.ResizeSection(index, int(width))
@@ -171,7 +171,7 @@ func restoreSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainK
 	sizesStr := qs.Value(QS_sizes, core.NewQVariant1("")).ToString()
 	sizes, err := splitIntList(sizesStr)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 	splitter.SetSizes(sizes)

@@ -2,8 +2,8 @@ package stardict
 
 import (
 	"compress/gzip"
-	"fmt"
 	"io"
+	"log"
 	"os"
 	"strings"
 	"sync"
@@ -30,7 +30,7 @@ func (d *Dict) Close() {
 	if d.file == nil {
 		return
 	}
-	fmt.Println("Closing", d.filename)
+	log.Println("Closing", d.filename)
 	d.file.Close()
 	d.file = nil
 }

@@ -1,8 +1,8 @@
 package application
 
 import (
-	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -49,10 +49,10 @@ func LoadUserStyle(app *widgets.QApplication) {
 	}
 	_, err := os.Stat(stylePath)
 	if err != nil {
-		fmt.Printf("Error loading style file %#v: %v\n", stylePath, err)
+		log.Printf("Error loading style file %#v: %v\n", stylePath, err)
 		return
 	}
-	fmt.Println("Loading", stylePath)
+	log.Println("Loading", stylePath)
 	file := core.NewQFile2(stylePath)
 	file.Open(core.QIODevice__ReadOnly | core.QIODevice__Text)
 	stream := core.NewQTextStream2(file)
@@ -61,7 +61,7 @@ func LoadUserStyle(app *widgets.QApplication) {
 	{
 		err := readArticleStyle(conf.ArticleStyle)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}
 }
