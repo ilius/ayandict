@@ -15,6 +15,11 @@ import (
 func NewFrequencyView(maxSize int) *FrequencyTable {
 	widget := widgets.NewQTableWidget(nil)
 	widget.SetColumnCount(2)
+
+	widget.ConnectItemClicked(func(item *widgets.QTableWidgetItem) {
+		widget.ItemActivated(item)
+	})
+
 	return &FrequencyTable{
 		QTableWidget: widget,
 		maxSize:      maxSize,

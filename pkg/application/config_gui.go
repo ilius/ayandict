@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/ilius/ayandict/pkg/config"
+	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
@@ -69,4 +70,15 @@ func ReloadConfig(app *widgets.QApplication) {
 	if !reflect.DeepEqual(conf.DirectoryList, currentDirList) {
 		reloadDicts()
 	}
+}
+
+func OpenConfig() {
+	err := config.EnsureExists(conf)
+	if err != nil {
+		fmt.Println(err)
+	}
+	url := core.NewQUrl()
+	url.SetScheme("file")
+	url.SetPath(config.Path(), core.QUrl__TolerantMode)
+	gui.QDesktopServices_OpenUrl(url)
 }

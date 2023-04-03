@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ilius/ayandict/pkg/config"
-
 	// "github.com/therecipe/qt/webengine"
 
 	"github.com/ilius/ayandict/pkg/frequency"
@@ -243,9 +241,6 @@ func Run() {
 		historyView.KeyPressEventDefault(event)
 	})
 
-	frequencyTable.ConnectItemClicked(func(item *widgets.QTableWidgetItem) {
-		frequencyTable.ItemActivated(item)
-	})
 	frequencyTable.ConnectItemActivated(func(item *widgets.QTableWidgetItem) {
 		key := frequencyTable.Keys[item.Row()]
 		doQuery(key)
@@ -260,14 +255,7 @@ func Run() {
 		closeDicts()
 	})
 	openConfigButton.ConnectClicked(func(checked bool) {
-		err := config.EnsureExists(conf)
-		if err != nil {
-			fmt.Println(err)
-		}
-		url := core.NewQUrl()
-		url.SetScheme("file")
-		url.SetPath(config.Path(), core.QUrl__TolerantMode)
-		gui.QDesktopServices_OpenUrl(url)
+		OpenConfig()
 	})
 	reloadConfigButton.ConnectClicked(func(checked bool) {
 		ReloadConfig(app)
@@ -289,8 +277,6 @@ func Run() {
 	clearButton.ConnectClicked(func(checked bool) {
 		resetQuery()
 	})
-
-	const dialogAccepted = int(widgets.QDialog__Accepted)
 
 	dictsButton.ConnectClicked(func(checked bool) {
 		if dictManager == nil {
@@ -348,9 +334,6 @@ func Run() {
 	frequencyTable.HorizontalHeader().ConnectSectionResized(func(logicalIndex int, oldSize int, newSize int) {
 		saveTableColumnsWidth(qs, frequencyTable.QTableWidget, QS_frequencyTable)
 	})
-
-	// QSplitter.Sizes() panics:
-	// interface conversion: interface {} is []interface {}, not []int
 
 	setupSplitterSizesSave(qs, mainSplitter, QS_mainSplitter)
 

@@ -177,6 +177,9 @@ func restoreSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainK
 	splitter.SetSizes(sizes)
 }
 
+// QSplitter.Sizes() panics:
+// interface conversion: interface {} is []interface {}, not []int
+
 func setupSplitterSizesSave(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
 	var mutex sync.Mutex
 	var lastSave time.Time

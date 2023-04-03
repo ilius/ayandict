@@ -38,7 +38,10 @@ from /usr/share/common-licenses/GPL.
 If not, see http://www.gnu.org/licenses/gpl.txt
 `
 
-var expanding = widgets.QSizePolicy__Expanding
+const (
+	expanding      = widgets.QSizePolicy__Expanding
+	dialogAccepted = int(widgets.QDialog__Accepted)
+)
 
 // we trim these characters when user right-clicks on a word without selecting it
 const punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~،؛؟۔"
