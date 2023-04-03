@@ -13,20 +13,20 @@ import (
 )
 
 type QueryWidgets struct {
-	Webview     *widgets.QTextBrowser
+	ArticleView *ArticleView
 	ResultList  *ResultListWidget
 	HeaderLabel *widgets.QLabel
 }
 
 func NewResultListWidget(
-	webview *widgets.QTextBrowser,
+	articleView *ArticleView,
 	headerLabel *widgets.QLabel,
 ) *ResultListWidget {
 	widget := widgets.NewQListWidget(nil)
 	resultList := &ResultListWidget{
 		QListWidget: widget,
 		HeaderLabel: headerLabel,
-		Webview:     webview,
+		ArticleView: articleView,
 	}
 	widget.ConnectCurrentRowChanged(func(row int) {
 		if row < 0 {
@@ -47,7 +47,7 @@ func NewResultListWidget(
 type ResultListWidget struct {
 	*widgets.QListWidget
 	HeaderLabel *widgets.QLabel
-	Webview     *widgets.QTextBrowser
+	ArticleView *ArticleView
 	results     []common.QueryResult
 }
 
@@ -113,12 +113,12 @@ func (w *ResultListWidget) OnActivate(row int) {
 	if definitionStyleString != "" {
 		text = definitionStyleString + text
 	}
-	w.Webview.SetHtml(text)
+	w.ArticleView.SetHtml(text)
 	resDir := res.ResourceDir()
 	if resDir == "" {
-		w.Webview.SetSearchPaths([]string{})
+		w.ArticleView.SetSearchPaths([]string{})
 	} else {
-		w.Webview.SetSearchPaths([]string{resDir})
+		w.ArticleView.SetSearchPaths([]string{resDir})
 	}
 }
 
@@ -134,7 +134,7 @@ func onQuery(
 ) {
 	if query == "" {
 		if !isAuto {
-			queryWidgets.Webview.SetHtml("")
+			queryWidgets.ArticleView.SetHtml("")
 		}
 		return
 	}
@@ -149,7 +149,7 @@ func onQuery(
 	queryWidgets.ResultList.SetResults(results)
 	if len(results) == 0 {
 		if !isAuto {
-			queryWidgets.Webview.SetHtml(fmt.Sprintf("No results for %#v", query))
+			queryWidgets.ArticleView.SetHtml(fmt.Sprintf("No results for %#v", query))
 			queryWidgets.HeaderLabel.SetText("")
 			addHistoryAndFrequency(query)
 		}

@@ -3,8 +3,6 @@ package application
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/ilius/ayandict/pkg/config"
 
@@ -13,7 +11,6 @@ import (
 	"github.com/ilius/ayandict/pkg/frequency"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
-	"github.com/therecipe/qt/multimedia"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -41,11 +38,7 @@ func Run() {
 	headerLabel.SetTextFormat(core.Qt__RichText)
 	headerLabel.SetWordWrap(true)
 
-	webview := widgets.NewQTextBrowser(nil)
-	// webview := webengine.NewQWebEngineView(nil)
-	webview.SetReadOnly(true)
-	webview.SetOpenExternalLinks(true)
-	webview.SetOpenLinks(false)
+	articleView := NewArticleView()
 
 	entry := widgets.NewQLineEdit(nil)
 	entry.SetPlaceholderText("")
@@ -148,7 +141,7 @@ func Run() {
 	leftMainLayout.AddSpacing(5)
 	leftMainLayout.AddWidget(headerLabel, 0, core.Qt__AlignVCenter)
 	leftMainLayout.AddSpacing(5)
-	leftMainLayout.AddWidget(webview, 0, 0)
+	leftMainLayout.AddWidget(articleView, 0, 0)
 	leftMainLayout.AddSpacing(5)
 	leftMainLayout.AddLayout(bottomBox, 0)
 
@@ -181,14 +174,20 @@ func Run() {
 	leftPanel := widgets.NewQWidget(nil, 0)
 	leftPanelLayout := widgets.NewQVBoxLayout2(leftPanel)
 	leftPanelLayout.AddWidget(widgets.NewQLabel2("Results", nil, 0), 0, 0)
-	resultList := NewResultListWidget(webview, headerLabel)
+	resultList := NewResultListWidget(articleView, headerLabel)
 	leftPanelLayout.AddWidget(resultList, 0, 0)
 
 	queryWidgets := &QueryWidgets{
-		Webview:     webview,
+		ArticleView: articleView,
 		ResultList:  resultList,
 		HeaderLabel: headerLabel,
 	}
+
+	doQuery := func(query string) {
+		onQuery(query, queryWidgets, false)
+		entry.SetText(query)
+	}
+	articleView.doQuery = doQuery
 
 	rightPanel := widgets.NewQTabWidget(nil)
 	rightPanel.AddTab(activityWidget, "Activity")
@@ -212,17 +211,10 @@ func Run() {
 	centralWidget.SetLayout(mainLayout)
 	window.SetCentralWidget(centralWidget)
 
-	mediaPlayer := multimedia.NewQMediaPlayer(nil, 0)
-
-	doQuery := func(query string) {
-		onQuery(query, queryWidgets, false)
-		entry.SetText(query)
-	}
-
 	resetQuery := func() {
 		entry.SetText("")
 		resultList.Clear()
-		webview.SetHtml("")
+		articleView.SetHtml("")
 		headerLabel.SetText("")
 	}
 
@@ -243,96 +235,9 @@ func Run() {
 		}
 		resultList.KeyPressEventDefault(event)
 	})
-	webview.ConnectAnchorClicked(func(link *core.QUrl) {
-		host := link.Host(core.QUrl__FullyDecoded)
-		// fmt.Printf(
-		// 	"AnchorClicked: %#v, host=%#v = %#v\n",
-		// 	link.ToString(core.QUrl__None),
-		// 	host,
-		// 	link.Host(core.QUrl__FullyEncoded),
-		// )
-		if link.Scheme() == "bword" {
-			if host != "" {
-				doQuery(host)
-			} else {
-				fmt.Printf("AnchorClicked: %#v\n", link.ToString(core.QUrl__None))
-			}
-			return
-		}
-		path := link.Path(core.QUrl__FullyDecoded)
-		// fmt.Printf("scheme=%#v, host=%#v, path=%#v", link.Scheme(), host, path)
-		switch link.Scheme() {
-		case "":
-			doQuery(path)
-			return
-		case "file", "http", "https":
-			// fmt.Printf("host=%#v, ext=%#v", host, ext)
-			switch filepath.Ext(path) {
-			case ".wav", ".mp3", ".ogg":
-				fmt.Println("Playing audio", link.ToString(core.QUrl__None))
-				mediaPlayer.SetMedia(multimedia.NewQMediaContent2(link), nil)
-				mediaPlayer.Play()
-				return
-			}
-		}
-		gui.QDesktopServices_OpenUrl(link)
-	})
 
-	// menuStyleOpt := widgets.NewQStyleOptionMenuItem()
-	// style := app.Style()
-	// queryMenuIcon := style.StandardIcon(widgets.QStyle__SP_ArrowUp, menuStyleOpt, nil)
-
-	// we set this on right-button MouseRelease when no text is selected
-	// and read it when Query is selected from context menu
-	// may not be pretty or concurrent-safe! but seems to work!
-	rightClickOnWord := ""
-
-	webview.ConnectContextMenuEvent(func(event *gui.QContextMenuEvent) {
-		event.Ignore()
-		// menu := webview.CreateStandardContextMenu2(event.GlobalPos())
-		menu := webview.CreateStandardContextMenu()
-		// actions := menu.Actions()
-		// fmt.Println("actions", actions)
-		// menu.Actions() panic
-		// https://github.com/therecipe/qt/issues/1286
-		// firstAction := menu.ActiveAction()
-
-		action := widgets.NewQAction2("Query", webview)
-		action.ConnectTriggered(func(checked bool) {
-			text := webview.TextCursor().SelectedText()
-			if text != "" {
-				doQuery(strings.Trim(text, queryForceTrimChars))
-				return
-			}
-			if rightClickOnWord != "" {
-				doQuery(rightClickOnWord)
-			}
-		})
-		menu.InsertAction(nil, action)
-		menu.Popup(event.GlobalPos(), nil)
-	})
-	webview.ConnectMouseReleaseEvent(func(event *gui.QMouseEvent) {
-		text := webview.TextCursor().SelectedText()
-		switch event.Button() {
-		case core.Qt__MiddleButton:
-			if text != "" {
-				doQuery(strings.Trim(text, queryForceTrimChars))
-			}
-			return
-		case core.Qt__RightButton:
-			if text == "" {
-				cursor := webview.CursorForPosition(event.Pos())
-				cursor.Select(gui.QTextCursor__WordUnderCursor)
-				// it doesn't actually select the word in GUI
-				rightClickOnWord = strings.Trim(cursor.SelectedText(), punctuation)
-				if rightClickOnWord != "" {
-					fmt.Printf("Right-clicked on word %#v\n", rightClickOnWord)
-				}
-			}
-		}
-		webview.MouseReleaseEventDefault(event)
-	})
-	webview.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
+	articleView.ConnectCustomHandlers()
+	articleView.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
 		switch event.Text() {
 		case " ":
 			entry.SetFocus(core.Qt__ShortcutFocusReason)
