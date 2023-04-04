@@ -92,7 +92,8 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 		queryWordCount++
 	}
 
-	chechEntry := func(terms []string) uint8 {
+	chechEntry := func(entry *IdxEntry) uint8 {
+		terms := entry.Terms
 		bestScore := uint8(0)
 		for _, termOrig := range terms {
 			term := strings.ToLower(termOrig)
@@ -151,7 +152,7 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 
 	for _, termIndex := range idx.byWordPrefix[prefix] {
 		entry := idx.terms[termIndex]
-		score := chechEntry(entry.Terms)
+		score := chechEntry(entry)
 		if score < minScore {
 			continue
 		}
