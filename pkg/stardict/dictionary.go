@@ -100,15 +100,6 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 			if term == query {
 				return 200
 			}
-			if strings.Contains(term, query) {
-				score := uint8(200 * (1 + len(query)) / (1 + len(term)))
-				if score >= bestScore {
-					bestScore = score
-					if score >= 180 {
-						continue
-					}
-				}
-			}
 			words := strings.Split(term, " ")
 			if len(words) < minWordCount {
 				continue
