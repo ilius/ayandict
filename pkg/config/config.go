@@ -42,8 +42,7 @@ type Config struct {
 	MostFrequentAutoSave bool `toml:"most_frequent_auto_save"`
 	MostFrequentMaxSize  int  `toml:"most_frequent_max_size"`
 
-	MaxResultsPerDict int `toml:"max_results_per_dict"`
-	MaxResultsTotal   int `toml:"max_results_total"`
+	MaxResultsTotal int `toml:"max_results_total"`
 
 	Audio bool `toml:"audio"`
 
@@ -78,8 +77,7 @@ func Default() *Config {
 		MostFrequentAutoSave: true,
 		MostFrequentMaxSize:  100,
 
-		MaxResultsPerDict: 20,
-		MaxResultsTotal:   40,
+		MaxResultsTotal: 40,
 
 		Audio: true,
 

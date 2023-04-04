@@ -62,7 +62,7 @@ func similarity(a string, b string) uint8 {
 // Search: first try an exact match
 // then search all translations for terms that contain the query
 // but sort the one that have it as prefix first
-func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
+func (d *Dictionary) Search(query string) []*SearchResult {
 	// if len(query) < 2 {
 	// 	return d.searchVeryShort(query)
 	// }
@@ -164,11 +164,6 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 	sort.Slice(results, func(i, j int) bool {
 		return results[i].score > results[j].score
 	})
-	if cutoff > 0 && len(results) > cutoff {
-		for ; cutoff < len(results) && results[cutoff].score > 180; cutoff++ {
-		}
-		results = results[:cutoff]
-	}
 	return results
 }
 

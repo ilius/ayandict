@@ -368,12 +368,11 @@ func LookupHTML(
 	dictsOrder map[string]int,
 ) []common.QueryResult {
 	results := []common.QueryResult{}
-	maxResultsPerDict := conf.MaxResultsPerDict
 	for _, dic := range dicList {
 		if dic.disabled {
 			continue
 		}
-		for _, res := range dic.Search(query, maxResultsPerDict) {
+		for _, res := range dic.Search(query) {
 			results = append(results, &QueryResultImp{
 				SearchResult: res,
 				dic:          dic,
