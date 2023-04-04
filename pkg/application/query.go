@@ -160,7 +160,7 @@ func onQuery(
 		conf,
 		dictsOrder,
 	)
-	log.Println("LookupHTML took", time.Now().Sub(t))
+	log.Printf("LookupHTML took %v for %#v", time.Now().Sub(t), query)
 	queryWidgets.ResultList.SetResults(results)
 	if len(results) == 0 {
 		if !isAuto {
