@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"unicode/utf8"
 
 	"github.com/ilius/ayandict/pkg/levenshtein"
 )
@@ -50,12 +49,17 @@ func (d *Dictionary) ResourceURL() string {
 	return d.resURL
 }
 
-func similarity(a string, b string) uint8 {
-	n := len(a)
-	if len(b) > n {
-		n = len(b)
+func similarity(r1 []rune, r2 []rune) uint8 {
+	if len(r1) > len(r2) {
+		r1, r2 = r2, r1
 	}
-	return uint8(200 * (n - levenshtein.ComputeDistance(a, b)) / n)
+	// now len(r1) <= len(r2)
+	n := len(r2)
+	if len(r1) < n*2/3 {
+		// this optimization assumes we want to ignore below %66 similarity
+		return 0
+	}
+	return uint8(200 * (n - levenshtein.ComputeDistance(r1, r2)) / n)
 }
 
 // Search: first try an exact match
@@ -70,12 +74,13 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 
 	query = strings.ToLower(strings.TrimSpace(query))
 	queryWords := strings.Split(query, " ")
+	queryRunes := []rune(query)
 
 	mainWordIndex := 0
 	for mainWordIndex < len(queryWords)-1 && queryWords[mainWordIndex] == "*" {
 		mainWordIndex++
 	}
-	queryMainWord := queryWords[mainWordIndex]
+	queryMainWord := []rune(queryWords[mainWordIndex])
 
 	minWordCount := 1
 	queryWordCount := 0
@@ -96,32 +101,30 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 			}
 			if strings.Contains(term, query) {
 				score := uint8(200 * (1 + len(query)) / (1 + len(term)))
-				if score > bestScore {
+				if score >= bestScore {
 					bestScore = score
-					continue
+					if score >= 180 {
+						continue
+					}
 				}
 			}
 			words := strings.Split(term, " ")
 			if len(words) < minWordCount {
 				continue
 			}
-			score := similarity(query, term)
+			score := similarity(queryRunes, []rune(term))
 			if score > bestScore {
 				bestScore = score
-				continue
+				if score >= 180 {
+					continue
+				}
 			}
-			// if score < 50 {
-			// 	continue
-			// }
 			if len(words) > 1 {
 				bestWordScore := uint8(0)
 				for wordI, word := range words {
-					wordScore := similarity(queryMainWord, word)
+					wordScore := similarity(queryMainWord, []rune(word))
 					if wordI != mainWordIndex {
 						wordScore -= wordScore / 10
-					}
-					if wordScore < 140 {
-						continue
 					}
 					if wordScore > bestWordScore {
 						bestWordScore = wordScore
@@ -142,7 +145,7 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 	}
 
 	t1 := time.Now()
-	prefix, _ := utf8.DecodeRuneInString(queryMainWord)
+	prefix := queryMainWord[0]
 
 	const minScore = uint8(140)
 

@@ -4,8 +4,6 @@
 // https://gist.github.com/andrei-m/982927#gistcomment-1931258
 package levenshtein
 
-import "unicode/utf8"
-
 // minLengthThreshold is the length of the string beyond which
 // an allocation will be made. Strings smaller than this will be
 // zero alloc.
@@ -17,30 +15,8 @@ const minLengthThreshold = 32
 // Works on runes (Unicode code points) but does not normalize
 // the input strings. See https://blog.golang.org/normalization
 // and the golang.org/x/text/unicode/norm package.
-func ComputeDistance(a, b string) int {
-	if len(a) == 0 {
-		return utf8.RuneCountInString(b)
-	}
-
-	if len(b) == 0 {
-		return utf8.RuneCountInString(a)
-	}
-
-	if a == b {
-		return 0
-	}
-
-	// We need to convert to []rune if the strings are non-ASCII.
-	// This could be avoided by using utf8.RuneCountInString
-	// and then doing some juggling with rune indices,
-	// but leads to far more bounds checks. It is a reasonable trade-off.
-	s1 := []rune(a)
-	s2 := []rune(b)
-
-	// swap to save some memory O(min(a,b)) instead of O(a)
-	if len(s1) > len(s2) {
-		s1, s2 = s2, s1
-	}
+// THE CALLER MUST MAKE SURE THAT: len(s1) <= len(s2)
+func ComputeDistance(s1, s2 []rune) int {
 	lenS1 := len(s1)
 	lenS2 := len(s2)
 
