@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -161,9 +160,6 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 		log.Printf("Search index loop took %v for %#v on %s\n", dt, query, d.DictName())
 	}
 	// log.Printf("Search produced %d results for %#v on %s\n", len(results), query, d.DictName())
-	sort.Slice(results, func(i, j int) bool {
-		return results[i].score > results[j].score
-	})
 	return results
 }
 
