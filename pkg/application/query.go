@@ -153,7 +153,7 @@ func onQuery(
 		}
 		return
 	}
-	log.Printf("Query: %s\n", query)
+	// log.Printf("Query: %s\n", query)
 	t := time.Now()
 	results := stardict.LookupHTML(
 		query,

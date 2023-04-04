@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	"github.com/ilius/ayandict/pkg/levenshtein"
@@ -138,6 +139,7 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 		return bestScore
 	}
 
+	t1 := time.Now()
 	prefix, _ := utf8.DecodeRuneInString(queryMainWord)
 	for _, termIndex := range idx.byWordPrefix[prefix] {
 		entry := idx.terms[termIndex]
@@ -154,7 +156,11 @@ func (d *Dictionary) Search(query string, cutoff int) []*SearchResult {
 		})
 
 	}
-	log.Printf("Search produced %d results for %#v on %s\n", len(results), query, d.DictName())
+	dt := time.Now().Sub(t1)
+	if dt > time.Millisecond {
+		log.Printf("Search index loop took %v for %#v on %s\n", dt, query, d.DictName())
+	}
+	// log.Printf("Search produced %d results for %#v on %s\n", len(results), query, d.DictName())
 	sort.Slice(results, func(i, j int) bool {
 		return results[i].score > results[j].score
 	})
