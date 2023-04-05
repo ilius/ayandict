@@ -316,7 +316,7 @@ func Run() {
 		}
 	})
 
-	qs := core.NewQSettings("ilius", "ayandict", window)
+	qs := getQSettings(window)
 	restoreSplitterSizes(qs, mainSplitter, QS_mainSplitter)
 	restoreMainWinGeometry(app, qs, window)
 	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {

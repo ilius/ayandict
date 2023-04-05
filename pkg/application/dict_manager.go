@@ -14,6 +14,7 @@ import (
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/stardict"
 	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -91,6 +92,9 @@ func NewDictManager(
 	window := widgets.NewQDialog(parent, core.Qt__Dialog)
 	window.SetWindowTitle("Dictionaries")
 	window.Resize2(800, 600)
+
+	qs := getQSettings(window)
+	restoreWinGeometry(app, qs, &window.QWidget, QS_dictManager)
 
 	const columns = 4
 
@@ -243,6 +247,13 @@ func NewDictManager(
 	for index, info := range infos {
 		setItem(index, info.DictName())
 	}
+
+	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		saveWinGeometry(qs, &window.QWidget, QS_dictManager)
+	})
+	window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
+		saveWinGeometry(qs, &window.QWidget, QS_dictManager)
+	})
 
 	return &DictManager{
 		Dialog:      window,

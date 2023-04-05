@@ -24,7 +24,13 @@ const (
 
 	QS_mainSplitter = "main_splitter"
 	QS_sizes        = "sizes"
+
+	QS_dictManager = "dict_manager"
 )
+
+func getQSettings(parent core.QObject_ITF) *core.QSettings {
+	return core.NewQSettings("ilius", "ayandict", parent)
+}
 
 func restoreSetting(qs *core.QSettings, key string, apply func(*core.QVariant)) {
 	if !qs.Contains(key) {
@@ -58,9 +64,21 @@ func saveMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
 	}
 }
 
+func saveWinGeometry(qs *core.QSettings, window *widgets.QWidget, mainKey string) {
+	qs.BeginGroup(mainKey)
+	defer qs.EndGroup()
+
+	qs.SetValue(QS_geometry, core.NewQVariant13(window.SaveGeometry()))
+	qs.SetValue(QS_maximized, core.NewQVariant9(window.IsMaximized()))
+	if !window.IsMaximized() {
+		qs.SetValue(QS_pos, core.NewQVariant27(window.Pos()))
+		qs.SetValue(QS_size, core.NewQVariant25(window.Size()))
+	}
+}
+
 func setWinPosition(
 	app *widgets.QApplication,
-	window *widgets.QMainWindow,
+	window *widgets.QWidget,
 	pos *core.QPoint,
 ) {
 	screenSize := app.Desktop().AvailableGeometry(0)
@@ -83,7 +101,7 @@ func setWinPosition(
 
 func setWinSize(
 	app *widgets.QApplication,
-	window *widgets.QMainWindow,
+	window *widgets.QWidget,
 	size *core.QSize,
 ) {
 	screenSize := app.Desktop().AvailableGeometry(0)
@@ -109,6 +127,32 @@ func restoreMainWinGeometry(
 	})
 	restoreSetting(qs, QS_savestate, func(value *core.QVariant) {
 		window.RestoreState(value.ToByteArray(), 0)
+	})
+	restoreBoolSetting(qs, QS_maximized, false, func(maximized bool) {
+		if maximized {
+			window.ShowMaximized()
+			return
+		}
+		restoreSetting(qs, QS_pos, func(value *core.QVariant) {
+			setWinPosition(app, &window.QWidget, value.ToPoint())
+		})
+		restoreSetting(qs, QS_size, func(value *core.QVariant) {
+			setWinSize(app, &window.QWidget, value.ToSize())
+		})
+	})
+}
+
+func restoreWinGeometry(
+	app *widgets.QApplication,
+	qs *core.QSettings,
+	window *widgets.QWidget,
+	mainKey string,
+) {
+	qs.BeginGroup(mainKey)
+	defer qs.EndGroup()
+
+	restoreSetting(qs, QS_geometry, func(value *core.QVariant) {
+		window.RestoreGeometry(value.ToByteArray())
 	})
 	restoreBoolSetting(qs, QS_maximized, false, func(maximized bool) {
 		if maximized {
