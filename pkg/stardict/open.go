@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 )
 
 func isDir(pathStr string) bool {
@@ -67,17 +68,25 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 			log.Println(err)
 		}
 	}
-	for _, dic := range dicList {
-		log.Printf("Loading index %#v\n", dic.idxPath)
-		if dic.disabled {
-			continue
-		}
+	var wg sync.WaitGroup
+	load := func(dic *Dictionary) {
+		defer wg.Done()
+		// log.Printf("Loading index %#v\n", dic.idxPath)
 		err = dic.load()
 		if err != nil {
 			log.Println(err)
+		} else {
+			log.Printf("Loaded index %#v\n", dic.idxPath)
 		}
 	}
-
+	for _, dic := range dicList {
+		if dic.disabled {
+			continue
+		}
+		wg.Add(1)
+		go load(dic)
+	}
+	wg.Wait()
 	return dicList, nil
 }
 
