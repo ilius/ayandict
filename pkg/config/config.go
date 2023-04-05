@@ -51,6 +51,18 @@ type Config struct {
 	ColorMapping map[string]string `toml:"color_mapping"`
 }
 
+const defaultHeaderTemplate = `<b><font color='#55f'>{{.DictName}}</font></b>
+<font color='#777'> [Score: %{{.Score}}]</font>
+<div dir="ltr" style="font-size: xx-large;font-weight:bold;">
+{{ index .Terms 0 }}
+</div>
+{{range slice .Terms 1}}
+<span dir="ltr" style="font-size: large;font-weight:bold;">
+	<span style="color:#ff0000;font-weight:bold;"> | </span>
+	{{ . }}
+</span>
+{{end}}`
+
 func Default() *Config {
 	return &Config{
 		DirectoryList: []string{
@@ -67,7 +79,7 @@ func Default() *Config {
 		SearchOnType:          false,
 		SearchOnTypeMinLength: 3,
 
-		HeaderTemplate: `<h1>{{.Term}} (from {{.DictName}})</h1>`,
+		HeaderTemplate: defaultHeaderTemplate,
 
 		HistoryDisable:  false,
 		HistoryAutoSave: true,
