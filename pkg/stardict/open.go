@@ -44,12 +44,6 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 			dicList = append(dicList, dic)
 			return nil
 		}
-		log.Printf("Loading index for %#v\n", path)
-		err = dic.load()
-		if err != nil {
-			log.Println(err)
-			return err
-		}
 		resDir := filepath.Join(dirPath, "res")
 		if isDir(resDir) {
 			dic.resDir = resDir
@@ -73,6 +67,17 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 			log.Println(err)
 		}
 	}
+	for _, dic := range dicList {
+		log.Printf("Loading index %#v\n", dic.idxPath)
+		if dic.disabled {
+			continue
+		}
+		err = dic.load()
+		if err != nil {
+			log.Println(err)
+		}
+	}
+
 	return dicList, nil
 }
 
