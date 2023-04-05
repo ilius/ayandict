@@ -248,6 +248,15 @@ func NewDictManager(
 		setItem(index, info.DictName())
 	}
 
+	restoreTableColumnsWidth(
+		qs,
+		table,
+		QS_dictManager,
+	)
+	table.HorizontalHeader().ConnectSectionResized(func(logicalIndex int, oldSize int, newSize int) {
+		saveTableColumnsWidth(qs, table, QS_dictManager)
+	})
+
 	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
 		saveWinGeometry(qs, &window.QWidget, QS_dictManager)
 	})
