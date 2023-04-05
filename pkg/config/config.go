@@ -49,6 +49,8 @@ type Config struct {
 	EmbedExternalStylesheet bool `toml:"embed_external_stylesheet"`
 
 	ColorMapping map[string]string `toml:"color_mapping"`
+
+	PopupStyleStr string `toml:"popup_style_str"`
 }
 
 const defaultHeaderTemplate = `<b><font color='#55f'>{{.DictName}}</font></b>
@@ -96,6 +98,8 @@ func Default() *Config {
 		EmbedExternalStylesheet: false,
 
 		ColorMapping: map[string]string{},
+
+		PopupStyleStr: "border: 1px solid red; background-color: #333; color: white",
 	}
 }
 

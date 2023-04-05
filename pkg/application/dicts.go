@@ -14,15 +14,16 @@ func loadingDictsPopup() *widgets.QLabel {
 	popup := widgets.NewQLabel2(
 		`<span style="font-size:xx-large;">Loading dictionaries</span>`,
 		nil,
-		core.Qt__SplashScreen|core.Qt__WindowStaysOnTopHint,
-		// Qt__SplashScreen or Qt__Popup?
-		// Qt__SplashScreen makes it centered on screen
+		core.Qt__SplashScreen,
 	)
+	// Qt__SplashScreen makes it centered on screen
 	popup.SetFrameStyle(int(widgets.QFrame__Raised | widgets.QFrame__Shadow(widgets.QFrame__Panel)))
 	popup.SetAlignment(core.Qt__AlignCenter)
-	popup.SetFixedSize2(400, 200)
+	popup.SetFixedSize2(300, 100)
+	popup.SetWindowModality(core.Qt__WindowModal)
+	popup.SetStyleSheet(conf.PopupStyleStr)
 	popup.Show()
-	// popup.Move
+	core.QCoreApplication_ProcessEvents(core.QEventLoop__AllEvents)
 	return popup
 }
 
