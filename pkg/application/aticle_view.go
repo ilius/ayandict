@@ -76,6 +76,18 @@ func (view *ArticleView) SetupCustomHandlers() {
 	}
 	mediaPlayer := multimedia.NewQMediaPlayer(nil, 0)
 
+	copyAction := widgets.NewQAction2("Copy", view)
+	view.AddAction(copyAction)
+	copyAction.SetShortcut(gui.NewQKeySequence2("Ctrl+C", gui.QKeySequence__PortableText))
+	copyAction.ConnectTriggered(func(checked bool) {
+		text := view.TextCursor().SelectedText()
+		if text == "" {
+			return
+		}
+		text = strings.TrimSpace(text)
+		view.app.Clipboard().SetText(text, gui.QClipboard__Clipboard)
+	})
+
 	view.ConnectAnchorClicked(func(link *core.QUrl) {
 		host := link.Host(core.QUrl__FullyDecoded)
 		// log.Printf(
