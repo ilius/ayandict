@@ -36,7 +36,7 @@ func Run() {
 	headerLabel.SetTextFormat(core.Qt__RichText)
 	headerLabel.SetWordWrap(true)
 
-	articleView := NewArticleView()
+	articleView := NewArticleView(app)
 
 	entry := widgets.NewQLineEdit(nil)
 	entry.SetPlaceholderText("")

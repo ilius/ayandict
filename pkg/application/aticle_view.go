@@ -14,10 +14,14 @@ import (
 type ArticleView struct {
 	*widgets.QTextBrowser
 
+	app *widgets.QApplication
+
 	doQuery func(string)
+
+	rightClickOnWord string
 }
 
-func NewArticleView() *ArticleView {
+func NewArticleView(app *widgets.QApplication) *ArticleView {
 	widget := widgets.NewQTextBrowser(nil)
 	// widget := webengine.NewQWebEngineView(nil)
 	widget.SetReadOnly(true)
@@ -25,7 +29,44 @@ func NewArticleView() *ArticleView {
 	widget.SetOpenLinks(false)
 	return &ArticleView{
 		QTextBrowser: widget,
+		app:          app,
 	}
+}
+
+func (view *ArticleView) createContextMenu() *widgets.QMenu {
+	menu := widgets.NewQMenu(view.QTextBrowser)
+	menu.AddAction("Query").ConnectTriggered(func(checked bool) {
+		text := view.TextCursor().SelectedText()
+		if text != "" {
+			view.doQuery(strings.Trim(text, queryForceTrimChars))
+			return
+		}
+		if view.rightClickOnWord != "" {
+			view.doQuery(view.rightClickOnWord)
+		}
+	})
+	menu.AddAction("Copy").ConnectTriggered(func(checked bool) {
+		text := view.TextCursor().SelectedText()
+		if text == "" {
+			return
+		}
+		text = strings.TrimSpace(text)
+		view.app.Clipboard().SetText(text, gui.QClipboard__Clipboard)
+	})
+	menu.AddAction("Copy All (HTML)").ConnectTriggered(func(checked bool) {
+		view.app.Clipboard().SetText(
+			view.ToHtml(),
+			gui.QClipboard__Clipboard,
+		)
+	})
+	menu.AddAction("Copy All (Plaintext)").ConnectTriggered(func(checked bool) {
+		view.app.Clipboard().SetText(
+			view.ToPlainText(),
+			gui.QClipboard__Clipboard,
+		)
+	})
+
+	return menu
 }
 
 func (view *ArticleView) SetupCustomHandlers() {
@@ -76,30 +117,10 @@ func (view *ArticleView) SetupCustomHandlers() {
 	// we set this on right-button MouseRelease when no text is selected
 	// and read it when Query is selected from context menu
 	// may not be pretty or concurrent-safe! but seems to work!
-	rightClickOnWord := ""
 
 	view.ConnectContextMenuEvent(func(event *gui.QContextMenuEvent) {
 		event.Ignore()
-		// menu := webview.CreateStandardContextMenu2(event.GlobalPos())
-		menu := view.CreateStandardContextMenu()
-		// actions := menu.Actions()
-		// log.Println("actions", actions)
-		// menu.Actions() panic
-		// https://github.com/therecipe/qt/issues/1286
-		// firstAction := menu.ActiveAction()
-
-		action := widgets.NewQAction2("Query", view)
-		action.ConnectTriggered(func(checked bool) {
-			text := view.TextCursor().SelectedText()
-			if text != "" {
-				doQuery(strings.Trim(text, queryForceTrimChars))
-				return
-			}
-			if rightClickOnWord != "" {
-				doQuery(rightClickOnWord)
-			}
-		})
-		menu.InsertAction(nil, action)
+		menu := view.createContextMenu()
 		menu.Popup(event.GlobalPos(), nil)
 	})
 	view.ConnectMouseReleaseEvent(func(event *gui.QMouseEvent) {
@@ -115,9 +136,9 @@ func (view *ArticleView) SetupCustomHandlers() {
 				cursor := view.CursorForPosition(event.Pos())
 				cursor.Select(gui.QTextCursor__WordUnderCursor)
 				// it doesn't actually select the word in GUI
-				rightClickOnWord = strings.Trim(cursor.SelectedText(), punctuation)
-				if rightClickOnWord != "" {
-					log.Printf("Right-clicked on word %#v\n", rightClickOnWord)
+				view.rightClickOnWord = strings.Trim(cursor.SelectedText(), punctuation)
+				if view.rightClickOnWord != "" {
+					log.Printf("Right-clicked on word %#v\n", view.rightClickOnWord)
 				}
 			}
 		}
