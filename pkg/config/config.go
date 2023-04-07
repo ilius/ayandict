@@ -42,6 +42,8 @@ type Config struct {
 	MostFrequentAutoSave bool `toml:"most_frequent_auto_save"`
 	MostFrequentMaxSize  int  `toml:"most_frequent_max_size"`
 
+	FavoritesAutoSave bool `toml:"favorites_auto_save"`
+
 	MaxResultsTotal int `toml:"max_results_total"`
 
 	Audio bool `toml:"audio"`
@@ -90,6 +92,8 @@ func Default() *Config {
 		MostFrequentDisable:  false,
 		MostFrequentAutoSave: true,
 		MostFrequentMaxSize:  100,
+
+		FavoritesAutoSave: true,
 
 		MaxResultsTotal: 40,
 

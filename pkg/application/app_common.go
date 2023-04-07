@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/ilius/ayandict/pkg/frequency"
+	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
@@ -53,24 +54,27 @@ const queryForceTrimChars = "‘’،؛"
 
 var frequencyTable *frequency.FrequencyTable
 
-func loadIcon(filename string) *gui.QIcon {
+// TODO: save data to a temp file and give the path to qt
+
+func loadPNGIcon(filename string) *gui.QIcon {
 	data, err := res.ReadFile("res/" + filename)
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
-	pixmap := gui.NewQPixmap()
-	// LoadFromData fails
-	// https://github.com/therecipe/qt/issues/1193
-	if !pixmap.LoadFromData(data, uint(len(data)), "PNG", 0) {
-		log.Println("loadIcon: LoadFromData failed")
-		return nil
-	}
-	// byteArray := core.NewQByteArray()
-	// byteArray.SetRawData(data, uint(len(data)))
-	// if !pixmap.LoadFromData2(byteArray, "", 0) {
-	// 	log.Println("loadIcon: LoadFromData failed")
-	// 	return nil
-	// }
+	image := gui.QImage_FromData(data, len(data), "PNG")
+	pixmap := gui.QPixmap_FromImage(image, core.Qt__AutoColor)
 	return gui.NewQIcon2(pixmap)
 }
+
+// func loadSVGIcon(filename string) *gui.QIcon {
+// 	data, err := res.ReadFile("res/" + filename)
+// 	if err != nil {
+// 		log.Println(err)
+// 		return nil
+// 	}
+// 	image := gui.QImage_FromData(data, len(data), "SVG")
+// 	image.Rect().SetSize(core.NewQSize2(36, 36))
+// 	pixmap := gui.QPixmap_FromImage(image, core.Qt__AutoColor)
+// 	return gui.NewQIcon2(pixmap)
+// }

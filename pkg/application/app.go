@@ -1,11 +1,13 @@
 package application
 
 import (
+	"fmt"
 	"log"
 	"os"
 
 	// "github.com/therecipe/qt/webengine"
 
+	"github.com/ilius/ayandict/pkg/favorites"
 	"github.com/ilius/ayandict/pkg/frequency"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
@@ -28,16 +30,6 @@ func Run() {
 	window.SetWindowTitle("AyanDict")
 	window.Resize2(600, 400)
 
-	headerLabel := widgets.NewQLabel(nil, 0)
-	headerLabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
-	// | core.Qt__TextSelectableByKeyboard
-	headerLabel.SetAlignment(core.Qt__AlignVCenter)
-	headerLabel.SetContentsMargins(20, 0, 0, 0)
-	headerLabel.SetTextFormat(core.Qt__RichText)
-	headerLabel.SetWordWrap(true)
-
-	articleView := NewArticleView(app)
-
 	entry := widgets.NewQLineEdit(nil)
 	entry.SetPlaceholderText("")
 	entry.SetFixedHeight(25)
@@ -53,6 +45,30 @@ func Run() {
 	queryBoxLayout.AddWidget(okButton, 0, 0)
 	// queryBoxLayout.SetSpacing(10)
 
+	headerLabel := widgets.NewQLabel(nil, 0)
+	headerLabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
+	// | core.Qt__TextSelectableByKeyboard
+	// headerLabel.SetAlignment(core.Qt__AlignVCenter)
+	headerLabel.SetContentsMargins(20, 0, 0, 0)
+	headerLabel.SetTextFormat(core.Qt__RichText)
+	headerLabel.SetWordWrap(true)
+	headerLabel.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
+
+	// FIXME: putting headerLabel in a HBox while WordWrap is on
+	// makes it not expand. Since I could not fix this, I'm putting
+	// Favorite button to the bottomBox for now
+	// headerBox := widgets.NewQWidget(nil, 0)
+	// headerBoxLayout := widgets.NewQHBoxLayout2(headerBox)
+	// headerBoxLayout.SetSizeConstraint(widgets.QLayout__SetMinimumSize)
+	// headerBoxLayout.SetContentsMargins(0, 0, 0, 0)
+	// headerBoxLayout.SetSpacing(10)
+	// headerBoxLayout.AddWidget(headerLabel, 1, core.Qt__AlignLeft)
+	// headerBox.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
+	// headerBoxLayout.AddWidget(favoriteButton, 0, core.Qt__AlignLeft)
+	// favoriteButton.SetSizePolicy2(widgets.QSizePolicy__Minimum, widgets.QSizePolicy__Minimum)
+
+	articleView := NewArticleView(app)
+
 	historyView := NewHistoryView()
 
 	frequencyTable.SetHorizontalHeaderItem(
@@ -67,6 +83,15 @@ func Run() {
 		frequencyTable.LoadFromFile(frequencyFilePath())
 	}
 	// TODO: save the width of 2 columns
+
+	favoritesWidget := favorites.NewFavoritesWidget(conf)
+	{
+		err := favoritesWidget.Load()
+		if err != nil {
+			// conf.FavoritesAutoSave = false
+			fmt.Println(err)
+		}
+	}
 
 	miscBox := widgets.NewQFrame(nil, 0)
 	miscLayout := widgets.NewQVBoxLayout2(miscBox)
@@ -100,6 +125,15 @@ func Run() {
 		)
 	}
 
+	// favoriteIcon := loadPNGIcon("favorite.png")
+	// if favoriteIcon == nil {
+	// 	panic("favoriteIcon is nil")
+	// }
+	// favoriteButton := widgets.NewQPushButton2("Favorite", nil)
+	favoriteButton := newIconTextButton("Favorite", widgets.QStyle__SP_DialogSaveButton)
+	favoriteButton.SetCheckable(true)
+	bottomBox.AddWidget(favoriteButton, 0, core.Qt__AlignLeft)
+
 	dictsButton := newIconTextButton("Dictionaries", widgets.QStyle__SP_FileDialogDetailedView)
 	bottomBox.AddWidget(dictsButton, 0, core.Qt__AlignLeft)
 
@@ -124,7 +158,7 @@ func Run() {
 	leftMainLayout.SetSpacing(0)
 	leftMainLayout.AddWidget(queryBox, 0, 0)
 	leftMainLayout.AddSpacing(5)
-	leftMainLayout.AddWidget(headerLabel, 0, core.Qt__AlignVCenter)
+	leftMainLayout.AddWidget(headerLabel, 0, 0)
 	leftMainLayout.AddSpacing(5)
 	leftMainLayout.AddWidget(articleView, 0, 0)
 	leftMainLayout.AddSpacing(5)
@@ -134,9 +168,11 @@ func Run() {
 	activityTypeCombo.AddItems([]string{
 		"Recent",
 		"Most Frequent",
+		"Favorites",
 	})
 
 	frequencyTable.Hide()
+	favoritesWidget.Hide()
 
 	activityWidget := widgets.NewQWidget(nil, 0)
 	activityLayout := widgets.NewQVBoxLayout2(activityWidget)
@@ -144,22 +180,38 @@ func Run() {
 	activityLayout.AddWidget(activityTypeCombo, 0, 0)
 	activityLayout.AddWidget(historyView, 0, 0)
 	activityLayout.AddWidget(frequencyTable, 0, 0)
+	activityLayout.AddWidget(favoritesWidget, 0, 0)
 
 	activityTypeCombo.ConnectCurrentIndexChanged(func(index int) {
 		switch index {
 		case 0:
 			historyView.Show()
 			frequencyTable.Hide()
+			favoritesWidget.Hide()
 		case 1:
 			historyView.Hide()
 			frequencyTable.Show()
+			favoritesWidget.Hide()
+		case 2:
+			historyView.Hide()
+			frequencyTable.Hide()
+			favoritesWidget.Show()
 		}
 	})
+
+	onResultDisplay := func(terms []string) {
+		isFav := favoritesWidget.HasFavorite(terms[0])
+		favoriteButton.SetChecked(isFav)
+	}
 
 	leftPanel := widgets.NewQWidget(nil, 0)
 	leftPanelLayout := widgets.NewQVBoxLayout2(leftPanel)
 	leftPanelLayout.AddWidget(widgets.NewQLabel2("Results", nil, 0), 0, 0)
-	resultList := NewResultListWidget(articleView, headerLabel)
+	resultList := NewResultListWidget(
+		articleView,
+		headerLabel,
+		onResultDisplay,
+	)
 	leftPanelLayout.AddWidget(resultList, 0, 0)
 
 	queryWidgets := &QueryWidgets{
@@ -248,6 +300,9 @@ func Run() {
 		// item.Column() panics!
 		frequencyTable.SetCurrentCell(newRow, 0)
 	})
+	favoritesWidget.ConnectItemActivated(func(item *widgets.QListWidgetItem) {
+		doQuery(item.Text())
+	})
 	reloadDictsButton.ConnectClicked(func(checked bool) {
 		reloadDicts()
 	})
@@ -313,6 +368,15 @@ func Run() {
 				return
 			}
 			onQuery(text, queryWidgets, true)
+		}
+	})
+
+	favoriteButton.ConnectClicked(func(checked bool) {
+		term := resultList.Active.Terms()[0]
+		if checked {
+			favoritesWidget.AddFavorite(term)
+		} else {
+			favoritesWidget.RemoveFavorite(term)
 		}
 	})
 

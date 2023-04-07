@@ -35,12 +35,14 @@ func (w *QueryWidgets) AddHistoryAndFrequency(query string) {
 func NewResultListWidget(
 	articleView *ArticleView,
 	headerLabel *widgets.QLabel,
+	onResultDisplay func(terms []string),
 ) *ResultListWidget {
 	widget := widgets.NewQListWidget(nil)
 	resultList := &ResultListWidget{
-		QListWidget: widget,
-		HeaderLabel: headerLabel,
-		ArticleView: articleView,
+		QListWidget:     widget,
+		HeaderLabel:     headerLabel,
+		ArticleView:     articleView,
+		onResultDisplay: onResultDisplay,
 	}
 	widget.ConnectCurrentRowChanged(func(row int) {
 		if row < 0 {
@@ -60,9 +62,15 @@ func NewResultListWidget(
 
 type ResultListWidget struct {
 	*widgets.QListWidget
+
+	results []common.QueryResult
+
+	Active common.QueryResult
+
 	HeaderLabel *widgets.QLabel
 	ArticleView *ArticleView
-	results     []common.QueryResult
+
+	onResultDisplay func(terms []string)
 }
 
 func (w *ResultListWidget) SetResults(results []common.QueryResult) {
@@ -107,11 +115,11 @@ func (w *ResultListWidget) OnActivate(row int) {
 	}
 	res := w.results[row]
 	terms := res.Terms()
-	term := html.EscapeString(strings.Join(terms, " | "))
+	termsJoined := html.EscapeString(strings.Join(terms, " | "))
 	headerBuf := bytes.NewBuffer(nil)
 	err := headerTpl.Execute(headerBuf, HeaderTemplateInput{
 		Terms:    terms,
-		Term:     term,
+		Term:     termsJoined,
 		DictName: res.DictName(),
 		Score:    res.Score() / 2,
 	})
@@ -134,6 +142,8 @@ func (w *ResultListWidget) OnActivate(row int) {
 	} else {
 		w.ArticleView.SetSearchPaths([]string{resDir})
 	}
+	w.onResultDisplay(res.Terms())
+	w.Active = res
 }
 
 func (w *ResultListWidget) Clear() {
