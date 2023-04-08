@@ -36,12 +36,16 @@ func Run() {
 
 	okButton := widgets.NewQPushButton2("OK", nil)
 
+	queryFavoriteButton := NewPNGIconTextButton("", "favorite.png")
+	queryFavoriteButton.SetCheckable(true)
+
 	queryBox := widgets.NewQFrame(nil, 0)
 	queryBoxLayout := widgets.NewQHBoxLayout2(queryBox)
 	queryBoxLayout.SetContentsMargins(5, 5, 5, 0)
 	queryBoxLayout.SetSpacing(10)
 	queryBoxLayout.AddWidget(widgets.NewQLabel2("Query:", nil, 0), 0, 0)
 	queryBoxLayout.AddWidget(entry, 0, 0)
+	queryBoxLayout.AddWidget(queryFavoriteButton, 0, 0)
 	queryBoxLayout.AddWidget(okButton, 0, 0)
 	// queryBoxLayout.SetSpacing(10)
 
@@ -210,15 +214,24 @@ func Run() {
 	)
 	leftPanelLayout.AddWidget(resultList, 0, 0)
 
-	queryWidgets := &QueryWidgets{
+	postQuery := func(query string) {
+		if query == "" {
+			queryFavoriteButton.SetChecked(false)
+			return
+		}
+		queryFavoriteButton.SetChecked(favoritesWidget.HasFavorite(query))
+	}
+
+	queryArgs := &QueryArgs{
 		ArticleView: articleView,
 		ResultList:  resultList,
 		HeaderLabel: headerLabel,
 		HistoryView: historyView,
+		PostQuery:   postQuery,
 	}
 
 	doQuery := func(query string) {
-		onQuery(query, queryWidgets, false)
+		onQuery(query, queryArgs, false)
 		entry.SetText(query)
 	}
 	articleView.doQuery = doQuery
@@ -247,10 +260,10 @@ func Run() {
 	}
 
 	entry.ConnectReturnPressed(func() {
-		onQuery(entry.Text(), queryWidgets, false)
+		onQuery(entry.Text(), queryArgs, false)
 	})
 	okButton.ConnectClicked(func(bool) {
-		onQuery(entry.Text(), queryWidgets, false)
+		onQuery(entry.Text(), queryArgs, false)
 	})
 	aboutButton.ConnectClicked(func(bool) {
 		aboutClicked(window)
@@ -303,11 +316,11 @@ func Run() {
 	})
 	reloadConfigButton.ConnectClicked(func(checked bool) {
 		ReloadConfig(app)
-		onQuery(entry.Text(), queryWidgets, false)
+		onQuery(entry.Text(), queryArgs, false)
 	})
 	reloadStyleButton.ConnectClicked(func(checked bool) {
 		LoadUserStyle(app)
-		onQuery(entry.Text(), queryWidgets, false)
+		onQuery(entry.Text(), queryArgs, false)
 	})
 	saveHistoryButton.ConnectClicked(func(checked bool) {
 		SaveHistory()
@@ -328,7 +341,7 @@ func Run() {
 		}
 		if dictManager.Dialog.Exec() == dialogAccepted {
 			SaveDictManagerDialog(dictManager)
-			onQuery(entry.Text(), queryWidgets, false)
+			onQuery(entry.Text(), queryArgs, false)
 		}
 	})
 
@@ -356,7 +369,7 @@ func Run() {
 			if len(text) < conf.SearchOnTypeMinLength {
 				return
 			}
-			onQuery(text, queryWidgets, true)
+			onQuery(text, queryArgs, true)
 		}
 	})
 
@@ -370,6 +383,24 @@ func Run() {
 			favoritesWidget.AddFavorite(term)
 		} else {
 			favoritesWidget.RemoveFavorite(term)
+		}
+		if term == entry.Text() {
+			queryFavoriteButton.SetChecked(checked)
+		}
+	})
+	queryFavoriteButton.ConnectClicked(func(checked bool) {
+		term := entry.Text()
+		if term == "" {
+			queryFavoriteButton.SetChecked(false)
+			return
+		}
+		if checked {
+			favoritesWidget.AddFavorite(term)
+		} else {
+			favoritesWidget.RemoveFavorite(term)
+		}
+		if resultList.Active != nil && term == resultList.Active.Terms()[0] {
+			favoriteButton.SetChecked(checked)
 		}
 	})
 

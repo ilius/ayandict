@@ -13,14 +13,15 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
-type QueryWidgets struct {
+type QueryArgs struct {
 	ArticleView *ArticleView
 	ResultList  *ResultListWidget
 	HeaderLabel *widgets.QLabel
 	HistoryView *HistoryView
+	PostQuery   func(string)
 }
 
-func (w *QueryWidgets) AddHistoryAndFrequency(query string) {
+func (w *QueryArgs) AddHistoryAndFrequency(query string) {
 	if !conf.HistoryDisable {
 		w.HistoryView.AddHistory(query)
 	}
@@ -153,7 +154,7 @@ func (w *ResultListWidget) Clear() {
 
 func onQuery(
 	query string,
-	queryWidgets *QueryWidgets,
+	queryWidgets *QueryArgs,
 	isAuto bool,
 ) {
 	if query == "" {
@@ -178,8 +179,7 @@ func onQuery(
 			queryWidgets.HeaderLabel.SetText("")
 			queryWidgets.AddHistoryAndFrequency(query)
 		}
-		return
 	}
 	queryWidgets.AddHistoryAndFrequency(query)
-	// log.Println(htmlStr)
+	queryWidgets.PostQuery(query)
 }

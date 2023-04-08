@@ -7,8 +7,10 @@ import (
 	"github.com/therecipe/qt/gui"
 )
 
-var iconMap = map[string]*gui.QIcon{}
-var iconMapMutex sync.RWMutex
+var (
+	iconMap      = map[string]*gui.QIcon{}
+	iconMapMutex sync.RWMutex
+)
 
 func loadPNGIcon(filename string) (*gui.QIcon, error) {
 	iconMapMutex.RLock()
