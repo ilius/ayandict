@@ -61,6 +61,16 @@ func (label *HeaderLabel) SetResult(res common.QueryResult) {
 	label.SetText(headerBuf.String())
 }
 
+func (label *HeaderLabel) addQueryAction(menu *widgets.QMenu, term string) {
+	menu.AddAction("Query: " + term).ConnectTriggered(func(checked bool) {
+		res := label.result
+		if res == nil {
+			return
+		}
+		label.doQuery(term)
+	})
+}
+
 func (label *HeaderLabel) createContextMenu(selection bool) *widgets.QMenu {
 	menu := widgets.NewQMenu(label.QLabel)
 	if selection {
@@ -78,13 +88,13 @@ func (label *HeaderLabel) createContextMenu(selection bool) *widgets.QMenu {
 			label.app.Clipboard().SetText(strings.TrimSpace(text), gui.QClipboard__Clipboard)
 		})
 	}
-	menu.AddAction("Query").ConnectTriggered(func(checked bool) {
-		res := label.result
-		if res == nil {
-			return
-		}
-		label.doQuery(res.Terms()[0])
-	})
+	terms := label.result.Terms()
+	if len(terms) > 10 {
+		terms = terms[:10]
+	}
+	for _, term := range terms {
+		label.addQueryAction(menu, term)
+	}
 
 	menu.AddAction("Copy All (Plaintext)").ConnectTriggered(func(checked bool) {
 		label.app.Clipboard().SetText(
