@@ -115,7 +115,12 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 				bestWordScore := uint8(0)
 				for wordI, word := range words {
 					wordScore := similarity(queryMainWord, []rune(word))
-					if wordI != mainWordIndex {
+					if wordScore < 50 {
+						continue
+					}
+					if wordI == mainWordIndex {
+						wordScore -= 1
+					} else {
 						wordScore -= wordScore / 10
 					}
 					if wordScore > bestWordScore {
