@@ -125,12 +125,17 @@ func Run() {
 		)
 	}
 
-	// favoriteIcon := loadPNGIcon("favorite.png")
-	// if favoriteIcon == nil {
-	// 	panic("favoriteIcon is nil")
-	// }
-	// favoriteButton := widgets.NewQPushButton2("Favorite", nil)
-	favoriteButton := newIconTextButton("Favorite", widgets.QStyle__SP_DialogSaveButton)
+	favoriteIcon, err := loadPNGIcon("favorite.png")
+	if err != nil {
+		fmt.Println(err)
+	}
+	var favoriteButton *widgets.QPushButton
+	if favoriteIcon == nil {
+		favoriteButton = newIconTextButton("Favorite", widgets.QStyle__SP_DialogSaveButton)
+	} else {
+		favoriteButton = widgets.NewQPushButton3(favoriteIcon, "Favorite", nil)
+	}
+
 	favoriteButton.SetCheckable(true)
 	bottomBox.AddWidget(favoriteButton, 0, core.Qt__AlignLeft)
 

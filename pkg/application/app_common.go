@@ -1,11 +1,7 @@
 package application
 
 import (
-	"log"
-
 	"github.com/ilius/ayandict/pkg/frequency"
-	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -53,28 +49,3 @@ const punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~،؛؟۔"
 const queryForceTrimChars = "‘’،؛"
 
 var frequencyTable *frequency.FrequencyTable
-
-// TODO: save data to a temp file and give the path to qt
-
-func loadPNGIcon(filename string) *gui.QIcon {
-	data, err := res.ReadFile("res/" + filename)
-	if err != nil {
-		log.Println(err)
-		return nil
-	}
-	image := gui.QImage_FromData(data, len(data), "PNG")
-	pixmap := gui.QPixmap_FromImage(image, core.Qt__AutoColor)
-	return gui.NewQIcon2(pixmap)
-}
-
-// func loadSVGIcon(filename string) *gui.QIcon {
-// 	data, err := res.ReadFile("res/" + filename)
-// 	if err != nil {
-// 		log.Println(err)
-// 		return nil
-// 	}
-// 	image := gui.QImage_FromData(data, len(data), "SVG")
-// 	image.Rect().SetSize(core.NewQSize2(36, 36))
-// 	pixmap := gui.QPixmap_FromImage(image, core.Qt__AutoColor)
-// 	return gui.NewQIcon2(pixmap)
-// }

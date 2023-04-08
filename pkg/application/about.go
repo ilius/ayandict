@@ -13,7 +13,10 @@ func addTabWithIcon(
 	label string,
 	filename string,
 ) {
-	icon := loadPNGIcon(filename)
+	icon, err := loadPNGIcon(filename)
+	if err != nil {
+		fmt.Println(err)
+	}
 	if icon == nil {
 		tabWidget.AddTab(widget, label)
 		return
