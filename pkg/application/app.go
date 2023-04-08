@@ -31,8 +31,9 @@ func Run() {
 	window.Resize2(600, 400)
 
 	entry := widgets.NewQLineEdit(nil)
-	entry.SetPlaceholderText("")
-	entry.SetFixedHeight(25)
+	entry.SetPlaceholderText("Type search query and press Enter")
+	// to reduce inner margins:
+	entry.SetTextMargins(0, -3, 0, -3)
 
 	okButton := widgets.NewQPushButton2("OK", nil)
 
