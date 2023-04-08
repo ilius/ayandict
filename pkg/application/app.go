@@ -125,16 +125,7 @@ func Run() {
 		)
 	}
 
-	favoriteIcon, err := loadPNGIcon("favorite.png")
-	if err != nil {
-		fmt.Println(err)
-	}
-	var favoriteButton *widgets.QPushButton
-	if favoriteIcon == nil {
-		favoriteButton = newIconTextButton("Favorite", widgets.QStyle__SP_DialogSaveButton)
-	} else {
-		favoriteButton = widgets.NewQPushButton3(favoriteIcon, "Favorite", nil)
-	}
+	favoriteButton := NewPNGIconTextButton("Favorite", "favorite.png")
 
 	favoriteButton.SetCheckable(true)
 	bottomBox.AddWidget(favoriteButton, 0, core.Qt__AlignLeft)
