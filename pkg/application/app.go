@@ -109,7 +109,7 @@ func Run() {
 	reloadStyleButton := widgets.NewQPushButton2("Reload Style", nil)
 	miscLayout.AddWidget(reloadStyleButton, 0, 0)
 
-	bottomBox := widgets.NewQHBoxLayout2(nil)
+	bottomBox := widgets.NewQHBoxLayout()
 	bottomBox.SetContentsMargins(0, 0, 0, 0)
 	bottomBox.SetSpacing(10)
 
@@ -237,14 +237,7 @@ func Run() {
 	mainSplitter.SetStretchFactor(1, 5)
 	mainSplitter.SetStretchFactor(2, 1)
 
-	mainLayout := widgets.NewQVBoxLayout()
-	mainLayout.SetContentsMargins(5, 5, 5, 5)
-	mainLayout.AddWidget(mainSplitter, 0, 0)
-	mainLayout.AddLayout(bottomBox, 0)
-
-	centralWidget := widgets.NewQWidget(nil, 0)
-	centralWidget.SetLayout(mainLayout)
-	window.SetCentralWidget(centralWidget)
+	window.SetCentralWidget(mainSplitter)
 
 	resetQuery := func() {
 		entry.SetText("")
