@@ -49,14 +49,7 @@ func Run() {
 	queryBoxLayout.AddWidget(okButton, 0, 0)
 	// queryBoxLayout.SetSpacing(10)
 
-	headerLabel := widgets.NewQLabel(nil, 0)
-	headerLabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
-	// | core.Qt__TextSelectableByKeyboard
-	// headerLabel.SetAlignment(core.Qt__AlignVCenter)
-	headerLabel.SetContentsMargins(20, 0, 0, 0)
-	headerLabel.SetTextFormat(core.Qt__RichText)
-	headerLabel.SetWordWrap(true)
-	headerLabel.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
+	headerLabel := CreateHeaderLabel(app)
 
 	// FIXME: putting headerLabel in a HBox while WordWrap is on
 	// makes it not expand. Since I could not fix this, I'm putting
@@ -234,6 +227,7 @@ func Run() {
 		onQuery(query, queryArgs, false)
 		entry.SetText(query)
 	}
+	headerLabel.doQuery = doQuery
 	articleView.doQuery = doQuery
 	historyView.doQuery = doQuery
 

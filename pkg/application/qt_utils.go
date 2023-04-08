@@ -1,6 +1,7 @@
 package application
 
 import (
+	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -11,4 +12,10 @@ func splitterSizes(splitter *widgets.QSplitter) []int {
 		widthList[i] = splitter.Widget(i).Geometry().Width()
 	}
 	return widthList
+}
+
+func plaintextFromHTML(htext string) string {
+	doc := gui.NewQTextDocument(nil)
+	doc.SetHtml(htext)
+	return doc.ToPlainText()
 }

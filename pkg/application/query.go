@@ -1,9 +1,7 @@
 package application
 
 import (
-	"bytes"
 	"fmt"
-	"html"
 	"log"
 	"strings"
 	"time"
@@ -16,7 +14,7 @@ import (
 type QueryArgs struct {
 	ArticleView *ArticleView
 	ResultList  *ResultListWidget
-	HeaderLabel *widgets.QLabel
+	HeaderLabel *HeaderLabel
 	HistoryView *HistoryView
 	PostQuery   func(string)
 }
@@ -35,7 +33,7 @@ func (w *QueryArgs) AddHistoryAndFrequency(query string) {
 
 func NewResultListWidget(
 	articleView *ArticleView,
-	headerLabel *widgets.QLabel,
+	headerLabel *HeaderLabel,
 	onResultDisplay func(terms []string),
 ) *ResultListWidget {
 	widget := widgets.NewQListWidget(nil)
@@ -68,7 +66,7 @@ type ResultListWidget struct {
 
 	Active common.QueryResult
 
-	HeaderLabel *widgets.QLabel
+	HeaderLabel *HeaderLabel
 	ArticleView *ArticleView
 
 	onResultDisplay func(terms []string)
@@ -115,20 +113,7 @@ func (w *ResultListWidget) OnActivate(row int) {
 		return
 	}
 	res := w.results[row]
-	terms := res.Terms()
-	termsJoined := html.EscapeString(strings.Join(terms, " | "))
-	headerBuf := bytes.NewBuffer(nil)
-	err := headerTpl.Execute(headerBuf, HeaderTemplateInput{
-		Terms:    terms,
-		Term:     termsJoined,
-		DictName: res.DictName(),
-		Score:    res.Score() / 2,
-	})
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	w.HeaderLabel.SetText(headerBuf.String())
+	w.HeaderLabel.SetResult(res)
 	text := strings.Join(
 		res.DefinitionsHTML(),
 		"\n<br/>\n",
