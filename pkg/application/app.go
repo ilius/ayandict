@@ -138,7 +138,7 @@ func Run() {
 
 	bottomBox.AddStretch(1)
 
-	openConfigButton := newIconTextButton("Config", widgets.QStyle__SP_DialogOpenButton)
+	openConfigButton := NewPNGIconTextButton("Config", "preferences-system-22.png")
 	bottomBox.AddWidget(openConfigButton, 0, 0)
 	reloadConfigButton := newIconTextButton("Reload", widgets.QStyle__SP_BrowserReload)
 	bottomBox.AddWidget(reloadConfigButton, 0, 0)

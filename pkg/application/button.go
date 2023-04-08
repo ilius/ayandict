@@ -14,5 +14,5 @@ func NewPNGIconTextButton(label string, imageName string) *widgets.QPushButton {
 	if icon == nil {
 		return widgets.NewQPushButton2(label, nil)
 	}
-	return widgets.NewQPushButton3(icon, "Favorite", nil)
+	return widgets.NewQPushButton3(icon, label, nil)
 }
