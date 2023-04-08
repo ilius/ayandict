@@ -377,6 +377,10 @@ func Run() {
 	})
 
 	favoriteButton.ConnectClicked(func(checked bool) {
+		if resultList.Active == nil {
+			favoriteButton.SetChecked(false)
+			return
+		}
 		term := resultList.Active.Terms()[0]
 		if checked {
 			favoritesWidget.AddFavorite(term)
