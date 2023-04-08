@@ -2,11 +2,21 @@ package application
 
 import (
 	"os"
+	"sync"
 
 	"github.com/therecipe/qt/gui"
 )
 
+var iconMap = map[string]*gui.QIcon{}
+var iconMapMutex sync.RWMutex
+
 func loadPNGIcon(filename string) (*gui.QIcon, error) {
+	iconMapMutex.RLock()
+	icon, ok := iconMap[filename]
+	iconMapMutex.RUnlock()
+	if ok {
+		return icon, nil
+	}
 	data, err := res.ReadFile("res/" + filename)
 	if err != nil {
 		return nil, err
@@ -18,7 +28,11 @@ func loadPNGIcon(filename string) (*gui.QIcon, error) {
 	file.Write(data)
 	file.Close()
 	pixmap := gui.NewQPixmap3(file.Name(), "PNG", 0)
-	return gui.NewQIcon2(pixmap), nil
+	icon = gui.NewQIcon2(pixmap)
+	iconMapMutex.Lock()
+	iconMap[filename] = icon
+	iconMapMutex.Unlock()
+	return icon, nil
 }
 
 // func loadSVGIcon(filename string) *gui.QIcon {
