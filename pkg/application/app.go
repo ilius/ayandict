@@ -19,6 +19,8 @@ var dictManager *DictManager
 func Run() {
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 	LoadConfig(app)
+	app.SetFont(ConfigFont(), "")
+
 	LoadUserStyle(app)
 	initDicts()
 

@@ -40,8 +40,6 @@ func LoadConfig(app *widgets.QApplication) {
 	}
 	conf = newConf
 
-	app.SetFont(ConfigFont(), "")
-
 	if conf.HistoryMaxSize > 0 {
 		historyMaxSize = conf.HistoryMaxSize
 	}
@@ -66,6 +64,7 @@ func ReloadConfig(app *widgets.QApplication) {
 	currentDirList := conf.DirectoryList
 
 	LoadConfig(app)
+	app.SetFont(ConfigFont(), "")
 
 	if conf.Style != currentStyle {
 		ReloadUserStyle(app)
