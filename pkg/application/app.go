@@ -255,6 +255,8 @@ func Run() {
 		resultList.Clear()
 		articleView.SetHtml("")
 		headerLabel.SetText("")
+		favoriteButton.SetChecked(false)
+		queryFavoriteButton.SetChecked(false)
 	}
 
 	entry.ConnectReturnPressed(func() {
