@@ -19,7 +19,6 @@ var dictManager *DictManager
 func Run() {
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 	LoadConfig(app)
-	app.SetFont(ConfigFont(), "")
 
 	LoadUserStyle(app)
 	initDicts()
@@ -248,6 +247,8 @@ func Run() {
 	mainSplitter.SetStretchFactor(2, 1)
 
 	window.SetCentralWidget(mainSplitter)
+
+	app.SetFont(ConfigFont(), "")
 
 	resetQuery := func() {
 		entry.SetText("")
