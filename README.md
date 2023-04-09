@@ -11,16 +11,19 @@ StarDict is the only supported format for now, and by default, it reads all Star
 <img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-wordnet.png" width="50%" height="50%"/>
 
 Linux - light style (default)
+
 ______________________________________________________________________
 
 <img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-dark-fa.png" width="50%" height="50%"/>
 
 Linux - dark style (Breeze)
+
 ______________________________________________________________________
 
 <img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/windows-light-fa.png" width="50%" height="50%"/>
 
 Windows - light style (default)
+
 ______________________________________________________________________
 
 <img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/windows-dark-wordnet.png" width="50%" height="50%"/>
@@ -28,6 +31,7 @@ ______________________________________________________________________
 Windows - dark style (Breeze)
 
 # Configuration
+
 To change configuration (which includes most user settings), you have to edit the config file (we do not have GUI for it, and no plan to add it, sorry!).
 
 After you run the program, you can click on "Config" button (as seen in screenshots) and it will open the `config.toml` file in your default text editor (for TOML files).
@@ -39,22 +43,27 @@ After you modify `config.toml`, you can click on "Reload" button (next to "Confi
 The full path for `config.toml` file:
 
 - Linux: `~/.config/ayandict/config.toml`
-	- If `$XDG_CONFIG_HOME` is set: `$XDG_CONFIG_HOME/ayandict/config.toml`
+
+  - If `$XDG_CONFIG_HOME` is set: `$XDG_CONFIG_HOME/ayandict/config.toml`
 
 - Windows: `C:\Users\USERNAME\AppData\Roaming\AyanDict\config.toml`
-	- More accurately: `%APPDATA%\AyanDict\config.toml`
+
+  - More accurately: `%APPDATA%\AyanDict\config.toml`
 
 - Mac: `~/Library/Preferences/AyanDict/config.toml`
 
 # Dictionaries
+
 As you see in screenshots, there is a button called "Dictionaries". It opens a dialog and lets you disable, enable and change order of dictionaries.
 
 Each dictionary has a "Symbol" which by default is the first letter of its name in curly brackets (for example `[W]` for WordNet). This symbol is shown in the list of results that is in the left side of window, as seen in screenshots. It is meant to show you which dictionary it comes from at first glance. You can change this symbol through "Dictionaries" dialog. Symbol can be empty, or be as long as you want (though it is 3 characters by default).
 
 # Convert other Dictionary formats
+
 You can use [PyGlossary](https://github.com/ilius/pyglossary) to convert various other formats to StarDict format and use them for this application. A [list of supported formats](https://github.com/ilius/pyglossary#supported-formats) is provided, and if you click on each format's link, it will lead you to more information about it.
 
 # Download Dictionaries
+
 There are tons of web pages that let you download various usable dictionaries, but here is a list I collected (feel free to open a pull request for more):
 
 - [kaikki.org](https://kaikki.org/dictionary/index.html)
@@ -63,8 +72,8 @@ There are tons of web pages that let you download various usable dictionaries, b
 - [@itkach/slob/wiki/Dictionaries](https://github.com/itkach/slob/wiki/Dictionaries)
 - [goldendict.org](http://goldendict.org/dictionaries.php)
 - [huzheng.org](http://www.huzheng.org/stardict/)
+- My repos: [@ilius/dict](https://github.com/ilius/dict) and [Persian Aryanpour in FreeDict](https://github.com/ilius/aryanpour-tei)
 - [tuxor1337.frama.io](https://tuxor1337.frama.io/firedict/dictionaries.html)
-- My repos: [@ilius/dict](https://github.com/ilius/dict) and [Persian Aryanpur in FreeDict](https://github.com/ilius/aryanpour-tei)
-= [kdr2.com](https://kdr2.com/resource/stardict.html)
-
-
+- [XDXF on SourceForge](https://sourceforge.net/projects/xdxf/files/)
+- [GoldenDict on SourceForge](https://sourceforge.net/projects/goldendict/files/dictionaries/)
+- [kdr2.com](https://kdr2.com/resource/stardict.html)
