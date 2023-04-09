@@ -51,6 +51,8 @@ func (view *HistoryView) ClearHistory() {
 	history = []string{}
 	historyMutex.Unlock()
 
+	view.Clear()
+
 	SaveHistory()
 }
 
