@@ -280,6 +280,9 @@ func Run() {
 		case "-": // core.Qt__Key_Minus
 			articleView.ZoomOut(1)
 			return true
+		case "\x1b": // Escape
+			resetQuery()
+			return true
 		}
 		return false
 	}
@@ -382,10 +385,6 @@ func Run() {
 		entry.KeyPressEventDefault(event)
 		switch event.Text() {
 		case "", "\b":
-			return
-		case "\x1b":
-			// Escape, is there a more elegant way?
-			resetQuery()
 			return
 		}
 		if conf.SearchOnType {
