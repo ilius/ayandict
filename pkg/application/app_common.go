@@ -5,7 +5,7 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
-const VERSION = "0.1.0"
+const VERSION = "1.0.0"
 
 const ABOUT = `AyanDict is simple dictionary appliation based on Qt and written in Go.
 
