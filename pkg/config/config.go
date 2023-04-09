@@ -53,6 +53,8 @@ type Config struct {
 	ColorMapping map[string]string `toml:"color_mapping"`
 
 	PopupStyleStr string `toml:"popup_style_str"`
+
+	WheelZoomFactor float64 `toml:"wheel_zoom_factor"`
 }
 
 const defaultHeaderTemplate = `<b><font color='#55f'>{{.DictName}}</font></b>
@@ -104,6 +106,8 @@ func Default() *Config {
 		ColorMapping: map[string]string{},
 
 		PopupStyleStr: "border: 1px solid red; background-color: #333; color: white",
+
+		WheelZoomFactor: 1.1,
 	}
 }
 

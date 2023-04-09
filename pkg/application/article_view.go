@@ -11,6 +11,11 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
+// Source code of QTextEdit says:
+// Zooming into HTML documents only works if the font-size is not set to a fixed size.
+// https://github.com/qt/qtbase/blob/dev/src/widgets/widgets/qtextedit.cpp#L451
+// https://bugreports.qt.io/browse/QTBUG-52751
+
 type ArticleView struct {
 	*widgets.QTextBrowser
 
@@ -21,12 +26,48 @@ type ArticleView struct {
 	rightClickOnWord string
 }
 
+func fontPointSize(font *gui.QFont, dpi float64) float64 {
+	points := font.PointSizeF()
+	if points > 0 {
+		return points
+	}
+	pixels := font.PixelSize()
+	return float64(pixels) * 72.0 / dpi
+}
+
 func NewArticleView(app *widgets.QApplication) *ArticleView {
 	widget := widgets.NewQTextBrowser(nil)
 	// widget := webengine.NewQWebEngineView(nil)
 	widget.SetReadOnly(true)
 	widget.SetOpenExternalLinks(true)
 	widget.SetOpenLinks(false)
+
+	dpi := app.PrimaryScreen().PhysicalDotsPerInch()
+
+	widget.ConnectWheelEvent(func(event *gui.QWheelEvent) {
+		if event.Modifiers()&core.Qt__ControlModifier == 0 {
+			widget.WheelEventDefault(event)
+			return
+		}
+		doc := widget.Document()
+		font := doc.DefaultFont()
+		delta := event.AngleDelta().Y()
+		// log.Println("WheelEvent", font.PixelSize(), font.PointSizeF())
+		if delta == 0 {
+			return
+		}
+		points := fontPointSize(font, dpi)
+		if points <= 0 {
+			log.Printf("bad font size: points=%v, pixels=%v", font.PointSizeF(), font.PixelSize())
+			return
+		}
+		if delta > 0 {
+			font.SetPointSizeF(points * conf.WheelZoomFactor)
+		} else {
+			font.SetPointSizeF(points / conf.WheelZoomFactor)
+		}
+		doc.SetDefaultFont(font)
+	})
 	return &ArticleView{
 		QTextBrowser: widget,
 		app:          app,
