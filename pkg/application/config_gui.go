@@ -19,6 +19,17 @@ var (
 	headerTpl *template.Template
 )
 
+func ConfigFont() *gui.QFont {
+	font := gui.NewQFont()
+	if conf.FontFamily != "" {
+		font.SetFamily(conf.FontFamily)
+	}
+	if conf.FontSize > 0 {
+		font.SetPixelSize(conf.FontSize)
+	}
+	return font
+}
+
 func LoadConfig(app *widgets.QApplication) {
 	confMutex.Lock()
 	defer confMutex.Unlock()
@@ -29,14 +40,7 @@ func LoadConfig(app *widgets.QApplication) {
 	}
 	conf = newConf
 
-	font := gui.NewQFont()
-	if conf.FontFamily != "" {
-		font.SetFamily(conf.FontFamily)
-	}
-	if conf.FontSize > 0 {
-		font.SetPixelSize(conf.FontSize)
-	}
-	app.SetFont(font, "")
+	app.SetFont(ConfigFont(), "")
 
 	if conf.HistoryMaxSize > 0 {
 		historyMaxSize = conf.HistoryMaxSize
