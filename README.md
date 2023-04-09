@@ -46,3 +46,25 @@ The full path for `config.toml` file:
 
 - Mac: `~/Library/Preferences/AyanDict/config.toml`
 
+# Dictionaries
+As you see in screenshots, there is a button called "Dictionaries". It opens a dialog and lets you disable, enable and change order of dictionaries.
+
+Each dictionary has a "Symbol" which by default is the first letter of its name in curly brackets (for example `[W]` for WordNet). This symbol is shown in the list of results that is in the left side of window, as seen in screenshots. It is meant to show you which dictionary it comes from at first glance. You can change this symbol through "Dictionaries" dialog. Symbol can be empty, or be as long as you want (though it is 3 characters by default).
+
+# Convert other Dictionary formats
+You can use [PyGlossary](https://github.com/ilius/pyglossary) to convert various other formats to StarDict format and use them for this application. A [list of supported formats](https://github.com/ilius/pyglossary#supported-formats) is provided, and if you click on each format's link, it will lead you to more information about it.
+
+# Download Dictionaries
+There are tons of web pages that let you download various usable dictionaries, but here is a list I collected (feel free to open a pull request for more):
+
+- [kaikki.org](https://kaikki.org/dictionary/index.html)
+- [library.kiwix.org](https://library.kiwix.org/)
+- [freedict.org](https://freedict.org/downloads/) and [@freedict/fd-dictionaries](https://github.com/freedict/fd-dictionaries)
+- [@itkach/slob/wiki/Dictionaries](https://github.com/itkach/slob/wiki/Dictionaries)
+- [goldendict.org](http://goldendict.org/dictionaries.php)
+- [huzheng.org](http://www.huzheng.org/stardict/)
+- [tuxor1337.frama.io](https://tuxor1337.frama.io/firedict/dictionaries.html)
+- My repos: [@ilius/dict](https://github.com/ilius/dict) and [Persian Aryanpur in FreeDict](https://github.com/ilius/aryanpour-tei)
+= [kdr2.com](https://kdr2.com/resource/stardict.html)
+
+
