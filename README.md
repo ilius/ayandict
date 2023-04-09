@@ -89,3 +89,10 @@ There are tons of web pages that let you download various usable dictionaries, b
 - [XDXF on SourceForge](https://sourceforge.net/projects/xdxf/files/)
 - [GoldenDict on SourceForge](https://sourceforge.net/projects/goldendict/files/dictionaries/)
 - [kdr2.com](https://kdr2.com/resource/stardict.html)
+
+# Keyboard bindings/shortcuts
+
+- **Escape**: clear the input query and results
+- **Space**: (while not typing in query entry) change keyboard focus to query entry
+- **`+`** or **`=`**: Zoom in (article/definiton/translation)
+- **`-`**: Zoom out (article/definiton/translation)
