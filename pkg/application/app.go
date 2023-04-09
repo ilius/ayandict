@@ -300,7 +300,7 @@ func Run() {
 		// case int(core.Qt__Key_Down):
 		// 	log.Println("Down")
 		// }
-		resultList.KeyPressEventDefault(event)
+		articleView.KeyPressEventDefault(event)
 	})
 
 	historyView.SetupCustomHandlers()
