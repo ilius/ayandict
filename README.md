@@ -6,6 +6,18 @@ It is designed for desktop and it should run on every desktop operating system t
 
 StarDict is the only supported format for now, and by default, it reads all StarDict dictionaries in `~/.stardict/dic` folder. But you can change the folder or add more folders through [configuration](#configuration).
 
+# Installation
+
+If you don't have Go langauge on your system, you can check [Releases](https://github.com/ilius/ayandict/releases) and download the latest binary for your platform if available.
+
+If you have Go, you can compile install the latest code with
+
+```sh
+go install github.com/ilius/ayandict@latest
+```
+
+Or clone the reposotory, `cd` to it and run `go build`, which will create the binary (`ayandict.exe` or `ayandict`) in this directory.
+
 # Screenshots
 
 <img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-wordnet.png" width="50%" height="50%"/>
