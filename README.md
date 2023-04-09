@@ -94,5 +94,5 @@ There are tons of web pages that let you download various usable dictionaries, b
 
 - **Escape**: clear the input query and results
 - **Space**: (while not typing in query entry) change keyboard focus to query entry
-- **`+`** or **`=`**: Zoom in (article/definiton/translation)
-- **`-`**: Zoom out (article/definiton/translation)
+- **`+`** or **`=`**: Zoom in (article/definition/translation)
+- **`-`**: Zoom out (article/definition/translation)
