@@ -266,10 +266,24 @@ func Run() {
 	aboutButton.ConnectClicked(func(bool) {
 		aboutClicked(window)
 	})
-	resultList.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
+
+	commonKeyPressEvent := func(event *gui.QKeyEvent) bool {
 		switch event.Text() {
 		case " ":
 			entry.SetFocus(core.Qt__ShortcutFocusReason)
+			return true
+		case "+", "=": // core.Qt__Key_Plus
+			articleView.ZoomIn(1)
+			return true
+		case "-": // core.Qt__Key_Minus
+			articleView.ZoomOut(1)
+			return true
+		}
+		return false
+	}
+
+	resultList.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
+		if commonKeyPressEvent(event) {
 			return
 		}
 		resultList.KeyPressEventDefault(event)
@@ -277,17 +291,21 @@ func Run() {
 
 	articleView.SetupCustomHandlers()
 	articleView.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
-		switch event.Text() {
-		case " ":
-			entry.SetFocus(core.Qt__ShortcutFocusReason)
+		if commonKeyPressEvent(event) {
+			return
 		}
+		// switch event.Key() {
+		// case int(core.Qt__Key_Up):
+		// 	log.Println("Up")
+		// case int(core.Qt__Key_Down):
+		// 	log.Println("Down")
+		// }
+		resultList.KeyPressEventDefault(event)
 	})
 
 	historyView.SetupCustomHandlers()
 	historyView.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
-		switch event.Text() {
-		case " ":
-			entry.SetFocus(core.Qt__ShortcutFocusReason)
+		if commonKeyPressEvent(event) {
 			return
 		}
 		historyView.KeyPressEventDefault(event)

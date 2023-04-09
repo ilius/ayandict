@@ -41,33 +41,6 @@ func NewArticleView(app *widgets.QApplication) *ArticleView {
 	widget.SetReadOnly(true)
 	widget.SetOpenExternalLinks(true)
 	widget.SetOpenLinks(false)
-
-	dpi := app.PrimaryScreen().PhysicalDotsPerInch()
-
-	widget.ConnectWheelEvent(func(event *gui.QWheelEvent) {
-		if event.Modifiers()&core.Qt__ControlModifier == 0 {
-			widget.WheelEventDefault(event)
-			return
-		}
-		doc := widget.Document()
-		font := doc.DefaultFont()
-		delta := event.AngleDelta().Y()
-		// log.Println("WheelEvent", font.PixelSize(), font.PointSizeF())
-		if delta == 0 {
-			return
-		}
-		points := fontPointSize(font, dpi)
-		if points <= 0 {
-			log.Printf("bad font size: points=%v, pixels=%v", font.PointSizeF(), font.PixelSize())
-			return
-		}
-		if delta > 0 {
-			font.SetPointSizeF(points * conf.WheelZoomFactor)
-		} else {
-			font.SetPointSizeF(points / conf.WheelZoomFactor)
-		}
-		doc.SetDefaultFont(font)
-	})
 	return &ArticleView{
 		QTextBrowser: widget,
 		app:          app,
@@ -196,5 +169,42 @@ func (view *ArticleView) SetupCustomHandlers() {
 			}
 		}
 		view.MouseReleaseEventDefault(event)
+	})
+
+	dpi := view.app.PrimaryScreen().PhysicalDotsPerInch()
+
+	zoom := func(delta int) {
+		doc := view.Document()
+		font := doc.DefaultFont()
+		points := fontPointSize(font, dpi)
+		if points <= 0 {
+			log.Printf("bad font size: points=%v, pixels=%v", font.PointSizeF(), font.PixelSize())
+			return
+		}
+		if delta > 0 {
+			font.SetPointSizeF(points * conf.WheelZoomFactor)
+		} else {
+			font.SetPointSizeF(points / conf.WheelZoomFactor)
+		}
+		doc.SetDefaultFont(font)
+	}
+
+	view.ConnectZoomIn(func(ran int) {
+		zoom(1)
+	})
+	view.ConnectZoomOut(func(ran int) {
+		zoom(-1)
+	})
+
+	view.ConnectWheelEvent(func(event *gui.QWheelEvent) {
+		if event.Modifiers()&core.Qt__ControlModifier == 0 {
+			view.WheelEventDefault(event)
+			return
+		}
+		delta := event.AngleDelta().Y()
+		if delta == 0 {
+			return
+		}
+		zoom(delta)
 	})
 }
