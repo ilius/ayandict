@@ -1,0 +1,24 @@
+#!/bin/bash
+set -x
+
+FLAGS=(-ldflags '-s -w')
+
+function build_for_os64() {
+	GOOS=$1 GOARCH=amd64 go build -o ayandict-$1-x86_64 "${FLAGS[@]}"
+}
+function build_for_os32() {
+	GOOS=$1 GOARCH=386 go build -o ayandict-$1-x86 "${FLAGS[@]}"
+}
+
+
+build_for_os64 linux
+build_for_os32 linux
+
+build_for_os64 windows
+build_for_os32 windows
+
+build_for_os64 freebsd
+build_for_os32 freebsd
+
+build_for_os64 darwin
+
