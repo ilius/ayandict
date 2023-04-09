@@ -8,6 +8,25 @@ StarDict is the only supported format for now, and by default, it reads all Star
 
 # Screenshots
 
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-wordnet.png" width="50%" height="50%"/>
+
+Linux - light style (default)
+______________________________________________________________________
+
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-dark-fa.png" width="50%" height="50%"/>
+
+Linux - dark style (Breeze)
+______________________________________________________________________
+
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/windows-light-fa.png" width="50%" height="50%"/>
+
+Windows - light style (default)
+______________________________________________________________________
+
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/windows-dark-wordnet.png" width="50%" height="50%"/>
+
+Windows - dark style (Breeze)
+
 # Configuration
 To change configuration (which includes most user settings), you have to edit the config file (we do not have GUI for it, and no plan to add it, sorry!).
 
