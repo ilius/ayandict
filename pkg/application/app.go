@@ -294,12 +294,18 @@ func Run() {
 		if commonKeyPressEvent(event) {
 			return
 		}
-		// switch event.Key() {
-		// case int(core.Qt__Key_Up):
-		// 	log.Println("Up")
-		// case int(core.Qt__Key_Down):
-		// 	log.Println("Down")
-		// }
+		switch event.Key() {
+		case int(core.Qt__Key_Up):
+			if conf.ArticleArrowKeys {
+				articleView.VerticalScrollBar().TriggerAction(widgets.QAbstractSlider__SliderSingleStepSub)
+				return
+			}
+		case int(core.Qt__Key_Down):
+			if conf.ArticleArrowKeys {
+				articleView.VerticalScrollBar().TriggerAction(widgets.QAbstractSlider__SliderSingleStepAdd)
+				return
+			}
+		}
 		articleView.KeyPressEventDefault(event)
 	})
 

@@ -55,6 +55,8 @@ type Config struct {
 	PopupStyleStr string `toml:"popup_style_str"`
 
 	WheelZoomFactor float64 `toml:"wheel_zoom_factor"`
+
+	ArticleArrowKeys bool `toml:"article_arrow_keys"`
 }
 
 const defaultHeaderTemplate = `<b><font color='#55f'>{{.DictName}}</font></b>
@@ -108,6 +110,8 @@ func Default() *Config {
 		PopupStyleStr: "border: 1px solid red; background-color: #333; color: white",
 
 		WheelZoomFactor: 1.1,
+
+		ArticleArrowKeys: false,
 	}
 }
 
