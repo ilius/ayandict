@@ -165,6 +165,8 @@ func onQuery(
 			queryWidgets.AddHistoryAndFrequency(query)
 		}
 	}
-	queryWidgets.AddHistoryAndFrequency(query)
+	if !isAuto {
+		queryWidgets.AddHistoryAndFrequency(query)
+	}
 	queryWidgets.PostQuery(query)
 }
