@@ -60,6 +60,16 @@ func LoadConfig(app *widgets.QApplication) {
 	}
 }
 
+func shouldReloadDicts(currentList []string, newList []string) bool {
+	if len(currentList) != len(newList) {
+		return true
+	}
+	if len(newList) == 0 {
+		return false
+	}
+	return !reflect.DeepEqual(newList, currentList)
+}
+
 func ReloadConfig(app *widgets.QApplication) {
 	currentDirList := conf.DirectoryList
 
@@ -69,8 +79,7 @@ func ReloadConfig(app *widgets.QApplication) {
 	if conf.Style != currentStyle {
 		ReloadUserStyle(app)
 	}
-
-	if !reflect.DeepEqual(conf.DirectoryList, currentDirList) {
+	if shouldReloadDicts(currentDirList, conf.DirectoryList) {
 		reloadDicts()
 	}
 }
