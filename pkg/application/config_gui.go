@@ -70,11 +70,23 @@ func shouldReloadDicts(currentList []string, newList []string) bool {
 	return !reflect.DeepEqual(newList, currentList)
 }
 
+func ReloadFont(app *widgets.QApplication) {
+	font := ConfigFont()
+	// app.SetFont only applies to future widgets (DictManager for example)
+	app.SetFont(font, "")
+	// widgets.QApplication_AllWidgets panics
+	// app.AllWidgets() panics
+	// window.Children() panics
+	for _, w := range allTextWidgets {
+		w.SetFont(font)
+	}
+}
+
 func ReloadConfig(app *widgets.QApplication) {
 	currentDirList := conf.DirectoryList
 
 	LoadConfig(app)
-	app.SetFont(ConfigFont(), "")
+	ReloadFont(app)
 
 	if conf.Style != currentStyle {
 		ReloadUserStyle(app)

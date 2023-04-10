@@ -264,6 +264,14 @@ func NewDictManager(
 		saveWinGeometry(qs, &window.QWidget, QS_dictManager)
 	})
 
+	allTextWidgets = append(
+		allTextWidgets,
+		table,
+		toolbar,
+		okButton,
+		cancelButton,
+	)
+
 	return &DictManager{
 		Dialog:      window,
 		TableWidget: table,

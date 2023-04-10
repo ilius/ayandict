@@ -73,7 +73,7 @@ After you run the program, you can click on "Config" button (as seen in screensh
 
 If `config.toml` does not exist, it will be created and filled with default config.
 
-After you modify `config.toml`, you can click on "Reload" button (next to "Config" button) and it will apply the changes (with exception of font probably).
+After you modify `config.toml`, you can click on "Reload" button (next to "Config" button) and it will apply the changes.
 
 The full path for `config.toml` file:
 

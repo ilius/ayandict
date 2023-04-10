@@ -16,6 +16,12 @@ import (
 
 var dictManager *DictManager
 
+type hasSetFont interface {
+	SetFont(gui.QFont_ITF)
+}
+
+var allTextWidgets = []hasSetFont{}
+
 func Run() {
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 	LoadConfig(app)
@@ -48,11 +54,12 @@ func Run() {
 	favoriteButton.SetToolTip("Add this term to favorites")
 	// favoriteButtonVBox.AddWidget(favoriteButton, 0, core.Qt__AlignBottom)
 
+	queryLabel := widgets.NewQLabel2("Query:", nil, 0)
 	queryBox := widgets.NewQFrame(nil, 0)
 	queryBoxLayout := widgets.NewQHBoxLayout2(queryBox)
 	queryBoxLayout.SetContentsMargins(5, 5, 5, 0)
 	queryBoxLayout.SetSpacing(10)
-	queryBoxLayout.AddWidget(widgets.NewQLabel2("Query:", nil, 0), 0, 0)
+	queryBoxLayout.AddWidget(queryLabel, 0, 0)
 	queryBoxLayout.AddWidget(entry, 0, 0)
 	queryBoxLayout.AddWidget(queryFavoriteButton, 0, 0)
 	queryBoxLayout.AddWidget(okButton, 0, 0)
@@ -255,6 +262,31 @@ func Run() {
 	window.SetCentralWidget(mainSplitter)
 
 	app.SetFont(ConfigFont(), "")
+
+	allTextWidgets = []hasSetFont{
+		queryLabel,
+		entry,
+		okButton,
+		headerLabel,
+		articleView,
+		historyView,
+		frequencyTable,
+		favoritesWidget,
+		saveHistoryButton,
+		clearHistoryButton,
+		saveFavoritesButton,
+		reloadDictsButton,
+		closeDictsButton,
+		reloadStyleButton,
+		dictsButton,
+		aboutButton,
+		openConfigButton,
+		reloadConfigButton,
+		clearButton,
+		activityTypeCombo,
+		resultList,
+		rightPanel,
+	}
 
 	resetQuery := func() {
 		entry.SetText("")
