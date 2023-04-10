@@ -40,6 +40,13 @@ func Run() {
 
 	queryFavoriteButton := NewPNGIconTextButton("", "favorite.png")
 	queryFavoriteButton.SetCheckable(true)
+	queryFavoriteButton.SetToolTip("Add this query to favorites")
+
+	// favoriteButtonVBox := widgets.NewQVBoxLayout()
+	favoriteButton := NewPNGIconTextButton("", "favorite.png")
+	favoriteButton.SetCheckable(true)
+	favoriteButton.SetToolTip("Add this term to favorites")
+	// favoriteButtonVBox.AddWidget(favoriteButton, 0, core.Qt__AlignBottom)
 
 	queryBox := widgets.NewQFrame(nil, 0)
 	queryBoxLayout := widgets.NewQHBoxLayout2(queryBox)
@@ -49,22 +56,23 @@ func Run() {
 	queryBoxLayout.AddWidget(entry, 0, 0)
 	queryBoxLayout.AddWidget(queryFavoriteButton, 0, 0)
 	queryBoxLayout.AddWidget(okButton, 0, 0)
-	// queryBoxLayout.SetSpacing(10)
 
 	headerLabel := CreateHeaderLabel(app)
+	headerLabel.SetAlignment(core.Qt__AlignLeft)
 
-	// FIXME: putting headerLabel in a HBox while WordWrap is on
-	// makes it not expand. Since I could not fix this, I'm putting
-	// Favorite button to the bottomBox for now
-	// headerBox := widgets.NewQWidget(nil, 0)
-	// headerBoxLayout := widgets.NewQHBoxLayout2(headerBox)
+	headerBox := widgets.NewQWidget(nil, 0)
+	headerBox.SetSizePolicy2(widgets.QSizePolicy__Preferred, widgets.QSizePolicy__Minimum)
+	headerBoxLayout := widgets.NewQHBoxLayout2(headerBox)
 	// headerBoxLayout.SetSizeConstraint(widgets.QLayout__SetMinimumSize)
-	// headerBoxLayout.SetContentsMargins(0, 0, 0, 0)
-	// headerBoxLayout.SetSpacing(10)
-	// headerBoxLayout.AddWidget(headerLabel, 1, core.Qt__AlignLeft)
-	// headerBox.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
-	// headerBoxLayout.AddWidget(favoriteButton, 0, core.Qt__AlignLeft)
-	// favoriteButton.SetSizePolicy2(widgets.QSizePolicy__Minimum, widgets.QSizePolicy__Minimum)
+	headerBoxLayout.SetContentsMargins(0, 0, 0, 0)
+	// headerBoxLayout.AddLayout(favoriteButtonVBox, 0)
+	headerBoxLayout.AddWidget(favoriteButton, 0, core.Qt__AlignCenter)
+	headerBoxLayout.AddSpacing(10)
+	headerBoxLayout.AddWidget(headerLabel, 1, 0)
+	// it is very important that last argument ^ above is 0
+	// otherwise label will not expand (while in layout and in wrap mode)
+	// don't ask me why!
+	headerBox.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
 
 	articleView := NewArticleView(app)
 
@@ -127,11 +135,6 @@ func Run() {
 		)
 	}
 
-	favoriteButton := NewPNGIconTextButton("Favorite", "favorite.png")
-
-	favoriteButton.SetCheckable(true)
-	buttonBox.AddWidget(favoriteButton, 0, core.Qt__AlignLeft)
-
 	dictsButton := newIconTextButton("Dictionaries", widgets.QStyle__SP_FileDialogDetailedView)
 	buttonBox.AddWidget(dictsButton, 0, core.Qt__AlignLeft)
 
@@ -156,7 +159,7 @@ func Run() {
 	leftMainLayout.SetSpacing(0)
 	leftMainLayout.AddWidget(queryBox, 0, 0)
 	leftMainLayout.AddSpacing(5)
-	leftMainLayout.AddWidget(headerLabel, 0, 0)
+	leftMainLayout.AddWidget(headerBox, 0, 0)
 	leftMainLayout.AddSpacing(5)
 	leftMainLayout.AddWidget(articleView, 0, 0)
 	leftMainLayout.AddSpacing(5)

@@ -26,8 +26,7 @@ func CreateHeaderLabel(app *widgets.QApplication) *HeaderLabel {
 	qlabel := widgets.NewQLabel(nil, 0)
 	qlabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
 	// | core.Qt__TextSelectableByKeyboard
-	// headerLabel.SetAlignment(core.Qt__AlignVCenter)
-	qlabel.SetContentsMargins(20, 0, 0, 0)
+	qlabel.SetContentsMargins(0, 0, 0, 0)
 	qlabel.SetTextFormat(core.Qt__RichText)
 	qlabel.SetWordWrap(true)
 	qlabel.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
@@ -41,6 +40,13 @@ func CreateHeaderLabel(app *widgets.QApplication) *HeaderLabel {
 		menu.Popup(event.GlobalPos(), nil)
 	})
 	return label
+}
+
+func (label *HeaderLabel) SetText(text string) {
+	label.QLabel.SetText(text)
+	// label.QLabel.AdjustSize()
+	parent := label.QLabel.ParentWidget()
+	parent.AdjustSize()
 }
 
 func (label *HeaderLabel) SetResult(res common.QueryResult) {
