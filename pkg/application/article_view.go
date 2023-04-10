@@ -85,9 +85,9 @@ func (view *ArticleView) zoom(delta int) {
 		return
 	}
 	if delta > 0 {
-		font.SetPointSizeF(points * conf.WheelZoomFactor)
+		font.SetPointSizeF(points * conf.ArticleZoomFactor)
 	} else {
-		font.SetPointSizeF(points / conf.WheelZoomFactor)
+		font.SetPointSizeF(points / conf.ArticleZoomFactor)
 	}
 	doc.SetDefaultFont(font)
 }
