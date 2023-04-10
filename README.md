@@ -57,6 +57,12 @@ Dictionaries dialog
 
 ______________________________________________________________________
 
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-misc-empty.png" width="70%" height="70%"/>
+
+Misc tab
+
+______________________________________________________________________
+
 # Configuration
 
 To change configuration (which includes most user settings), you have to edit the config file (we do not have GUI for it, and no plan to add it, sorry!).
