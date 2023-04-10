@@ -20,38 +20,38 @@ Or clone the reposotory, `cd` to it and run `go build`, which will create the bi
 
 # Screenshots
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-wordnet.png" width="50%" height="50%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-wordnet.png" width="70%" height="70%"/>
 
 Linux - light style (default)
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-dark-fa.png" width="50%" height="50%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-dark-fa.png" width="70%" height="70%"/>
 
 Linux - dark style (Breeze)
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/windows-light-fa.png" width="50%" height="50%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/windows-light-fa.png" width="70%" height="70%"/>
 
 Windows - light style (default)
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/windows-dark-wordnet.png" width="50%" height="50%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/windows-dark-wordnet.png" width="70%" height="70%"/>
 
 Windows - dark style (Breeze)
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-wordnet-frequent.png" width="50%" height="50%"/>
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-wordnet-favorites.png" width="50%" height="50%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-wordnet-frequent.png" width="70%" height="70%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-wordnet-favorites.png" width="70%" height="70%"/>
 
 Most Frequent queries and Favorites
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-dicts.png" width="50%" height="50%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-dicts.png" width="70%" height="70%"/>
 
 Dictionaries dialog
 
