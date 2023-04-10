@@ -84,9 +84,14 @@ func ReloadFont(app *widgets.QApplication) {
 
 func ReloadConfig(app *widgets.QApplication) {
 	currentDirList := conf.DirectoryList
+	fontFamiliy := conf.FontFamily
+	fontSize := conf.FontSize
 
 	LoadConfig(app)
-	ReloadFont(app)
+
+	if conf.FontFamily != fontFamiliy || conf.FontSize != fontSize {
+		ReloadFont(app)
+	}
 
 	if conf.Style != currentStyle {
 		ReloadUserStyle(app)
