@@ -142,10 +142,18 @@ func Run() {
 		)
 	}
 
-	dictsButton := newIconTextButton("Dictionaries", widgets.QStyle__SP_FileDialogDetailedView)
+	dictsButtonLabel := "Dictionaries"
+	if conf.ReduceMinimumWindowWidth {
+		dictsButtonLabel = "Dicts"
+	}
+	dictsButton := newIconTextButton(dictsButtonLabel, widgets.QStyle__SP_FileDialogDetailedView)
 	buttonBox.AddWidget(dictsButton, 0, core.Qt__AlignLeft)
 
-	aboutButton := newIconTextButton("About", widgets.QStyle__SP_MessageBoxInformation)
+	aboutButtonLabel := "About"
+	if conf.ReduceMinimumWindowWidth {
+		aboutButtonLabel = "\u200c"
+	}
+	aboutButton := newIconTextButton(aboutButtonLabel, widgets.QStyle__SP_MessageBoxInformation)
 	buttonBox.AddWidget(aboutButton, 0, core.Qt__AlignLeft)
 
 	buttonBox.AddStretch(1)

@@ -57,6 +57,8 @@ type Config struct {
 	WheelZoomFactor float64 `toml:"wheel_zoom_factor"`
 
 	ArticleArrowKeys bool `toml:"article_arrow_keys"`
+
+	ReduceMinimumWindowWidth bool `toml:"reduce_minimum_window_width"`
 }
 
 const defaultHeaderTemplate = `<b><font color='#55f'>{{.DictName}}</font></b>
@@ -112,6 +114,8 @@ func Default() *Config {
 		WheelZoomFactor: 1.1,
 
 		ArticleArrowKeys: false,
+
+		ReduceMinimumWindowWidth: false,
 	}
 }
 
