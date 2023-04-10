@@ -10,13 +10,15 @@ StarDict is the only supported format for now, and by default, it reads all Star
 
 If you don't have Go langauge on your system, you can check [Releases](https://github.com/ilius/ayandict/releases) and download the latest binary for your platform if available.
 
-If you have Go, you can compile install the latest code with
+If you have Go, you can compile and install the latest code with
 
 ```sh
 go install github.com/ilius/ayandict@latest
 ```
 
 Or clone the reposotory, `cd` to it and run `go build`, which will create the binary (`ayandict.exe` or `ayandict`) in this directory.
+
+It's good to know that the binary / executable file is completely portable, so you can copy it anywhere you want and run it from there (although on Unix the storage must support executable files).
 
 # Screenshots
 
