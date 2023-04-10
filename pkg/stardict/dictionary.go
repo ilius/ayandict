@@ -273,12 +273,14 @@ func NewDictionary(path string, name string) (*Dictionary, error) {
 		synPath = ""
 	}
 
-	// we should have either .dict.dz or .dict file
-	if _, err := os.Stat(dictDzPath); os.IsNotExist(err) {
-		if _, err := os.Stat(dictPath); os.IsNotExist(err) {
+	// we should have either .dict or .dict.dz file
+	if _, err := os.Stat(dictPath); err != nil {
+		if !os.IsNotExist(err) {
 			return nil, err
 		}
-	} else {
+		if _, errDz := os.Stat(dictDzPath); errDz != nil {
+			return nil, err
+		}
 		dictPath = dictDzPath
 	}
 
