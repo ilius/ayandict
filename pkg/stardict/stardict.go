@@ -369,7 +369,7 @@ func LookupHTML(
 ) []common.QueryResult {
 	results := []common.QueryResult{}
 	for _, dic := range dicList {
-		if dic.disabled {
+		if dic.dict == nil {
 			continue
 		}
 		for _, res := range dic.Search(query) {

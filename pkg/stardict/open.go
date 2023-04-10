@@ -74,7 +74,7 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 		// log.Printf("Loading index %#v\n", dic.idxPath)
 		err = dic.load()
 		if err != nil {
-			log.Println(err)
+			log.Printf("error loading %#v: %v", dic.DictName(), err)
 		} else {
 			log.Printf("Loaded index %#v\n", dic.idxPath)
 		}
