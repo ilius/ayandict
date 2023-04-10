@@ -51,6 +51,12 @@ Most Frequent queries and Favorites
 
 ______________________________________________________________________
 
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-dicts.png" width="50%" height="50%"/>
+
+Dictionaries dialog
+
+______________________________________________________________________
+
 # Configuration
 
 To change configuration (which includes most user settings), you have to edit the config file (we do not have GUI for it, and no plan to add it, sorry!).
