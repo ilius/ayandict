@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+set -x
+
+cd pkg/config/doc-gen
+go build
+./doc-gen > ../../../doc/config.rst
+
