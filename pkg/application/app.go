@@ -108,9 +108,9 @@ func Run() {
 	reloadStyleButton := widgets.NewQPushButton2("Reload Style", nil)
 	miscLayout.AddWidget(reloadStyleButton, 0, 0)
 
-	bottomBox := widgets.NewQHBoxLayout()
-	bottomBox.SetContentsMargins(0, 0, 0, 0)
-	bottomBox.SetSpacing(10)
+	buttonBox := widgets.NewQHBoxLayout()
+	buttonBox.SetContentsMargins(0, 0, 0, 0)
+	buttonBox.SetSpacing(10)
 
 	bottomBoxStyleOpt := widgets.NewQStyleOptionButton()
 	style := app.Style()
@@ -127,25 +127,25 @@ func Run() {
 	favoriteButton := NewPNGIconTextButton("Favorite", "favorite.png")
 
 	favoriteButton.SetCheckable(true)
-	bottomBox.AddWidget(favoriteButton, 0, core.Qt__AlignLeft)
+	buttonBox.AddWidget(favoriteButton, 0, core.Qt__AlignLeft)
 
 	dictsButton := newIconTextButton("Dictionaries", widgets.QStyle__SP_FileDialogDetailedView)
-	bottomBox.AddWidget(dictsButton, 0, core.Qt__AlignLeft)
+	buttonBox.AddWidget(dictsButton, 0, core.Qt__AlignLeft)
 
 	aboutButton := newIconTextButton("About", widgets.QStyle__SP_MessageBoxInformation)
-	bottomBox.AddWidget(aboutButton, 0, core.Qt__AlignLeft)
+	buttonBox.AddWidget(aboutButton, 0, core.Qt__AlignLeft)
 
-	bottomBox.AddStretch(1)
+	buttonBox.AddStretch(1)
 
 	openConfigButton := NewPNGIconTextButton("Config", "preferences-system-22.png")
-	bottomBox.AddWidget(openConfigButton, 0, 0)
+	buttonBox.AddWidget(openConfigButton, 0, 0)
 	reloadConfigButton := newIconTextButton("Reload", widgets.QStyle__SP_BrowserReload)
-	bottomBox.AddWidget(reloadConfigButton, 0, 0)
+	buttonBox.AddWidget(reloadConfigButton, 0, 0)
 
-	bottomBox.AddStretch(1)
+	buttonBox.AddStretch(1)
 
 	clearButton := widgets.NewQPushButton2("Clear", nil)
-	bottomBox.AddWidget(clearButton, 0, core.Qt__AlignRight)
+	buttonBox.AddWidget(clearButton, 0, core.Qt__AlignRight)
 
 	leftMainWidget := widgets.NewQWidget(nil, 0)
 	leftMainLayout := widgets.NewQVBoxLayout2(leftMainWidget)
@@ -157,7 +157,7 @@ func Run() {
 	leftMainLayout.AddSpacing(5)
 	leftMainLayout.AddWidget(articleView, 0, 0)
 	leftMainLayout.AddSpacing(5)
-	leftMainLayout.AddLayout(bottomBox, 0)
+	leftMainLayout.AddLayout(buttonBox, 0)
 
 	activityTypeCombo := widgets.NewQComboBox(nil)
 	activityTypeCombo.AddItems([]string{
