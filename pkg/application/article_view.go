@@ -19,20 +19,11 @@ import (
 type ArticleView struct {
 	*widgets.QTextBrowser
 
-	app *widgets.QApplication
-
+	app     *widgets.QApplication
+	dpi     float64
 	doQuery func(string)
 
 	rightClickOnWord string
-}
-
-func fontPointSize(font *gui.QFont, dpi float64) float64 {
-	points := font.PointSizeF()
-	if points > 0 {
-		return points
-	}
-	pixels := font.PixelSize()
-	return float64(pixels) * 72.0 / dpi
 }
 
 func NewArticleView(app *widgets.QApplication) *ArticleView {
@@ -41,9 +32,11 @@ func NewArticleView(app *widgets.QApplication) *ArticleView {
 	widget.SetReadOnly(true)
 	widget.SetOpenExternalLinks(true)
 	widget.SetOpenLinks(false)
+	dpi := app.PrimaryScreen().PhysicalDotsPerInch()
 	return &ArticleView{
 		QTextBrowser: widget,
 		app:          app,
+		dpi:          dpi,
 	}
 }
 
@@ -81,6 +74,29 @@ func (view *ArticleView) createContextMenu() *widgets.QMenu {
 	})
 
 	return menu
+}
+
+func (view *ArticleView) zoom(delta int) {
+	doc := view.Document()
+	font := doc.DefaultFont()
+	points := fontPointSize(font, view.dpi)
+	if points <= 0 {
+		log.Printf("bad font size: points=%v, pixels=%v", font.PointSizeF(), font.PixelSize())
+		return
+	}
+	if delta > 0 {
+		font.SetPointSizeF(points * conf.WheelZoomFactor)
+	} else {
+		font.SetPointSizeF(points / conf.WheelZoomFactor)
+	}
+	doc.SetDefaultFont(font)
+}
+
+func (view *ArticleView) ZoomIn(ran int) {
+	view.zoom(1)
+}
+func (view *ArticleView) ZoomOut(ran int) {
+	view.zoom(-1)
 }
 
 func (view *ArticleView) SetupCustomHandlers() {
@@ -171,31 +187,6 @@ func (view *ArticleView) SetupCustomHandlers() {
 		view.MouseReleaseEventDefault(event)
 	})
 
-	dpi := view.app.PrimaryScreen().PhysicalDotsPerInch()
-
-	zoom := func(delta int) {
-		doc := view.Document()
-		font := doc.DefaultFont()
-		points := fontPointSize(font, dpi)
-		if points <= 0 {
-			log.Printf("bad font size: points=%v, pixels=%v", font.PointSizeF(), font.PixelSize())
-			return
-		}
-		if delta > 0 {
-			font.SetPointSizeF(points * conf.WheelZoomFactor)
-		} else {
-			font.SetPointSizeF(points / conf.WheelZoomFactor)
-		}
-		doc.SetDefaultFont(font)
-	}
-
-	view.ConnectZoomIn(func(ran int) {
-		zoom(1)
-	})
-	view.ConnectZoomOut(func(ran int) {
-		zoom(-1)
-	})
-
 	view.ConnectWheelEvent(func(event *gui.QWheelEvent) {
 		if event.Modifiers()&core.Qt__ControlModifier == 0 {
 			view.WheelEventDefault(event)
@@ -205,6 +196,6 @@ func (view *ArticleView) SetupCustomHandlers() {
 		if delta == 0 {
 			return
 		}
-		zoom(delta)
+		view.zoom(delta)
 	})
 }

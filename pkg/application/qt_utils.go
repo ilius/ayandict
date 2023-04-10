@@ -19,3 +19,12 @@ func plaintextFromHTML(htext string) string {
 	doc.SetHtml(htext)
 	return doc.ToPlainText()
 }
+
+func fontPointSize(font *gui.QFont, dpi float64) float64 {
+	points := font.PointSizeF()
+	if points > 0 {
+		return points
+	}
+	pixels := font.PixelSize()
+	return float64(pixels) * 72.0 / dpi
+}
