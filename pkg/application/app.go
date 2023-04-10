@@ -110,7 +110,7 @@ func Run() {
 
 	buttonBox := widgets.NewQHBoxLayout()
 	buttonBox.SetContentsMargins(0, 0, 0, 0)
-	buttonBox.SetSpacing(10)
+	buttonBox.SetSpacing(5)
 
 	bottomBoxStyleOpt := widgets.NewQStyleOptionButton()
 	style := app.Style()
