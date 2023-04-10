@@ -101,6 +101,9 @@ func Run() {
 	clearHistoryButton := widgets.NewQPushButton2("Clear History", nil)
 	miscLayout.AddWidget(clearHistoryButton, 0, 0)
 
+	saveFavoritesButton := widgets.NewQPushButton2("Save Favorites", nil)
+	miscLayout.AddWidget(saveFavoritesButton, 0, 0)
+
 	reloadDictsButton := widgets.NewQPushButton2("Reload Dicts", nil)
 	miscLayout.AddWidget(reloadDictsButton, 0, 0)
 	closeDictsButton := widgets.NewQPushButton2("Close Dicts", nil)
@@ -357,6 +360,9 @@ func Run() {
 		historyView.ClearHistory()
 		frequencyTable.Clear()
 		SaveFrequency()
+	})
+	saveFavoritesButton.ConnectClicked(func(checked bool) {
+		favoritesWidget.Save()
 	})
 	clearButton.ConnectClicked(func(checked bool) {
 		resetQuery()

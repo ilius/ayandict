@@ -3,6 +3,7 @@ package favorites
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"os"
 )
 
@@ -60,6 +61,7 @@ func (fav *Favorites) Save(fpath string) error {
 	if err != nil {
 		return err
 	}
+	log.Println("Saving", fpath)
 	err = ioutil.WriteFile(fpath, jsonBytes, 0o644)
 	if err != nil {
 		return err
