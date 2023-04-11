@@ -399,6 +399,7 @@ func Run() {
 	})
 	reloadDictsButton.ConnectClicked(func(checked bool) {
 		reloadDicts()
+		onQuery(entry.Text(), queryArgs, false)
 	})
 	closeDictsButton.ConnectClicked(func(checked bool) {
 		closeDicts()
