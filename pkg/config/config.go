@@ -59,6 +59,8 @@ type Config struct {
 	ArticleArrowKeys bool `toml:"article_arrow_keys"`
 
 	ReduceMinimumWindowWidth bool `toml:"reduce_minimum_window_width"`
+
+	LocalServerPorts []string `toml:"local_server_ports"`
 }
 
 const defaultHeaderTemplate = `<b><font color='#55f'>{{.DictName}}</font></b>
@@ -116,6 +118,10 @@ func Default() *Config {
 		ArticleArrowKeys: false,
 
 		ReduceMinimumWindowWidth: false,
+
+		LocalServerPorts: []string{
+			"8357",
+		},
 	}
 }
 

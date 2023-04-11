@@ -18,16 +18,8 @@ var client = http.Client{
 	Timeout: 100 * time.Millisecond,
 }
 
-var localPort = "8350"
-var localTryPorts = []string{
-	"8350", "8351", "8352",
-}
-
-func isSingleInstanceRunning(appName string) bool {
-	ok, port := findLocalServer(localTryPorts)
-	if ok {
-		localPort = port
-	}
+func isSingleInstanceRunning(appName string, ports []string) bool {
+	ok, _ := findLocalServer(ports)
 	return ok
 }
 
@@ -35,9 +27,10 @@ func handleGetAppName(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(APP_NAME))
 }
 
-func startSingleInstanceServer(appName string) {
+func startSingleInstanceServer(appName string, port string) {
 	http.HandleFunc("/"+serverAppName, handleGetAppName)
-	err := http.ListenAndServe(":"+localPort, nil)
+	log.Println("Starting local server on port", port)
+	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Println(err)
 	}

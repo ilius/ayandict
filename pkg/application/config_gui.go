@@ -30,7 +30,7 @@ func ConfigFont() *gui.QFont {
 	return font
 }
 
-func LoadConfig(app *widgets.QApplication) {
+func LoadConfig() {
 	confMutex.Lock()
 	defer confMutex.Unlock()
 	newConf, err := config.Load()
@@ -87,7 +87,7 @@ func ReloadConfig(app *widgets.QApplication) {
 	fontFamiliy := conf.FontFamily
 	fontSize := conf.FontSize
 
-	LoadConfig(app)
+	LoadConfig()
 
 	if conf.FontFamily != fontFamiliy || conf.FontSize != fontSize {
 		ReloadFont(app)

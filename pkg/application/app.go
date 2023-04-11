@@ -23,14 +23,18 @@ type hasSetFont interface {
 var allTextWidgets = []hasSetFont{}
 
 func Run() {
-	if isSingleInstanceRunning(APP_NAME) {
+	LoadConfig()
+	if len(conf.LocalServerPorts) == 0 {
+		panic("config local_server_ports is empty")
+	}
+
+	if isSingleInstanceRunning(APP_NAME, conf.LocalServerPorts) {
 		log.Println("Another instance is running")
 		return
 	}
-	go startSingleInstanceServer(APP_NAME)
+	go startSingleInstanceServer(APP_NAME, conf.LocalServerPorts[0])
 
 	app := widgets.NewQApplication(len(os.Args), os.Args)
-	LoadConfig(app)
 
 	LoadUserStyle(app)
 	initDicts()
