@@ -1,6 +1,6 @@
 ``directory_list``
 ------------------
-List of dictionary directory paths
+List of dictionary directory paths (absolute or relative to home)
 
 Default value: ``[".stardict/dic"]``
 

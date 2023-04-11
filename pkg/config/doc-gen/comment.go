@@ -1,7 +1,7 @@
 package main
 
 var commentMap = map[string]string{
-	"directory_list": "List of dictionary directory paths",
+	"directory_list": "List of dictionary directory paths (absolute or relative to home)",
 	"style":          "Path to application stylesheet file (.qss)",
 	"article_style":  "Path to article stylesheet file (.css)",
 	"font_family":    "Application font family",
