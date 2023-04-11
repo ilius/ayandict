@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"sync"
 
 	"github.com/ilius/ayandict/pkg/config"
+	"github.com/ilius/ayandict/pkg/qerr"
 )
 
 var (
@@ -70,7 +70,7 @@ func SaveHistory() {
 	}
 	err = ioutil.WriteFile(historyFilePath(), jsonBytes, 0o644)
 	if err != nil {
-		log.Printf("Error saving history: %v\n", err)
+		qerr.Error("Error saving history: %v", err)
 	}
 }
 
@@ -79,6 +79,6 @@ func SaveFrequency() {
 	defer frequencySaveMutex.Unlock()
 	err := frequencyTable.SaveToFile(frequencyFilePath())
 	if err != nil {
-		log.Printf("Error saving history: %v\n", err)
+		qerr.Errorf("Error saving history: %v", err)
 	}
 }

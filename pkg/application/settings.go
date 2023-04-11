@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
 )
@@ -192,7 +193,7 @@ func restoreTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, m
 	for index, widthStr := range widthList {
 		width, err := strconv.ParseInt(widthStr, 10, 64)
 		if err != nil {
-			log.Printf("invalid column width=%#v\n", widthStr)
+			qerr.Errorf("invalid column width=%#v\n", widthStr)
 			continue
 		}
 		header.ResizeSection(index, int(width))

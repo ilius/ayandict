@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/ilius/ayandict/pkg/config"
+	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
 )
@@ -49,7 +50,7 @@ func LoadUserStyle(app *widgets.QApplication) {
 	}
 	_, err := os.Stat(stylePath)
 	if err != nil {
-		log.Printf("Error loading style file %#v: %v\n", stylePath, err)
+		qerr.Errorf("Error loading style file %#v: %v\n", stylePath, err)
 		return
 	}
 	log.Println("Loading", stylePath)
@@ -61,7 +62,7 @@ func LoadUserStyle(app *widgets.QApplication) {
 	{
 		err := readArticleStyle(conf.ArticleStyle)
 		if err != nil {
-			log.Println(err)
+			qerr.Error(err)
 		}
 	}
 }

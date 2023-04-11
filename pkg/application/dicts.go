@@ -1,8 +1,7 @@
 package application
 
 import (
-	"log"
-
+	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/ilius/ayandict/pkg/stardict"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
@@ -32,7 +31,7 @@ func initDicts() {
 	popup := loadingDictsPopup()
 	dictSettingsMap, dictsOrder, err = loadDictsSettings()
 	if err != nil {
-		log.Println(err)
+		qerr.Errorf("Error reading dicts.json: %v", err)
 	}
 	stardict.Init(conf.DirectoryList, dictsOrder)
 	popup.Destroy(true, true)

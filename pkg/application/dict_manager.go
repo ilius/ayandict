@@ -12,6 +12,7 @@ import (
 
 	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/config"
+	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/ilius/ayandict/pkg/stardict"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
@@ -193,7 +194,7 @@ func NewDictManager(
 		table.SetItem(index, 1, symbolItem)
 		entries, err := info.EntryCount()
 		if err != nil {
-			log.Println(err)
+			qerr.Error(err)
 			return
 		}
 		table.SetItem(index, 2, newItem(strconv.FormatInt(int64(entries), 10)))
@@ -233,7 +234,7 @@ func NewDictManager(
 	openFolder := func() {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
-			log.Println(err)
+			qerr.Error(err)
 			return
 		}
 		for _, p := range conf.DirectoryList {
@@ -334,6 +335,6 @@ func SaveDictManagerDialog(manager *DictManager) {
 
 	err := saveDictsSettings(dictSettingsMap)
 	if err != nil {
-		log.Println(err)
+		qerr.Error(err)
 	}
 }

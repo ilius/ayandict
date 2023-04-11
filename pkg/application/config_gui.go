@@ -2,11 +2,11 @@ package application
 
 import (
 	"html/template"
-	"log"
 	"reflect"
 	"sync"
 
 	"github.com/ilius/ayandict/pkg/config"
+	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
@@ -35,7 +35,8 @@ func LoadConfig() {
 	defer confMutex.Unlock()
 	newConf, err := config.Load()
 	if err != nil {
-		log.Printf("Failed to load config: %v\n", err)
+		qerr.Errorf("Failed to load config: %v", err)
+		conf = config.Default()
 		return
 	}
 	conf = newConf
@@ -46,14 +47,14 @@ func LoadConfig() {
 	{
 		err := readArticleStyle(conf.ArticleStyle)
 		if err != nil {
-			log.Println(err)
+			qerr.Error(err)
 		}
 	}
 	{
 		// log.Println("Parsing:", conf.HeaderTemplate)
 		headerTplNew, err := template.New("header").Parse(conf.HeaderTemplate)
 		if err != nil {
-			log.Println(err)
+			qerr.Error(err)
 		} else {
 			headerTpl = headerTplNew
 		}
@@ -104,7 +105,7 @@ func ReloadConfig(app *widgets.QApplication) {
 func OpenConfig() {
 	err := config.EnsureExists(conf)
 	if err != nil {
-		log.Println(err)
+		qerr.Error(err)
 	}
 	url := core.NewQUrl()
 	url.SetScheme("file")

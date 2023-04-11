@@ -3,10 +3,10 @@ package application
 import (
 	"bytes"
 	"html"
-	"log"
 	"strings"
 
 	"github.com/ilius/ayandict/pkg/common"
+	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
@@ -61,7 +61,7 @@ func (label *HeaderLabel) SetResult(res common.QueryResult) {
 		Score:    res.Score() / 2,
 	})
 	if err != nil {
-		log.Println(err)
+		qerr.Errorf("Error formatting header label: %v", err)
 		return
 	}
 	label.SetText(headerBuf.String())

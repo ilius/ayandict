@@ -2,7 +2,6 @@ package application
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -10,6 +9,7 @@ import (
 
 	"github.com/ilius/ayandict/pkg/favorites"
 	"github.com/ilius/ayandict/pkg/frequency"
+	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
@@ -31,19 +31,20 @@ func Run() {
 	if conf.LocalClientTimeout != "" {
 		timeout, err := time.ParseDuration(conf.LocalClientTimeout)
 		if err != nil {
-			log.Printf("bad local_client_timeout=%v", conf.LocalClientTimeout)
+			qerr.Errorf("bad local_client_timeout=%v", conf.LocalClientTimeout)
 		} else if timeout > 0 {
 			client.Timeout = timeout
 		}
 	}
 
 	if isSingleInstanceRunning(APP_NAME, conf.LocalServerPorts) {
-		log.Println("Another instance is running")
+		qerr.Error("Another instance is running")
 		return
 	}
 	go startSingleInstanceServer(APP_NAME, conf.LocalServerPorts[0])
 
 	app := widgets.NewQApplication(len(os.Args), os.Args)
+	qerr.ShowQtError = true
 
 	LoadUserStyle(app)
 	initDicts()
@@ -444,7 +445,7 @@ func Run() {
 	if !conf.HistoryDisable {
 		err := LoadHistory()
 		if err != nil {
-			log.Println(err)
+			qerr.Error(err)
 		} else {
 			historyView.AddHistoryList(history)
 		}

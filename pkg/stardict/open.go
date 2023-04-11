@@ -7,6 +7,8 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+
+	"github.com/ilius/ayandict/pkg/qerr"
 )
 
 func isDir(pathStr string) bool {
@@ -66,6 +68,7 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 		err := filepath.Walk(dirPath, walkFunc)
 		if err != nil {
 			log.Println(err)
+			qerr.Error(err)
 		}
 	}
 	var wg sync.WaitGroup
@@ -74,6 +77,7 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 		// log.Printf("Loading index %#v\n", dic.idxPath)
 		err = dic.load()
 		if err != nil {
+			qerr.Errorf("error loading %#v: %v", dic.DictName(), err)
 			log.Printf("error loading %#v: %v", dic.DictName(), err)
 		} else {
 			log.Printf("Loaded index %#v\n", dic.idxPath)

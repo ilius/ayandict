@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/ilius/ayandict/pkg/qerr"
 )
 
 const (
@@ -32,7 +34,7 @@ func startSingleInstanceServer(appName string, port string) {
 	log.Println("Starting local server on port", port)
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
-		log.Println(err)
+		qerr.Error(err)
 	}
 }
 
@@ -57,7 +59,7 @@ func findLocalServer(ports []string) (bool, string) {
 		log.Printf("%s responsed in %v", _urlStr, time.Now().Sub(t))
 		data, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			log.Println(err)
+			qerr.Error(err)
 			continue
 		}
 		res.Body.Close()
