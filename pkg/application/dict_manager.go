@@ -18,7 +18,12 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
-const dictsJsonFilename = "dicts.json"
+const (
+	dictsJsonFilename    = "dicts.json"
+	dictManager_up       = "Up"
+	dictManager_down     = "Down"
+	dictManager_openDirs = "Open Directories"
+)
 
 type DictSettings struct {
 	Symbol string `json:"symbol"`
@@ -140,12 +145,17 @@ func NewDictManager(
 	toolbar.SetIconSize(core.NewQSize2(48, 48))
 	{
 		icon := style.StandardIcon(widgets.QStyle__SP_ArrowUp, tbOpt, nil)
-		toolbar.AddAction2(icon, "Up")
+		toolbar.AddAction2(icon, dictManager_up)
 	}
 	toolbar.AddSeparator()
 	{
 		icon := style.StandardIcon(widgets.QStyle__SP_ArrowDown, tbOpt, nil)
-		toolbar.AddAction2(icon, "Down")
+		toolbar.AddAction2(icon, dictManager_down)
+	}
+	toolbar.AddSeparator()
+	{
+		icon := style.StandardIcon(widgets.QStyle__SP_DirOpenIcon, tbOpt, nil)
+		toolbar.AddAction2(icon, dictManager_openDirs)
 	}
 	newItem := func(text string) *widgets.QTableWidgetItem {
 		item := widgets.NewQTableWidgetItem2(text, 0)
@@ -220,12 +230,30 @@ func NewDictManager(
 		}
 		table.SetCurrentCell(row+1, table.CurrentColumn())
 	}
+	openFolder := func() {
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		for _, p := range conf.DirectoryList {
+			if !filepath.IsAbs(p) {
+				p = filepath.Join(homeDir, p)
+			}
+			url := core.NewQUrl()
+			url.SetScheme("file")
+			url.SetPath(p, core.QUrl__TolerantMode)
+			gui.QDesktopServices_OpenUrl(url)
+		}
+	}
 	toolbar.ConnectActionTriggered(func(action *widgets.QAction) {
 		switch action.Text() {
-		case "Up":
+		case dictManager_up:
 			toolbarUp()
-		case "Down":
+		case dictManager_down:
 			toolbarDown()
+		case dictManager_openDirs:
+			openFolder()
 		}
 	})
 
