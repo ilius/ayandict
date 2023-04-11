@@ -106,10 +106,8 @@ func printMarkdown() {
 		keyCode := codeValue(key)
 		fmt.Println(keyCode)
 		fmt.Println(strings.Repeat("-", len(keyCode)))
-		fmt.Println(comment)
-		fmt.Println()
-		fmt.Println("Default value: " + jsonCodeValue(fieldValIn))
-		fmt.Println()
+		fmt.Println(comment + "\n")
+		fmt.Println("Default value: " + jsonCodeValue(fieldValIn) + "\n")
 	}
 
 }
