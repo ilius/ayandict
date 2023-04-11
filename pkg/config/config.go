@@ -61,6 +61,8 @@ type Config struct {
 	ReduceMinimumWindowWidth bool `toml:"reduce_minimum_window_width"`
 
 	LocalServerPorts []string `toml:"local_server_ports"`
+
+	LocalClientTimeout string `toml:"local_client_timeout"`
 }
 
 const defaultHeaderTemplate = `<b><font color='#55f'>{{.DictName}}</font></b>
@@ -122,6 +124,8 @@ func Default() *Config {
 		LocalServerPorts: []string{
 			"8357",
 		},
+
+		LocalClientTimeout: "",
 	}
 }
 
@@ -173,10 +177,13 @@ func EnsureExists(conf *Config) error {
 	if err == nil {
 		return nil
 	}
-	if os.IsNotExist(err) {
-		return Save(conf)
+	if !os.IsNotExist(err) {
+		return err
 	}
-	return err
+	if conf.LocalClientTimeout == "" {
+		conf.LocalClientTimeout = "100ms"
+	}
+	return Save(conf)
 }
 
 func Save(conf *Config) error {

@@ -95,6 +95,7 @@ func (view *ArticleView) zoom(delta int) {
 func (view *ArticleView) ZoomIn(ran int) {
 	view.zoom(1)
 }
+
 func (view *ArticleView) ZoomOut(ran int) {
 	view.zoom(-1)
 }

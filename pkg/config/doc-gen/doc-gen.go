@@ -46,6 +46,10 @@ var commentMap = map[string]string{
 	"article_arrow_keys": "Use arrow keys to scroll through article (when focused)",
 
 	"reduce_minimum_window_width": "Use smaller buttons to reduce minimum width of window",
+
+	"local_server_ports": "Ports for local server. Server runs on first port; Client tries all",
+
+	"local_client_timeout": "Timeout for local web client, default is 100ms",
 }
 
 func getTomlTag(s string) string {
@@ -109,7 +113,6 @@ func printMarkdown() {
 		fmt.Println(comment + "\n")
 		fmt.Println("Default value: " + jsonCodeValue(fieldValIn) + "\n")
 	}
-
 }
 
 func main() {

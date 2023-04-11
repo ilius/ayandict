@@ -136,3 +136,15 @@ Use smaller buttons to reduce minimum width of window
 
 Default value: ``false``
 
+``local_server_ports``
+----------------------
+Ports for local server. Server runs on first port; Client tries all
+
+Default value: ``["8357"]``
+
+``local_client_timeout``
+------------------------
+Timeout for local web client, default is 100ms
+
+Default value: ``""``
+
