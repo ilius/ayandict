@@ -87,6 +87,8 @@ The full path for `config.toml` file:
 
 - Mac: `~/Library/Preferences/AyanDict/config.toml`
 
+Here is a [list of all config parameters](./doc/config.rst).
+
 # Dictionaries
 
 As you see in screenshots, there is a button called "Dictionaries". It opens a dialog and lets you disable, enable and change order of dictionaries.
