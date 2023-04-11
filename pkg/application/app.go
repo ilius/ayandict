@@ -23,6 +23,12 @@ type hasSetFont interface {
 var allTextWidgets = []hasSetFont{}
 
 func Run() {
+	if isSingleInstanceRunning(APP_NAME) {
+		log.Println("Another instance is running")
+		return
+	}
+	go startSingleInstanceServer(APP_NAME)
+
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 	LoadConfig(app)
 
