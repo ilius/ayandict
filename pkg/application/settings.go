@@ -54,6 +54,7 @@ func restoreBoolSetting(
 }
 
 func saveMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
+	log.Println("Saving main window geometry")
 	qs.BeginGroup(QS_mainwindow)
 	defer qs.EndGroup()
 
@@ -258,21 +259,41 @@ func setupSplitterSizesSave(qs *core.QSettings, splitter *widgets.QSplitter, mai
 
 func setupMainWinGeometrySave(qs *core.QSettings, window *widgets.QMainWindow) {
 	var mutex sync.Mutex
-	var lastSave time.Time
+
+	ch := make(chan time.Time, 100)
+
+	saveLoop := func() {
+		defer mutex.Unlock()
+		defer log.Println("Ending saveLoop")
+		log.Println("Starting saveLoop")
+		var lastSave time.Time
+		for {
+			var lastChange *time.Time
+		Loop1:
+			for {
+				select {
+				case t := <-ch:
+					lastChange = &t
+				case <-time.After(500 * time.Millisecond):
+					break Loop1
+				}
+			}
+			if lastChange == nil {
+				return
+			}
+			if lastChange.After(lastSave) {
+				saveMainWinGeometry(qs, window)
+				lastSave = time.Now()
+			}
+		}
+	}
 
 	// might want to pass: pos *core.QPoint, size *core.QSize
 	onChange := func() {
-		eventTime := time.Now()
-		if !tryLockAsManyAs(&mutex, 3, 700*time.Millisecond) {
-			return
+		if mutex.TryLock() {
+			go saveLoop()
 		}
-		defer mutex.Unlock()
-		if eventTime.Before(lastSave) {
-			return
-		}
-		saveMainWinGeometry(qs, window)
-		lastSave = time.Now()
-		time.Sleep(700 * time.Millisecond)
+		ch <- time.Now()
 	}
 
 	window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
