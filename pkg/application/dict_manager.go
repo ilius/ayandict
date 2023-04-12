@@ -252,7 +252,9 @@ func NewDictManager(
 	}
 }
 
-func (dm *DictManager) UpdateMap() map[string]int {
+// updates global var dictSettingsMap
+// and returns dicts order
+func (dm *DictManager) updateMap() map[string]int {
 	table := dm.TableWidget
 	order := map[string]int{}
 	count := table.RowCount()
@@ -276,8 +278,14 @@ func (dm *DictManager) UpdateMap() map[string]int {
 	return order
 }
 
-func (dm *DictManager) SaveDictsSettings() {
-	dictsOrder = dm.UpdateMap()
+// Run shows the dialog, if it Cancel was clicked it returns false
+// if OK was clicked, then applies and saves changes
+// and returs true
+func (dm *DictManager) Run() bool {
+	if dm.Dialog.Exec() != dialogAccepted {
+		return false
+	}
+	dictsOrder = dm.updateMap()
 
 	stardict.ApplyDictsOrder(dictsOrder)
 
@@ -285,4 +293,5 @@ func (dm *DictManager) SaveDictsSettings() {
 	if err != nil {
 		qerr.Error(err)
 	}
+	return true
 }
