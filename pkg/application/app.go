@@ -16,17 +16,14 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
-var dictManager *DictManager
-
 type hasSetFont interface {
 	SetFont(gui.QFont_ITF)
 }
 
-var allTextWidgets = []hasSetFont{}
-
 func Run() {
 	app := &Application{
-		QApplication: widgets.NewQApplication(len(os.Args), os.Args),
+		QApplication:   widgets.NewQApplication(len(os.Args), os.Args),
+		allTextWidgets: []hasSetFont{},
 	}
 	qerr.ShowQtError = true
 	app.Run()
@@ -34,6 +31,10 @@ func Run() {
 
 type Application struct {
 	*widgets.QApplication
+
+	dictManager *DictManager
+
+	allTextWidgets []hasSetFont
 }
 
 func (app *Application) Run() {
@@ -303,7 +304,7 @@ func (app *Application) Run() {
 
 	app.SetFont(ConfigFont(), "")
 
-	allTextWidgets = []hasSetFont{
+	app.allTextWidgets = []hasSetFont{
 		queryLabel,
 		entry,
 		okButton,
@@ -412,6 +413,7 @@ func (app *Application) Run() {
 	})
 	reloadDictsButton.ConnectClicked(func(checked bool) {
 		reloadDicts()
+		app.dictManager = nil
 		onQuery(entry.Text(), queryArgs, false)
 	})
 	closeDictsButton.ConnectClicked(func(checked bool) {
@@ -445,11 +447,11 @@ func (app *Application) Run() {
 	})
 
 	dictsButton.ConnectClicked(func(checked bool) {
-		if dictManager == nil {
-			dictManager = NewDictManager(app, window)
+		if app.dictManager == nil {
+			app.dictManager = NewDictManager(app, window)
 		}
-		if dictManager.Dialog.Exec() == dialogAccepted {
-			SaveDictManagerDialog(dictManager)
+		if app.dictManager.Dialog.Exec() == dialogAccepted {
+			SaveDictManagerDialog(app.dictManager)
 			onQuery(entry.Text(), queryArgs, false)
 		}
 	})

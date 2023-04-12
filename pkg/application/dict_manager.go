@@ -293,8 +293,8 @@ func NewDictManager(
 		saveWinGeometry(qs, &window.QWidget, QS_dictManager)
 	})
 
-	allTextWidgets = append(
-		allTextWidgets,
+	app.allTextWidgets = append(
+		app.allTextWidgets,
 		table,
 		toolbar,
 		okButton,

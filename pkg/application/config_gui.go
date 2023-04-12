@@ -77,7 +77,7 @@ func ReloadFont(app *Application) {
 	// widgets.QApplication_AllWidgets panics
 	// app.AllWidgets() panics
 	// window.Children() panics
-	for _, w := range allTextWidgets {
+	for _, w := range app.allTextWidgets {
 		w.SetFont(font)
 	}
 }
@@ -100,6 +100,7 @@ func ReloadConfig(app *Application) {
 	}
 	if shouldReloadDicts(currentDirList, conf.DirectoryList) {
 		reloadDicts()
+		app.dictManager = nil
 	}
 }
 

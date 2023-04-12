@@ -42,7 +42,6 @@ func reloadDicts() {
 	popup := loadingDictsPopup()
 	stardict.Init(conf.DirectoryList, dictsOrder)
 	popup.Destroy(true, true)
-	dictManager = nil
 }
 
 func closeDicts() {
