@@ -227,7 +227,7 @@ func restoreSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainK
 // QSplitter.Sizes() panics:
 // interface conversion: interface {} is []interface {}, not []int
 
-func actionSaveLoop(ch chan time.Time, callable func()) {
+func actionSaveLoop(ch <-chan time.Time, callable func()) {
 	var lastSave time.Time
 	for {
 		var lastEvent *time.Time
