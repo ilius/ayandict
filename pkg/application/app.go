@@ -7,6 +7,7 @@ import (
 
 	// "github.com/therecipe/qt/webengine"
 
+	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/favorites"
 	"github.com/ilius/ayandict/pkg/frequency"
 	"github.com/ilius/ayandict/pkg/qerr"
@@ -24,7 +25,9 @@ type hasSetFont interface {
 var allTextWidgets = []hasSetFont{}
 
 func Run() {
-	LoadConfig()
+	if !LoadConfig() {
+		conf = config.Default()
+	}
 	if len(conf.LocalServerPorts) == 0 {
 		panic("config local_server_ports is empty")
 	}

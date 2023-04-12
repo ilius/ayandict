@@ -30,14 +30,13 @@ func ConfigFont() *gui.QFont {
 	return font
 }
 
-func LoadConfig() {
+func LoadConfig() bool {
 	confMutex.Lock()
 	defer confMutex.Unlock()
 	newConf, err := config.Load()
 	if err != nil {
 		qerr.Errorf("Failed to load config: %v", err)
-		conf = config.Default()
-		return
+		return false
 	}
 	conf = newConf
 
@@ -59,6 +58,7 @@ func LoadConfig() {
 			headerTpl = headerTplNew
 		}
 	}
+	return true
 }
 
 func shouldReloadDicts(currentList []string, newList []string) bool {
@@ -88,7 +88,9 @@ func ReloadConfig(app *widgets.QApplication) {
 	fontFamiliy := conf.FontFamily
 	fontSize := conf.FontSize
 
-	LoadConfig()
+	if !LoadConfig() {
+		return
+	}
 
 	if conf.FontFamily != fontFamiliy || conf.FontSize != fontSize {
 		ReloadFont(app)
