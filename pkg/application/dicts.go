@@ -18,8 +18,10 @@ import (
 
 const dictsJsonFilename = "dicts.json"
 
-var dictsOrder map[string]int
-var dictSettingsMap = map[string]*DictSettings{}
+var (
+	dictsOrder      map[string]int
+	dictSettingsMap = map[string]*DictSettings{}
+)
 
 type DictSettings struct {
 	Symbol string `json:"symbol"`

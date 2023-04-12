@@ -281,5 +281,4 @@ func setupMainWinGeometrySave(qs *core.QSettings, window *widgets.QMainWindow) {
 	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
 		go onChange()
 	})
-
 }

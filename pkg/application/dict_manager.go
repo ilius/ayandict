@@ -108,17 +108,7 @@ func NewDictManager(
 		item.SetFlags(core.Qt__ItemIsSelectable | core.Qt__ItemIsEnabled)
 		return item
 	}
-	setItem := func(index int, dictName string) {
-		ds := dictSettingsMap[dictName]
-		if ds == nil {
-			log.Printf("Dict Manager: found new dict: %v\n", dictName)
-			ds = &DictSettings{
-				Symbol: defaultDictSymbol(dictName),
-				Order:  index,
-				Hash:   calcHashForDictName(dictName),
-			}
-			dictSettingsMap[dictName] = ds
-		}
+	setItem := func(index int, dictName string, ds *DictSettings) {
 		info, ok := infoMap[dictName]
 		if !ok {
 			log.Printf("dictName=%#v not in infoMap\n", dictName)
@@ -220,7 +210,18 @@ func NewDictManager(
 
 	table.SetRowCount(len(infos))
 	for index, info := range infos {
-		setItem(index, info.DictName())
+		dictName := info.DictName()
+		ds := dictSettingsMap[dictName]
+		if ds == nil {
+			log.Printf("Dict Manager: found new dict: %v\n", dictName)
+			ds = &DictSettings{
+				Symbol: defaultDictSymbol(dictName),
+				Order:  index,
+				Hash:   calcHashForDictName(dictName),
+			}
+			dictSettingsMap[dictName] = ds
+		}
+		setItem(index, dictName, ds)
 	}
 
 	restoreTableColumnsWidth(
