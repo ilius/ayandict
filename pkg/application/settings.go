@@ -4,7 +4,6 @@ import (
 	"log"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/ilius/ayandict/pkg/qerr"
@@ -54,7 +53,7 @@ func restoreBoolSetting(
 }
 
 func saveMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
-	log.Println("Saving main window geometry")
+	// log.Println("Saving main window geometry")
 	qs.BeginGroup(QS_mainwindow)
 	defer qs.EndGroup()
 
@@ -203,6 +202,7 @@ func restoreTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, m
 }
 
 func saveSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
+	// log.Println("Saving splitter sizes")
 	qs.BeginGroup(mainKey)
 	defer qs.EndGroup()
 	sizes := splitterSizes(splitter)
@@ -227,65 +227,45 @@ func restoreSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainK
 // QSplitter.Sizes() panics:
 // interface conversion: interface {} is []interface {}, not []int
 
-func setupSplitterSizesSave(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
-	var mutex sync.Mutex
+func actionSaveLoop(ch chan time.Time, callable func()) {
 	var lastSave time.Time
-	savedPos := make(map[int]int, 3)
-
-	onMove := func(pos int, index int) {
-		// log.Printf("---- splitter: moved: index=%v, pos=%v", index, pos)
-		eventTime := time.Now()
-		if !tryLockAsManyAs(&mutex, 5, 500*time.Millisecond) {
-			return
+	for {
+		var lastEvent *time.Time
+		select {
+		case t := <-ch:
+			lastEvent = &t
 		}
-		defer mutex.Unlock()
-		if eventTime.Before(lastSave) {
-			return
+	Loop1:
+		for {
+			select {
+			case t := <-ch:
+				lastEvent = &t
+			case <-time.After(500 * time.Millisecond):
+				break Loop1
+			}
 		}
-		if savedPos[index] == pos {
-			return
+		if lastEvent == nil {
+			continue
 		}
-		// log.Printf("---- splitter: saving sizes: index=%v, pos=%v", index, pos)
-		saveSplitterSizes(qs, splitter, mainKey)
-		lastSave = time.Now()
-		savedPos[index] = pos
-		time.Sleep(500 * time.Millisecond)
+		if lastEvent.After(lastSave) {
+			callable()
+			lastSave = time.Now()
+		}
 	}
+}
 
+func setupSplitterSizesSave(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
+	ch := make(chan time.Time, 100)
 	splitter.ConnectSplitterMoved(func(pos int, index int) {
-		go onMove(pos, index)
+		ch <- time.Now()
+	})
+	go actionSaveLoop(ch, func() {
+		saveSplitterSizes(qs, splitter, mainKey)
 	})
 }
 
 func setupMainWinGeometrySave(qs *core.QSettings, window *widgets.QMainWindow) {
 	ch := make(chan time.Time, 100)
-
-	saveLoop := func() {
-		var lastSave time.Time
-		for {
-			var lastChange *time.Time
-			select {
-			case t := <-ch:
-				lastChange = &t
-			}
-		Loop1:
-			for {
-				select {
-				case t := <-ch:
-					lastChange = &t
-				case <-time.After(500 * time.Millisecond):
-					break Loop1
-				}
-			}
-			if lastChange == nil {
-				continue
-			}
-			if lastChange.After(lastSave) {
-				saveMainWinGeometry(qs, window)
-				lastSave = time.Now()
-			}
-		}
-	}
 
 	window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
 		ch <- time.Now()
@@ -293,5 +273,7 @@ func setupMainWinGeometrySave(qs *core.QSettings, window *widgets.QMainWindow) {
 	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
 		ch <- time.Now()
 	})
-	go saveLoop()
+	go actionSaveLoop(ch, func() {
+		saveMainWinGeometry(qs, window)
+	})
 }
