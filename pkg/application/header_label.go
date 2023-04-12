@@ -15,14 +15,14 @@ import (
 type HeaderLabel struct {
 	*widgets.QLabel
 
-	app *widgets.QApplication
+	app *Application
 
 	result common.QueryResult
 
 	doQuery func(string)
 }
 
-func CreateHeaderLabel(app *widgets.QApplication) *HeaderLabel {
+func CreateHeaderLabel(app *Application) *HeaderLabel {
 	qlabel := widgets.NewQLabel(nil, 0)
 	qlabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
 	// | core.Qt__TextSelectableByKeyboard

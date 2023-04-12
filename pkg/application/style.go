@@ -9,7 +9,6 @@ import (
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/widgets"
 )
 
 // the current conf.Style value (unchanged config value)
@@ -38,7 +37,7 @@ func readArticleStyle(stylePath string) error {
 	return nil
 }
 
-func LoadUserStyle(app *widgets.QApplication) {
+func LoadUserStyle(app *Application) {
 	configDir := config.GetConfigDir()
 	stylePath := conf.Style
 	if stylePath == "" {
@@ -67,7 +66,7 @@ func LoadUserStyle(app *widgets.QApplication) {
 	}
 }
 
-func ReloadUserStyle(app *widgets.QApplication) {
+func ReloadUserStyle(app *Application) {
 	if conf.Style == "" {
 		app.SetStyleSheet("")
 		currentStyle = ""

@@ -9,7 +9,6 @@ import (
 	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
-	"github.com/therecipe/qt/widgets"
 )
 
 var (
@@ -71,7 +70,7 @@ func shouldReloadDicts(currentList []string, newList []string) bool {
 	return !reflect.DeepEqual(newList, currentList)
 }
 
-func ReloadFont(app *widgets.QApplication) {
+func ReloadFont(app *Application) {
 	font := ConfigFont()
 	// app.SetFont only applies to future widgets (DictManager for example)
 	app.SetFont(font, "")
@@ -83,7 +82,7 @@ func ReloadFont(app *widgets.QApplication) {
 	}
 }
 
-func ReloadConfig(app *widgets.QApplication) {
+func ReloadConfig(app *Application) {
 	currentDirList := conf.DirectoryList
 	fontFamiliy := conf.FontFamily
 	fontSize := conf.FontSize

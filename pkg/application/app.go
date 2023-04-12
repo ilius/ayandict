@@ -25,9 +25,18 @@ type hasSetFont interface {
 var allTextWidgets = []hasSetFont{}
 
 func Run() {
-	app := widgets.NewQApplication(len(os.Args), os.Args)
+	app := &Application{
+		QApplication: widgets.NewQApplication(len(os.Args), os.Args),
+	}
 	qerr.ShowQtError = true
+	app.Run()
+}
 
+type Application struct {
+	*widgets.QApplication
+}
+
+func (app *Application) Run() {
 	if !LoadConfig() {
 		conf = config.Default()
 	}

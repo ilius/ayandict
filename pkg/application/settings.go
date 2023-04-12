@@ -78,7 +78,7 @@ func saveWinGeometry(qs *core.QSettings, window *widgets.QWidget, mainKey string
 }
 
 func setWinPosition(
-	app *widgets.QApplication,
+	app *Application,
 	window *widgets.QWidget,
 	pos *core.QPoint,
 ) {
@@ -101,7 +101,7 @@ func setWinPosition(
 }
 
 func setWinSize(
-	app *widgets.QApplication,
+	app *Application,
 	window *widgets.QWidget,
 	size *core.QSize,
 ) {
@@ -116,7 +116,7 @@ func setWinSize(
 }
 
 func restoreMainWinGeometry(
-	app *widgets.QApplication,
+	app *Application,
 	qs *core.QSettings,
 	window *widgets.QMainWindow,
 ) {
@@ -144,7 +144,7 @@ func restoreMainWinGeometry(
 }
 
 func restoreWinGeometry(
-	app *widgets.QApplication,
+	app *Application,
 	qs *core.QSettings,
 	window *widgets.QWidget,
 	mainKey string,

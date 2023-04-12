@@ -89,7 +89,7 @@ func makeDictInfoMap(infos []common.Info) map[string]common.Info {
 }
 
 func NewDictManager(
-	app *widgets.QApplication,
+	app *Application,
 	parent widgets.QWidget_ITF,
 ) *DictManager {
 	infos := stardict.GetInfoList()

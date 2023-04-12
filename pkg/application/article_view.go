@@ -19,14 +19,14 @@ import (
 type ArticleView struct {
 	*widgets.QTextBrowser
 
-	app     *widgets.QApplication
+	app     *Application
 	dpi     float64
 	doQuery func(string)
 
 	rightClickOnWord string
 }
 
-func NewArticleView(app *widgets.QApplication) *ArticleView {
+func NewArticleView(app *Application) *ArticleView {
 	widget := widgets.NewQTextBrowser(nil)
 	// widget := webengine.NewQWebEngineView(nil)
 	widget.SetReadOnly(true)
