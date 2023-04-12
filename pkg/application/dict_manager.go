@@ -1,17 +1,12 @@
 package application
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
-	"unicode/utf8"
 
 	"github.com/ilius/ayandict/pkg/common"
-	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/ilius/ayandict/pkg/stardict"
 	"github.com/therecipe/qt/core"
@@ -20,61 +15,10 @@ import (
 )
 
 const (
-	dictsJsonFilename    = "dicts.json"
 	dictManager_up       = "Up"
 	dictManager_down     = "Down"
 	dictManager_openDirs = "Open Directories"
 )
-
-type DictSettings struct {
-	Symbol string `json:"symbol"`
-	Order  int    `json:"order"`
-	Hash   string `json:"hash"`
-}
-
-var dictSettingsMap = map[string]*DictSettings{}
-
-func defaultDictSymbol(dictName string) string {
-	symbol, _ := utf8.DecodeRune([]byte(dictName))
-	return fmt.Sprintf("[%s]", string(symbol))
-}
-
-func loadDictsSettings() (map[string]*DictSettings, map[string]int, error) {
-	order := map[string]int{}
-	settingsMap := map[string]*DictSettings{}
-	fpath := filepath.Join(config.GetConfigDir(), dictsJsonFilename)
-	jsonBytes, err := ioutil.ReadFile(fpath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return settingsMap, order, nil
-		}
-		return settingsMap, order, err
-	}
-	err = json.Unmarshal(jsonBytes, &settingsMap)
-	if err != nil {
-		return settingsMap, order, err
-	}
-	for dictName, ds := range settingsMap {
-		order[dictName] = ds.Order
-		if ds.Symbol == "" {
-			ds.Symbol = defaultDictSymbol(dictName)
-		}
-	}
-	return settingsMap, order, nil
-}
-
-func saveDictsSettings(settingsMap map[string]*DictSettings) error {
-	jsonBytes, err := json.MarshalIndent(settingsMap, "", "\t")
-	if err != nil {
-		return err
-	}
-	fpath := filepath.Join(config.GetConfigDir(), dictsJsonFilename)
-	err = ioutil.WriteFile(fpath, jsonBytes, 0o644)
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
 type DictManager struct {
 	Dialog      *widgets.QDialog
@@ -308,7 +252,8 @@ func NewDictManager(
 	}
 }
 
-func dictsSettingsFromListWidget(table *widgets.QTableWidget) map[string]int {
+func (dm *DictManager) UpdateMap() map[string]int {
+	table := dm.TableWidget
 	order := map[string]int{}
 	count := table.RowCount()
 	for index := 0; index < count; index++ {
@@ -331,8 +276,8 @@ func dictsSettingsFromListWidget(table *widgets.QTableWidget) map[string]int {
 	return order
 }
 
-func SaveDictManagerDialog(manager *DictManager) {
-	dictsOrder = dictsSettingsFromListWidget(manager.TableWidget)
+func (dm *DictManager) SaveDictsSettings() {
+	dictsOrder = dm.UpdateMap()
 
 	stardict.ApplyDictsOrder(dictsOrder)
 

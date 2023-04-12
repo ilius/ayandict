@@ -454,7 +454,7 @@ func (app *Application) Run() {
 			app.dictManager = NewDictManager(app, window)
 		}
 		if app.dictManager.Dialog.Exec() == dialogAccepted {
-			SaveDictManagerDialog(app.dictManager)
+			app.dictManager.SaveDictsSettings()
 			onQuery(entry.Text(), queryArgs, false)
 		}
 	})
