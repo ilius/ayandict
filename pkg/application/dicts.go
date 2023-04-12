@@ -86,23 +86,31 @@ func saveDictsSettings(settingsMap map[string]*DictSettings) error {
 	return nil
 }
 
+func calcHashForDictName(dictName string) string {
+	dic := stardict.ByDictName(dictName)
+	if dic == nil {
+		qerr.Errorf("could not find dictionary name %#v", dictName)
+		return ""
+	}
+	log.Println("Calculating hash for", dictName)
+	b_hash, err := dic.CalcHash()
+	if err != nil {
+		qerr.Error(err)
+	}
+	return fmt.Sprintf("%x", b_hash)
+}
+
 func setDictHash() bool {
 	modified := false
 	for dictName, ds := range dictSettingsMap {
 		if ds.Hash != "" {
 			continue
 		}
-		dic := stardict.ByDictName(dictName)
-		if dic == nil {
-			qerr.Errorf("could not find dictionary name %#v", dictName)
+		hash := calcHashForDictName(dictName)
+		if hash == "" {
 			continue
 		}
-		log.Println("Calculating hash for", dictName)
-		b_hash, err := dic.CalcHash()
-		if err != nil {
-			qerr.Error(err)
-		}
-		ds.Hash = fmt.Sprintf("%x", b_hash)
+		ds.Hash = hash
 		modified = true
 	}
 	return modified

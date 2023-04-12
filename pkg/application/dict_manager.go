@@ -111,10 +111,11 @@ func NewDictManager(
 	setItem := func(index int, dictName string) {
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
-			log.Printf("dictName=%#v, ds=%v\n", dictName, ds)
+			log.Printf("Dict Manager: found new dict: %v\n", dictName)
 			ds = &DictSettings{
 				Symbol: defaultDictSymbol(dictName),
 				Order:  index,
+				Hash:   calcHashForDictName(dictName),
 			}
 			dictSettingsMap[dictName] = ds
 		}
@@ -288,7 +289,6 @@ func (dm *DictManager) Run() bool {
 	dictsOrder = dm.updateMap()
 
 	stardict.ApplyDictsOrder(dictsOrder)
-
 	err := saveDictsSettings(dictSettingsMap)
 	if err != nil {
 		qerr.Error(err)
