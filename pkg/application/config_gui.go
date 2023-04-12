@@ -102,6 +102,7 @@ func ReloadConfig(app *Application) {
 		reloadDicts()
 		app.dictManager = nil
 	}
+	app.headerLabel.SetWordWrap(conf.HeaderWordWrap)
 }
 
 func OpenConfig() {

@@ -35,6 +35,8 @@ type Application struct {
 	dictManager *DictManager
 
 	allTextWidgets []hasSetFont
+
+	headerLabel *HeaderLabel
 }
 
 func (app *Application) Run() {
@@ -98,6 +100,7 @@ func (app *Application) Run() {
 	queryBoxLayout.AddWidget(okButton, 0, 0)
 
 	headerLabel := CreateHeaderLabel(app)
+	app.headerLabel = headerLabel
 	headerLabel.SetAlignment(core.Qt__AlignLeft)
 
 	headerBox := widgets.NewQWidget(nil, 0)
