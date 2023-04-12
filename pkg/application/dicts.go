@@ -1,6 +1,9 @@
 package application
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/ilius/ayandict/pkg/stardict"
 	"github.com/therecipe/qt/core"
@@ -26,15 +29,44 @@ func loadingDictsPopup() *widgets.QLabel {
 	return popup
 }
 
+func setDictHash() bool {
+	modified := false
+	for dictName, ds := range dictSettingsMap {
+		if ds.Hash != "" {
+			continue
+		}
+		dic := stardict.ByDictName(dictName)
+		if dic == nil {
+			qerr.Errorf("could not find dictionary name %#v", dictName)
+			continue
+		}
+		log.Println("Calculating hash for", dictName)
+		b_hash, err := dic.CalcHash()
+		if err != nil {
+			qerr.Error(err)
+		}
+		ds.Hash = fmt.Sprintf("%x", b_hash)
+		modified = true
+	}
+	return modified
+}
+
 func initDicts() {
 	var err error
 	popup := loadingDictsPopup()
+	defer popup.Destroy(true, true)
+
 	dictSettingsMap, dictsOrder, err = loadDictsSettings()
 	if err != nil {
 		qerr.Errorf("Error reading dicts.json: %v", err)
 	}
 	stardict.Init(conf.DirectoryList, dictsOrder)
-	popup.Destroy(true, true)
+	if setDictHash() {
+		err := saveDictsSettings(dictSettingsMap)
+		if err != nil {
+			qerr.Error(err)
+		}
+	}
 }
 
 func reloadDicts() {

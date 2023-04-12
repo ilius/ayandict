@@ -2,7 +2,9 @@ package stardict
 
 import (
 	"bytes"
+	"crypto/sha1"
 	"encoding/binary"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -47,6 +49,19 @@ func (d *Dictionary) ResourceDir() string {
 
 func (d *Dictionary) ResourceURL() string {
 	return d.resURL
+}
+
+func (d *Dictionary) CalcHash() ([]byte, error) {
+	file, err := os.Open(d.idxPath)
+	defer file.Close()
+	if err != nil {
+		return nil, err
+	}
+	hash := sha1.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return nil, err
+	}
+	return hash.Sum(nil), nil
 }
 
 func similarity(r1 []rune, r2 []rune) uint8 {

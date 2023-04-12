@@ -29,6 +29,7 @@ const (
 type DictSettings struct {
 	Symbol string `json:"symbol"`
 	Order  int    `json:"order"`
+	Hash   string `json:"hash"`
 }
 
 var dictSettingsMap = map[string]*DictSettings{}
@@ -307,9 +308,8 @@ func NewDictManager(
 	}
 }
 
-func dictsSettingsFromListWidget(table *widgets.QTableWidget) (map[string]*DictSettings, map[string]int) {
+func dictsSettingsFromListWidget(table *widgets.QTableWidget) map[string]int {
 	order := map[string]int{}
-	settingMap := map[string]*DictSettings{}
 	count := table.RowCount()
 	for index := 0; index < count; index++ {
 		disable := table.Item(index, 0).CheckState() != core.Qt__Checked
@@ -320,16 +320,19 @@ func dictsSettingsFromListWidget(table *widgets.QTableWidget) (map[string]*DictS
 			value = -value
 		}
 		order[dictName] = value
-		settingMap[dictName] = &DictSettings{
-			Symbol: symbol,
-			Order:  value,
+		ds := dictSettingsMap[dictName]
+		if ds == nil {
+			ds = &DictSettings{}
+			dictSettingsMap[dictName] = ds
 		}
+		ds.Symbol = symbol
+		ds.Order = value
 	}
-	return settingMap, order
+	return order
 }
 
 func SaveDictManagerDialog(manager *DictManager) {
-	dictSettingsMap, dictsOrder = dictsSettingsFromListWidget(manager.TableWidget)
+	dictsOrder = dictsSettingsFromListWidget(manager.TableWidget)
 
 	stardict.ApplyDictsOrder(dictsOrder)
 

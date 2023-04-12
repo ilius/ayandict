@@ -32,7 +32,10 @@ var (
 	hrefBwordSpaceRE = regexp.MustCompile(` href="bword://[^<>"]*?( |%20)[^<>" ]*?"`)
 )
 
-var dicList []*Dictionary
+var (
+	dicList []*Dictionary
+	dicMap  = map[string]*Dictionary{}
+)
 
 type QueryResultImp struct {
 	*SearchResult
@@ -114,6 +117,9 @@ func Init(directoryList []string, order map[string]int) {
 	if order != nil {
 		Reorder(order)
 	}
+	for _, dic := range dicList {
+		dicMap[dic.DictName()] = dic
+	}
 }
 
 func GetInfoList() []common.Info {
@@ -122,6 +128,10 @@ func GetInfoList() []common.Info {
 		infos[i] = dic.info
 	}
 	return infos
+}
+
+func ByDictName(dictName string) *Dictionary {
+	return dicMap[dictName]
 }
 
 func Reorder(order map[string]int) {
