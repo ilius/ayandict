@@ -9,6 +9,7 @@ import (
 
 	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -253,4 +254,32 @@ func setupSplitterSizesSave(qs *core.QSettings, splitter *widgets.QSplitter, mai
 	splitter.ConnectSplitterMoved(func(pos int, index int) {
 		go onMove(pos, index)
 	})
+}
+
+func setupMainWinGeometrySave(qs *core.QSettings, window *widgets.QMainWindow) {
+	var mutex sync.Mutex
+	var lastSave time.Time
+
+	// might want to pass: pos *core.QPoint, size *core.QSize
+	onChange := func() {
+		eventTime := time.Now()
+		if !tryLockAsManyAs(&mutex, 3, 700*time.Millisecond) {
+			return
+		}
+		defer mutex.Unlock()
+		if eventTime.Before(lastSave) {
+			return
+		}
+		saveMainWinGeometry(qs, window)
+		lastSave = time.Now()
+		time.Sleep(700 * time.Millisecond)
+	}
+
+	window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
+		go onChange()
+	})
+	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		go onChange()
+	})
+
 }

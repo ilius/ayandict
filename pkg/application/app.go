@@ -516,12 +516,8 @@ func (app *Application) Run() {
 	qs := getQSettings(window)
 	restoreSplitterSizes(qs, mainSplitter, QS_mainSplitter)
 	restoreMainWinGeometry(app, qs, window)
-	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		saveMainWinGeometry(qs, window)
-	})
-	window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
-		saveMainWinGeometry(qs, window)
-	})
+	setupMainWinGeometrySave(qs, window)
+
 	restoreTableColumnsWidth(
 		qs,
 		frequencyTable.QTableWidget,
