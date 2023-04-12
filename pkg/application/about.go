@@ -29,7 +29,7 @@ func aboutClicked(
 ) {
 	window := widgets.NewQDialog(parent, core.Qt__Dialog)
 	window.SetWindowTitle("About AyanDict")
-	window.Resize2(800, 400)
+	window.Resize2(600, 500)
 
 	topHBox := widgets.NewQHBoxLayout()
 	topLabel := widgets.NewQLabel2(fmt.Sprintf(
