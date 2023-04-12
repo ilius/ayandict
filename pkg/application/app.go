@@ -25,6 +25,9 @@ type hasSetFont interface {
 var allTextWidgets = []hasSetFont{}
 
 func Run() {
+	app := widgets.NewQApplication(len(os.Args), os.Args)
+	qerr.ShowQtError = true
+
 	if !LoadConfig() {
 		conf = config.Default()
 	}
@@ -45,9 +48,6 @@ func Run() {
 		return
 	}
 	go startSingleInstanceServer(APP_NAME, conf.LocalServerPorts[0])
-
-	app := widgets.NewQApplication(len(os.Args), os.Args)
-	qerr.ShowQtError = true
 
 	LoadUserStyle(app)
 	initDicts()
