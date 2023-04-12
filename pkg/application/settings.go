@@ -258,17 +258,16 @@ func setupSplitterSizesSave(qs *core.QSettings, splitter *widgets.QSplitter, mai
 }
 
 func setupMainWinGeometrySave(qs *core.QSettings, window *widgets.QMainWindow) {
-	var mutex sync.Mutex
-
 	ch := make(chan time.Time, 100)
 
 	saveLoop := func() {
-		defer mutex.Unlock()
-		defer log.Println("Ending saveLoop")
-		log.Println("Starting saveLoop")
 		var lastSave time.Time
 		for {
 			var lastChange *time.Time
+			select {
+			case t := <-ch:
+				lastChange = &t
+			}
 		Loop1:
 			for {
 				select {
@@ -279,7 +278,7 @@ func setupMainWinGeometrySave(qs *core.QSettings, window *widgets.QMainWindow) {
 				}
 			}
 			if lastChange == nil {
-				return
+				continue
 			}
 			if lastChange.After(lastSave) {
 				saveMainWinGeometry(qs, window)
@@ -288,18 +287,11 @@ func setupMainWinGeometrySave(qs *core.QSettings, window *widgets.QMainWindow) {
 		}
 	}
 
-	// might want to pass: pos *core.QPoint, size *core.QSize
-	onChange := func() {
-		if mutex.TryLock() {
-			go saveLoop()
-		}
-		ch <- time.Now()
-	}
-
 	window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
-		go onChange()
+		ch <- time.Now()
 	})
 	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		go onChange()
+		ch <- time.Now()
 	})
+	go saveLoop()
 }
