@@ -10,7 +10,8 @@ var commentMap = map[string]string{
 	"search_on_type":            "Enable/disable search-on-type",
 	"search_on_type_min_length": "Minimum query length for search-on-type",
 
-	"header_template": "HTML template for header (dict name + entry terms)",
+	"header_template":  "HTML template for header (dict name + entry terms)",
+	"header_word_wrap": "Enable word-wrapping for header (dict name + entry terms)",
 
 	"history_disable":   "Disable history",
 	"history_auto_save": "Auto-save history on every new record",

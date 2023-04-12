@@ -28,7 +28,7 @@ func CreateHeaderLabel(app *widgets.QApplication) *HeaderLabel {
 	// | core.Qt__TextSelectableByKeyboard
 	qlabel.SetContentsMargins(0, 0, 0, 0)
 	qlabel.SetTextFormat(core.Qt__RichText)
-	qlabel.SetWordWrap(true)
+	qlabel.SetWordWrap(conf.HeaderWordWrap)
 	qlabel.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
 	label := &HeaderLabel{
 		QLabel: qlabel,

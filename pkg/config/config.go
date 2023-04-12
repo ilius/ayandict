@@ -33,6 +33,7 @@ type Config struct {
 	SearchOnTypeMinLength int  `toml:"search_on_type_min_length"`
 
 	HeaderTemplate string `toml:"header_template"`
+	HeaderWordWrap bool   `toml:"header_word_wrap"`
 
 	HistoryDisable  bool `toml:"history_disable"`
 	HistoryAutoSave bool `toml:"history_auto_save"`
@@ -94,6 +95,7 @@ func Default() *Config {
 		SearchOnTypeMinLength: 3,
 
 		HeaderTemplate: defaultHeaderTemplate,
+		HeaderWordWrap: true,
 
 		HistoryDisable:  false,
 		HistoryAutoSave: true,
