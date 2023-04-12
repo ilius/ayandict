@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/qerr"
@@ -233,12 +234,18 @@ func NewDictManager(
 		saveTableColumnsWidth(qs, table, QS_dictManager)
 	})
 
-	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		saveWinGeometry(qs, &window.QWidget, QS_dictManager)
-	})
-	window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
-		saveWinGeometry(qs, &window.QWidget, QS_dictManager)
-	})
+	{
+		ch := make(chan time.Time, 100)
+		window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
+			ch <- time.Now()
+		})
+		window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+			ch <- time.Now()
+		})
+		go actionSaveLoop(ch, func() {
+			saveWinGeometry(qs, &window.QWidget, QS_dictManager)
+		})
+	}
 
 	app.allTextWidgets = append(
 		app.allTextWidgets,
