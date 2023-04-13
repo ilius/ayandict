@@ -139,7 +139,7 @@ func (view *FrequencyTable) Trim() {
 	if maxSize > 20 {
 		maxSize -= 10
 	} else {
-		maxSize = maxSize * 2 / 3
+		maxSize -= maxSize / 3
 	}
 	// log.Printf("Triming %d items to %d\n", len(view.Counts), maxSize)
 	newKeys := view.Keys[:maxSize]

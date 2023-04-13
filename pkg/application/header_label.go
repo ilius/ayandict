@@ -58,7 +58,7 @@ func (label *HeaderLabel) SetResult(res common.QueryResult) {
 		Terms:    terms,
 		Term:     termsJoined,
 		DictName: res.DictName(),
-		Score:    res.Score() / 2,
+		Score:    res.Score() >> 1,
 	})
 	if err != nil {
 		qerr.Errorf("Error formatting header label: %v", err)

@@ -90,13 +90,13 @@ func setWinPosition(
 	case x < 0:
 		pos.SetX(0)
 	case x > screenSize.Width():
-		pos.SetX(screenSize.Width() / 2)
+		pos.SetX(screenSize.Width() >> 1)
 	}
 	switch {
 	case y < 0:
 		pos.SetY(0)
 	case y > screenSize.Height():
-		pos.SetY(screenSize.Height() / 2)
+		pos.SetY(screenSize.Height() >> 1)
 	}
 	window.Move(pos)
 }

@@ -70,16 +70,15 @@ func similarity(r1 []rune, r2 []rune) uint8 {
 	}
 	// now len(r1) <= len(r2)
 	n := len(r2)
-	if len(r1) < n*2/3 {
+	if len(r1) < (n - n/3) {
 		// this optimization assumes we want to ignore below %66 similarity
 		return 0
 	}
 	return uint8(200 * (n - levenshtein.ComputeDistance(r1, r2)) / n)
 }
 
-// Search: first try an exact match
-// then search all translations for terms that contain the query
-// but sort the one that have it as prefix first
+// Search: run a fuzzy search with similarity scores
+// ranging from 140 (which means %70) to 200 (which means 100%)
 func (d *Dictionary) Search(query string) []*SearchResult {
 	// if len(query) < 2 {
 	// 	return d.searchVeryShort(query)
@@ -146,7 +145,7 @@ func (d *Dictionary) Search(query string) []*SearchResult {
 					continue
 				}
 				if queryWordCount > 1 {
-					bestWordScore = bestWordScore/2 + bestWordScore/7
+					bestWordScore = bestWordScore>>1 + bestWordScore/7
 				}
 				if bestWordScore > bestScore {
 					bestScore = bestWordScore
