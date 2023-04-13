@@ -5,3 +5,11 @@ type DictSettings struct {
 	Order  int    `json:"order"`
 	Hash   string `json:"hash"`
 }
+
+func NewDictSettings(info Info, index int) *DictSettings {
+	return &DictSettings{
+		Symbol: DefaultSymbol(info.DictName()),
+		Order:  index,
+		Hash:   Hash(info),
+	}
+}

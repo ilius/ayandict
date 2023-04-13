@@ -215,7 +215,7 @@ func NewDictManager(
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
 			log.Printf("dict manager: found new dict: %v\n", dictName)
-			ds = newDictSetting(info, index)
+			ds = common.NewDictSettings(info, index)
 			dictSettingsMap[dictName] = ds
 		}
 		setItem(index, dictName, ds)

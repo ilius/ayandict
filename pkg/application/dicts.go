@@ -2,12 +2,10 @@ package application
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
-	"unicode/utf8"
 
 	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/config"
@@ -23,11 +21,6 @@ var (
 	dictsOrder      map[string]int
 	dictSettingsMap = map[string]*common.DictSettings{}
 )
-
-func defaultDictSymbol(dictName string) string {
-	symbol, _ := utf8.DecodeRune([]byte(dictName))
-	return fmt.Sprintf("[%s]", string(symbol))
-}
 
 func loadingDictsPopup() *widgets.QLabel {
 	popup := widgets.NewQLabel2(
@@ -64,7 +57,7 @@ func loadDictsSettings() (map[string]*common.DictSettings, map[string]int, error
 	for dictName, ds := range settingsMap {
 		order[dictName] = ds.Order
 		if ds.Symbol == "" {
-			ds.Symbol = defaultDictSymbol(dictName)
+			ds.Symbol = common.DefaultSymbol(dictName)
 		}
 	}
 	return settingsMap, order, nil
@@ -83,24 +76,6 @@ func saveDictsSettings(settingsMap map[string]*common.DictSettings) error {
 	return nil
 }
 
-func calcHashByDictInfo(info common.Info) string {
-	log.Println("Calculating hash for", info.DictName())
-	b_hash, err := info.CalcHash()
-	if err != nil {
-		qerr.Error(err)
-		return ""
-	}
-	return fmt.Sprintf("%x", b_hash)
-}
-
-func newDictSetting(info common.Info, index int) *common.DictSettings {
-	return &common.DictSettings{
-		Symbol: defaultDictSymbol(info.DictName()),
-		Order:  index,
-		Hash:   calcHashByDictInfo(info),
-	}
-}
-
 func initDicts() {
 	var err error
 	popup := loadingDictsPopup()
@@ -117,12 +92,12 @@ func initDicts() {
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
 			log.Printf("init: found new dict: %v\n", dictName)
-			dictSettingsMap[dictName] = newDictSetting(info, index)
+			dictSettingsMap[dictName] = common.NewDictSettings(info, index)
 			modified = true
 			continue
 		}
 		if ds.Hash == "" {
-			hash := calcHashByDictInfo(info)
+			hash := common.Hash(info)
 			if hash != "" {
 				ds.Hash = hash
 				modified = true
