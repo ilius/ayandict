@@ -126,7 +126,13 @@ func InitDicts(conf *config.Config) {
 	if err != nil {
 		panic(err)
 	}
+
+	// to support another format, you can call pkg.Open just like stardict
+	// and append them new dicList to this dicList. since we are sorting them
+	// here in Reorder after loading all dictionaries
+
 	log.Println("Loading dictionaries took", time.Now().Sub(t))
+
 	Reorder(dictsOrder)
 
 	modified := false
