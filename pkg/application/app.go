@@ -415,7 +415,7 @@ func (app *Application) Run() {
 		doQuery(item.Text())
 	})
 	reloadDictsButton.ConnectClicked(func(checked bool) {
-		reloadDicts()
+		initDicts()
 		app.dictManager = nil
 		onQuery(entry.Text(), queryArgs, false)
 	})

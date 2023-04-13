@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"unicode/utf8"
 
+	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/ilius/ayandict/pkg/stardict"
@@ -88,34 +89,22 @@ func saveDictsSettings(settingsMap map[string]*DictSettings) error {
 	return nil
 }
 
-func calcHashForDictName(dictName string) string {
-	dic := stardict.ByDictName(dictName)
-	if dic == nil {
-		qerr.Errorf("could not find dictionary name %#v", dictName)
-		return ""
-	}
-	log.Println("Calculating hash for", dictName)
-	b_hash, err := dic.CalcHash()
+func calcHashByDictInfo(info common.Info) string {
+	log.Println("Calculating hash for", info.DictName())
+	b_hash, err := info.CalcHash()
 	if err != nil {
 		qerr.Error(err)
+		return ""
 	}
 	return fmt.Sprintf("%x", b_hash)
 }
 
-func setDictHash() bool {
-	modified := false
-	for dictName, ds := range dictSettingsMap {
-		if ds.Hash != "" {
-			continue
-		}
-		hash := calcHashForDictName(dictName)
-		if hash == "" {
-			continue
-		}
-		ds.Hash = hash
-		modified = true
+func newDictSetting(info common.Info, index int) *DictSettings {
+	return &DictSettings{
+		Symbol: defaultDictSymbol(info.DictName()),
+		Order:  index,
+		Hash:   calcHashByDictInfo(info),
 	}
-	return modified
 }
 
 func initDicts() {
@@ -127,20 +116,31 @@ func initDicts() {
 	if err != nil {
 		qerr.Errorf("Error reading dicts.json: %v", err)
 	}
-	stardict.Init(conf.DirectoryList, dictsOrder)
-	if setDictHash() {
+	infoList := stardict.Init(conf.DirectoryList, dictsOrder)
+	modified := false
+	for index, info := range infoList {
+		dictName := info.DictName()
+		ds := dictSettingsMap[dictName]
+		if ds == nil {
+			log.Printf("init: found new dict: %v\n", dictName)
+			dictSettingsMap[dictName] = newDictSetting(info, index)
+			modified = true
+			continue
+		}
+		if ds.Hash == "" {
+			hash := calcHashByDictInfo(info)
+			if hash != "" {
+				ds.Hash = hash
+				modified = true
+			}
+		}
+	}
+	if modified {
 		err := saveDictsSettings(dictSettingsMap)
 		if err != nil {
 			qerr.Error(err)
 		}
 	}
-}
-
-func reloadDicts() {
-	// do we need mutex for this?
-	popup := loadingDictsPopup()
-	stardict.Init(conf.DirectoryList, dictsOrder)
-	popup.Destroy(true, true)
 }
 
 func closeDicts() {

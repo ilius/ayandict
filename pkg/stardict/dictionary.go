@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -29,16 +28,16 @@ type SearchResult struct {
 
 // Dictionary stardict dictionary
 type Dictionary struct {
+	*Info
+
 	dict     *Dict
 	idx      *Idx
-	info     *Info
 	ifoPath  string
 	idxPath  string
 	dictPath string
 	synPath  string
 	resDir   string
 	resURL   string
-	disabled bool
 
 	decodeData func(data []byte) []*SearchResultItem
 }
@@ -193,7 +192,7 @@ func (d *Dictionary) SearchFuzzy(query string) []*SearchResult {
 }
 
 func (d *Dictionary) decodeWithSametypesequence(data []byte) (items []*SearchResultItem) {
-	seq := d.info.Options["sametypesequence"]
+	seq := d.Options["sametypesequence"]
 
 	seqLen := len(seq)
 
@@ -261,14 +260,7 @@ func (d *Dictionary) decodeWithoutSametypesequence(data []byte) (items []*Search
 
 // DictName returns book name
 func (d *Dictionary) DictName() string {
-	return d.info.Options["bookname"]
-}
-
-// EntryCount returns number of entries in the dictionary
-func (d *Dictionary) EntryCount() uint64 {
-	num, _ := strconv.ParseUint(d.info.Options["wordcount"], 10, 64)
-
-	return num
+	return d.Options["bookname"]
 }
 
 // NewDictionary returns a new Dictionary
@@ -311,7 +303,7 @@ func NewDictionary(path string, name string) (*Dictionary, error) {
 	if err != nil {
 		return nil, err
 	}
-	d.info = info
+	d.Info = info
 
 	d.ifoPath = ifoPath
 	d.idxPath = idxPath
@@ -329,14 +321,14 @@ func NewDictionary(path string, name string) (*Dictionary, error) {
 
 func (d *Dictionary) load() error {
 	{
-		idx, err := ReadIndex(d.idxPath, d.synPath, d.info)
+		idx, err := ReadIndex(d.idxPath, d.synPath, d.Info)
 		if err != nil {
 			return err
 		}
 		d.idx = idx
 	}
 	{
-		dict, err := ReadDict(d.dictPath, d.info)
+		dict, err := ReadDict(d.dictPath, d.Info)
 		if err != nil {
 			return err
 		}

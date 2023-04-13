@@ -38,8 +38,8 @@ func NewDictManager(
 	app *Application,
 	parent widgets.QWidget_ITF,
 ) *DictManager {
-	infos := stardict.GetInfoList()
-	infoMap := makeDictInfoMap(infos)
+	infoList := stardict.GetInfoList()
+	infoMap := makeDictInfoMap(infoList)
 
 	window := widgets.NewQDialog(parent, core.Qt__Dialog)
 	window.SetWindowTitle("Dictionaries")
@@ -209,17 +209,13 @@ func NewDictManager(
 	mainBox.AddLayout(mainHBox, 1)
 	mainBox.AddWidget(buttonBox, 0, 0)
 
-	table.SetRowCount(len(infos))
-	for index, info := range infos {
+	table.SetRowCount(len(infoList))
+	for index, info := range infoList {
 		dictName := info.DictName()
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
-			log.Printf("Dict Manager: found new dict: %v\n", dictName)
-			ds = &DictSettings{
-				Symbol: defaultDictSymbol(dictName),
-				Order:  index,
-				Hash:   calcHashForDictName(dictName),
-			}
+			log.Printf("dict manager: found new dict: %v\n", dictName)
+			ds = newDictSetting(info, index)
 			dictSettingsMap[dictName] = ds
 		}
 		setItem(index, dictName, ds)

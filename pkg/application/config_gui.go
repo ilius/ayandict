@@ -99,7 +99,7 @@ func ReloadConfig(app *Application) {
 		ReloadUserStyle(app)
 	}
 	if shouldReloadDicts(currentDirList, conf.DirectoryList) {
-		reloadDicts()
+		initDicts()
 		app.dictManager = nil
 	}
 	app.headerLabel.SetWordWrap(conf.HeaderWordWrap)

@@ -42,8 +42,7 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 			return err
 		}
 		if order[dic.DictName()] < 0 {
-			dic.disabled = true
-			dic.info.Disabled = true
+			dic.Disabled = true
 			dicList = append(dicList, dic)
 			return nil
 		}
@@ -84,7 +83,7 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 		}
 	}
 	for _, dic := range dicList {
-		if dic.disabled {
+		if dic.Disabled {
 			continue
 		}
 		wg.Add(1)

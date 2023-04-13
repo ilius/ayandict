@@ -5,4 +5,5 @@ type Info interface {
 	EntryCount() (int, error)
 	Description() string
 	IndexFileSize() uint64
+	CalcHash() ([]byte, error)
 }

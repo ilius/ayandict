@@ -33,8 +33,9 @@ var (
 )
 
 var (
-	dicList []*Dictionary
-	dicMap  = map[string]*Dictionary{}
+	dicList  []*Dictionary
+	dicMap   = map[string]*Dictionary{}
+	infoList []common.Info
 )
 
 type QueryResultImp struct {
@@ -106,7 +107,7 @@ func (s DicListSorter) Less(i, j int) bool {
 	return absInt(s.Order[s.List[i].DictName()]) < absInt(s.Order[s.List[j].DictName()])
 }
 
-func Init(directoryList []string, order map[string]int) {
+func Init(directoryList []string, order map[string]int) []common.Info {
 	t := time.Now()
 	var err error
 	dicList, err = Open(directoryList, order)
@@ -114,20 +115,16 @@ func Init(directoryList []string, order map[string]int) {
 		panic(err)
 	}
 	log.Println("Loading dictionaries took", time.Now().Sub(t))
-	if order != nil {
-		Reorder(order)
+	Reorder(order)
+	infoList = make([]common.Info, len(dicList))
+	for i, dic := range dicList {
+		infoList[i] = dic
 	}
-	for _, dic := range dicList {
-		dicMap[dic.DictName()] = dic
-	}
+	return infoList
 }
 
 func GetInfoList() []common.Info {
-	infos := make([]common.Info, len(dicList))
-	for i, dic := range dicList {
-		infos[i] = dic.info
-	}
-	return infos
+	return infoList
 }
 
 func ByDictName(dictName string) *Dictionary {
@@ -144,9 +141,9 @@ func Reorder(order map[string]int) {
 func ApplyDictsOrder(order map[string]int) {
 	Reorder(order)
 	for _, dic := range dicList {
-		disabled := dic.disabled
-		dic.disabled = order[dic.DictName()] < 0
-		if disabled && !dic.disabled {
+		disabled := dic.Disabled
+		dic.Disabled = order[dic.DictName()] < 0
+		if disabled && !dic.Disabled {
 			dic.load()
 		}
 	}
@@ -379,7 +376,7 @@ func LookupHTML(
 ) []common.QueryResult {
 	results := []common.QueryResult{}
 	for _, dic := range dicList {
-		if dic.disabled || dic.dict == nil {
+		if dic.Disabled || dic.dict == nil {
 			continue
 		}
 		for _, res := range dic.SearchFuzzy(query) {
@@ -409,7 +406,7 @@ func LookupHTML(
 
 func CloseDictFiles() {
 	for _, dic := range dicList {
-		if dic.disabled {
+		if dic.Disabled {
 			continue
 		}
 		dic.dict.Close()
