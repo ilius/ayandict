@@ -1,4 +1,4 @@
-package application
+package dictmgr
 
 import (
 	"encoding/json"
@@ -22,7 +22,7 @@ var (
 	dictSettingsMap = map[string]*common.DictSettings{}
 )
 
-func loadingDictsPopup() *widgets.QLabel {
+func loadingDictsPopup(conf *config.Config) *widgets.QLabel {
 	popup := widgets.NewQLabel2(
 		`<span style="font-size:xx-large;">Loading dictionaries</span>`,
 		nil,
@@ -76,9 +76,9 @@ func saveDictsSettings(settingsMap map[string]*common.DictSettings) error {
 	return nil
 }
 
-func initDicts() {
+func InitDicts(conf *config.Config) {
 	var err error
-	popup := loadingDictsPopup()
+	popup := loadingDictsPopup(conf)
 	defer popup.Destroy(true, true)
 
 	dictSettingsMap, dictsOrder, err = loadDictsSettings()
@@ -112,6 +112,14 @@ func initDicts() {
 	}
 }
 
-func closeDicts() {
+func CloseDicts() {
 	stardict.CloseDictFiles()
+}
+
+func DictSymbol(dictName string) string {
+	ds := dictSettingsMap[dictName]
+	if ds == nil {
+		return ""
+	}
+	return ds.Symbol
 }

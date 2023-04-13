@@ -1,14 +1,15 @@
-package application
+package dictmgr
 
 import (
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
-	"time"
 
 	"github.com/ilius/ayandict/pkg/common"
+	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/qerr"
+	"github.com/ilius/ayandict/pkg/settings"
 	"github.com/ilius/ayandict/pkg/stardict"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
@@ -19,11 +20,14 @@ const (
 	dictManager_up       = "Up"
 	dictManager_down     = "Down"
 	dictManager_openDirs = "Open Directories"
+
+	QS_dictManager = "dict_manager"
 )
 
 type DictManager struct {
 	Dialog      *widgets.QDialog
 	TableWidget *widgets.QTableWidget
+	TextWidgets []common.HasSetFont
 }
 
 func makeDictInfoMap(infos []common.Info) map[string]common.Info {
@@ -35,8 +39,9 @@ func makeDictInfoMap(infos []common.Info) map[string]common.Info {
 }
 
 func NewDictManager(
-	app *Application,
+	app *widgets.QApplication,
 	parent widgets.QWidget_ITF,
+	conf *config.Config,
 ) *DictManager {
 	infoList := stardict.GetInfoList()
 	infoMap := makeDictInfoMap(infoList)
@@ -45,8 +50,8 @@ func NewDictManager(
 	window.SetWindowTitle("Dictionaries")
 	window.Resize2(800, 600)
 
-	qs := getQSettings(window)
-	restoreWinGeometry(app, qs, &window.QWidget, QS_dictManager)
+	qs := settings.GetQSettings(window)
+	settings.RestoreWinGeometry(app, qs, &window.QWidget, QS_dictManager)
 
 	const columns = 4
 
@@ -221,39 +226,26 @@ func NewDictManager(
 		setItem(index, dictName, ds)
 	}
 
-	restoreTableColumnsWidth(
+	settings.RestoreTableColumnsWidth(
 		qs,
 		table,
 		QS_dictManager,
 	)
 	table.HorizontalHeader().ConnectSectionResized(func(logicalIndex int, oldSize int, newSize int) {
-		saveTableColumnsWidth(qs, table, QS_dictManager)
+		settings.SaveTableColumnsWidth(qs, table, QS_dictManager)
 	})
 
-	{
-		ch := make(chan time.Time, 100)
-		window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
-			ch <- time.Now()
-		})
-		window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-			ch <- time.Now()
-		})
-		go actionSaveLoop(ch, func() {
-			saveWinGeometry(qs, &window.QWidget, QS_dictManager)
-		})
-	}
-
-	app.allTextWidgets = append(
-		app.allTextWidgets,
-		table,
-		toolbar,
-		okButton,
-		cancelButton,
-	)
+	settings.SetupWinGeometrySave(qs, &window.QWidget, QS_dictManager)
 
 	return &DictManager{
 		Dialog:      window,
 		TableWidget: table,
+		TextWidgets: []common.HasSetFont{
+			table,
+			toolbar,
+			okButton,
+			cancelButton,
+		},
 	}
 }
 
@@ -287,7 +279,7 @@ func (dm *DictManager) updateMap() map[string]int {
 // if OK was clicked, then applies and saves changes
 // and returs true
 func (dm *DictManager) Run() bool {
-	if dm.Dialog.Exec() != dialogAccepted {
+	if dm.Dialog.Exec() != int(widgets.QDialog__Accepted) {
 		return false
 	}
 	dictsOrder = dm.updateMap()

@@ -7,23 +7,27 @@ import (
 
 	// "github.com/therecipe/qt/webengine"
 
+	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/config"
+	"github.com/ilius/ayandict/pkg/dictmgr"
 	"github.com/ilius/ayandict/pkg/favorites"
 	"github.com/ilius/ayandict/pkg/frequency"
 	"github.com/ilius/ayandict/pkg/qerr"
+	"github.com/ilius/ayandict/pkg/settings"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
 
-type hasSetFont interface {
-	SetFont(gui.QFont_ITF)
-}
+const (
+	QS_mainSplitter   = "main_splitter"
+	QS_frequencyTable = "frequencytable"
+)
 
 func Run() {
 	app := &Application{
 		QApplication:   widgets.NewQApplication(len(os.Args), os.Args),
-		allTextWidgets: []hasSetFont{},
+		allTextWidgets: []common.HasSetFont{},
 	}
 	qerr.ShowQtError = true
 	app.Run()
@@ -32,9 +36,9 @@ func Run() {
 type Application struct {
 	*widgets.QApplication
 
-	dictManager *DictManager
+	dictManager *dictmgr.DictManager
 
-	allTextWidgets []hasSetFont
+	allTextWidgets []common.HasSetFont
 
 	headerLabel *HeaderLabel
 }
@@ -62,7 +66,7 @@ func (app *Application) Run() {
 	go startSingleInstanceServer(APP_NAME, conf.LocalServerPorts[0])
 
 	LoadUserStyle(app)
-	initDicts()
+	dictmgr.InitDicts(conf)
 
 	frequencyTable = frequency.NewFrequencyView(conf.MostFrequentMaxSize)
 
@@ -307,7 +311,7 @@ func (app *Application) Run() {
 
 	app.SetFont(ConfigFont(), "")
 
-	app.allTextWidgets = []hasSetFont{
+	app.allTextWidgets = []common.HasSetFont{
 		queryLabel,
 		entry,
 		okButton,
@@ -415,12 +419,12 @@ func (app *Application) Run() {
 		doQuery(item.Text())
 	})
 	reloadDictsButton.ConnectClicked(func(checked bool) {
-		initDicts()
+		dictmgr.InitDicts(conf)
 		app.dictManager = nil
 		onQuery(entry.Text(), queryArgs, false)
 	})
 	closeDictsButton.ConnectClicked(func(checked bool) {
-		closeDicts()
+		dictmgr.CloseDicts()
 	})
 	openConfigButton.ConnectClicked(func(checked bool) {
 		OpenConfig()
@@ -451,7 +455,11 @@ func (app *Application) Run() {
 
 	dictsButton.ConnectClicked(func(checked bool) {
 		if app.dictManager == nil {
-			app.dictManager = NewDictManager(app, window)
+			app.dictManager = dictmgr.NewDictManager(app.QApplication, window, conf)
+			app.allTextWidgets = append(
+				app.allTextWidgets,
+				app.dictManager.TextWidgets...,
+			)
 		}
 		if app.dictManager.Run() {
 			onQuery(entry.Text(), queryArgs, false)
@@ -513,22 +521,22 @@ func (app *Application) Run() {
 		}
 	})
 
-	qs := getQSettings(window)
-	restoreSplitterSizes(qs, mainSplitter, QS_mainSplitter)
-	restoreMainWinGeometry(app, qs, window)
-	setupMainWinGeometrySave(qs, window)
+	qs := settings.GetQSettings(window)
+	settings.RestoreSplitterSizes(qs, mainSplitter, QS_mainSplitter)
+	settings.RestoreMainWinGeometry(app.QApplication, qs, window)
+	settings.SetupMainWinGeometrySave(qs, window)
 
-	restoreTableColumnsWidth(
+	settings.RestoreTableColumnsWidth(
 		qs,
 		frequencyTable.QTableWidget,
 		QS_frequencyTable,
 	)
 	// frequencyTable.ConnectColumnResized does not work
 	frequencyTable.HorizontalHeader().ConnectSectionResized(func(logicalIndex int, oldSize int, newSize int) {
-		saveTableColumnsWidth(qs, frequencyTable.QTableWidget, QS_frequencyTable)
+		settings.SaveTableColumnsWidth(qs, frequencyTable.QTableWidget, QS_frequencyTable)
 	})
 
-	setupSplitterSizesSave(qs, mainSplitter, QS_mainSplitter)
+	settings.SetupSplitterSizesSave(qs, mainSplitter, QS_mainSplitter)
 
 	window.Show()
 	app.Exec()

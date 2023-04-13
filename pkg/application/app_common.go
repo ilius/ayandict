@@ -38,8 +38,7 @@ If not, see http://www.gnu.org/licenses/gpl.txt
 `
 
 const (
-	expanding      = widgets.QSizePolicy__Expanding
-	dialogAccepted = int(widgets.QDialog__Accepted)
+	expanding = widgets.QSizePolicy__Expanding
 )
 
 // we trim these characters when user right-clicks on a word without selecting it

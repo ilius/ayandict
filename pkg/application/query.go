@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/ilius/ayandict/pkg/common"
-	"github.com/ilius/ayandict/pkg/stardict"
+	"github.com/ilius/ayandict/pkg/dictmgr"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -89,9 +89,9 @@ func (w *ResultListWidget) SetResults(results []common.QueryResult) {
 		default:
 			text += fmt.Sprintf("%s (+%d)", terms[0], len(terms)-1)
 		}
-		ds := dictSettingsMap[res.DictName()]
-		if ds != nil && ds.Symbol != "" {
-			text = fmt.Sprintf("%s %s", text, ds.Symbol)
+		symbol := dictmgr.DictSymbol(res.DictName())
+		if symbol != "" {
+			text = fmt.Sprintf("%s %s", text, symbol)
 		}
 		w.AddItem(text)
 	}
@@ -151,11 +151,7 @@ func onQuery(
 	}
 	// log.Printf("Query: %s\n", query)
 	t := time.Now()
-	results := stardict.LookupHTML(
-		query,
-		conf,
-		dictsOrder,
-	)
+	results := dictmgr.LookupHTML(query, conf)
 	log.Printf("LookupHTML took %v for %#v", time.Now().Sub(t), query)
 	queryWidgets.ResultList.SetResults(results)
 	if len(results) == 0 {

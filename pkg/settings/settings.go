@@ -1,4 +1,4 @@
-package application
+package settings
 
 import (
 	"log"
@@ -20,16 +20,42 @@ const (
 	QS_pos        = "pos"
 	QS_size       = "size"
 
-	QS_frequencyTable = "frequencytable"
-	QS_columnwidth    = "columnwidth"
+	QS_columnwidth = "columnwidth"
 
-	QS_mainSplitter = "main_splitter"
-	QS_sizes        = "sizes"
-
-	QS_dictManager = "dict_manager"
+	QS_sizes = "sizes"
 )
 
-func getQSettings(parent core.QObject_ITF) *core.QSettings {
+func joinIntList(nums []int) string {
+	strs := make([]string, len(nums))
+	for i, num := range nums {
+		strs[i] = strconv.FormatInt(int64(num), 10)
+	}
+	return strings.Join(strs, ",")
+}
+
+func splitIntList(st string) ([]int, error) {
+	strs := strings.Split(st, ",")
+	nums := make([]int, len(strs))
+	for i, st := range strs {
+		n, err := strconv.ParseInt(st, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		nums[i] = int(n)
+	}
+	return nums, nil
+}
+
+func splitterSizes(splitter *widgets.QSplitter) []int {
+	itemCount := splitter.Count()
+	widthList := make([]int, itemCount)
+	for i := 0; i < itemCount; i++ {
+		widthList[i] = splitter.Widget(i).Geometry().Width()
+	}
+	return widthList
+}
+
+func GetQSettings(parent core.QObject_ITF) *core.QSettings {
 	return core.NewQSettings("ilius", "ayandict", parent)
 }
 
@@ -66,7 +92,7 @@ func saveMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
 	}
 }
 
-func saveWinGeometry(qs *core.QSettings, window *widgets.QWidget, mainKey string) {
+func SaveWinGeometry(qs *core.QSettings, window *widgets.QWidget, mainKey string) {
 	qs.BeginGroup(mainKey)
 	defer qs.EndGroup()
 
@@ -79,7 +105,7 @@ func saveWinGeometry(qs *core.QSettings, window *widgets.QWidget, mainKey string
 }
 
 func setWinPosition(
-	app *Application,
+	app *widgets.QApplication,
 	window *widgets.QWidget,
 	pos *core.QPoint,
 ) {
@@ -102,7 +128,7 @@ func setWinPosition(
 }
 
 func setWinSize(
-	app *Application,
+	app *widgets.QApplication,
 	window *widgets.QWidget,
 	size *core.QSize,
 ) {
@@ -116,8 +142,8 @@ func setWinSize(
 	window.Resize(size)
 }
 
-func restoreMainWinGeometry(
-	app *Application,
+func RestoreMainWinGeometry(
+	app *widgets.QApplication,
 	qs *core.QSettings,
 	window *widgets.QMainWindow,
 ) {
@@ -144,8 +170,8 @@ func restoreMainWinGeometry(
 	})
 }
 
-func restoreWinGeometry(
-	app *Application,
+func RestoreWinGeometry(
+	app *widgets.QApplication,
 	qs *core.QSettings,
 	window *widgets.QWidget,
 	mainKey string,
@@ -170,7 +196,7 @@ func restoreWinGeometry(
 	})
 }
 
-func saveTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, mainKey string) {
+func SaveTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, mainKey string) {
 	qs.BeginGroup(mainKey)
 	defer qs.EndGroup()
 	count := table.ColumnCount()
@@ -181,7 +207,7 @@ func saveTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, main
 	qs.SetValue(QS_columnwidth, core.NewQVariant1(joinIntList(widths)))
 }
 
-func restoreTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, mainKey string) {
+func RestoreTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, mainKey string) {
 	qs.BeginGroup(mainKey)
 	defer qs.EndGroup()
 	if !qs.Contains(QS_columnwidth) {
@@ -209,7 +235,7 @@ func saveSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainKey 
 	qs.SetValue(QS_sizes, core.NewQVariant1(joinIntList(sizes)))
 }
 
-func restoreSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
+func RestoreSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
 	qs.BeginGroup(mainKey)
 	defer qs.EndGroup()
 	if !qs.Contains(QS_sizes) {
@@ -254,7 +280,7 @@ func actionSaveLoop(ch <-chan time.Time, callable func()) {
 	}
 }
 
-func setupSplitterSizesSave(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
+func SetupSplitterSizesSave(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
 	ch := make(chan time.Time, 100)
 	splitter.ConnectSplitterMoved(func(pos int, index int) {
 		ch <- time.Now()
@@ -264,7 +290,25 @@ func setupSplitterSizesSave(qs *core.QSettings, splitter *widgets.QSplitter, mai
 	})
 }
 
-func setupMainWinGeometrySave(qs *core.QSettings, window *widgets.QMainWindow) {
+func SetupWinGeometrySave(
+	qs *core.QSettings,
+	window *widgets.QWidget,
+	mainKey string,
+) {
+	ch := make(chan time.Time, 100)
+
+	window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
+		ch <- time.Now()
+	})
+	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		ch <- time.Now()
+	})
+	go actionSaveLoop(ch, func() {
+		SaveWinGeometry(qs, window, mainKey)
+	})
+}
+
+func SetupMainWinGeometrySave(qs *core.QSettings, window *widgets.QMainWindow) {
 	ch := make(chan time.Time, 100)
 
 	window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
