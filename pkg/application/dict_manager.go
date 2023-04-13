@@ -109,7 +109,7 @@ func NewDictManager(
 		item.SetFlags(core.Qt__ItemIsSelectable | core.Qt__ItemIsEnabled)
 		return item
 	}
-	setItem := func(index int, dictName string, ds *DictSettings) {
+	setItem := func(index int, dictName string, ds *common.DictSettings) {
 		info, ok := infoMap[dictName]
 		if !ok {
 			log.Printf("dictName=%#v not in infoMap\n", dictName)
@@ -274,7 +274,7 @@ func (dm *DictManager) updateMap() map[string]int {
 		order[dictName] = value
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
-			ds = &DictSettings{}
+			ds = &common.DictSettings{}
 			dictSettingsMap[dictName] = ds
 		}
 		ds.Symbol = symbol

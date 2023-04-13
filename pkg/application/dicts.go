@@ -21,14 +21,8 @@ const dictsJsonFilename = "dicts.json"
 
 var (
 	dictsOrder      map[string]int
-	dictSettingsMap = map[string]*DictSettings{}
+	dictSettingsMap = map[string]*common.DictSettings{}
 )
-
-type DictSettings struct {
-	Symbol string `json:"symbol"`
-	Order  int    `json:"order"`
-	Hash   string `json:"hash"`
-}
 
 func defaultDictSymbol(dictName string) string {
 	symbol, _ := utf8.DecodeRune([]byte(dictName))
@@ -52,9 +46,9 @@ func loadingDictsPopup() *widgets.QLabel {
 	return popup
 }
 
-func loadDictsSettings() (map[string]*DictSettings, map[string]int, error) {
+func loadDictsSettings() (map[string]*common.DictSettings, map[string]int, error) {
 	order := map[string]int{}
-	settingsMap := map[string]*DictSettings{}
+	settingsMap := map[string]*common.DictSettings{}
 	fpath := filepath.Join(config.GetConfigDir(), dictsJsonFilename)
 	jsonBytes, err := ioutil.ReadFile(fpath)
 	if err != nil {
@@ -76,7 +70,7 @@ func loadDictsSettings() (map[string]*DictSettings, map[string]int, error) {
 	return settingsMap, order, nil
 }
 
-func saveDictsSettings(settingsMap map[string]*DictSettings) error {
+func saveDictsSettings(settingsMap map[string]*common.DictSettings) error {
 	jsonBytes, err := json.MarshalIndent(settingsMap, "", "\t")
 	if err != nil {
 		return err
@@ -99,8 +93,8 @@ func calcHashByDictInfo(info common.Info) string {
 	return fmt.Sprintf("%x", b_hash)
 }
 
-func newDictSetting(info common.Info, index int) *DictSettings {
-	return &DictSettings{
+func newDictSetting(info common.Info, index int) *common.DictSettings {
+	return &common.DictSettings{
 		Symbol: defaultDictSymbol(info.DictName()),
 		Order:  index,
 		Hash:   calcHashByDictInfo(info),
