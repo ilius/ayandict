@@ -382,7 +382,7 @@ func LookupHTML(
 		if dic.disabled || dic.dict == nil {
 			continue
 		}
-		for _, res := range dic.Search(query) {
+		for _, res := range dic.SearchFuzzy(query) {
 			results = append(results, &QueryResultImp{
 				SearchResult: res,
 				dic:          dic,

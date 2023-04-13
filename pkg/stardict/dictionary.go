@@ -77,9 +77,9 @@ func similarity(r1 []rune, r2 []rune) uint8 {
 	return uint8(200 * (n - levenshtein.ComputeDistance(r1, r2)) / n)
 }
 
-// Search: run a fuzzy search with similarity scores
+// SearchFuzzy: run a fuzzy search with similarity scores
 // ranging from 140 (which means %70) to 200 (which means 100%)
-func (d *Dictionary) Search(query string) []*SearchResult {
+func (d *Dictionary) SearchFuzzy(query string) []*SearchResult {
 	// if len(query) < 2 {
 	// 	return d.searchVeryShort(query)
 	// }
