@@ -18,6 +18,7 @@ import (
 const (
 	dictManager_up       = "Up"
 	dictManager_down     = "Down"
+	dictManager_openInfo = "Open Info File"
 	dictManager_openDirs = "Open Directories"
 
 	QS_dictManager = "dict_manager"
@@ -104,6 +105,11 @@ func NewDictManager(
 	}
 	toolbar.AddSeparator()
 	{
+		icon := style.StandardIcon(widgets.QStyle__SP_FileIcon, tbOpt, nil)
+		toolbar.AddAction2(icon, dictManager_openInfo)
+	}
+	toolbar.AddSeparator()
+	{
 		icon := style.StandardIcon(widgets.QStyle__SP_DirOpenIcon, tbOpt, nil)
 		toolbar.AddAction2(icon, dictManager_openDirs)
 	}
@@ -171,6 +177,26 @@ func NewDictManager(
 		}
 		table.SetCurrentCell(row+1, table.CurrentColumn())
 	}
+	openInfoFile := func() {
+		row := table.CurrentRow()
+		if row < 0 {
+			return
+		}
+		dictName := table.Item(row, 3).Text()
+		dic := dicMap[dictName]
+		if dic == nil {
+			qerr.Errorf("No dictionary %#v found", dictName)
+			return
+		}
+		path := dic.InfoPath()
+		if path == "" {
+			return
+		}
+		url := core.NewQUrl()
+		url.SetScheme("file")
+		url.SetPath(path, core.QUrl__TolerantMode)
+		gui.QDesktopServices_OpenUrl(url)
+	}
 	openFolder := func() {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
@@ -193,6 +219,8 @@ func NewDictManager(
 			toolbarUp()
 		case dictManager_down:
 			toolbarDown()
+		case dictManager_openInfo:
+			openInfoFile()
 		case dictManager_openDirs:
 			openFolder()
 		}

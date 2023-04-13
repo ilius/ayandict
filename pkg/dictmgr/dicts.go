@@ -137,6 +137,9 @@ func InitDicts(conf *config.Config) {
 	if err != nil {
 		panic(err)
 	}
+	for _, dic := range dicList {
+		dicMap[dic.DictName()] = dic
+	}
 
 	// to support another format, you can call pkg.Open just like stardict
 	// and append them new dicList to this dicList. since we are sorting them

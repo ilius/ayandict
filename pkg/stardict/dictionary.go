@@ -55,6 +55,10 @@ func (d *dictionaryImp) IndexPath() string {
 	return d.idxPath
 }
 
+func (d *dictionaryImp) InfoPath() string {
+	return d.ifoPath
+}
+
 func (d *dictionaryImp) Close() {
 	d.dict.Close()
 }

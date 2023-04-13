@@ -13,6 +13,7 @@ type Dictionary interface {
 	ResourceURL() string
 	IndexPath() string
 	IndexFileSize() uint64
+	InfoPath() string
 	CalcHash() ([]byte, error)
 	SearchFuzzy(query string) []*SearchResultLow
 }
