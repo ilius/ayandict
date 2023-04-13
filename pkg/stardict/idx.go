@@ -1,16 +1,14 @@
 package stardict
 
 import (
-	"bytes"
 	"encoding/binary"
-	"fmt"
 	"io/ioutil"
 )
 
 type IdxEntry struct {
-	Terms  []string
-	Offset uint64
-	Size   uint64
+	terms  []string
+	offset uint64
+	size   uint64
 }
 
 // Idx implements an in-memory index for a dictionary
@@ -19,15 +17,16 @@ type Idx struct {
 	terms        []*IdxEntry
 }
 
-// NewIdx initializes idx struct
-func NewIdx(entryCount int) *Idx {
-	idx := new(Idx)
+// newIdx initializes idx struct
+func newIdx(entryCount int) *Idx {
+	idx := &Idx{
+		byWordPrefix: map[rune][]int{},
+	}
 	if entryCount > 0 {
 		idx.terms = make([]*IdxEntry, 0, entryCount)
 	} else {
 		idx.terms = []*IdxEntry{}
 	}
-	idx.byWordPrefix = map[rune][]int{}
 	return idx
 }
 
@@ -35,9 +34,9 @@ func NewIdx(entryCount int) *Idx {
 func (idx *Idx) Add(term string, offset uint64, size uint64) int {
 	termIndex := len(idx.terms)
 	idx.terms = append(idx.terms, &IdxEntry{
-		Terms:  []string{term},
-		Offset: offset,
-		Size:   size,
+		terms:  []string{term},
+		offset: offset,
+		size:   size,
 	})
 	return termIndex
 }
@@ -62,7 +61,7 @@ func ReadIndex(filename string, synPath string, info *Info) (*Idx, error) {
 	if err != nil {
 		return nil, err
 	}
-	idx := NewIdx(entryCount)
+	idx := newIdx(entryCount)
 
 	wordPrefixMap := WordPrefixMap{}
 
@@ -124,41 +123,4 @@ func ReadIndex(filename string, synPath string, info *Info) (*Idx, error) {
 	}
 
 	return idx, err
-}
-
-func readSyn(idx *Idx, synPath string, wordPrefixMap WordPrefixMap) error {
-	data, err := ioutil.ReadFile(synPath)
-	// unable to read index
-	if err != nil {
-		return err
-	}
-	dataLen := len(data)
-	pos := 0
-	for pos < dataLen {
-		beg := pos
-		// Python: pos = data.find("\x00", beg)
-		offset := bytes.Index(data[beg:], []byte{0})
-		if offset < 0 {
-			return fmt.Errorf("Synonym file is corrupted")
-		}
-		pos = offset + beg
-		b_alt := data[beg:pos]
-		pos += 1
-		if pos+4 > len(data) {
-			return fmt.Errorf("Synonym file is corrupted")
-		}
-		termIndex := int(binary.BigEndian.Uint32(data[pos : pos+4]))
-		pos += 4
-		if termIndex >= len(idx.terms) {
-			return fmt.Errorf(
-				"Corrupted synonym file. Word %#v references invalid item",
-				string(b_alt),
-			)
-		}
-		alt := string(b_alt)
-		entry := idx.terms[termIndex]
-		entry.Terms = append(entry.Terms, alt)
-		wordPrefixMap.Add(alt, termIndex)
-	}
-	return nil
 }

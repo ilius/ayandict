@@ -15,8 +15,8 @@ import (
 	"github.com/ilius/ayandict/pkg/levenshtein"
 )
 
-// Dictionary stardict dictionary
-type Dictionary struct {
+// dictionaryImp stardict dictionary
+type dictionaryImp struct {
 	*Info
 
 	dict     *Dict
@@ -31,35 +31,35 @@ type Dictionary struct {
 	decodeData func(data []byte) []*common.SearchResultItem
 }
 
-func (d *Dictionary) Disabled() bool {
+func (d *dictionaryImp) Disabled() bool {
 	return d.disabled
 }
 
-func (d *Dictionary) Loaded() bool {
+func (d *dictionaryImp) Loaded() bool {
 	return d.dict != nil
 }
 
-func (d *Dictionary) SetDisabled(disabled bool) {
+func (d *dictionaryImp) SetDisabled(disabled bool) {
 	d.disabled = disabled
 }
 
-func (d *Dictionary) ResourceDir() string {
+func (d *dictionaryImp) ResourceDir() string {
 	return d.resDir
 }
 
-func (d *Dictionary) ResourceURL() string {
+func (d *dictionaryImp) ResourceURL() string {
 	return d.resURL
 }
 
-func (d *Dictionary) IndexPath() string {
+func (d *dictionaryImp) IndexPath() string {
 	return d.idxPath
 }
 
-func (d *Dictionary) Close() {
+func (d *dictionaryImp) Close() {
 	d.dict.Close()
 }
 
-func (d *Dictionary) CalcHash() ([]byte, error) {
+func (d *dictionaryImp) CalcHash() ([]byte, error) {
 	file, err := os.Open(d.idxPath)
 	defer file.Close()
 	if err != nil {
@@ -87,7 +87,7 @@ func similarity(r1 []rune, r2 []rune) uint8 {
 
 // SearchFuzzy: run a fuzzy search with similarity scores
 // ranging from 140 (which means %70) to 200 (which means 100%)
-func (d *Dictionary) SearchFuzzy(query string) []*common.SearchResultLow {
+func (d *dictionaryImp) SearchFuzzy(query string) []*common.SearchResultLow {
 	// if len(query) < 2 {
 	// 	return d.searchVeryShort(query)
 	// }
@@ -115,7 +115,7 @@ func (d *Dictionary) SearchFuzzy(query string) []*common.SearchResultLow {
 	}
 
 	chechEntry := func(entry *IdxEntry) uint8 {
-		terms := entry.Terms
+		terms := entry.terms
 		bestScore := uint8(0)
 		for termI, termOrig := range terms {
 			termJ := uint8(3)
@@ -185,9 +185,9 @@ func (d *Dictionary) SearchFuzzy(query string) []*common.SearchResultLow {
 		}
 		results = append(results, &common.SearchResultLow{
 			F_Score: score,
-			F_Terms: entry.Terms,
+			F_Terms: entry.terms,
 			Items: func() []*common.SearchResultItem {
-				return d.decodeData(d.dict.GetSequence(entry.Offset, entry.Size))
+				return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
 			},
 		})
 
@@ -200,7 +200,7 @@ func (d *Dictionary) SearchFuzzy(query string) []*common.SearchResultLow {
 	return results
 }
 
-func (d *Dictionary) decodeWithSametypesequence(data []byte) (items []*common.SearchResultItem) {
+func (d *dictionaryImp) decodeWithSametypesequence(data []byte) (items []*common.SearchResultItem) {
 	seq := d.Options["sametypesequence"]
 
 	seqLen := len(seq)
@@ -233,7 +233,7 @@ func (d *Dictionary) decodeWithSametypesequence(data []byte) (items []*common.Se
 	return
 }
 
-func (d *Dictionary) decodeWithoutSametypesequence(data []byte) (items []*common.SearchResultItem) {
+func (d *dictionaryImp) decodeWithoutSametypesequence(data []byte) (items []*common.SearchResultItem) {
 	var dataPos int
 	dataSize := len(data)
 
@@ -268,15 +268,15 @@ func (d *Dictionary) decodeWithoutSametypesequence(data []byte) (items []*common
 }
 
 // DictName returns book name
-func (d *Dictionary) DictName() string {
+func (d *dictionaryImp) DictName() string {
 	return d.Options["bookname"]
 }
 
 // NewDictionary returns a new Dictionary
 // path - path to dictionary files
 // name - name of dictionary to parse
-func NewDictionary(path string, name string) (*Dictionary, error) {
-	d := new(Dictionary)
+func NewDictionary(path string, name string) (*dictionaryImp, error) {
+	d := new(dictionaryImp)
 
 	path = filepath.Clean(path)
 
@@ -328,7 +328,7 @@ func NewDictionary(path string, name string) (*Dictionary, error) {
 	return d, nil
 }
 
-func (d *Dictionary) Load() error {
+func (d *dictionaryImp) Load() error {
 	{
 		idx, err := ReadIndex(d.idxPath, d.synPath, d.Info)
 		if err != nil {
