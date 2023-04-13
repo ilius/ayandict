@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/qerr"
 )
 
@@ -20,8 +21,8 @@ func isDir(pathStr string) bool {
 }
 
 // Open open directories
-func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
-	var dicList []*Dictionary
+func Open(dirPathList []string, order map[string]int) ([]common.Dictionary, error) {
+	var dicList []common.Dictionary
 	const ext = ".ifo"
 
 	walkFunc := func(path string, fi os.FileInfo, err error) error {
@@ -42,7 +43,7 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 			return err
 		}
 		if order[dic.DictName()] < 0 {
-			dic.Disabled = true
+			dic.disabled = true
 			dicList = append(dicList, dic)
 			return nil
 		}
@@ -71,19 +72,18 @@ func Open(dirPathList []string, order map[string]int) ([]*Dictionary, error) {
 		}
 	}
 	var wg sync.WaitGroup
-	load := func(dic *Dictionary) {
+	load := func(dic common.Dictionary) {
 		defer wg.Done()
-		// log.Printf("Loading index %#v\n", dic.idxPath)
-		err = dic.load()
+		err = dic.Load()
 		if err != nil {
 			qerr.Errorf("error loading %#v: %v", dic.DictName(), err)
 			log.Printf("error loading %#v: %v", dic.DictName(), err)
 		} else {
-			log.Printf("Loaded index %#v\n", dic.idxPath)
+			log.Printf("Loaded index %#v\n", dic.IndexPath())
 		}
 	}
 	for _, dic := range dicList {
-		if dic.Disabled {
+		if dic.Disabled() {
 			continue
 		}
 		wg.Add(1)

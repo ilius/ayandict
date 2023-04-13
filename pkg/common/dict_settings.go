@@ -6,7 +6,7 @@ type DictSettings struct {
 	Hash   string `json:"hash"`
 }
 
-func NewDictSettings(info Info, index int) *DictSettings {
+func NewDictSettings(info Dictionary, index int) *DictSettings {
 	return &DictSettings{
 		Symbol: DefaultSymbol(info.DictName()),
 		Order:  index,

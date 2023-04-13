@@ -1,4 +1,4 @@
-package stardict
+package dictmgr
 
 import (
 	"bytes"
@@ -10,10 +10,8 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/config"
@@ -31,123 +29,6 @@ var (
 
 	hrefBwordSpaceRE = regexp.MustCompile(` href="bword://[^<>"]*?( |%20)[^<>" ]*?"`)
 )
-
-var (
-	dicList  []*Dictionary
-	dicMap   = map[string]*Dictionary{}
-	infoList []common.Info
-)
-
-type QueryResultImp struct {
-	*SearchResult
-	dic    *Dictionary
-	conf   *config.Config
-	hDefis []string
-}
-
-func (r *QueryResultImp) DictName() string {
-	return r.dic.DictName()
-}
-
-func (r *QueryResultImp) Score() uint8 {
-	return r.score
-}
-
-func (r *QueryResultImp) Terms() []string {
-	return r.terms
-}
-
-func (r *QueryResultImp) DefinitionsHTML() []string {
-	if r.hDefis != nil {
-		return r.hDefis
-	}
-	definitions := []string{}
-	resURL := r.dic.ResourceURL()
-	for _, item := range r.items() {
-		if item.Type == 'h' {
-			itemDefi := string(item.Data)
-			itemDefi = fixDefiHTML(itemDefi, resURL, r.conf, r.dic)
-			definitions = append(definitions, itemDefi+"<br/>\n")
-			continue
-		}
-		definitions = append(definitions, fmt.Sprintf(
-			"<pre>%s</pre>\n<br/>\n",
-			std_html.EscapeString(string(item.Data)),
-		))
-	}
-	r.hDefis = definitions
-	return definitions
-}
-
-func (r *QueryResultImp) ResourceDir() string {
-	return r.dic.resDir
-}
-
-type DicListSorter struct {
-	Order map[string]int
-	List  []*Dictionary
-}
-
-func (s DicListSorter) Len() int {
-	return len(s.List)
-}
-
-func (s DicListSorter) Swap(i, j int) {
-	s.List[i], s.List[j] = s.List[j], s.List[i]
-}
-
-func absInt(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
-func (s DicListSorter) Less(i, j int) bool {
-	return absInt(s.Order[s.List[i].DictName()]) < absInt(s.Order[s.List[j].DictName()])
-}
-
-func Init(directoryList []string, order map[string]int) []common.Info {
-	t := time.Now()
-	var err error
-	dicList, err = Open(directoryList, order)
-	if err != nil {
-		panic(err)
-	}
-	log.Println("Loading dictionaries took", time.Now().Sub(t))
-	Reorder(order)
-	infoList = make([]common.Info, len(dicList))
-	for i, dic := range dicList {
-		infoList[i] = dic
-	}
-	return infoList
-}
-
-func GetInfoList() []common.Info {
-	return infoList
-}
-
-func ByDictName(dictName string) *Dictionary {
-	return dicMap[dictName]
-}
-
-func Reorder(order map[string]int) {
-	sort.Sort(DicListSorter{
-		List:  dicList,
-		Order: order,
-	})
-}
-
-func ApplyDictsOrder(order map[string]int) {
-	Reorder(order)
-	for _, dic := range dicList {
-		disabled := dic.Disabled
-		dic.Disabled = order[dic.DictName()] < 0
-		if disabled && !dic.Disabled {
-			dic.load()
-		}
-	}
-}
 
 func fixResURL(quoted string, resURL string) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
@@ -350,7 +231,7 @@ func fixDefiHTML(
 	defi string,
 	resURL string,
 	conf *config.Config,
-	dic *Dictionary,
+	dic common.Dictionary,
 ) string {
 	if resURL != "" {
 		defi = fixFileSrc(defi, resURL)
@@ -360,55 +241,11 @@ func fixDefiHTML(
 		defi = fixAudioTag(defi, resURL)
 	}
 	if conf.EmbedExternalStylesheet {
-		defi = embedExternalStyle(defi, dic.resDir)
+		defi = embedExternalStyle(defi, dic.ResourceDir())
 	}
 	defi = hrefBwordSpaceRE.ReplaceAllStringFunc(defi, hrefBwordSpaceSub)
 	if len(conf.ColorMapping) > 0 {
 		defi = applyColorMapping(defi, conf.ColorMapping)
 	}
 	return defi
-}
-
-func LookupHTML(
-	query string,
-	conf *config.Config,
-	dictsOrder map[string]int,
-) []common.QueryResult {
-	results := []common.QueryResult{}
-	for _, dic := range dicList {
-		if dic.Disabled || dic.dict == nil {
-			continue
-		}
-		for _, res := range dic.SearchFuzzy(query) {
-			results = append(results, &QueryResultImp{
-				SearchResult: res,
-				dic:          dic,
-				conf:         conf,
-			})
-		}
-	}
-	sort.Slice(results, func(i, j int) bool {
-		res1 := results[i]
-		res2 := results[j]
-		score1 := res1.Score()
-		score2 := res2.Score()
-		if score1 != score2 {
-			return score1 > score2
-		}
-		return dictsOrder[res1.DictName()] < dictsOrder[res2.DictName()]
-	})
-	cutoff := conf.MaxResultsTotal
-	if cutoff > 0 && len(results) > cutoff {
-		results = results[:cutoff]
-	}
-	return results
-}
-
-func CloseDictFiles() {
-	for _, dic := range dicList {
-		if dic.Disabled {
-			continue
-		}
-		dic.dict.Close()
-	}
 }

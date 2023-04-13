@@ -62,9 +62,9 @@ func NewResultListWidget(
 type ResultListWidget struct {
 	*widgets.QListWidget
 
-	results []common.QueryResult
+	results []common.SearchResultIface
 
-	Active common.QueryResult
+	Active common.SearchResultIface
 
 	HeaderLabel *HeaderLabel
 	ArticleView *ArticleView
@@ -72,7 +72,7 @@ type ResultListWidget struct {
 	onResultDisplay func(terms []string)
 }
 
-func (w *ResultListWidget) SetResults(results []common.QueryResult) {
+func (w *ResultListWidget) SetResults(results []common.SearchResultIface) {
 	w.QListWidget.Clear()
 	w.results = results
 	for _, res := range results {

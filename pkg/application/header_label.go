@@ -17,7 +17,7 @@ type HeaderLabel struct {
 
 	app *Application
 
-	result common.QueryResult
+	result common.SearchResultIface
 
 	doQuery func(string)
 }
@@ -49,7 +49,7 @@ func (label *HeaderLabel) SetText(text string) {
 	parent.AdjustSize()
 }
 
-func (label *HeaderLabel) SetResult(res common.QueryResult) {
+func (label *HeaderLabel) SetResult(res common.SearchResultIface) {
 	label.result = res
 	terms := res.Terms()
 	termsJoined := html.EscapeString(strings.Join(terms, " | "))

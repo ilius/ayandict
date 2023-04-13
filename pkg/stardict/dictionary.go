@@ -11,20 +11,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/levenshtein"
 )
-
-// SearchResultItem contain single translation item
-type SearchResultItem struct {
-	Data []byte
-	Type rune
-}
-
-type SearchResult struct {
-	items func() []*SearchResultItem
-	terms []string
-	score uint8
-}
 
 // Dictionary stardict dictionary
 type Dictionary struct {
@@ -39,7 +28,19 @@ type Dictionary struct {
 	resDir   string
 	resURL   string
 
-	decodeData func(data []byte) []*SearchResultItem
+	decodeData func(data []byte) []*common.SearchResultItem
+}
+
+func (d *Dictionary) Disabled() bool {
+	return d.disabled
+}
+
+func (d *Dictionary) Loaded() bool {
+	return d.dict != nil
+}
+
+func (d *Dictionary) SetDisabled(disabled bool) {
+	d.disabled = disabled
 }
 
 func (d *Dictionary) ResourceDir() string {
@@ -48,6 +49,14 @@ func (d *Dictionary) ResourceDir() string {
 
 func (d *Dictionary) ResourceURL() string {
 	return d.resURL
+}
+
+func (d *Dictionary) IndexPath() string {
+	return d.idxPath
+}
+
+func (d *Dictionary) Close() {
+	d.dict.Close()
 }
 
 func (d *Dictionary) CalcHash() ([]byte, error) {
@@ -78,12 +87,12 @@ func similarity(r1 []rune, r2 []rune) uint8 {
 
 // SearchFuzzy: run a fuzzy search with similarity scores
 // ranging from 140 (which means %70) to 200 (which means 100%)
-func (d *Dictionary) SearchFuzzy(query string) []*SearchResult {
+func (d *Dictionary) SearchFuzzy(query string) []*common.SearchResultLow {
 	// if len(query) < 2 {
 	// 	return d.searchVeryShort(query)
 	// }
 	idx := d.idx
-	results := []*SearchResult{}
+	results := []*common.SearchResultLow{}
 
 	query = strings.ToLower(strings.TrimSpace(query))
 	queryWords := strings.Split(query, " ")
@@ -174,10 +183,10 @@ func (d *Dictionary) SearchFuzzy(query string) []*SearchResult {
 		if score < minScore {
 			continue
 		}
-		results = append(results, &SearchResult{
-			score: score,
-			terms: entry.Terms,
-			items: func() []*SearchResultItem {
+		results = append(results, &common.SearchResultLow{
+			F_Score: score,
+			F_Terms: entry.Terms,
+			Items: func() []*common.SearchResultItem {
 				return d.decodeData(d.dict.GetSequence(entry.Offset, entry.Size))
 			},
 		})
@@ -191,7 +200,7 @@ func (d *Dictionary) SearchFuzzy(query string) []*SearchResult {
 	return results
 }
 
-func (d *Dictionary) decodeWithSametypesequence(data []byte) (items []*SearchResultItem) {
+func (d *Dictionary) decodeWithSametypesequence(data []byte) (items []*common.SearchResultItem) {
 	seq := d.Options["sametypesequence"]
 
 	seqLen := len(seq)
@@ -204,18 +213,18 @@ func (d *Dictionary) decodeWithSametypesequence(data []byte) (items []*SearchRes
 		case 'm', 'l', 'g', 't', 'x', 'y', 'k', 'w', 'h', 'r':
 			// if last seq item
 			if i == seqLen-1 {
-				items = append(items, &SearchResultItem{Type: t, Data: data[dataPos:dataSize]})
+				items = append(items, &common.SearchResultItem{Type: t, Data: data[dataPos:dataSize]})
 			} else {
 				end := bytes.IndexRune(data[dataPos:], '\000')
-				items = append(items, &SearchResultItem{Type: t, Data: data[dataPos : dataPos+end+1]})
+				items = append(items, &common.SearchResultItem{Type: t, Data: data[dataPos : dataPos+end+1]})
 				dataPos += end + 1
 			}
 		case 'W', 'P':
 			if i == seqLen-1 {
-				items = append(items, &SearchResultItem{Type: t, Data: data[dataPos:dataSize]})
+				items = append(items, &common.SearchResultItem{Type: t, Data: data[dataPos:dataSize]})
 			} else {
 				size := binary.BigEndian.Uint32(data[dataPos : dataPos+4])
-				items = append(items, &SearchResultItem{Type: t, Data: data[dataPos+4 : dataPos+int(size)+5]})
+				items = append(items, &common.SearchResultItem{Type: t, Data: data[dataPos+4 : dataPos+int(size)+5]})
 				dataPos += int(size) + 5
 			}
 		}
@@ -224,7 +233,7 @@ func (d *Dictionary) decodeWithSametypesequence(data []byte) (items []*SearchRes
 	return
 }
 
-func (d *Dictionary) decodeWithoutSametypesequence(data []byte) (items []*SearchResultItem) {
+func (d *Dictionary) decodeWithoutSametypesequence(data []byte) (items []*common.SearchResultItem) {
 	var dataPos int
 	dataSize := len(data)
 
@@ -238,15 +247,15 @@ func (d *Dictionary) decodeWithoutSametypesequence(data []byte) (items []*Search
 			end := bytes.IndexRune(data[dataPos:], '\000')
 
 			if end < 0 { // last item
-				items = append(items, &SearchResultItem{Type: rune(t), Data: data[dataPos:dataSize]})
+				items = append(items, &common.SearchResultItem{Type: rune(t), Data: data[dataPos:dataSize]})
 				dataPos = dataSize
 			} else {
-				items = append(items, &SearchResultItem{Type: rune(t), Data: data[dataPos : dataPos+end+1]})
+				items = append(items, &common.SearchResultItem{Type: rune(t), Data: data[dataPos : dataPos+end+1]})
 				dataPos += end + 1
 			}
 		case 'W', 'P':
 			size := binary.BigEndian.Uint32(data[dataPos : dataPos+4])
-			items = append(items, &SearchResultItem{Type: rune(t), Data: data[dataPos+4 : dataPos+int(size)+5]})
+			items = append(items, &common.SearchResultItem{Type: rune(t), Data: data[dataPos+4 : dataPos+int(size)+5]})
 			dataPos += int(size) + 5
 		}
 
@@ -319,7 +328,7 @@ func NewDictionary(path string, name string) (*Dictionary, error) {
 	return d, nil
 }
 
-func (d *Dictionary) load() error {
+func (d *Dictionary) Load() error {
 	{
 		idx, err := ReadIndex(d.idxPath, d.synPath, d.Info)
 		if err != nil {

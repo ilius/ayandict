@@ -7,7 +7,7 @@ import (
 	"github.com/ilius/ayandict/pkg/qerr"
 )
 
-func Hash(info Info) string {
+func Hash(info Dictionary) string {
 	log.Println("Calculating hash for", info.DictName())
 	b_hash, err := info.CalcHash()
 	if err != nil {

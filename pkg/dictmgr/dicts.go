@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
+	"time"
 
 	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/config"
@@ -18,9 +20,42 @@ import (
 const dictsJsonFilename = "dicts.json"
 
 var (
+	dicList         []common.Dictionary
+	dicMap          = map[string]common.Dictionary{}
 	dictsOrder      map[string]int
 	dictSettingsMap = map[string]*common.DictSettings{}
 )
+
+func absInt(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
+type DicListSorter struct {
+	Order map[string]int
+	List  []common.Dictionary
+}
+
+func (s DicListSorter) Len() int {
+	return len(s.List)
+}
+
+func (s DicListSorter) Swap(i, j int) {
+	s.List[i], s.List[j] = s.List[j], s.List[i]
+}
+
+func (s DicListSorter) Less(i, j int) bool {
+	return absInt(s.Order[s.List[i].DictName()]) < absInt(s.Order[s.List[j].DictName()])
+}
+
+func Reorder(order map[string]int) {
+	sort.Sort(DicListSorter{
+		List:  dicList,
+		Order: order,
+	})
+}
 
 func loadingDictsPopup(conf *config.Config) *widgets.QLabel {
 	popup := widgets.NewQLabel2(
@@ -85,9 +120,17 @@ func InitDicts(conf *config.Config) {
 	if err != nil {
 		qerr.Errorf("Error reading dicts.json: %v", err)
 	}
-	infoList := stardict.Init(conf.DirectoryList, dictsOrder)
+
+	t := time.Now()
+	dicList, err = stardict.Open(conf.DirectoryList, dictsOrder)
+	if err != nil {
+		panic(err)
+	}
+	log.Println("Loading dictionaries took", time.Now().Sub(t))
+	Reorder(dictsOrder)
+
 	modified := false
-	for index, info := range infoList {
+	for index, info := range dicList {
 		dictName := info.DictName()
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
@@ -113,7 +156,12 @@ func InitDicts(conf *config.Config) {
 }
 
 func CloseDicts() {
-	stardict.CloseDictFiles()
+	for _, dic := range dicList {
+		if dic.Disabled() {
+			continue
+		}
+		dic.Close()
+	}
 }
 
 func DictSymbol(dictName string) string {

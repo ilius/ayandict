@@ -10,7 +10,6 @@ import (
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/ilius/ayandict/pkg/settings"
-	"github.com/ilius/ayandict/pkg/stardict"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
@@ -30,8 +29,8 @@ type DictManager struct {
 	TextWidgets []common.HasSetFont
 }
 
-func makeDictInfoMap(infos []common.Info) map[string]common.Info {
-	infoMap := make(map[string]common.Info, len(infos))
+func makeDictInfoMap(infos []common.Dictionary) map[string]common.Dictionary {
+	infoMap := make(map[string]common.Dictionary, len(infos))
 	for _, info := range infos {
 		infoMap[info.DictName()] = info
 	}
@@ -43,8 +42,7 @@ func NewDictManager(
 	parent widgets.QWidget_ITF,
 	conf *config.Config,
 ) *DictManager {
-	infoList := stardict.GetInfoList()
-	infoMap := makeDictInfoMap(infoList)
+	infoMap := makeDictInfoMap(dicList)
 
 	window := widgets.NewQDialog(parent, core.Qt__Dialog)
 	window.SetWindowTitle("Dictionaries")
@@ -214,8 +212,8 @@ func NewDictManager(
 	mainBox.AddLayout(mainHBox, 1)
 	mainBox.AddWidget(buttonBox, 0, 0)
 
-	table.SetRowCount(len(infoList))
-	for index, info := range infoList {
+	table.SetRowCount(len(dicList))
+	for index, info := range dicList {
 		dictName := info.DictName()
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
@@ -284,7 +282,16 @@ func (dm *DictManager) Run() bool {
 	}
 	dictsOrder = dm.updateMap()
 
-	stardict.ApplyDictsOrder(dictsOrder)
+	Reorder(dictsOrder)
+
+	for _, dic := range dicList {
+		disabled := dic.Disabled()
+		dic.SetDisabled(dictsOrder[dic.DictName()] < 0)
+		if disabled && !dic.Disabled() {
+			dic.Load()
+		}
+	}
+
 	err := saveDictsSettings(dictSettingsMap)
 	if err != nil {
 		qerr.Error(err)
