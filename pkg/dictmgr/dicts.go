@@ -111,6 +111,17 @@ func saveDictsSettings(settingsMap map[string]*common.DictSettings) error {
 	return nil
 }
 
+func getDictNameByHashMap() map[string][]string {
+	byHash := map[string][]string{}
+	for dictName, ds := range dictSettingsMap {
+		if ds.Hash == "" {
+			continue
+		}
+		byHash[ds.Hash] = append(byHash[ds.Hash], dictName)
+	}
+	return byHash
+}
+
 func InitDicts(conf *config.Config) {
 	var err error
 	popup := loadingDictsPopup(conf)
@@ -133,20 +144,41 @@ func InitDicts(conf *config.Config) {
 
 	log.Println("Loading dictionaries took", time.Now().Sub(t))
 
-	Reorder(dictsOrder)
+	nameByHash := getDictNameByHashMap()
+
+	newDictSettings := func(dic common.Dictionary, index int) *common.DictSettings {
+		hash := common.Hash(dic)
+		if hash != "" {
+			prevNames := nameByHash[hash]
+			if len(prevNames) > 0 {
+				log.Println("init: found renamed dicts:", prevNames)
+				prevName := prevNames[0]
+				ds := dictSettingsMap[prevName]
+				delete(dictSettingsMap, prevName)
+				return ds
+			}
+		}
+		return &common.DictSettings{
+			Symbol: common.DefaultSymbol(dic.DictName()),
+			Order:  index,
+			Hash:   hash,
+		}
+	}
 
 	modified := false
-	for index, info := range dicList {
-		dictName := info.DictName()
+	for index, dic := range dicList {
+		dictName := dic.DictName()
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
 			log.Printf("init: found new dict: %v\n", dictName)
-			dictSettingsMap[dictName] = common.NewDictSettings(info, index)
+			ds = newDictSettings(dic, index)
+			dictSettingsMap[dictName] = ds
+			dictsOrder[dictName] = ds.Order
 			modified = true
 			continue
 		}
 		if ds.Hash == "" {
-			hash := common.Hash(info)
+			hash := common.Hash(dic)
 			if hash != "" {
 				ds.Hash = hash
 				modified = true
@@ -159,6 +191,8 @@ func InitDicts(conf *config.Config) {
 			qerr.Error(err)
 		}
 	}
+
+	Reorder(dictsOrder)
 }
 
 func CloseDicts() {
