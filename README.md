@@ -1,6 +1,6 @@
 # AyanDict
 
-A simple and minimalistic cross-platform desktop dictionary application based on Qt framework and written in Go that uses StarDict dictionary format.
+A simple cross-platform desktop dictionary application based on Qt framework and written in Go that uses StarDict dictionary format.
 
 It is designed for desktop and it should run on every desktop operating system that Qt supports. It is tested on Linux and Windows, and it should run perfectly on Mac, FreeBSD and other modern Unix-like systems. I will upload binaries for Linux, Windows and Mac (and maybe FreeBSD).
 
@@ -109,7 +109,7 @@ There are tons of web pages that let you download various usable dictionaries, b
 - [@itkach/slob/wiki/Dictionaries](https://github.com/itkach/slob/wiki/Dictionaries)
 - [goldendict.org](http://goldendict.org/dictionaries.php)
 - [huzheng.org](http://www.huzheng.org/stardict/)
-- My repos: [@ilius/dict](https://github.com/ilius/dict) and [Persian Aryanpour in FreeDict](https://github.com/ilius/aryanpour-tei)
+- My repositories: [@ilius/dict](https://github.com/ilius/dict) and [Persian Aryanpour in FreeDict](https://github.com/ilius/aryanpour-tei)
 - [tuxor1337.frama.io](https://tuxor1337.frama.io/firedict/dictionaries.html)
 - [XDXF on SourceForge](https://sourceforge.net/projects/xdxf/files/)
 - [GoldenDict on SourceForge](https://sourceforge.net/projects/goldendict/files/dictionaries/)
@@ -118,7 +118,7 @@ There are tons of web pages that let you download various usable dictionaries, b
 # Keyboard bindings/shortcuts
 
 - **Escape**: clear the input query and results
-- **Space**: (while not typing in query entry) change keyboard focus to query entry
+- **Space**: (while query entry is not focused) change keyboard focus to query entry
 - **`+`** or **`=`**: Zoom in (article/definition/translation)
 - **`-`**: Zoom out (article/definition/translation)
 
