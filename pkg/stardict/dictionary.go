@@ -76,7 +76,7 @@ func (d *dictionaryImp) CalcHash() ([]byte, error) {
 	return hash.Sum(nil), nil
 }
 
-func similarity(r1 []rune, r2 []rune) uint8 {
+func similarity(r1 []rune, r2 []rune, subtract uint8) uint8 {
 	if len(r1) > len(r2) {
 		r1, r2 = r2, r1
 	}
@@ -86,7 +86,11 @@ func similarity(r1 []rune, r2 []rune) uint8 {
 		// this optimization assumes we want to ignore below %66 similarity
 		return 0
 	}
-	return uint8(200 * (n - levenshtein.ComputeDistance(r1, r2)) / n)
+	score := uint8(200 * (n - levenshtein.ComputeDistance(r1, r2)) / n)
+	if score <= subtract {
+		return 0
+	}
+	return score - subtract
 }
 
 // SearchFuzzy: run a fuzzy search with similarity scores
@@ -122,36 +126,32 @@ func (d *dictionaryImp) SearchFuzzy(query string) []*common.SearchResultLow {
 		terms := entry.terms
 		bestScore := uint8(0)
 		for termI, termOrig := range terms {
-			termJ := uint8(3)
+			subtract := uint8(3)
 			if termI < 3 {
-				termJ = uint8(termI)
+				subtract = uint8(termI)
 			}
 			term := strings.ToLower(termOrig)
 			if term == query {
-				return 200 - termJ
+				return 200 - subtract
 			}
 			words := strings.Split(term, " ")
 			if len(words) < minWordCount {
 				continue
 			}
-			score := similarity(queryRunes, []rune(term))
-			if score > 50 {
-				score -= termJ
-				if score > bestScore {
-					bestScore = score
-					if score >= 180 {
-						continue
-					}
+			score := similarity(queryRunes, []rune(term), subtract)
+			if score > bestScore {
+				bestScore = score
+				if score >= 180 {
+					continue
 				}
 			}
 			if len(words) > 1 {
 				bestWordScore := uint8(0)
 				for wordI, word := range words {
-					wordScore := similarity(queryMainWord, []rune(word))
+					wordScore := similarity(queryMainWord, []rune(word), subtract)
 					if wordScore < 50 {
 						continue
 					}
-					wordScore -= termJ
 					if wordI == mainWordIndex {
 						wordScore -= 1
 					} else {
