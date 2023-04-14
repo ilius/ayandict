@@ -70,7 +70,7 @@ func SaveHistory() {
 	}
 	err = ioutil.WriteFile(historyFilePath(), jsonBytes, 0o644)
 	if err != nil {
-		qerr.Error("Error saving history: %v", err)
+		qerr.Errorf("Error saving history: %v", err)
 	}
 }
 
