@@ -135,14 +135,13 @@ func (d *dictionaryImp) SearchFuzzy(query string) []*common.SearchResultLow {
 				continue
 			}
 			score := similarity(queryRunes, []rune(term))
-			if score < 50 {
-				continue
-			}
-			score -= termJ
-			if score > bestScore {
-				bestScore = score
-				if score >= 180 {
-					continue
+			if score > 50 {
+				score -= termJ
+				if score > bestScore {
+					bestScore = score
+					if score >= 180 {
+						continue
+					}
 				}
 			}
 			if len(words) > 1 {
