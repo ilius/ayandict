@@ -7,16 +7,33 @@ import (
 	"github.com/ilius/ayandict/pkg/config"
 )
 
+type QueryMode uint8
+
+const (
+	QueryModeFuzzy QueryMode = iota
+	QueryModeStartWith
+)
+
+func search(dic common.Dictionary, mode QueryMode, query string) []*common.SearchResultLow {
+	switch mode {
+	case QueryModeStartWith:
+		return dic.SearchStartWith(query)
+	}
+	return dic.SearchFuzzy(query)
+}
+
 func LookupHTML(
 	query string,
 	conf *config.Config,
+	mode QueryMode,
 ) []common.SearchResultIface {
 	results := []common.SearchResultIface{}
+
 	for _, dic := range dicList {
 		if dic.Disabled() || !dic.Loaded() {
 			continue
 		}
-		for _, res := range dic.SearchFuzzy(query) {
+		for _, res := range search(dic, mode, query) {
 			results = append(results, &SearchResult{
 				SearchResultLow: res,
 				dic:             dic,

@@ -81,6 +81,12 @@ func (app *Application) Run() {
 	// to reduce inner margins:
 	entry.SetTextMargins(0, -3, 0, -3)
 
+	queryModeCombo := widgets.NewQComboBox(nil)
+	queryModeCombo.AddItems([]string{
+		"Fuzzy",
+		"Start with",
+	})
+
 	okButton := widgets.NewQPushButton2("OK", nil)
 
 	queryFavoriteButton := NewPNGIconTextButton("", "favorite.png")
@@ -100,6 +106,7 @@ func (app *Application) Run() {
 	queryBoxLayout.SetSpacing(10)
 	queryBoxLayout.AddWidget(queryLabel, 0, 0)
 	queryBoxLayout.AddWidget(entry, 0, 0)
+	queryBoxLayout.AddWidget(queryModeCombo, 0, 0)
 	queryBoxLayout.AddWidget(queryFavoriteButton, 0, 0)
 	queryBoxLayout.AddWidget(okButton, 0, 0)
 
@@ -284,6 +291,7 @@ func (app *Application) Run() {
 		HeaderLabel: headerLabel,
 		HistoryView: historyView,
 		PostQuery:   postQuery,
+		ModeCombo:   queryModeCombo,
 	}
 
 	doQuery := func(query string) {

@@ -122,7 +122,7 @@ func (d *dictionaryImp) SearchFuzzy(query string) []*common.SearchResultLow {
 		queryWordCount++
 	}
 
-	chechEntry := func(entry *IdxEntry) uint8 {
+	checkEntry := func(entry *IdxEntry) uint8 {
 		terms := entry.terms
 		bestScore := uint8(0)
 		for termI, termOrig := range terms {
@@ -182,7 +182,7 @@ func (d *dictionaryImp) SearchFuzzy(query string) []*common.SearchResultLow {
 
 	for _, termIndex := range idx.byWordPrefix[prefix] {
 		entry := idx.terms[termIndex]
-		score := chechEntry(entry)
+		score := checkEntry(entry)
 		if score < minScore {
 			continue
 		}
@@ -193,14 +193,71 @@ func (d *dictionaryImp) SearchFuzzy(query string) []*common.SearchResultLow {
 				return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
 			},
 		})
-
 	}
 	dt := time.Now().Sub(t1)
 	if dt > time.Millisecond {
-		log.Printf("Search index loop took %v for %#v on %s\n", dt, query, d.DictName())
+		log.Printf("SearchFuzzy index loop took %v for %#v on %s\n", dt, query, d.DictName())
 	}
 	// log.Printf("Search produced %d results for %#v on %s\n", len(results), query, d.DictName())
 	return results
+}
+
+func (d *dictionaryImp) SearchStartWith(query string) []*common.SearchResultLow {
+	idx := d.idx
+	results := []*common.SearchResultLow{}
+
+	query = strings.ToLower(strings.TrimSpace(query))
+	queryRunes := []rune(query)
+
+	checkEntry := func(entry *IdxEntry) uint8 {
+		terms := entry.terms
+		bestScore := uint8(0)
+		for termI, termOrig := range terms {
+			term := strings.ToLower(termOrig)
+			if !strings.HasPrefix(term, query) {
+				continue
+			}
+			subtract := uint8(3)
+			if termI < 3 {
+				subtract = uint8(termI)
+			}
+			deltaLen := len(term) - len(query)
+			subtract2 := uint8(20)
+			if deltaLen < 20 {
+				subtract2 = uint8(deltaLen)
+			}
+			score := 200 - subtract - subtract2
+			if score > bestScore {
+				bestScore = score
+			}
+		}
+		return bestScore
+	}
+
+	t1 := time.Now()
+	prefix := queryRunes[0]
+	const minScore = uint8(140)
+	for _, termIndex := range idx.byWordPrefix[prefix] {
+		entry := idx.terms[termIndex]
+		score := checkEntry(entry)
+		if score < minScore {
+			continue
+		}
+		results = append(results, &common.SearchResultLow{
+			F_Score: score,
+			F_Terms: entry.terms,
+			Items: func() []*common.SearchResultItem {
+				return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
+			},
+		})
+	}
+	dt := time.Now().Sub(t1)
+	if dt > time.Millisecond {
+		log.Printf("SearchStartWith index loop took %v for %#v on %s\n", dt, query, d.DictName())
+	}
+	// log.Printf("Search produced %d results for %#v on %s\n", len(results), query, d.DictName())
+	return results
+
 }
 
 func (d *dictionaryImp) decodeWithSametypesequence(data []byte) (items []*common.SearchResultItem) {

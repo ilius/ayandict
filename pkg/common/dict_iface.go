@@ -16,4 +16,5 @@ type Dictionary interface {
 	InfoPath() string
 	CalcHash() ([]byte, error)
 	SearchFuzzy(query string) []*SearchResultLow
+	SearchStartWith(query string) []*SearchResultLow
 }

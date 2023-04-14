@@ -17,6 +17,7 @@ type QueryArgs struct {
 	HeaderLabel *HeaderLabel
 	HistoryView *HistoryView
 	PostQuery   func(string)
+	ModeCombo   *widgets.QComboBox
 }
 
 func (w *QueryArgs) AddHistoryAndFrequency(query string) {
@@ -151,7 +152,12 @@ func onQuery(
 	}
 	// log.Printf("Query: %s\n", query)
 	t := time.Now()
-	results := dictmgr.LookupHTML(query, conf)
+	mode := dictmgr.QueryModeFuzzy
+	switch queryWidgets.ModeCombo.CurrentIndex() {
+	case 1:
+		mode = dictmgr.QueryModeStartWith
+	}
+	results := dictmgr.LookupHTML(query, conf, mode)
 	log.Printf("LookupHTML took %v for %#v", time.Now().Sub(t), query)
 	queryWidgets.ResultList.SetResults(results)
 	if len(results) == 0 {
