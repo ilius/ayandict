@@ -335,6 +335,7 @@ func (app *Application) Run() {
 		resultList,
 		rightPanel,
 	}
+	ReloadFont(app)
 
 	resetQuery := func() {
 		entry.SetText("")
