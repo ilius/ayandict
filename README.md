@@ -8,7 +8,7 @@ StarDict is the only supported format for now, and by default, it reads all Star
 
 # Installation
 
-If you don't have Go langauge on your system, you can check [Releases](https://github.com/ilius/ayandict/releases) and download the latest binary for your platform if available.
+If you don't have Go language on your system, you can check [Releases](https://github.com/ilius/ayandict/releases) and download the latest binary for your platform if available.
 
 If you have Go, you can compile and install the latest code with
 
@@ -16,7 +16,7 @@ If you have Go, you can compile and install the latest code with
 go install github.com/ilius/ayandict@latest
 ```
 
-Or clone the reposotory, `cd` to it and run `go build`, which will create the binary (`ayandict.exe` or `ayandict`) in this directory.
+Or clone the repository, `cd` to it and run `go build`, which will create the binary (`ayandict.exe` or `ayandict`) in this directory.
 
 It's good to know that the binary / executable file is completely portable, so you can copy it anywhere you want and run it from there (although on Unix the storage must support executable files).
 
@@ -128,6 +128,6 @@ Search is fuzzy (prefix search is planned) and it is based on similarity scores 
 
 If you specifically want terms with "language" as the second word, you can type "\* language". We do not support pattern matching (yet), and you can only use `*` alone (not as part of a pattern).
 
-Anything with at least %70 similarity score is listed (for example "languge" is %87 similar to "language"). But we have a limit of how many results are displayed, and by default it's 40 results. You can change this with [config parameter](<(./doc/config.rst)>) `max_results_total`.
+Anything with at least %70 similarity score is listed (for example "languge" is %87 similar to "language"). But we have a limit of how many results are displayed, and by default it's 40 results. You can change this with [config parameter](./doc/config.rst) `max_results_total`.
 
-This works pretty well in most cases, but the only catch is that first letter of your query must match the first letter of one of your target words. For example if you type "symmetry", it will never match term "asymmetry" even though they are close enough (high simlarity score), because their first letter is different. I have a workaround in mind for this in the future.
+This works pretty well in most cases, but the only catch is that first letter of your query must match the first letter of one of your target words. For example if you type "symmetry", it will never match term "asymmetry" even though they are close enough (high similarity score), because their first letter is different. I have a workaround in mind for this in the future.
