@@ -295,19 +295,16 @@ func (d *dictionaryImp) SearchRegex(query string) ([]*common.SearchResultLow, er
 	if err != nil {
 		return nil, err
 	}
-	re.Longest()
 
 	t1 := time.Now()
 	results := d.searchPattern(func(term string) uint8 {
 		if !re.MatchString(term) {
 			return 0
 		}
-		deltaLen := len(term) - 1
-		subtract := uint8(20)
-		if deltaLen < 20 {
-			subtract = uint8(deltaLen)
+		if len(term) < 20 {
+			return 200 - uint8(len(term))
 		}
-		return 200 - subtract
+		return 180
 	})
 	dt := time.Now().Sub(t1)
 	if dt > time.Millisecond {
@@ -327,12 +324,10 @@ func (d *dictionaryImp) SearchGlob(query string) ([]*common.SearchResultLow, err
 		if !pattern.Match(term) {
 			return 0
 		}
-		deltaLen := len(term) - 1
-		subtract := uint8(20)
-		if deltaLen < 20 {
-			subtract = uint8(deltaLen)
+		if len(term) < 20 {
+			return 200 - uint8(len(term))
 		}
-		return 200 - subtract
+		return 180
 	})
 	dt := time.Now().Sub(t1)
 	if dt > time.Millisecond {
