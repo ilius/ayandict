@@ -181,7 +181,7 @@ func (d *dictionaryImp) SearchFuzzy(query string) []*common.SearchResultLow {
 	const minScore = uint8(140)
 
 	for _, termIndex := range idx.byWordPrefix[prefix] {
-		entry := idx.terms[termIndex]
+		entry := idx.entries[termIndex]
 		score := checkEntry(entry)
 		if score < minScore {
 			continue
@@ -238,7 +238,7 @@ func (d *dictionaryImp) SearchStartWith(query string) []*common.SearchResultLow 
 	prefix := queryRunes[0]
 	const minScore = uint8(140)
 	for _, termIndex := range idx.byWordPrefix[prefix] {
-		entry := idx.terms[termIndex]
+		entry := idx.entries[termIndex]
 		score := checkEntry(entry)
 		if score < minScore {
 			continue

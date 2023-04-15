@@ -30,14 +30,14 @@ func readSyn(idx *Idx, synPath string, wordPrefixMap WordPrefixMap) error {
 		}
 		termIndex := int(binary.BigEndian.Uint32(data[pos : pos+4]))
 		pos += 4
-		if termIndex >= len(idx.terms) {
+		if termIndex >= len(idx.entries) {
 			return fmt.Errorf(
 				"Corrupted synonym file. Word %#v references invalid item",
 				string(b_alt),
 			)
 		}
 		alt := string(b_alt)
-		entry := idx.terms[termIndex]
+		entry := idx.entries[termIndex]
 		entry.terms = append(entry.terms, alt)
 		wordPrefixMap.Add(alt, termIndex)
 	}

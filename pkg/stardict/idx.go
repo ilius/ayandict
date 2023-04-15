@@ -14,7 +14,7 @@ type IdxEntry struct {
 // Idx implements an in-memory index for a dictionary
 type Idx struct {
 	byWordPrefix map[rune][]int
-	terms        []*IdxEntry
+	entries      []*IdxEntry
 }
 
 // newIdx initializes idx struct
@@ -23,17 +23,17 @@ func newIdx(entryCount int) *Idx {
 		byWordPrefix: map[rune][]int{},
 	}
 	if entryCount > 0 {
-		idx.terms = make([]*IdxEntry, 0, entryCount)
+		idx.entries = make([]*IdxEntry, 0, entryCount)
 	} else {
-		idx.terms = []*IdxEntry{}
+		idx.entries = []*IdxEntry{}
 	}
 	return idx
 }
 
 // Add adds an item to in-memory index
 func (idx *Idx) Add(term string, offset uint64, size uint64) int {
-	termIndex := len(idx.terms)
-	idx.terms = append(idx.terms, &IdxEntry{
+	termIndex := len(idx.entries)
+	idx.entries = append(idx.entries, &IdxEntry{
 		terms:  []string{term},
 		offset: offset,
 		size:   size,
