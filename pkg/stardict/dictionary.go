@@ -130,11 +130,11 @@ func (d *dictionaryImp) SearchFuzzy(query string) []*common.SearchResultLow {
 			if termI < 3 {
 				subtract = uint8(termI)
 			}
-			term := strings.ToLower(termOrig)
-			if term == query {
-				return 200 - subtract
-			}
-			words := strings.Split(term, " ")
+			term := lowerRunes(termOrig)
+			// if term == queryRunes {
+			// 	return 200 - subtract
+			// }
+			words := splitRunes(term, ' ')
 			if len(words) < minWordCount {
 				continue
 			}
@@ -188,7 +188,7 @@ func (d *dictionaryImp) SearchFuzzy(query string) []*common.SearchResultLow {
 		}
 		results = append(results, &common.SearchResultLow{
 			F_Score: score,
-			F_Terms: entry.terms,
+			F_Terms: stringListFromRunes(entry.terms),
 			Items: func() []*common.SearchResultItem {
 				return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
 			},
@@ -213,7 +213,7 @@ func (d *dictionaryImp) SearchStartWith(query string) []*common.SearchResultLow 
 		terms := entry.terms
 		bestScore := uint8(0)
 		for termI, termOrig := range terms {
-			term := strings.ToLower(termOrig)
+			term := strings.ToLower(string(termOrig))
 			if !strings.HasPrefix(term, query) {
 				continue
 			}
@@ -245,7 +245,7 @@ func (d *dictionaryImp) SearchStartWith(query string) []*common.SearchResultLow 
 		}
 		results = append(results, &common.SearchResultLow{
 			F_Score: score,
-			F_Terms: entry.terms,
+			F_Terms: stringListFromRunes(entry.terms),
 			Items: func() []*common.SearchResultItem {
 				return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
 			},

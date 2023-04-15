@@ -36,7 +36,7 @@ func readSyn(idx *Idx, synPath string, wordPrefixMap WordPrefixMap) error {
 				string(b_alt),
 			)
 		}
-		alt := string(b_alt)
+		alt := []rune(string(b_alt))
 		entry := idx.entries[termIndex]
 		entry.terms = append(entry.terms, alt)
 		wordPrefixMap.Add(alt, termIndex)

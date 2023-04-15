@@ -6,7 +6,7 @@ import (
 )
 
 type IdxEntry struct {
-	terms  []string
+	terms  [][]rune
 	offset uint64
 	size   uint64
 }
@@ -31,10 +31,10 @@ func newIdx(entryCount int) *Idx {
 }
 
 // Add adds an item to in-memory index
-func (idx *Idx) Add(term string, offset uint64, size uint64) int {
+func (idx *Idx) Add(term []rune, offset uint64, size uint64) int {
 	termIndex := len(idx.entries)
 	idx.entries = append(idx.entries, &IdxEntry{
-		terms:  []string{term},
+		terms:  [][]rune{term},
 		offset: offset,
 		size:   size,
 	})
@@ -69,7 +69,7 @@ func ReadIndex(filename string, synPath string, info *Info) (*Idx, error) {
 	var bufPos int
 	state := termState
 
-	var term string
+	var term []rune
 	var dataOffset uint64
 
 	maxIntBytes := info.MaxIdxBytes()
@@ -81,7 +81,7 @@ func ReadIndex(filename string, synPath string, info *Info) (*Idx, error) {
 				bufPos++
 				continue
 			}
-			term = string(buf[:bufPos])
+			term = []rune(string(buf[:bufPos]))
 			bufPos = 0
 			state = offsetState
 			continue
