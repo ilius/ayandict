@@ -17,4 +17,6 @@ type Dictionary interface {
 	CalcHash() ([]byte, error)
 	SearchFuzzy(query string) []*SearchResultLow
 	SearchStartWith(query string) []*SearchResultLow
+	SearchRegex(query string) ([]*SearchResultLow, error)
+	SearchGlob(query string) ([]*SearchResultLow, error)
 }

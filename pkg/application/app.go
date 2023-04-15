@@ -85,6 +85,8 @@ func (app *Application) Run() {
 	queryModeCombo.AddItems([]string{
 		"Fuzzy",
 		"Start with",
+		"Regex",
+		"Glob",
 	})
 
 	okButton := widgets.NewQPushButton2("OK", nil)

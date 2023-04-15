@@ -156,6 +156,10 @@ func onQuery(
 	switch queryWidgets.ModeCombo.CurrentIndex() {
 	case 1:
 		mode = dictmgr.QueryModeStartWith
+	case 2:
+		mode = dictmgr.QueryModeRegex
+	case 3:
+		mode = dictmgr.QueryModeGlob
 	}
 	results := dictmgr.LookupHTML(query, conf, mode)
 	log.Printf("LookupHTML took %v for %#v", time.Now().Sub(t), query)

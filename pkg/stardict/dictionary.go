@@ -8,9 +8,11 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
+	"github.com/gobwas/glob"
 	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/levenshtein"
 )
@@ -257,7 +259,86 @@ func (d *dictionaryImp) SearchStartWith(query string) []*common.SearchResultLow 
 	}
 	// log.Printf("Search produced %d results for %#v on %s\n", len(results), query, d.DictName())
 	return results
+}
 
+func (d *dictionaryImp) searchPattern(
+	checkTerm func(string) uint8,
+) []*common.SearchResultLow {
+	idx := d.idx
+	results := []*common.SearchResultLow{}
+	const minScore = uint8(140)
+	for _, entry := range idx.entries {
+		score := uint8(0)
+		for _, term := range entry.terms {
+			termScore := checkTerm(term)
+			if termScore > score {
+				score = termScore
+				break
+			}
+		}
+		if score < minScore {
+			continue
+		}
+		results = append(results, &common.SearchResultLow{
+			F_Score: score,
+			F_Terms: entry.terms,
+			Items: func() []*common.SearchResultItem {
+				return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
+			},
+		})
+	}
+	return results
+}
+
+func (d *dictionaryImp) SearchRegex(query string) ([]*common.SearchResultLow, error) {
+	re, err := regexp.Compile("^" + query + "$")
+	if err != nil {
+		return nil, err
+	}
+	re.Longest()
+
+	t1 := time.Now()
+	results := d.searchPattern(func(term string) uint8 {
+		if !re.MatchString(term) {
+			return 0
+		}
+		deltaLen := len(term) - 1
+		subtract := uint8(20)
+		if deltaLen < 20 {
+			subtract = uint8(deltaLen)
+		}
+		return 200 - subtract
+	})
+	dt := time.Now().Sub(t1)
+	if dt > time.Millisecond {
+		log.Printf("SearchRegex index loop took %v for %#v on %s\n", dt, query, d.DictName())
+	}
+	return results, nil
+}
+
+func (d *dictionaryImp) SearchGlob(query string) ([]*common.SearchResultLow, error) {
+	pattern, err := glob.Compile(query)
+	if err != nil {
+		return nil, err
+	}
+
+	t1 := time.Now()
+	results := d.searchPattern(func(term string) uint8 {
+		if !pattern.Match(term) {
+			return 0
+		}
+		deltaLen := len(term) - 1
+		subtract := uint8(20)
+		if deltaLen < 20 {
+			subtract = uint8(deltaLen)
+		}
+		return 200 - subtract
+	})
+	dt := time.Now().Sub(t1)
+	if dt > time.Millisecond {
+		log.Printf("SearchGlob index loop took %v for %#v on %s\n", dt, query, d.DictName())
+	}
+	return results, nil
 }
 
 func (d *dictionaryImp) decodeWithSametypesequence(data []byte) (items []*common.SearchResultItem) {
