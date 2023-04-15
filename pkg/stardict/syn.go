@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io/ioutil"
+	"strings"
 )
 
 func readSyn(idx *Idx, synPath string, wordPrefixMap WordPrefixMap) error {
@@ -39,7 +40,10 @@ func readSyn(idx *Idx, synPath string, wordPrefixMap WordPrefixMap) error {
 		alt := string(b_alt)
 		entry := idx.entries[termIndex]
 		entry.terms = append(entry.terms, alt)
-		wordPrefixMap.Add(alt, termIndex)
+		wordPrefixMap.Add(
+			strings.Split(strings.ToLower(alt), " "),
+			termIndex,
+		)
 	}
 	return nil
 }

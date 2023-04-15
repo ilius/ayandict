@@ -3,6 +3,7 @@ package stardict
 import (
 	"encoding/binary"
 	"io/ioutil"
+	"strings"
 )
 
 type IdxEntry struct {
@@ -28,17 +29,6 @@ func newIdx(entryCount int) *Idx {
 		idx.entries = []*IdxEntry{}
 	}
 	return idx
-}
-
-// Add adds an item to in-memory index
-func (idx *Idx) Add(term string, offset uint64, size uint64) int {
-	termIndex := len(idx.entries)
-	idx.entries = append(idx.entries, &IdxEntry{
-		terms:  []string{term},
-		offset: offset,
-		size:   size,
-	})
-	return termIndex
 }
 
 type t_state int
@@ -105,8 +95,14 @@ func ReadIndex(filename string, synPath string, info *Info) (*Idx, error) {
 		// finished with one record
 		bufPos = 0
 		state = termState
-		termIndex := idx.Add(term, dataOffset, num)
-		wordPrefixMap.Add(term, termIndex)
+		words := strings.Split(strings.ToLower(term), " ")
+		termIndex := len(idx.entries)
+		idx.entries = append(idx.entries, &IdxEntry{
+			terms:  []string{term},
+			offset: dataOffset,
+			size:   num,
+		})
+		wordPrefixMap.Add(words, termIndex)
 	}
 	if synPath != "" {
 		err := readSyn(idx, synPath, wordPrefixMap)

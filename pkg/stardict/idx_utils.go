@@ -1,14 +1,13 @@
 package stardict
 
 import (
-	"strings"
 	"unicode/utf8"
 )
 
 type WordPrefixMap map[rune]map[int]bool
 
-func (wpm WordPrefixMap) Add(term string, termIndex int) {
-	for _, word := range strings.Split(strings.ToLower(term), " ") {
+func (wpm WordPrefixMap) Add(words []string, termIndex int) {
+	for _, word := range words {
 		prefix, _ := utf8.DecodeRuneInString(word)
 		m, ok := wpm[prefix]
 		if !ok {
