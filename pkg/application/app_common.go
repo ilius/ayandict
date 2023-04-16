@@ -9,7 +9,7 @@ const APP_NAME = "ayandict"
 
 const VERSION = "1.0.0"
 
-const ABOUT = `AyanDict is simple dictionary appliation based on Qt and written in Go.
+const ABOUT = `AyanDict is simple dictionary application based on Qt and written in Go.
 
 Copyleft © 2023 Saeed Rasooli
 AyanDict is licensed by the GNU General Public License version 3 (or later)
@@ -17,7 +17,7 @@ AyanDict is licensed by the GNU General Public License version 3 (or later)
 
 const AUTHORS = `Saeed Rasooli <saeed.gnu@gmail.com> (ilius)`
 
-const LICENSE = `AyanDict - A simple simple dictionary appliation
+const LICENSE = `AyanDict - A simple simple dictionary application
 
 Copyright © 2023 Saeed Rasooli
 This program is free software; you can redistribute it
@@ -46,7 +46,7 @@ const punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~،؛؟۔"
 
 // when double-click in QTextBrowser. some punctuations next to words
 // are also selected, specially non-ascii ones,
-// so we trim them on riht-click -> Query action or on middle-click action
+// so we trim them on right-click -> Query action or on middle-click action
 const queryForceTrimChars = "‘’،؛"
 
 var frequencyTable *frequency.FrequencyTable
