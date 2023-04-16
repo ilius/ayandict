@@ -299,6 +299,12 @@ func (d *dictionaryImp) searchPattern(
 	}
 
 	N := len(idx.entries)
+	if N < 2*workerCount {
+		go worker(0, N)
+		results := <-ch
+		return results
+	}
+
 	step := (N-1)/workerCount + 1
 	for startI := 0; startI < N; startI += step {
 		endI := startI + step
