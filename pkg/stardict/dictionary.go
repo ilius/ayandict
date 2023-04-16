@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/gobwas/glob"
@@ -268,13 +267,13 @@ func (d *dictionaryImp) searchPattern(
 	const workerCount = 8
 
 	idx := d.idx
-	results := []*common.SearchResultLow{}
-	var resultsLock sync.Mutex
 	const minScore = uint8(140)
-	var wg sync.WaitGroup
 
+	ch := make(chan []*common.SearchResultLow, workerCount)
+
+	// must not return in the middle of worker, or program will freeze
 	worker := func(startI int, endI int) {
-		defer wg.Done()
+		var results []*common.SearchResultLow
 		for entryI := startI; entryI < endI; entryI++ {
 			entry := idx.entries[entryI]
 			score := uint8(0)
@@ -288,7 +287,6 @@ func (d *dictionaryImp) searchPattern(
 			if score < minScore {
 				continue
 			}
-			resultsLock.Lock()
 			results = append(results, &common.SearchResultLow{
 				F_Score: score,
 				F_Terms: entry.terms,
@@ -296,21 +294,25 @@ func (d *dictionaryImp) searchPattern(
 					return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
 				},
 			})
-			resultsLock.Unlock()
 		}
+		ch <- results
 	}
 
 	N := len(idx.entries)
 	step := (N-1)/workerCount + 1
 	for startI := 0; startI < N; startI += step {
-		wg.Add(1)
 		endI := startI + step
 		if endI > N {
 			endI = N
 		}
 		go worker(startI, endI)
 	}
-	wg.Wait()
+	results := []*common.SearchResultLow{}
+	for i := 0; i < workerCount; i++ {
+		workerResults := <-ch
+		results = append(results, workerResults...)
+	}
+
 	return results
 }
 
