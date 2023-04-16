@@ -17,7 +17,7 @@ AyanDict is licensed by the GNU General Public License version 3 (or later)
 
 const AUTHORS = `Saeed Rasooli <saeed.gnu@gmail.com> (ilius)`
 
-const LICENSE = `AyanDict - A simple simple dictionary application
+const LICENSE = `AyanDict - A simple dictionary application
 
 Copyright © 2023 Saeed Rasooli
 This program is free software; you can redistribute it
