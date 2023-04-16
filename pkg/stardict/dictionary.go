@@ -218,8 +218,11 @@ func (d *dictionaryImp) SearchFuzzy(query string, workerCount int) []*common.Sea
 	prefix := queryMainWord[0]
 	entryIndexes := idx.byWordPrefix[prefix]
 
-	// must not return in the middle of worker, or program will freeze
-	worker := func(startI int, endI int) {
+	t1 := time.Now()
+	N := len(entryIndexes)
+
+	results := d.runWorkers(N, ch, workerCount, func(startI int, endI int) {
+		// must not return in the middle of worker, or program will freeze
 		results := []*common.SearchResultLow{}
 		for i := startI; i < endI; i++ {
 			entry := idx.entries[entryIndexes[i]]
@@ -236,12 +239,7 @@ func (d *dictionaryImp) SearchFuzzy(query string, workerCount int) []*common.Sea
 			})
 		}
 		ch <- results
-	}
-
-	t1 := time.Now()
-	N := len(entryIndexes)
-
-	results := d.runWorkers(N, ch, workerCount, worker)
+	})
 
 	dt := time.Now().Sub(t1)
 	if dt > time.Millisecond {
@@ -293,8 +291,11 @@ func (d *dictionaryImp) SearchStartWith(
 	prefix, _ := utf8.DecodeRuneInString(query)
 	entryIndexes := idx.byWordPrefix[prefix]
 
-	// must not return in the middle of worker, or program will freeze
-	worker := func(startI int, endI int) {
+	t1 := time.Now()
+	N := len(entryIndexes)
+
+	results := d.runWorkers(N, ch, workerCount, func(startI int, endI int) {
+		// must not return in the middle of worker, or program will freeze
 		results := []*common.SearchResultLow{}
 		for i := startI; i < endI; i++ {
 			entry := idx.entries[entryIndexes[i]]
@@ -311,12 +312,7 @@ func (d *dictionaryImp) SearchStartWith(
 			})
 		}
 		ch <- results
-	}
-
-	t1 := time.Now()
-	N := len(entryIndexes)
-
-	results := d.runWorkers(N, ch, workerCount, worker)
+	})
 
 	dt := time.Now().Sub(t1)
 	if dt > time.Millisecond {
@@ -339,8 +335,9 @@ func (d *dictionaryImp) searchPattern(
 
 	ch := make(chan []*common.SearchResultLow, workerCount)
 
-	// must not return in the middle of worker, or program will freeze
-	worker := func(startI int, endI int) {
+	N := len(idx.entries)
+	return d.runWorkers(N, ch, workerCount, func(startI int, endI int) {
+		// must not return in the middle of worker, or program will freeze
 		var results []*common.SearchResultLow
 		for entryI := startI; entryI < endI; entryI++ {
 			entry := idx.entries[entryI]
@@ -364,10 +361,7 @@ func (d *dictionaryImp) searchPattern(
 			})
 		}
 		ch <- results
-	}
-
-	N := len(idx.entries)
-	return d.runWorkers(N, ch, workerCount, worker)
+	})
 }
 
 func (d *dictionaryImp) SearchRegex(query string, workerCount int) ([]*common.SearchResultLow, error) {
