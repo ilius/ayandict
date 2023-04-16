@@ -98,29 +98,34 @@ func similarity(r1 []rune, r2 []rune, subtract uint8) uint8 {
 
 func (d *dictionaryImp) runWorkers(
 	N int,
-	ch <-chan []*common.SearchResultLow,
 	workerCount int,
-	worker func(int, int),
+	worker func(int, int) []*common.SearchResultLow,
 ) []*common.SearchResultLow {
-	if workerCount < 2 || N < 2*workerCount {
-		go worker(0, N)
-		results := <-ch
-		return results
+	if workerCount < 2 {
+		return worker(0, N)
+	}
+	if N < 2*workerCount {
+		return worker(0, N)
+	}
+
+	ch := make(chan []*common.SearchResultLow, workerCount)
+
+	sender := func(start int, end int) {
+		ch <- worker(start, end)
 	}
 
 	step := N / workerCount
-	startI := 0
+	start := 0
 	for i := 0; i < workerCount-1; i++ {
-		endI := startI + step
-		go worker(startI, endI)
-		startI = endI
+		end := start + step
+		go sender(start, end)
+		start = end
 	}
-	go worker(startI, N)
+	go sender(start, N)
 
 	results := []*common.SearchResultLow{}
 	for i := 0; i < workerCount; i++ {
-		workerResults := <-ch
-		results = append(results, workerResults...)
+		results = append(results, <-ch...)
 	}
 
 	return results
@@ -135,11 +140,6 @@ func (d *dictionaryImp) SearchFuzzy(query string, workerCount int) []*common.Sea
 
 	idx := d.idx
 	const minScore = uint8(140)
-
-	if workerCount < 1 {
-		workerCount = 1
-	}
-	ch := make(chan []*common.SearchResultLow, workerCount)
 
 	query = strings.ToLower(strings.TrimSpace(query))
 	queryWords := strings.Split(query, " ")
@@ -221,10 +221,9 @@ func (d *dictionaryImp) SearchFuzzy(query string, workerCount int) []*common.Sea
 	t1 := time.Now()
 	N := len(entryIndexes)
 
-	results := d.runWorkers(N, ch, workerCount, func(startI int, endI int) {
-		// must not return in the middle of worker, or program will freeze
-		results := []*common.SearchResultLow{}
-		for i := startI; i < endI; i++ {
+	results := d.runWorkers(N, workerCount, func(start int, end int) []*common.SearchResultLow {
+		var results []*common.SearchResultLow
+		for i := start; i < end; i++ {
 			entry := idx.entries[entryIndexes[i]]
 			score := checkEntry(entry)
 			if score < minScore {
@@ -238,7 +237,7 @@ func (d *dictionaryImp) SearchFuzzy(query string, workerCount int) []*common.Sea
 				},
 			})
 		}
-		ch <- results
+		return results
 	})
 
 	dt := time.Now().Sub(t1)
@@ -255,11 +254,6 @@ func (d *dictionaryImp) SearchStartWith(
 ) []*common.SearchResultLow {
 	idx := d.idx
 	const minScore = uint8(140)
-
-	if workerCount < 1 {
-		workerCount = 1
-	}
-	ch := make(chan []*common.SearchResultLow, workerCount)
 
 	query = strings.ToLower(strings.TrimSpace(query))
 
@@ -294,10 +288,9 @@ func (d *dictionaryImp) SearchStartWith(
 	t1 := time.Now()
 	N := len(entryIndexes)
 
-	results := d.runWorkers(N, ch, workerCount, func(startI int, endI int) {
-		// must not return in the middle of worker, or program will freeze
-		results := []*common.SearchResultLow{}
-		for i := startI; i < endI; i++ {
+	results := d.runWorkers(N, workerCount, func(start int, end int) []*common.SearchResultLow {
+		var results []*common.SearchResultLow
+		for i := start; i < end; i++ {
 			entry := idx.entries[entryIndexes[i]]
 			score := checkEntry(entry)
 			if score < minScore {
@@ -311,7 +304,7 @@ func (d *dictionaryImp) SearchStartWith(
 				},
 			})
 		}
-		ch <- results
+		return results
 	})
 
 	dt := time.Now().Sub(t1)
@@ -329,17 +322,10 @@ func (d *dictionaryImp) searchPattern(
 	idx := d.idx
 	const minScore = uint8(140)
 
-	if workerCount < 1 {
-		workerCount = 1
-	}
-
-	ch := make(chan []*common.SearchResultLow, workerCount)
-
 	N := len(idx.entries)
-	return d.runWorkers(N, ch, workerCount, func(startI int, endI int) {
-		// must not return in the middle of worker, or program will freeze
+	return d.runWorkers(N, workerCount, func(start int, end int) []*common.SearchResultLow {
 		var results []*common.SearchResultLow
-		for entryI := startI; entryI < endI; entryI++ {
+		for entryI := start; entryI < end; entryI++ {
 			entry := idx.entries[entryI]
 			score := uint8(0)
 			for _, term := range entry.terms {
@@ -360,7 +346,7 @@ func (d *dictionaryImp) searchPattern(
 				},
 			})
 		}
-		ch <- results
+		return results
 	})
 }
 
