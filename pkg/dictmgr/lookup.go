@@ -17,26 +17,31 @@ const (
 	QueryModeGlob
 )
 
-func search(dic common.Dictionary, mode QueryMode, query string) []*common.SearchResultLow {
+func search(
+	dic common.Dictionary,
+	conf *config.Config,
+	mode QueryMode,
+	query string,
+) []*common.SearchResultLow {
 	switch mode {
 	case QueryModeStartWith:
 		return dic.SearchStartWith(query)
 	case QueryModeRegex:
-		results, err := dic.SearchRegex(query)
+		results, err := dic.SearchRegex(query, conf.SearchWorkerCount)
 		if err != nil {
 			qerr.Error(err)
 			return nil
 		}
 		return results
 	case QueryModeGlob:
-		results, err := dic.SearchGlob(query)
+		results, err := dic.SearchGlob(query, conf.SearchWorkerCount)
 		if err != nil {
 			qerr.Error(err)
 			return nil
 		}
 		return results
 	}
-	return dic.SearchFuzzy(query)
+	return dic.SearchFuzzy(query, conf.SearchWorkerCount)
 }
 
 func LookupHTML(
@@ -50,7 +55,7 @@ func LookupHTML(
 		if dic.Disabled() || !dic.Loaded() {
 			continue
 		}
-		for _, res := range search(dic, mode, query) {
+		for _, res := range search(dic, conf, mode, query) {
 			results = append(results, &SearchResult{
 				SearchResultLow: res,
 				dic:             dic,

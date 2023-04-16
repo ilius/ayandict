@@ -154,3 +154,9 @@ Timeout for local web client, default is 100ms
 
 Default value: ``""``
 
+``search_worker_count``
+-----------------------
+The number of workers / goroutines used for search
+
+Default value: ``8``
+

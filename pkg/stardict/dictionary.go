@@ -97,16 +97,17 @@ func similarity(r1 []rune, r2 []rune, subtract uint8) uint8 {
 
 // SearchFuzzy: run a fuzzy search with similarity scores
 // ranging from 140 (which means %70) to 200 (which means 100%)
-func (d *dictionaryImp) SearchFuzzy(query string) []*common.SearchResultLow {
+func (d *dictionaryImp) SearchFuzzy(query string, workerCount int) []*common.SearchResultLow {
 	// if len(query) < 2 {
 	// 	return d.searchVeryShort(query)
 	// }
 
-	workerCount := 8
-
 	idx := d.idx
 	const minScore = uint8(140)
 
+	if workerCount < 1 {
+		workerCount = 1
+	}
 	ch := make(chan []*common.SearchResultLow, workerCount)
 
 	query = strings.ToLower(strings.TrimSpace(query))
@@ -209,7 +210,7 @@ func (d *dictionaryImp) SearchFuzzy(query string) []*common.SearchResultLow {
 	t1 := time.Now()
 
 	N := len(entryIndexes)
-	if N < 2*workerCount {
+	if workerCount < 2 || N < 2*workerCount {
 		go worker(0, N)
 		results := <-ch
 		return results
@@ -296,12 +297,15 @@ func (d *dictionaryImp) SearchStartWith(query string) []*common.SearchResultLow 
 }
 
 func (d *dictionaryImp) searchPattern(
+	workerCount int,
 	checkTerm func(string) uint8,
 ) []*common.SearchResultLow {
-	const workerCount = 8
-
 	idx := d.idx
 	const minScore = uint8(140)
+
+	if workerCount < 1 {
+		workerCount = 1
+	}
 
 	ch := make(chan []*common.SearchResultLow, workerCount)
 
@@ -333,7 +337,7 @@ func (d *dictionaryImp) searchPattern(
 	}
 
 	N := len(idx.entries)
-	if N < 2*workerCount {
+	if workerCount < 2 || N < 2*workerCount {
 		go worker(0, N)
 		results := <-ch
 		return results
@@ -356,14 +360,14 @@ func (d *dictionaryImp) searchPattern(
 	return results
 }
 
-func (d *dictionaryImp) SearchRegex(query string) ([]*common.SearchResultLow, error) {
+func (d *dictionaryImp) SearchRegex(query string, workerCount int) ([]*common.SearchResultLow, error) {
 	re, err := regexp.Compile("^" + query + "$")
 	if err != nil {
 		return nil, err
 	}
 
 	t1 := time.Now()
-	results := d.searchPattern(func(term string) uint8 {
+	results := d.searchPattern(workerCount, func(term string) uint8 {
 		if !re.MatchString(term) {
 			return 0
 		}
@@ -379,14 +383,14 @@ func (d *dictionaryImp) SearchRegex(query string) ([]*common.SearchResultLow, er
 	return results, nil
 }
 
-func (d *dictionaryImp) SearchGlob(query string) ([]*common.SearchResultLow, error) {
+func (d *dictionaryImp) SearchGlob(query string, workerCount int) ([]*common.SearchResultLow, error) {
 	pattern, err := glob.Compile(query)
 	if err != nil {
 		return nil, err
 	}
 
 	t1 := time.Now()
-	results := d.searchPattern(func(term string) uint8 {
+	results := d.searchPattern(workerCount, func(term string) uint8 {
 		if !pattern.Match(term) {
 			return 0
 		}

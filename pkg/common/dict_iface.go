@@ -15,8 +15,8 @@ type Dictionary interface {
 	IndexFileSize() uint64
 	InfoPath() string
 	CalcHash() ([]byte, error)
-	SearchFuzzy(query string) []*SearchResultLow
+	SearchFuzzy(query string, workerCount int) []*SearchResultLow
 	SearchStartWith(query string) []*SearchResultLow
-	SearchRegex(query string) ([]*SearchResultLow, error)
-	SearchGlob(query string) ([]*SearchResultLow, error)
+	SearchRegex(query string, workerCount int) ([]*SearchResultLow, error)
+	SearchGlob(query string, workerCount int) ([]*SearchResultLow, error)
 }

@@ -64,6 +64,8 @@ type Config struct {
 	LocalServerPorts []string `toml:"local_server_ports"`
 
 	LocalClientTimeout string `toml:"local_client_timeout"`
+
+	SearchWorkerCount int `toml:"search_worker_count"`
 }
 
 const defaultHeaderTemplate = `<b><font color='#55f'>{{.DictName}}</font></b>
@@ -128,6 +130,8 @@ func Default() *Config {
 		},
 
 		LocalClientTimeout: "",
+
+		SearchWorkerCount: 8,
 	}
 }
 
