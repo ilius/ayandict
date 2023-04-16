@@ -96,6 +96,36 @@ func similarity(r1 []rune, r2 []rune, subtract uint8) uint8 {
 	return score - subtract
 }
 
+func (d *dictionaryImp) runWorkers(
+	N int,
+	ch <-chan []*common.SearchResultLow,
+	workerCount int,
+	worker func(int, int),
+) []*common.SearchResultLow {
+	if workerCount < 2 || N < 2*workerCount {
+		go worker(0, N)
+		results := <-ch
+		return results
+	}
+
+	step := N / workerCount
+	startI := 0
+	for i := 0; i < workerCount-1; i++ {
+		endI := startI + step
+		go worker(startI, endI)
+		startI = endI
+	}
+	go worker(startI, N)
+
+	results := []*common.SearchResultLow{}
+	for i := 0; i < workerCount; i++ {
+		workerResults := <-ch
+		results = append(results, workerResults...)
+	}
+
+	return results
+}
+
 // SearchFuzzy: run a fuzzy search with similarity scores
 // ranging from 140 (which means %70) to 200 (which means 100%)
 func (d *dictionaryImp) SearchFuzzy(query string, workerCount int) []*common.SearchResultLow {
@@ -209,28 +239,9 @@ func (d *dictionaryImp) SearchFuzzy(query string, workerCount int) []*common.Sea
 	}
 
 	t1 := time.Now()
-
 	N := len(entryIndexes)
-	if workerCount < 2 || N < 2*workerCount {
-		go worker(0, N)
-		results := <-ch
-		return results
-	}
 
-	step := N / workerCount
-	startI := 0
-	for i := 0; i < workerCount-1; i++ {
-		endI := startI + step
-		go worker(startI, endI)
-		startI = endI
-	}
-	go worker(startI, N)
-
-	results := []*common.SearchResultLow{}
-	for i := 0; i < workerCount; i++ {
-		workerResults := <-ch
-		results = append(results, workerResults...)
-	}
+	results := d.runWorkers(N, ch, workerCount, worker)
 
 	dt := time.Now().Sub(t1)
 	if dt > time.Millisecond {
@@ -303,28 +314,9 @@ func (d *dictionaryImp) SearchStartWith(
 	}
 
 	t1 := time.Now()
-
 	N := len(entryIndexes)
-	if workerCount < 2 || N < 2*workerCount {
-		go worker(0, N)
-		results := <-ch
-		return results
-	}
 
-	step := N / workerCount
-	startI := 0
-	for i := 0; i < workerCount-1; i++ {
-		endI := startI + step
-		go worker(startI, endI)
-		startI = endI
-	}
-	go worker(startI, N)
-
-	results := []*common.SearchResultLow{}
-	for i := 0; i < workerCount; i++ {
-		workerResults := <-ch
-		results = append(results, workerResults...)
-	}
+	results := d.runWorkers(N, ch, workerCount, worker)
 
 	dt := time.Now().Sub(t1)
 	if dt > time.Millisecond {
@@ -375,27 +367,7 @@ func (d *dictionaryImp) searchPattern(
 	}
 
 	N := len(idx.entries)
-	if workerCount < 2 || N < 2*workerCount {
-		go worker(0, N)
-		results := <-ch
-		return results
-	}
-
-	step := N / workerCount
-	startI := 0
-	for i := 0; i < workerCount-1; i++ {
-		endI := startI + step
-		go worker(startI, endI)
-		startI = endI
-	}
-	go worker(startI, N)
-	results := []*common.SearchResultLow{}
-	for i := 0; i < workerCount; i++ {
-		workerResults := <-ch
-		results = append(results, workerResults...)
-	}
-
-	return results
+	return d.runWorkers(N, ch, workerCount, worker)
 }
 
 func (d *dictionaryImp) SearchRegex(query string, workerCount int) ([]*common.SearchResultLow, error) {
