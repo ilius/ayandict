@@ -66,7 +66,12 @@ func LookupHTML(
 		if score1 != score2 {
 			return score1 > score2
 		}
-		return dictsOrder[res1.DictName()] < dictsOrder[res2.DictName()]
+		do1 := dictsOrder[res1.DictName()]
+		do2 := dictsOrder[res2.DictName()]
+		if do1 != do2 {
+			return do1 < do2
+		}
+		return res1.Terms()[0] < res2.Terms()[0]
 	})
 	cutoff := conf.MaxResultsTotal
 	if cutoff > 0 && len(results) > cutoff {
