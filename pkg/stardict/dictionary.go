@@ -101,8 +101,13 @@ func (d *dictionaryImp) SearchFuzzy(query string) []*common.SearchResultLow {
 	// if len(query) < 2 {
 	// 	return d.searchVeryShort(query)
 	// }
+
+	workerCount := 8
+
 	idx := d.idx
-	results := []*common.SearchResultLow{}
+	const minScore = uint8(140)
+
+	ch := make(chan []*common.SearchResultLow, workerCount)
 
 	query = strings.ToLower(strings.TrimSpace(query))
 	queryWords := strings.Split(query, " ")
@@ -116,6 +121,7 @@ func (d *dictionaryImp) SearchFuzzy(query string) []*common.SearchResultLow {
 
 	minWordCount := 1
 	queryWordCount := 0
+
 	for _, word := range queryWords {
 		if word == "*" {
 			minWordCount++
@@ -177,25 +183,53 @@ func (d *dictionaryImp) SearchFuzzy(query string) []*common.SearchResultLow {
 		return bestScore
 	}
 
-	t1 := time.Now()
 	prefix := queryMainWord[0]
+	entryIndexes := idx.byWordPrefix[prefix]
 
-	const minScore = uint8(140)
-
-	for _, termIndex := range idx.byWordPrefix[prefix] {
-		entry := idx.entries[termIndex]
-		score := checkEntry(entry)
-		if score < minScore {
-			continue
+	// must not return in the middle of worker, or program will freeze
+	worker := func(startI int, endI int) {
+		results := []*common.SearchResultLow{}
+		for i := startI; i < endI; i++ {
+			entry := idx.entries[entryIndexes[i]]
+			score := checkEntry(entry)
+			if score < minScore {
+				continue
+			}
+			results = append(results, &common.SearchResultLow{
+				F_Score: score,
+				F_Terms: entry.terms,
+				Items: func() []*common.SearchResultItem {
+					return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
+				},
+			})
 		}
-		results = append(results, &common.SearchResultLow{
-			F_Score: score,
-			F_Terms: entry.terms,
-			Items: func() []*common.SearchResultItem {
-				return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
-			},
-		})
+		ch <- results
 	}
+
+	t1 := time.Now()
+
+	N := len(entryIndexes)
+	if N < 2*workerCount {
+		go worker(0, N)
+		results := <-ch
+		return results
+	}
+
+	step := N / workerCount
+	startI := 0
+	for i := 0; i < workerCount-1; i++ {
+		endI := startI + step
+		go worker(startI, endI)
+		startI = endI
+	}
+	go worker(startI, N)
+
+	results := []*common.SearchResultLow{}
+	for i := 0; i < workerCount; i++ {
+		workerResults := <-ch
+		results = append(results, workerResults...)
+	}
+
 	dt := time.Now().Sub(t1)
 	if dt > time.Millisecond {
 		log.Printf("SearchFuzzy index loop took %v for %#v on %s\n", dt, query, d.DictName())
