@@ -1,13 +1,16 @@
 #!/bin/bash
+set -e
 set -x
 
 FLAGS=(-ldflags '-s -w')
 
+VERSION=$(go run pkg/version/version.go)
+
 function build_for_os64() {
-	GOOS=$1 GOARCH=amd64 go build -o ayandict-$1-x86_64 "${FLAGS[@]}"
+	GOOS=$1 GOARCH=amd64 go build -o ayandict-$VERSION-$1-x86_64 "${FLAGS[@]}"
 }
 function build_for_os32() {
-	GOOS=$1 GOARCH=386 go build -o ayandict-$1-x86 "${FLAGS[@]}"
+	GOOS=$1 GOARCH=386 go build -o ayandict-$VERSION-$1-x86 "${FLAGS[@]}"
 }
 
 
