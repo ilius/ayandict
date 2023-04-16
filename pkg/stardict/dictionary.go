@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gobwas/glob"
@@ -264,29 +265,52 @@ func (d *dictionaryImp) SearchStartWith(query string) []*common.SearchResultLow 
 func (d *dictionaryImp) searchPattern(
 	checkTerm func(string) uint8,
 ) []*common.SearchResultLow {
+	const workerCount = 8
+
 	idx := d.idx
 	results := []*common.SearchResultLow{}
+	var resultsLock sync.Mutex
 	const minScore = uint8(140)
-	for _, entry := range idx.entries {
-		score := uint8(0)
-		for _, term := range entry.terms {
-			termScore := checkTerm(term)
-			if termScore > score {
-				score = termScore
-				break
+	var wg sync.WaitGroup
+
+	worker := func(startI int, endI int) {
+		defer wg.Done()
+		for entryI := startI; entryI < endI; entryI++ {
+			entry := idx.entries[entryI]
+			score := uint8(0)
+			for _, term := range entry.terms {
+				termScore := checkTerm(term)
+				if termScore > score {
+					score = termScore
+					break
+				}
 			}
+			if score < minScore {
+				continue
+			}
+			resultsLock.Lock()
+			results = append(results, &common.SearchResultLow{
+				F_Score: score,
+				F_Terms: entry.terms,
+				Items: func() []*common.SearchResultItem {
+					return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
+				},
+			})
+			resultsLock.Unlock()
 		}
-		if score < minScore {
-			continue
-		}
-		results = append(results, &common.SearchResultLow{
-			F_Score: score,
-			F_Terms: entry.terms,
-			Items: func() []*common.SearchResultItem {
-				return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
-			},
-		})
 	}
+
+	N := len(idx.entries)
+	step := (N-1)/workerCount + 1
+	for startI := 0; startI < N; startI += step {
+		wg.Add(1)
+		endI := startI + step
+		if endI > N {
+			endI = N
+		}
+		go worker(startI, endI)
+	}
+	wg.Wait()
 	return results
 }
 
