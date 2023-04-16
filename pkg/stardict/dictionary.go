@@ -305,14 +305,14 @@ func (d *dictionaryImp) searchPattern(
 		return results
 	}
 
-	step := (N-1)/workerCount + 1
-	for startI := 0; startI < N; startI += step {
+	step := N / workerCount
+	startI := 0
+	for i := 0; i < workerCount-1; i++ {
 		endI := startI + step
-		if endI > N {
-			endI = N
-		}
 		go worker(startI, endI)
+		startI = endI
 	}
+	go worker(startI, N)
 	results := []*common.SearchResultLow{}
 	for i := 0; i < workerCount; i++ {
 		workerResults := <-ch
