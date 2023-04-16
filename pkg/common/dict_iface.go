@@ -16,7 +16,7 @@ type Dictionary interface {
 	InfoPath() string
 	CalcHash() ([]byte, error)
 	SearchFuzzy(query string, workerCount int) []*SearchResultLow
-	SearchStartWith(query string) []*SearchResultLow
+	SearchStartWith(query string, workerCount int) []*SearchResultLow
 	SearchRegex(query string, workerCount int) ([]*SearchResultLow, error)
 	SearchGlob(query string, workerCount int) ([]*SearchResultLow, error)
 }

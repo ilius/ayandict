@@ -23,25 +23,26 @@ func search(
 	mode QueryMode,
 	query string,
 ) []*common.SearchResultLow {
+	workerCount := conf.SearchWorkerCount
 	switch mode {
 	case QueryModeStartWith:
-		return dic.SearchStartWith(query)
+		return dic.SearchStartWith(query, workerCount)
 	case QueryModeRegex:
-		results, err := dic.SearchRegex(query, conf.SearchWorkerCount)
+		results, err := dic.SearchRegex(query, workerCount)
 		if err != nil {
 			qerr.Error(err)
 			return nil
 		}
 		return results
 	case QueryModeGlob:
-		results, err := dic.SearchGlob(query, conf.SearchWorkerCount)
+		results, err := dic.SearchGlob(query, workerCount)
 		if err != nil {
 			qerr.Error(err)
 			return nil
 		}
 		return results
 	}
-	return dic.SearchFuzzy(query, conf.SearchWorkerCount)
+	return dic.SearchFuzzy(query, workerCount)
 }
 
 func LookupHTML(

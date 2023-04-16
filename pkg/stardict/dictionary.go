@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/gobwas/glob"
 	"github.com/ilius/ayandict/pkg/common"
@@ -239,12 +240,19 @@ func (d *dictionaryImp) SearchFuzzy(query string, workerCount int) []*common.Sea
 	return results
 }
 
-func (d *dictionaryImp) SearchStartWith(query string) []*common.SearchResultLow {
+func (d *dictionaryImp) SearchStartWith(
+	query string,
+	workerCount int,
+) []*common.SearchResultLow {
 	idx := d.idx
-	results := []*common.SearchResultLow{}
+	const minScore = uint8(140)
+
+	if workerCount < 1 {
+		workerCount = 1
+	}
+	ch := make(chan []*common.SearchResultLow, workerCount)
 
 	query = strings.ToLower(strings.TrimSpace(query))
-	queryRunes := []rune(query)
 
 	checkEntry := func(entry *IdxEntry) uint8 {
 		terms := entry.terms
@@ -271,23 +279,53 @@ func (d *dictionaryImp) SearchStartWith(query string) []*common.SearchResultLow 
 		return bestScore
 	}
 
-	t1 := time.Now()
-	prefix := queryRunes[0]
-	const minScore = uint8(140)
-	for _, termIndex := range idx.byWordPrefix[prefix] {
-		entry := idx.entries[termIndex]
-		score := checkEntry(entry)
-		if score < minScore {
-			continue
+	prefix, _ := utf8.DecodeRuneInString(query)
+	entryIndexes := idx.byWordPrefix[prefix]
+
+	// must not return in the middle of worker, or program will freeze
+	worker := func(startI int, endI int) {
+		results := []*common.SearchResultLow{}
+		for i := startI; i < endI; i++ {
+			entry := idx.entries[entryIndexes[i]]
+			score := checkEntry(entry)
+			if score < minScore {
+				continue
+			}
+			results = append(results, &common.SearchResultLow{
+				F_Score: score,
+				F_Terms: entry.terms,
+				Items: func() []*common.SearchResultItem {
+					return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
+				},
+			})
 		}
-		results = append(results, &common.SearchResultLow{
-			F_Score: score,
-			F_Terms: entry.terms,
-			Items: func() []*common.SearchResultItem {
-				return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
-			},
-		})
+		ch <- results
 	}
+
+	t1 := time.Now()
+
+	N := len(entryIndexes)
+	if workerCount < 2 || N < 2*workerCount {
+		go worker(0, N)
+		results := <-ch
+		return results
+	}
+
+	step := N / workerCount
+	startI := 0
+	for i := 0; i < workerCount-1; i++ {
+		endI := startI + step
+		go worker(startI, endI)
+		startI = endI
+	}
+	go worker(startI, N)
+
+	results := []*common.SearchResultLow{}
+	for i := 0; i < workerCount; i++ {
+		workerResults := <-ch
+		results = append(results, workerResults...)
+	}
+
 	dt := time.Now().Sub(t1)
 	if dt > time.Millisecond {
 		log.Printf("SearchStartWith index loop took %v for %#v on %s\n", dt, query, d.DictName())
