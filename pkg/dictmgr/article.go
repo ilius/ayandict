@@ -111,7 +111,11 @@ func getAttr(node *html.Node, attrName string) string {
 	return ""
 }
 
-func fixAudioTag(defi string, resURL string) string {
+func fixAudioTag(
+	defi string,
+	resURL string,
+	playImage string,
+) string {
 	// fix <audio ...><source src="..."></audio>
 	// value for src= is already fixed
 	// just need to replace `<source ...>` with `<a ...>Audio</a>`
@@ -136,7 +140,7 @@ func fixAudioTag(defi string, resURL string) string {
 			}
 			parts = append(parts, "<a href="+
 				strconv.Quote(std_html.EscapeString(src))+
-				">"+filepath.Base(src)+"</a>")
+				">"+playImage+"</a>")
 		}
 		return strings.Join(parts, ", ")
 	}
@@ -268,7 +272,7 @@ func fixDefiHTML(
 		defi = fixFileSrc(defi, resURL)
 	}
 	if conf.Audio {
-		defi = fixAudioTag(defi, resURL)
+		defi = fixAudioTag(defi, resURL, getPlayImage())
 	}
 	if conf.EmbedExternalStylesheet {
 		defi = embedExternalStyle(defi, dic.ResourceDir())
