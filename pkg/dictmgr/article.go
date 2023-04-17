@@ -16,13 +16,17 @@ import (
 	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/html"
+	"github.com/therecipe/qt/core"
 )
 
 var (
-	srcRE       = regexp.MustCompile(` src="[^<>"]*?"`)
-	hrefSoundRE = regexp.MustCompile(` href="sound://[^<>"]*?"`)
-	audioRE     = regexp.MustCompile(`<audio[ >].*?</audio>`)
-	linkRE      = regexp.MustCompile(`<link [^<>]+>`)
+	srcRE = regexp.MustCompile(` src="[^<>"]*?"`)
+
+	emptySoundRE = regexp.MustCompile(`<a [^<>]*href="sound://[^<>"]*?"></a>`)
+	hrefSoundRE  = regexp.MustCompile(` href="sound://[^<>"]*?"`)
+	audioRE      = regexp.MustCompile(`<audio[ >].*?</audio>`)
+
+	linkRE = regexp.MustCompile(`<link [^<>]+>`)
 
 	colorRE      = regexp.MustCompile(` color=["']#?[a-zA-Z0-9]+["']`)
 	styleColorRE = regexp.MustCompile(`color:#?[a-zA-Z0-9]+`)
@@ -54,6 +58,13 @@ func fixSoundURL(quoted string, resURL string) (bool, string) {
 		return false, ""
 	}
 	return true, resURL + "/" + urlStr[len("sound://"):]
+}
+
+func fixEmptySoundLink(defi string, playImg string) string {
+	subFunc := func(match string) string {
+		return match[:len(match)-4] + playImg + "</a>"
+	}
+	return emptySoundRE.ReplaceAllStringFunc(defi, subFunc)
 }
 
 func fixHrefSound(defi string, resURL string) string {
@@ -227,15 +238,34 @@ func applyColorMapping(defi string, colorMapping map[string]string) string {
 	return defi
 }
 
+func getPlayImage() string {
+	imgPath, err := loadPNGFile("audio-play.png")
+	if err != nil {
+		log.Println(err)
+	}
+	qUrl := core.NewQUrl()
+	qUrl.SetScheme("file")
+	qUrl.SetPath(imgPath, core.QUrl__TolerantMode)
+	return fmt.Sprintf(
+		`<img src=%s />`,
+		strconv.Quote(qUrl.ToString(core.QUrl__None)),
+	)
+}
+
 func fixDefiHTML(
 	defi string,
 	resURL string,
 	conf *config.Config,
 	dic common.Dictionary,
 ) string {
+	if conf.Audio {
+		defi = fixEmptySoundLink(defi, getPlayImage())
+		if resURL != "" {
+			defi = fixHrefSound(defi, resURL)
+		}
+	}
 	if resURL != "" {
 		defi = fixFileSrc(defi, resURL)
-		defi = fixHrefSound(defi, resURL)
 	}
 	if conf.Audio {
 		defi = fixAudioTag(defi, resURL)
