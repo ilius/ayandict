@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/BurntSushi/toml"
 )
@@ -15,7 +16,9 @@ func codeValue(x any) string {
 }
 
 func jsonCodeValue(x any) string {
-	switch x.(type) {
+	switch typed := x.(type) {
+	case time.Duration:
+		return fmt.Sprintf("``%#v``", typed.String())
 	case int, float64, string, bool:
 		return fmt.Sprintf("``%#v``", x)
 	}

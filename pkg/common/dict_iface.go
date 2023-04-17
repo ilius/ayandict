@@ -1,5 +1,7 @@
 package common
 
+import "time"
+
 type Dictionary interface {
 	Disabled() bool
 	SetDisabled(bool)
@@ -15,8 +17,8 @@ type Dictionary interface {
 	IndexFileSize() uint64
 	InfoPath() string
 	CalcHash() ([]byte, error)
-	SearchFuzzy(query string, workerCount int) []*SearchResultLow
-	SearchStartWith(query string, workerCount int) []*SearchResultLow
-	SearchRegex(query string, workerCount int) ([]*SearchResultLow, error)
-	SearchGlob(query string, workerCount int) ([]*SearchResultLow, error)
+	SearchFuzzy(query string, workerCount int, timeout time.Duration) []*SearchResultLow
+	SearchStartWith(query string, workerCount int, timeout time.Duration) []*SearchResultLow
+	SearchRegex(query string, workerCount int, timeout time.Duration) ([]*SearchResultLow, error)
+	SearchGlob(query string, workerCount int, timeout time.Duration) ([]*SearchResultLow, error)
 }

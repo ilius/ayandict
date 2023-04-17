@@ -150,13 +150,19 @@ Default value: ``["8357"]``
 
 ``local_client_timeout``
 ------------------------
-Timeout for local web client, default is 100ms
+Timeout for local web client
 
-Default value: ``""``
+Default value: ``"100ms"``
 
 ``search_worker_count``
 -----------------------
 The number of workers / goroutines used for search
 
 Default value: ``8``
+
+``search_timeout``
+------------------
+Timeout for search on each dictionary
+
+Default value: ``"5s"``
 

@@ -41,7 +41,9 @@ var commentMap = map[string]string{
 
 	"local_server_ports": "Ports for local server. Server runs on first port; Client tries all",
 
-	"local_client_timeout": "Timeout for local web client, default is 100ms",
+	"local_client_timeout": "Timeout for local web client",
 
 	"search_worker_count": "The number of workers / goroutines used for search",
+
+	"search_timeout": "Timeout for search on each dictionary",
 }

@@ -66,6 +66,8 @@ type Config struct {
 	LocalClientTimeout time.Duration `toml:"local_client_timeout"`
 
 	SearchWorkerCount int `toml:"search_worker_count"`
+
+	SearchTimeout time.Duration `toml:"search_timeout"`
 }
 
 const defaultHeaderTemplate = `<b><font color='#55f'>{{.DictName}}</font></b>
@@ -132,6 +134,8 @@ func Default() *Config {
 		LocalClientTimeout: 100 * time.Millisecond,
 
 		SearchWorkerCount: 8,
+
+		SearchTimeout: 5 * time.Second,
 	}
 }
 
