@@ -362,6 +362,13 @@ func (app *Application) Run() {
 	okButton.ConnectClicked(func(bool) {
 		onQuery(entry.Text(), queryArgs, false)
 	})
+	queryModeCombo.ConnectCurrentIndexChanged(func(i int) {
+		text := entry.Text()
+		if text == "" {
+			return
+		}
+		onQuery(text, queryArgs, false)
+	})
 	aboutButton.ConnectClicked(func(bool) {
 		aboutClicked(window)
 	})
