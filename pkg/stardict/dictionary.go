@@ -2,7 +2,6 @@ package stardict
 
 import (
 	"bytes"
-	"crypto/sha1"
 	"encoding/binary"
 	"io"
 	"log"
@@ -16,6 +15,7 @@ import (
 	"github.com/gobwas/glob"
 	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/levenshtein"
+	"github.com/ilius/ayandict/pkg/murmur3"
 )
 
 // dictionaryImp stardict dictionary
@@ -72,7 +72,7 @@ func (d *dictionaryImp) CalcHash() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	hash := sha1.New()
+	hash := murmur3.New128()
 	if _, err := io.Copy(hash, file); err != nil {
 		return nil, err
 	}
