@@ -3,7 +3,6 @@ package application
 import (
 	"fmt"
 	"os"
-	"time"
 
 	// "github.com/therecipe/qt/webengine"
 
@@ -50,14 +49,7 @@ func (app *Application) Run() {
 	if len(conf.LocalServerPorts) == 0 {
 		panic("config local_server_ports is empty")
 	}
-	if conf.LocalClientTimeout != "" {
-		timeout, err := time.ParseDuration(conf.LocalClientTimeout)
-		if err != nil {
-			qerr.Errorf("bad local_client_timeout=%v", conf.LocalClientTimeout)
-		} else if timeout > 0 {
-			client.Timeout = timeout
-		}
-	}
+	client.Timeout = conf.LocalClientTimeout
 
 	if isSingleInstanceRunning(APP_NAME, conf.LocalServerPorts) {
 		qerr.Error("Another instance is running")

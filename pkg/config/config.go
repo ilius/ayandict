@@ -63,7 +63,7 @@ type Config struct {
 
 	LocalServerPorts []string `toml:"local_server_ports"`
 
-	LocalClientTimeout string `toml:"local_client_timeout"`
+	LocalClientTimeout time.Duration `toml:"local_client_timeout"`
 
 	SearchWorkerCount int `toml:"search_worker_count"`
 }
@@ -129,7 +129,7 @@ func Default() *Config {
 			"8357",
 		},
 
-		LocalClientTimeout: "",
+		LocalClientTimeout: 100 * time.Millisecond,
 
 		SearchWorkerCount: 8,
 	}
@@ -185,9 +185,6 @@ func EnsureExists(conf *Config) error {
 	}
 	if !os.IsNotExist(err) {
 		return err
-	}
-	if conf.LocalClientTimeout == "" {
-		conf.LocalClientTimeout = "100ms"
 	}
 	return Save(conf)
 }
