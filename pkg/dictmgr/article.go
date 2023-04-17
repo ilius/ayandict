@@ -262,8 +262,10 @@ func fixDefiHTML(
 	conf *config.Config,
 	dic common.Dictionary,
 ) string {
+	var playImage string
 	if conf.Audio {
-		defi = fixEmptySoundLink(defi, getPlayImage())
+		playImage = getPlayImage()
+		defi = fixEmptySoundLink(defi, playImage)
 		if resURL != "" {
 			defi = fixHrefSound(defi, resURL)
 		}
@@ -272,7 +274,7 @@ func fixDefiHTML(
 		defi = fixFileSrc(defi, resURL)
 	}
 	if conf.Audio {
-		defi = fixAudioTag(defi, resURL, getPlayImage())
+		defi = fixAudioTag(defi, resURL, playImage)
 	}
 	if conf.EmbedExternalStylesheet {
 		defi = embedExternalStyle(defi, dic.ResourceDir())
