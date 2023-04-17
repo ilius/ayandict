@@ -84,7 +84,6 @@ func (d *digest128) bmix(p []byte) (tail []byte) {
 }
 
 func (d *digest128) Sum128() (h1, h2 uint64) {
-
 	h1, h2 = d.h1, d.h2
 
 	var k1, k2 uint64
@@ -178,9 +177,10 @@ func rotl64(x uint64, r byte) uint64 {
 
 // Sum128 returns the MurmurHash3 sum of data. It is equivalent to the
 // following sequence (without the extra burden and the extra allocation):
-//     hasher := New128()
-//     hasher.Write(data)
-//     return hasher.Sum128()
+//
+//	hasher := New128()
+//	hasher.Write(data)
+//	return hasher.Sum128()
 func Sum128(data []byte) (h1 uint64, h2 uint64) {
 	d := &digest128{h1: 0, h2: 0}
 	d.tail = d.bmix(data)

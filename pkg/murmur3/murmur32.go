@@ -61,7 +61,6 @@ func (d *digest32) bmix(p []byte) (tail []byte) {
 }
 
 func (d *digest32) Sum32() (h1 uint32) {
-
 	h1 = d.h1
 
 	var k1 uint32
@@ -99,11 +98,11 @@ func rotl32(x uint32, r byte) uint32 {
 
 // Sum32 returns the MurmurHash3 sum of data. It is equivalent to the
 // following sequence (without the extra burden and the extra allocation):
-//     hasher := New32()
-//     hasher.Write(data)
-//     return hasher.Sum32()
+//
+//	hasher := New32()
+//	hasher.Write(data)
+//	return hasher.Sum32()
 func Sum32(data []byte) uint32 {
-
 	var h1 uint32 = 0
 
 	nblocks := len(data) / 4

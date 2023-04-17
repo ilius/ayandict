@@ -91,42 +91,55 @@ func bench32(b *testing.B, length int) {
 func Benchmark32_1(b *testing.B) {
 	bench32(b, 1)
 }
+
 func Benchmark32_2(b *testing.B) {
 	bench32(b, 2)
 }
+
 func Benchmark32_4(b *testing.B) {
 	bench32(b, 4)
 }
+
 func Benchmark32_8(b *testing.B) {
 	bench32(b, 8)
 }
+
 func Benchmark32_16(b *testing.B) {
 	bench32(b, 16)
 }
+
 func Benchmark32_32(b *testing.B) {
 	bench32(b, 32)
 }
+
 func Benchmark32_64(b *testing.B) {
 	bench32(b, 64)
 }
+
 func Benchmark32_128(b *testing.B) {
 	bench32(b, 128)
 }
+
 func Benchmark32_256(b *testing.B) {
 	bench32(b, 256)
 }
+
 func Benchmark32_512(b *testing.B) {
 	bench32(b, 512)
 }
+
 func Benchmark32_1024(b *testing.B) {
 	bench32(b, 1024)
 }
+
 func Benchmark32_2048(b *testing.B) {
 	bench32(b, 2048)
 }
+
 func Benchmark32_4096(b *testing.B) {
 	bench32(b, 4096)
 }
+
 func Benchmark32_8192(b *testing.B) {
 	bench32(b, 8192)
 }
@@ -159,15 +172,19 @@ func benchPartial32(b *testing.B, length int) {
 func BenchmarkPartial32_8(b *testing.B) {
 	benchPartial32(b, 8)
 }
+
 func BenchmarkPartial32_16(b *testing.B) {
 	benchPartial32(b, 16)
 }
+
 func BenchmarkPartial32_32(b *testing.B) {
 	benchPartial32(b, 32)
 }
+
 func BenchmarkPartial32_64(b *testing.B) {
 	benchPartial32(b, 64)
 }
+
 func BenchmarkPartial32_128(b *testing.B) {
 	benchPartial32(b, 128)
 }
@@ -186,42 +203,55 @@ func bench128(b *testing.B, length int) {
 func Benchmark128_1(b *testing.B) {
 	bench128(b, 1)
 }
+
 func Benchmark128_2(b *testing.B) {
 	bench128(b, 2)
 }
+
 func Benchmark128_4(b *testing.B) {
 	bench128(b, 4)
 }
+
 func Benchmark128_8(b *testing.B) {
 	bench128(b, 8)
 }
+
 func Benchmark128_16(b *testing.B) {
 	bench128(b, 16)
 }
+
 func Benchmark128_32(b *testing.B) {
 	bench128(b, 32)
 }
+
 func Benchmark128_64(b *testing.B) {
 	bench128(b, 64)
 }
+
 func Benchmark128_128(b *testing.B) {
 	bench128(b, 128)
 }
+
 func Benchmark128_256(b *testing.B) {
 	bench128(b, 256)
 }
+
 func Benchmark128_512(b *testing.B) {
 	bench128(b, 512)
 }
+
 func Benchmark128_1024(b *testing.B) {
 	bench128(b, 1024)
 }
+
 func Benchmark128_2048(b *testing.B) {
 	bench128(b, 2048)
 }
+
 func Benchmark128_4096(b *testing.B) {
 	bench128(b, 4096)
 }
+
 func Benchmark128_8192(b *testing.B) {
 	bench128(b, 8192)
 }

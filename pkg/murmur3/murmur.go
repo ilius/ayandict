@@ -7,12 +7,12 @@ Native (and fast) implementation of Austin Appleby's MurmurHash3.
 
 Package murmur3 implements Austin Appleby's non-cryptographic MurmurHash3.
 
- Reference implementation:
-    http://code.google.com/p/smhasher/wiki/MurmurHash3
+	Reference implementation:
+	   http://code.google.com/p/smhasher/wiki/MurmurHash3
 
- History, characteristics and (legacy) perfs:
-    https://sites.google.com/site/murmurhash/
-    https://sites.google.com/site/murmurhash/statistics
+	History, characteristics and (legacy) perfs:
+	   https://sites.google.com/site/murmurhash/
+	   https://sites.google.com/site/murmurhash/statistics
 */
 package murmur3
 
