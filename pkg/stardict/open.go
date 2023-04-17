@@ -1,6 +1,7 @@
 package stardict
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -25,18 +26,44 @@ func Open(dirPathList []string, order map[string]int) ([]common.Dictionary, erro
 	var dicList []common.Dictionary
 	const ext = ".ifo"
 
-	walkFunc := func(path string, fi os.FileInfo, err error) error {
+	findIfoFile := func(path string) (string, os.FileInfo, error) {
+		dirEntries, err := os.ReadDir(path)
 		if err != nil {
-			return err
+			return "", nil, err
 		}
+		for _, de := range dirEntries {
+			if filepath.Ext(de.Name()) != ext {
+				continue
+			}
+			fi, err := de.Info()
+			if err != nil {
+				return "", nil, err
+			}
+			if fi == nil {
+				return "", nil, nil
+			}
+			return filepath.Join(path, fi.Name()), fi, nil
+		}
+		return "", nil, nil
+	}
+
+	checkDirEntry := func(path string, fi os.FileInfo) error {
 		if fi.IsDir() {
-			return nil
+			ifoPath, ifoFi, err := findIfoFile(path)
+			if err != nil {
+				return err
+			}
+			if ifoFi == nil {
+				return nil
+			}
+			fi = ifoFi
+			path = ifoPath
 		}
 		name := fi.Name()
-		if filepath.Ext(fi.Name()) != ext {
+		if filepath.Ext(name) != ext {
 			return nil
 		}
-		log.Printf("Initializing %#v\n", path)
+		log.Printf("Initializing %#v\n", name)
 		dirPath := filepath.Dir(path)
 		dic, err := NewDictionary(dirPath, name[:len(name)-len(ext)])
 		if err != nil {
@@ -65,12 +92,20 @@ func Open(dirPathList []string, order map[string]int) ([]common.Dictionary, erro
 		if !filepath.IsAbs(dirPath) {
 			dirPath = filepath.Join(homeDir, dirPath)
 		}
-		err := filepath.Walk(dirPath, walkFunc)
+
+		dirEntries, err := ioutil.ReadDir(dirPath)
 		if err != nil {
-			log.Println(err)
 			qerr.Error(err)
+			continue
+		}
+		for _, fi := range dirEntries {
+			err := checkDirEntry(filepath.Join(dirPath, fi.Name()), fi)
+			if err != nil {
+				go qerr.Error(err)
+			}
 		}
 	}
+	log.Println("Starting to load indexes")
 	var wg sync.WaitGroup
 	load := func(dic common.Dictionary) {
 		defer wg.Done()

@@ -57,6 +57,7 @@ func dictunzip(filename string) (string, error) {
 // ReadDict creates Dict and opens .dict file
 func ReadDict(filename string, info *Info) (*Dict, error) {
 	if strings.HasSuffix(filename, ".dz") {
+		log.Println("dictunzip", filename)
 		// if file is compressed then read it from archive
 		var err error
 		filename, err = dictunzip(filename)
