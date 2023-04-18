@@ -60,6 +60,20 @@ func (view *ArticleView) createContextMenu() *widgets.QMenu {
 		text = strings.TrimSpace(text)
 		view.app.Clipboard().SetText(text, gui.QClipboard__Clipboard)
 	})
+	menu.AddAction("Copy HTML").ConnectTriggered(func(checked bool) {
+		text := view.TextCursor().Selection().ToHtml(core.NewQByteArray2("utf-8", 5))
+		body := strings.Index(text, "<body>")
+		if body >= 0 {
+			text = text[body+6:]
+		}
+		end := strings.Index(text, "</body>")
+		if end >= 0 {
+			text = text[:end]
+		}
+		text = strings.Replace(text, "<!--EndFragment-->", "", 1)
+		// starts with: <p style="..."><br /></p>
+		view.app.Clipboard().SetText(text, gui.QClipboard__Clipboard)
+	})
 	menu.AddAction("Copy All (HTML)").ConnectTriggered(func(checked bool) {
 		view.app.Clipboard().SetText(
 			view.ToHtml(),
