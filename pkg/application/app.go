@@ -52,7 +52,7 @@ func (app *Application) Run() {
 	}
 	client.Timeout = conf.LocalClientTimeout
 
-	if isSingleInstanceRunning(common.APP_NAME, conf.LocalServerPorts) {
+	if ok, _ := findLocalServer(conf.LocalServerPorts); ok {
 		qerr.Error("Another instance is running")
 		return
 	}

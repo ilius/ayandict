@@ -21,11 +21,6 @@ var client = http.Client{
 	Timeout: 100 * time.Millisecond,
 }
 
-func isSingleInstanceRunning(appName string, ports []string) bool {
-	ok, _ := findLocalServer(ports)
-	return ok
-}
-
 func findLocalServer(ports []string) (bool, string) {
 	for _, port := range ports {
 		_url := &url.URL{
@@ -44,7 +39,7 @@ func findLocalServer(ports []string) (bool, string) {
 		if res.Body == nil {
 			continue
 		}
-		log.Printf("%s responsed in %v", _urlStr, time.Now().Sub(t))
+		log.Printf("%s responded in %v", _urlStr, time.Now().Sub(t))
 		data, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			qerr.Error(err)
