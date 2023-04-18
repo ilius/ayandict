@@ -12,6 +12,7 @@ import (
 	"github.com/ilius/ayandict/pkg/favorites"
 	"github.com/ilius/ayandict/pkg/frequency"
 	"github.com/ilius/ayandict/pkg/qerr"
+	"github.com/ilius/ayandict/pkg/server"
 	"github.com/ilius/ayandict/pkg/settings"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
@@ -51,11 +52,11 @@ func (app *Application) Run() {
 	}
 	client.Timeout = conf.LocalClientTimeout
 
-	if isSingleInstanceRunning(APP_NAME, conf.LocalServerPorts) {
+	if isSingleInstanceRunning(common.APP_NAME, conf.LocalServerPorts) {
 		qerr.Error("Another instance is running")
 		return
 	}
-	go startSingleInstanceServer(APP_NAME, conf.LocalServerPorts[0])
+	go server.StartServer(conf.LocalServerPorts[0])
 
 	LoadUserStyle(app)
 	dictmgr.InitDicts(conf)

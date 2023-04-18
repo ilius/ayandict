@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/qerr"
 )
 
@@ -23,19 +24,6 @@ var client = http.Client{
 func isSingleInstanceRunning(appName string, ports []string) bool {
 	ok, _ := findLocalServer(ports)
 	return ok
-}
-
-func handleGetAppName(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(APP_NAME))
-}
-
-func startSingleInstanceServer(appName string, port string) {
-	http.HandleFunc("/"+serverAppName, handleGetAppName)
-	log.Println("Starting local server on port", port)
-	err := http.ListenAndServe(":"+port, nil)
-	if err != nil {
-		qerr.Error(err)
-	}
 }
 
 func findLocalServer(ports []string) (bool, string) {
@@ -63,7 +51,7 @@ func findLocalServer(ports []string) (bool, string) {
 			continue
 		}
 		res.Body.Close()
-		if string(data) == APP_NAME {
+		if string(data) == common.APP_NAME {
 			return true, port
 		}
 	}

@@ -3,6 +3,7 @@ package application
 import (
 	"fmt"
 
+	"github.com/ilius/ayandict/pkg/common"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
 )
@@ -34,7 +35,7 @@ func aboutClicked(
 	topHBox := widgets.NewQHBoxLayout()
 	topLabel := widgets.NewQLabel2(fmt.Sprintf(
 		"AyanDict\nVersion %s",
-		VERSION,
+		common.VERSION,
 	), nil, 0)
 	topHBox.AddWidget(topLabel, 0, 0)
 
@@ -50,19 +51,19 @@ func aboutClicked(
 	// 	padding: 15px;
 	// }`)
 
-	aboutLabel := widgets.NewQLabel2(ABOUT, nil, 0)
+	aboutLabel := widgets.NewQLabel2(common.ABOUT, nil, 0)
 	aboutLabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
 	aboutLabel.SetAlignment(core.Qt__AlignTop)
 	addTabWithIcon(tabWidget, aboutLabel, "About", "dialog-information-22.png")
 
-	authorsLabel := widgets.NewQLabel2(AUTHORS, nil, 0)
+	authorsLabel := widgets.NewQLabel2(common.AUTHORS, nil, 0)
 	authorsLabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
 	authorsLabel.SetAlignment(core.Qt__AlignTop)
 	addTabWithIcon(tabWidget, authorsLabel, "Authors", "author-22.png")
 
 	licenseWidget := widgets.NewQTextEdit(nil)
 	licenseWidget.SetReadOnly(true)
-	licenseWidget.SetPlainText(LICENSE)
+	licenseWidget.SetPlainText(common.LICENSE)
 	addTabWithIcon(tabWidget, licenseWidget, "License", "license-22.png")
 
 	buttonBox := widgets.NewQDialogButtonBox(nil)

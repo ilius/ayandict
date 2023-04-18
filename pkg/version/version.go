@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/ilius/ayandict/pkg/application"
+	"github.com/ilius/ayandict/pkg/common"
 )
 
 func main() {
-	fmt.Println(application.VERSION)
+	fmt.Println(common.VERSION)
 }
