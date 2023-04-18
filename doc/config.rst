@@ -162,7 +162,7 @@ Default value: ``8``
 
 ``search_timeout``
 ------------------
-Timeout for search on each dictionary
+Timeout for search on each dictionary. Only works if ``search_worker_count > 1``
 
 Default value: ``"5s"``
 

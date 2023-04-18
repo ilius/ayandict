@@ -45,5 +45,5 @@ var commentMap = map[string]string{
 
 	"search_worker_count": "The number of workers / goroutines used for search",
 
-	"search_timeout": "Timeout for search on each dictionary",
+	"search_timeout": "Timeout for search on each dictionary. Only works if ``search_worker_count > 1``",
 }
