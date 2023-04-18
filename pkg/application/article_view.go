@@ -4,6 +4,7 @@ import (
 	"log"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/therecipe/qt/core"
@@ -32,6 +33,7 @@ type ArticleView struct {
 	doQuery func(string)
 
 	rightClickOnWord string
+	rightClickOnUrl  string
 }
 
 func NewArticleView(app *Application) *ArticleView {
@@ -60,6 +62,11 @@ func (view *ArticleView) createContextMenu() *widgets.QMenu {
 			view.doQuery(view.rightClickOnWord)
 		}
 	})
+	if view.rightClickOnUrl != "" {
+		menu.AddAction("Copy Link Target").ConnectTriggered(func(checked bool) {
+			view.app.Clipboard().SetText(view.rightClickOnUrl, gui.QClipboard__Clipboard)
+		})
+	}
 	menu.AddAction("Copy").ConnectTriggered(func(checked bool) {
 		text := view.TextCursor().SelectedText()
 		if text == "" {
@@ -133,6 +140,32 @@ func (view *ArticleView) ZoomIn(ran int) {
 
 func (view *ArticleView) ZoomOut(ran int) {
 	view.zoom(-1)
+}
+
+func (view *ArticleView) findLinkOnCursor(cursor *gui.QTextCursor) string {
+	text := cursor.Selection().ToHtml(core.NewQByteArray2("utf-8", 5))
+	// log.Println("findLinkOnCursor:", text)
+	start := strings.Index(text, startFrag)
+	if start >= 0 {
+		text = text[start:]
+	}
+	start = strings.Index(text, "href=")
+	if start < 0 {
+		// log.Println("findLinkOnCursor: did not find end href=")
+		return ""
+	}
+	text = text[start+5:]
+	end := strings.Index(text[1:], text[:1])
+	if end < 0 {
+		// log.Println("findLinkOnCursor: did not find end quote")
+		return ""
+	}
+	urlStr, err := strconv.Unquote(text[:end+2])
+	if err != nil {
+		// log.Println("error in Unquote", err)
+		return ""
+	}
+	return urlStr
 }
 
 func (view *ArticleView) SetupCustomHandlers() {
@@ -214,6 +247,13 @@ func (view *ArticleView) SetupCustomHandlers() {
 				cursor := view.CursorForPosition(event.Pos())
 				cursor.Select(gui.QTextCursor__WordUnderCursor)
 				// it doesn't actually select the word in GUI
+
+				urlStr := view.findLinkOnCursor(cursor)
+				if urlStr != "" {
+					// log.Println("right-click on url:", urlStr)
+					view.rightClickOnUrl = urlStr
+				}
+
 				view.rightClickOnWord = strings.Trim(cursor.SelectedText(), punctuation)
 				if view.rightClickOnWord != "" {
 					log.Printf("Right-clicked on word %#v\n", view.rightClickOnWord)

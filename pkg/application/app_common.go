@@ -10,7 +10,7 @@ const (
 )
 
 // we trim these characters when user right-clicks on a word without selecting it
-const punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~،؛؟۔"
+const punctuation = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~،؛؟۔"
 
 // when double-click in QTextBrowser. some punctuations next to words
 // are also selected, specially non-ascii ones,
