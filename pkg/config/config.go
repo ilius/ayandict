@@ -16,9 +16,6 @@ const fileName = "config.toml"
 
 var mutex sync.Mutex
 
-// if you set FontSize, you can not change font size of
-// html definition view using mouse scroll
-
 type Config struct {
 	DirectoryList []string `toml:"directory_list"`
 
