@@ -46,6 +46,8 @@ type Config struct {
 
 	Audio bool `toml:"audio"`
 
+	AudioAutoPlay int `toml:"audio_auto_play"`
+
 	EmbedExternalStylesheet bool `toml:"embed_external_stylesheet"`
 
 	ColorMapping map[string]string `toml:"color_mapping"`
@@ -111,6 +113,8 @@ func Default() *Config {
 		MaxResultsTotal: 40,
 
 		Audio: true,
+
+		AudioAutoPlay: 1,
 
 		EmbedExternalStylesheet: false,
 

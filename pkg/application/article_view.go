@@ -6,7 +6,10 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/ilius/ayandict/pkg/common"
+	"github.com/ilius/ayandict/pkg/mp3duration"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/multimedia"
@@ -32,6 +35,8 @@ type ArticleView struct {
 	dpi     float64
 	doQuery func(string)
 
+	mediaPlayer *multimedia.QMediaPlayer
+
 	rightClickOnWord string
 	rightClickOnUrl  string
 }
@@ -47,6 +52,58 @@ func NewArticleView(app *Application) *ArticleView {
 		QTextBrowser: widget,
 		app:          app,
 		dpi:          dpi,
+	}
+}
+
+var audioUrlRE = regexp.MustCompile(`href="[^<>"]+\.mp3"`)
+
+func (view *ArticleView) autoPlay(text string, count int) {
+	player := view.mediaPlayer
+	for _, match := range audioUrlRE.FindAllString(text, count) {
+		urlStr, err := strconv.Unquote(match[5:])
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		qUrl := core.NewQUrl3(urlStr, core.QUrl__TolerantMode)
+		log.Println("Playing audio", urlStr)
+		content := multimedia.NewQMediaContent2(qUrl)
+		player.SetMedia(content, nil)
+		player.Play()
+		// log.Println("Duration:", player.Duration())
+		// player.Duration() is always zero
+		if qUrl.Scheme() != "file" {
+			// TODO: save to a cache directory
+			time.Sleep(2000 * time.Millisecond)
+			continue
+		}
+		fpath := filePathFromQUrl(qUrl)
+		if fpath == "" {
+			continue
+		}
+		duration, err := mp3duration.Calculate(fpath)
+		if err != nil {
+			log.Printf("error in mp3duration.Calculate(%#v): %v", fpath, err)
+			continue
+		}
+		duration += 500 * time.Millisecond
+		log.Println("Sleeping", duration)
+		time.Sleep(duration)
+	}
+}
+
+func (view *ArticleView) SetResult(res common.SearchResultIface) {
+	text := strings.Join(
+		res.DefinitionsHTML(),
+		"\n<br/>\n",
+	)
+	text2 := text
+	if definitionStyleString != "" {
+		text2 = definitionStyleString + text2
+	}
+	view.SetHtml(text2)
+	if conf.Audio && conf.AudioAutoPlay > 0 {
+		go view.autoPlay(text, conf.AudioAutoPlay)
 	}
 }
 
@@ -174,6 +231,7 @@ func (view *ArticleView) SetupCustomHandlers() {
 		panic("doQuery is not set")
 	}
 	mediaPlayer := multimedia.NewQMediaPlayer(nil, 0)
+	view.mediaPlayer = mediaPlayer
 
 	copyAction := widgets.NewQAction2("Copy", view)
 	view.AddAction(copyAction)

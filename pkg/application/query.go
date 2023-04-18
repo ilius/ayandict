@@ -115,14 +115,7 @@ func (w *ResultListWidget) OnActivate(row int) {
 	}
 	res := w.results[row]
 	w.HeaderLabel.SetResult(res)
-	text := strings.Join(
-		res.DefinitionsHTML(),
-		"\n<br/>\n",
-	)
-	if definitionStyleString != "" {
-		text = definitionStyleString + text
-	}
-	w.ArticleView.SetHtml(text)
+	w.ArticleView.SetResult(res)
 	resDir := res.ResourceDir()
 	if resDir == "" {
 		w.ArticleView.SetSearchPaths([]string{})

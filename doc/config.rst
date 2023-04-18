@@ -106,6 +106,12 @@ Enable audio in article
 
 Default value: ``true``
 
+``audio_auto_play``
+-------------------
+Number of audio file to auto-play, set ``0`` to disable.
+
+Default value: ``1``
+
 ``embed_external_stylesheet``
 -----------------------------
 Embed external stylesheet/css in article

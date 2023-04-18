@@ -2,10 +2,22 @@ package application
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 )
+
+func filePathFromQUrl(qUrl *core.QUrl) string {
+	fpath := qUrl.Path(core.QUrl__FullyEncoded)
+	if fpath == "" {
+		return ""
+	}
+	if filepath.Separator == '\\' {
+		fpath = fpath[1:]
+	}
+	return fpath
+}
 
 func plaintextFromHTML(htext string) string {
 	doc := gui.NewQTextDocument(nil)
