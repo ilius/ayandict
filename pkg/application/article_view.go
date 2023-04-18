@@ -3,6 +3,7 @@ package application
 import (
 	"log"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/therecipe/qt/core"
@@ -15,6 +16,13 @@ import (
 // Zooming into HTML documents only works if the font-size is not set to a fixed size.
 // https://github.com/qt/qtbase/blob/dev/src/widgets/widgets/qtextedit.cpp#L451
 // https://bugreports.qt.io/browse/QTBUG-52751
+
+const (
+	startFrag = "<!--StartFragment-->"
+	endFrag   = "<!--EndFragment-->"
+)
+
+var dummyParagRE = regexp.MustCompile(`<p [^<>]*><br />(</p>|$)`)
 
 type ArticleView struct {
 	*widgets.QTextBrowser
@@ -61,17 +69,7 @@ func (view *ArticleView) createContextMenu() *widgets.QMenu {
 		view.app.Clipboard().SetText(text, gui.QClipboard__Clipboard)
 	})
 	menu.AddAction("Copy HTML").ConnectTriggered(func(checked bool) {
-		text := view.TextCursor().Selection().ToHtml(core.NewQByteArray2("utf-8", 5))
-		body := strings.Index(text, "<body>")
-		if body >= 0 {
-			text = text[body+6:]
-		}
-		end := strings.Index(text, "</body>")
-		if end >= 0 {
-			text = text[:end]
-		}
-		text = strings.Replace(text, "<!--EndFragment-->", "", 1)
-		// starts with: <p style="..."><br /></p>
+		text := view.selectedHTML()
 		view.app.Clipboard().SetText(text, gui.QClipboard__Clipboard)
 	})
 	menu.AddAction("Copy All (HTML)").ConnectTriggered(func(checked bool) {
@@ -88,6 +86,29 @@ func (view *ArticleView) createContextMenu() *widgets.QMenu {
 	})
 
 	return menu
+}
+
+func (view *ArticleView) selectedHTML() string {
+	text := view.TextCursor().Selection().ToHtml(core.NewQByteArray2("utf-8", 5))
+	body := strings.Index(text, "<body>")
+	if body >= 0 {
+		text = text[body+6:]
+	}
+	endBody := strings.Index(text, "</body>")
+	if endBody >= 0 {
+		text = text[:endBody]
+	}
+	start := strings.Index(text, startFrag)
+	if start >= 0 {
+		text = text[start+len(startFrag):]
+	}
+	end := strings.Index(text, endFrag)
+	if end >= 0 {
+		text = text[:end]
+	}
+	text = strings.TrimSpace(text)
+	text = dummyParagRE.ReplaceAllString(text, "")
+	return text
 }
 
 func (view *ArticleView) zoom(delta int) {
