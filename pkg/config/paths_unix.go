@@ -15,3 +15,7 @@ func GetConfigDir() string {
 	}
 	return filepath.Join(parent, "ayandict")
 }
+
+func GetCacheDir() string {
+	return filepath.Join(os.Getenv("HOME"), ".cache", "ayandict")
+}

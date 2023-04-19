@@ -30,6 +30,17 @@ func Run() {
 		allTextWidgets: []common.HasSetFont{},
 	}
 	qerr.ShowQtError = true
+
+	if cacheDir == "" {
+		qerr.Error(cacheDir)
+	}
+	{
+		err := os.MkdirAll(cacheDir, 0o755)
+		if err != nil {
+			qerr.Error(err)
+		}
+	}
+
 	app.Run()
 }
 

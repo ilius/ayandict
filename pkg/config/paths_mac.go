@@ -14,3 +14,7 @@ func GetConfigDir() string {
 		"Library/Preferences/AyanDict",
 	)
 }
+
+func GetCacheDir() string {
+	return filepath.Join(os.Getenv("HOME"), "Library", "Caches", "AyanDict")
+}

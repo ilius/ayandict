@@ -3,18 +3,19 @@ package application
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 )
 
 func filePathFromQUrl(qUrl *core.QUrl) string {
-	fpath := qUrl.Path(core.QUrl__FullyEncoded)
+	fpath := qUrl.Path(core.QUrl__FullyDecoded)
 	if fpath == "" {
 		return ""
 	}
 	if filepath.Separator == '\\' {
-		fpath = fpath[1:]
+		fpath = strings.TrimLeft(fpath, "/")
 	}
 	return fpath
 }

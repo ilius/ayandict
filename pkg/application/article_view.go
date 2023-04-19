@@ -66,14 +66,23 @@ func (view *ArticleView) autoPlay(text string, count int) {
 			continue
 		}
 		qUrl := core.NewQUrl3(urlStr, core.QUrl__TolerantMode)
-		log.Println("Playing audio", urlStr)
+		// log.Println("Playing audio", urlStr)
+		isRemote := qUrl.Scheme() != "file"
+		if isRemote {
+			qUrlLocal, err := audioCache.Get(urlStr)
+			if err != nil {
+				log.Println(err)
+			} else {
+				qUrl = qUrlLocal
+				isRemote = false
+			}
+		}
 		content := multimedia.NewQMediaContent2(qUrl)
 		player.SetMedia(content, nil)
 		player.Play()
 		// log.Println("Duration:", player.Duration())
 		// player.Duration() is always zero
-		if qUrl.Scheme() != "file" {
-			// TODO: save to a cache directory
+		if isRemote {
 			time.Sleep(2000 * time.Millisecond)
 			continue
 		}
@@ -81,6 +90,7 @@ func (view *ArticleView) autoPlay(text string, count int) {
 		if fpath == "" {
 			continue
 		}
+		// log.Println("Calculating duration of", fpath)
 		duration, err := mp3duration.Calculate(fpath)
 		if err != nil {
 			log.Printf("error in mp3duration.Calculate(%#v): %v", fpath, err)
