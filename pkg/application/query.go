@@ -17,6 +17,7 @@ type QueryArgs struct {
 	HeaderLabel *HeaderLabel
 	HistoryView *HistoryView
 	PostQuery   func(string)
+	Entry       *widgets.QLineEdit
 	ModeCombo   *widgets.QComboBox
 }
 
@@ -30,6 +31,19 @@ func (w *QueryArgs) AddHistoryAndFrequency(query string) {
 			SaveFrequency()
 		}
 	}
+}
+
+func (w *QueryArgs) SetNoResult(query string) {
+	w.ArticleView.SetHtml(fmt.Sprintf("No results for %#v", query))
+	w.HeaderLabel.SetText("")
+	w.AddHistoryAndFrequency(query)
+}
+
+func (w *QueryArgs) ResetQuery() {
+	w.Entry.SetText("")
+	w.ResultList.Clear()
+	w.HeaderLabel.SetText("")
+	w.ArticleView.SetHtml("")
 }
 
 func NewResultListWidget(
@@ -159,9 +173,7 @@ func onQuery(
 	queryWidgets.ResultList.SetResults(results)
 	if len(results) == 0 {
 		if !isAuto {
-			queryWidgets.ArticleView.SetHtml(fmt.Sprintf("No results for %#v", query))
-			queryWidgets.HeaderLabel.SetText("")
-			queryWidgets.AddHistoryAndFrequency(query)
+			queryWidgets.SetNoResult(query)
 		}
 	}
 	if !isAuto {

@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	// "github.com/therecipe/qt/webengine"
@@ -93,7 +94,7 @@ func (app *Application) Run() {
 		"Glob",
 	})
 
-	okButton := widgets.NewQPushButton2("OK", nil)
+	okButton := widgets.NewQPushButton2(" OK ", nil)
 
 	queryFavoriteButton := NewPNGIconTextButton("", "favorite.png")
 	queryFavoriteButton.SetCheckable(true)
@@ -103,7 +104,18 @@ func (app *Application) Run() {
 	favoriteButton := NewPNGIconTextButton("", "favorite.png")
 	favoriteButton.SetCheckable(true)
 	favoriteButton.SetToolTip("Add this term to favorites")
+	favoriteButton.Hide()
 	// favoriteButtonVBox.AddWidget(favoriteButton, 0, core.Qt__AlignBottom)
+
+	okButton.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		h := event.Size().Height()
+		log.Println("okButton height =")
+		if h > 100 {
+			return
+		}
+		queryFavoriteButton.SetFixedSize2(h, h)
+		favoriteButton.SetFixedSize2(h, h)
+	})
 
 	queryLabel := widgets.NewQLabel2("Query:", nil, 0)
 	queryBox := widgets.NewQFrame(nil, 0)
@@ -125,13 +137,11 @@ func (app *Application) Run() {
 	headerBoxLayout := widgets.NewQHBoxLayout2(headerBox)
 	// headerBoxLayout.SetSizeConstraint(widgets.QLayout__SetMinimumSize)
 	headerBoxLayout.SetContentsMargins(0, 0, 0, 0)
-	// headerBoxLayout.AddLayout(favoriteButtonVBox, 0)
-	headerBoxLayout.AddWidget(favoriteButton, 0, core.Qt__AlignCenter)
-	headerBoxLayout.AddSpacing(10)
+	headerBoxLayout.AddSpacing(5)
 	headerBoxLayout.AddWidget(headerLabel, 1, 0)
-	// it is very important that last argument ^ above is 0
-	// otherwise label will not expand (while in layout and in wrap mode)
-	// don't ask me why!
+	// headerBoxLayout.AddLayout(favoriteButtonVBox, 0)
+	headerBoxLayout.AddWidget(favoriteButton, 0, core.Qt__AlignRight)
+	headerBoxLayout.AddSpacing(15)
 	headerBox.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
 
 	articleView := NewArticleView(app)
@@ -269,6 +279,7 @@ func (app *Application) Run() {
 	})
 
 	onResultDisplay := func(terms []string) {
+		favoriteButton.Show()
 		isFav := favoritesWidget.HasFavorite(terms[0])
 		favoriteButton.SetChecked(isFav)
 	}
@@ -297,6 +308,7 @@ func (app *Application) Run() {
 		HeaderLabel: headerLabel,
 		HistoryView: historyView,
 		PostQuery:   postQuery,
+		Entry:       entry,
 		ModeCombo:   queryModeCombo,
 	}
 
@@ -352,11 +364,8 @@ func (app *Application) Run() {
 	ReloadFont(app)
 
 	resetQuery := func() {
-		entry.SetText("")
-		resultList.Clear()
-		articleView.SetHtml("")
-		headerLabel.SetText("")
-		favoriteButton.SetChecked(false)
+		queryArgs.ResetQuery()
+		favoriteButton.Hide()
 		queryFavoriteButton.SetChecked(false)
 	}
 
