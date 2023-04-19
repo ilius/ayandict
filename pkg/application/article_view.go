@@ -102,7 +102,7 @@ func (view *ArticleView) autoPlay(text string, count int) {
 			continue
 		}
 		duration += conf.AudioAutoPlayWaitBetween
-		log.Println("Sleeping", duration)
+		// log.Println("Sleeping", duration)
 		time.Sleep(duration)
 	}
 }

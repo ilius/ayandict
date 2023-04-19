@@ -2,7 +2,6 @@ package application
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	// "github.com/therecipe/qt/webengine"
@@ -109,7 +108,6 @@ func (app *Application) Run() {
 
 	okButton.ConnectResizeEvent(func(event *gui.QResizeEvent) {
 		h := event.Size().Height()
-		log.Println("okButton height =")
 		if h > 100 {
 			return
 		}
