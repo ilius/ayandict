@@ -57,8 +57,15 @@ func NewArticleView(app *Application) *ArticleView {
 
 var audioUrlRE = regexp.MustCompile(`href="[^<>"]+\.mp3"`)
 
-func (view *ArticleView) autoPlay(text string, count int) {
+func (view *ArticleView) playAudio(qUrl *core.QUrl) {
+	log.Println("Playing audio", qUrl.ToString(core.QUrl__PreferLocalFile))
 	player := view.mediaPlayer
+	content := multimedia.NewQMediaContent2(qUrl)
+	player.SetMedia(content, nil)
+	player.Play()
+}
+
+func (view *ArticleView) autoPlay(text string, count int) {
 	for _, match := range audioUrlRE.FindAllString(text, count) {
 		urlStr, err := strconv.Unquote(match[5:])
 		if err != nil {
@@ -77,9 +84,7 @@ func (view *ArticleView) autoPlay(text string, count int) {
 				isRemote = false
 			}
 		}
-		content := multimedia.NewQMediaContent2(qUrl)
-		player.SetMedia(content, nil)
-		player.Play()
+		view.playAudio(qUrl)
 		// log.Println("Duration:", player.Duration())
 		// player.Duration() is always zero
 		if isRemote {
@@ -255,39 +260,50 @@ func (view *ArticleView) SetupCustomHandlers() {
 		view.app.Clipboard().SetText(text, gui.QClipboard__Clipboard)
 	})
 
-	view.ConnectAnchorClicked(func(link *core.QUrl) {
-		host := link.Host(core.QUrl__FullyDecoded)
+	view.ConnectAnchorClicked(func(qUrl *core.QUrl) {
+		host := qUrl.Host(core.QUrl__FullyDecoded)
 		// log.Printf(
 		// 	"AnchorClicked: %#v, host=%#v = %#v\n",
 		// 	link.ToString(core.QUrl__None),
 		// 	host,
 		// 	link.Host(core.QUrl__FullyEncoded),
 		// )
-		if link.Scheme() == "bword" {
+		if qUrl.Scheme() == "bword" {
 			if host != "" {
 				doQuery(host)
 			} else {
-				log.Printf("AnchorClicked: %#v\n", link.ToString(core.QUrl__None))
+				log.Printf("AnchorClicked: %#v\n", qUrl.ToString(core.QUrl__None))
 			}
 			return
 		}
-		path := link.Path(core.QUrl__FullyDecoded)
+		path := qUrl.Path(core.QUrl__FullyDecoded)
 		// log.Printf("scheme=%#v, host=%#v, path=%#v", link.Scheme(), host, path)
-		switch link.Scheme() {
+		switch qUrl.Scheme() {
 		case "":
 			doQuery(path)
 			return
-		case "file", "http", "https":
+		case "file":
 			// log.Printf("host=%#v, ext=%#v", host, ext)
 			switch filepath.Ext(path) {
-			case ".wav", ".mp3", ".ogg":
-				log.Println("Playing audio", link.ToString(core.QUrl__None))
-				mediaPlayer.SetMedia(multimedia.NewQMediaContent2(link), nil)
-				mediaPlayer.Play()
+			case ".mp3", ".wav", ".ogg":
+				view.playAudio(qUrl)
+				return
+			}
+		case "http", "https":
+			// log.Printf("host=%#v, ext=%#v", host, ext)
+			switch filepath.Ext(path) {
+			case ".mp3", ".wav", ".ogg":
+				qUrlLocal, err := audioCache.Get(qUrl.ToString(core.QUrl__None))
+				if err != nil {
+					log.Println(err)
+				} else {
+					qUrl = qUrlLocal
+				}
+				view.playAudio(qUrl)
 				return
 			}
 		}
-		gui.QDesktopServices_OpenUrl(link)
+		gui.QDesktopServices_OpenUrl(qUrl)
 	})
 	// menuStyleOpt := widgets.NewQStyleOptionMenuItem()
 	// style := app.Style()
