@@ -85,14 +85,14 @@ func ReloadFont(app *Application) {
 
 func ReloadConfig(app *Application) {
 	currentDirList := conf.DirectoryList
-	fontFamiliy := conf.FontFamily
+	fontFamily := conf.FontFamily
 	fontSize := conf.FontSize
 
 	if !LoadConfig() {
 		return
 	}
 
-	if conf.FontFamily != fontFamiliy || conf.FontSize != fontSize {
+	if conf.FontFamily != fontFamily || conf.FontSize != fontSize {
 		ReloadFont(app)
 	}
 
