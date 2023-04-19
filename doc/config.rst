@@ -112,6 +112,12 @@ Number of audio file to auto-play, set ``0`` to disable.
 
 Default value: ``1``
 
+``audio_auto_play_wait_between``
+--------------------------------
+Wait time between multiple audio files on auto-play
+
+Default value: ``"500ms"``
+
 ``embed_external_stylesheet``
 -----------------------------
 Embed external stylesheet/css in article

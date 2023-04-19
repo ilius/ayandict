@@ -29,6 +29,8 @@ var commentMap = map[string]string{
 
 	"audio_auto_play": "Number of audio file to auto-play, set ``0`` to disable.",
 
+	"audio_auto_play_wait_between": "Wait time between multiple audio files on auto-play",
+
 	"embed_external_stylesheet": "Embed external stylesheet/css in article",
 
 	"color_mapping": "Mapping for colors used in article",

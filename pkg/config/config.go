@@ -48,6 +48,8 @@ type Config struct {
 
 	AudioAutoPlay int `toml:"audio_auto_play"`
 
+	AudioAutoPlayWaitBetween time.Duration `toml:"audio_auto_play_wait_between"`
+
 	EmbedExternalStylesheet bool `toml:"embed_external_stylesheet"`
 
 	ColorMapping map[string]string `toml:"color_mapping"`
@@ -115,6 +117,8 @@ func Default() *Config {
 		Audio: true,
 
 		AudioAutoPlay: 1,
+
+		AudioAutoPlayWaitBetween: 500 * time.Millisecond,
 
 		EmbedExternalStylesheet: false,
 

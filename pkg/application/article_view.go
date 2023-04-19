@@ -101,7 +101,7 @@ func (view *ArticleView) autoPlay(text string, count int) {
 			log.Printf("error in mp3duration.Calculate(%#v): %v", fpath, err)
 			continue
 		}
-		duration += 500 * time.Millisecond
+		duration += conf.AudioAutoPlayWaitBetween
 		log.Println("Sleeping", duration)
 		time.Sleep(duration)
 	}
