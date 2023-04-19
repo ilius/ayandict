@@ -15,10 +15,12 @@ import (
 	"github.com/therecipe/qt/core"
 )
 
-var cacheDir = config.GetCacheDir()
-var downloader = http.Client{
-	Timeout: 1000 * time.Millisecond,
-}
+var (
+	cacheDir   = config.GetCacheDir()
+	downloader = http.Client{
+		Timeout: 1000 * time.Millisecond,
+	}
+)
 var audioCache = NewAudioCache()
 
 func NewAudioCache() *AudioCache {

@@ -6,6 +6,7 @@ type SearchResultIface interface {
 	DictName() string
 	DefinitionsHTML() []string
 	ResourceDir() string
+	EntryIndex() uint64
 }
 
 type SearchResultItem struct {
@@ -14,9 +15,10 @@ type SearchResultItem struct {
 }
 
 type SearchResultLow struct {
-	Items   func() []*SearchResultItem
-	F_Terms []string
-	F_Score uint8
+	Items        func() []*SearchResultItem
+	F_Terms      []string
+	F_Score      uint8
+	F_EntryIndex uint64
 }
 
 func (res *SearchResultLow) Terms() []string {
@@ -25,4 +27,8 @@ func (res *SearchResultLow) Terms() []string {
 
 func (res *SearchResultLow) Score() uint8 {
 	return res.F_Score
+}
+
+func (res *SearchResultLow) EntryIndex() uint64 {
+	return res.F_EntryIndex
 }

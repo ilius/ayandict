@@ -78,7 +78,17 @@ func LookupHTML(
 		if do1 != do2 {
 			return do1 < do2
 		}
-		return res1.Terms()[0] < res2.Terms()[0]
+		// if we do not use entryIndex, the resulting order can be random
+		// for entries with same headwords
+		// and no need to compare headwords for StarDict when we have entryIndex
+		// since they are already sorted in idx file.
+		// if we added other formats, maybe we can add a config for this
+		// term1 := res1.Terms()[0]
+		// term2 := res2.Terms()[0]
+		// if term1 != term2 {
+		// 	return term1 < term2
+		// }
+		return res1.EntryIndex() < res2.EntryIndex()
 	})
 	cutoff := conf.MaxResultsTotal
 	if cutoff > 0 && len(results) > cutoff {

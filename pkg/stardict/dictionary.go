@@ -251,6 +251,7 @@ func (d *dictionaryImp) SearchFuzzy(
 					Items: func() []*common.SearchResultItem {
 						return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
 					},
+					F_EntryIndex: uint64(i),
 				})
 			}
 			return results
