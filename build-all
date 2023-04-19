@@ -7,21 +7,36 @@ FLAGS=(-ldflags '-s -w')
 VERSION=$(go run pkg/version/version.go)
 
 function build_for_os64() {
-	GOOS=$1 GOARCH=amd64 go build -o ayandict-$VERSION-$1-x86_64 "${FLAGS[@]}"
+	OUT=ayandict-$VERSION-$1-x86_64
+	GOOS=$1 GOARCH=amd64 go build -o $OUT "${FLAGS[@]}"
+	echo $OUT
 }
+
 function build_for_os32() {
-	GOOS=$1 GOARCH=386 go build -o ayandict-$VERSION-$1-x86 "${FLAGS[@]}"
+	OUT=ayandict-$VERSION-$1-x86
+	GOOS=$1 GOARCH=386 go build -o $OUT "${FLAGS[@]}"
+	echo $OUT
 }
 
+function build_for_mac() {
+	OUT=ayandict-$VERSION-mac-x86_64
+	GOOS=darwin GOARCH=amd64 go build -o $OUT "${FLAGS[@]}"
+	echo $OUT
+}
 
-build_for_os64 linux
-build_for_os32 linux
+function win_zip() {
+	C:\\Windows\\System32\\tar.exe -a -c -f $1.zip $1
+	rm $1
+}
 
-build_for_os64 windows
-build_for_os32 windows
+bzip2 -f $(build_for_os64 linux)
+bzip2 -f $(build_for_os32 linux)
 
-build_for_os64 freebsd
-build_for_os32 freebsd
+win_zip $(build_for_os64 windows)
+win_zip $(build_for_os32 windows)
 
-build_for_os64 darwin
+bzip2 -f $(build_for_os64 freebsd)
+bzip2 -f $(build_for_os32 freebsd)
+
+bzip2 -f $(build_for_mac)
 
