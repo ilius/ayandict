@@ -19,6 +19,8 @@ type HeaderLabel struct {
 
 	result common.SearchResultIface
 
+	text string
+
 	doQuery func(string)
 }
 
@@ -43,7 +45,11 @@ func CreateHeaderLabel(app *Application) *HeaderLabel {
 }
 
 func (label *HeaderLabel) SetText(text string) {
+	if text == label.text {
+		return
+	}
 	label.QLabel.SetText(text)
+	label.text = text
 	// label.QLabel.AdjustSize()
 	parent := label.QLabel.ParentWidget()
 	parent.AdjustSize()
