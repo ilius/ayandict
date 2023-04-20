@@ -2,8 +2,7 @@
 set -e
 set -x
 
-FLAGS=(-ldflags '-s -w')
-
+FLAGS=(-ldflags '-s -w' -trimpath)
 VERSION=$(go run pkg/version/version.go)
 
 function build_for_os64() {
@@ -24,16 +23,24 @@ function build_for_mac() {
 	echo $OUT
 }
 
-function win_zip() {
-	C:\\Windows\\System32\\tar.exe -a -c -f $1.zip $1
-	rm $1
+function run_zip() {
+	if [ -f C:\\Windows\\System32\\tar.exe ] ; then
+		C:\\Windows\\System32\\tar.exe -a -c -f $1.zip $1
+		rm $1
+		return
+	fi
+	if which zip ; then
+		zip $1.zip $1
+		rm $1
+		return
+	fi
 }
 
 bzip2 -f $(build_for_os64 linux)
 bzip2 -f $(build_for_os32 linux)
 
-win_zip $(build_for_os64 windows)
-win_zip $(build_for_os32 windows)
+run_zip $(build_for_os64 windows)
+run_zip $(build_for_os32 windows)
 
 bzip2 -f $(build_for_os64 freebsd)
 bzip2 -f $(build_for_os32 freebsd)
