@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/ilius/ayandict/pkg/common"
@@ -39,6 +40,8 @@ type ArticleView struct {
 
 	rightClickOnWord string
 	rightClickOnUrl  string
+
+	autoPlayMutex sync.Mutex
 }
 
 func NewArticleView(app *Application) *ArticleView {
@@ -66,7 +69,13 @@ func (view *ArticleView) playAudio(qUrl *core.QUrl) {
 }
 
 func (view *ArticleView) autoPlay(text string, count int) {
-	for _, match := range audioUrlRE.FindAllString(text, count) {
+	if !view.autoPlayMutex.TryLock() {
+		return
+	}
+	defer view.autoPlayMutex.Unlock()
+	matches := audioUrlRE.FindAllString(text, count)
+	lastIndex := len(matches) - 1
+	for index, match := range matches {
 		urlStr, err := strconv.Unquote(match[5:])
 		if err != nil {
 			log.Println(err)
@@ -101,7 +110,9 @@ func (view *ArticleView) autoPlay(text string, count int) {
 			log.Printf("error in mp3duration.Calculate(%#v): %v", fpath, err)
 			continue
 		}
-		duration += conf.AudioAutoPlayWaitBetween
+		if index < lastIndex {
+			duration += conf.AudioAutoPlayWaitBetween
+		}
 		// log.Println("Sleeping", duration)
 		time.Sleep(duration)
 	}
