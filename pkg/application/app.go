@@ -72,7 +72,7 @@ func (app *Application) Run() {
 	}
 	go server.StartServer(conf.LocalServerPorts[0])
 
-	LoadUserStyle(app)
+	app.LoadUserStyle()
 	dictmgr.InitDicts(conf)
 
 	frequencyTable = frequency.NewFrequencyView(
@@ -365,7 +365,7 @@ func (app *Application) Run() {
 		resultList,
 		rightPanel,
 	}
-	ReloadFont(app)
+	app.ReloadFont()
 
 	resetQuery := func() {
 		queryArgs.ResetQuery()
@@ -444,11 +444,11 @@ func (app *Application) Run() {
 		OpenConfig()
 	})
 	reloadConfigButton.ConnectClicked(func(checked bool) {
-		ReloadConfig(app)
+		app.ReloadConfig()
 		onQuery(entry.Text(), queryArgs, false)
 	})
 	reloadStyleButton.ConnectClicked(func(checked bool) {
-		LoadUserStyle(app)
+		app.LoadUserStyle()
 		onQuery(entry.Text(), queryArgs, false)
 	})
 	saveHistoryButton.ConnectClicked(func(checked bool) {

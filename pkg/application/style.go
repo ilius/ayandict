@@ -37,7 +37,7 @@ func readArticleStyle(stylePath string) error {
 	return nil
 }
 
-func LoadUserStyle(app *Application) {
+func (app *Application) LoadUserStyle() {
 	configDir := config.GetConfigDir()
 	stylePath := conf.Style
 	if stylePath == "" {
@@ -66,11 +66,11 @@ func LoadUserStyle(app *Application) {
 	}
 }
 
-func ReloadUserStyle(app *Application) {
+func (app *Application) ReloadUserStyle() {
 	if conf.Style == "" {
 		app.SetStyleSheet("")
 		currentStyle = ""
 		return
 	}
-	LoadUserStyle(app)
+	app.LoadUserStyle()
 }

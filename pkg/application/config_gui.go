@@ -71,7 +71,7 @@ func shouldReloadDicts(currentList []string, newList []string) bool {
 	return !reflect.DeepEqual(newList, currentList)
 }
 
-func ReloadFont(app *Application) {
+func (app *Application) ReloadFont() {
 	font := ConfigFont()
 	// app.SetFont only applies to future widgets (DictManager for example)
 	app.SetFont(font, "")
@@ -83,7 +83,7 @@ func ReloadFont(app *Application) {
 	}
 }
 
-func ReloadConfig(app *Application) {
+func (app *Application) ReloadConfig() {
 	currentDirList := conf.DirectoryList
 	fontFamily := conf.FontFamily
 	fontSize := conf.FontSize
@@ -93,17 +93,17 @@ func ReloadConfig(app *Application) {
 	}
 
 	if conf.FontFamily != fontFamily || conf.FontSize != fontSize {
-		ReloadFont(app)
+		app.ReloadFont()
 	}
 
 	if conf.Style != currentStyle {
-		ReloadUserStyle(app)
+		app.ReloadUserStyle()
 	}
 	if shouldReloadDicts(currentDirList, conf.DirectoryList) {
 		dictmgr.InitDicts(conf)
 		app.dictManager = nil
 	}
-	app.headerLabel.SetWordWrap(conf.HeaderWordWrap)
+	app.headerLabel.ReloadConfig()
 	audioCache.ReloadConfig()
 }
 

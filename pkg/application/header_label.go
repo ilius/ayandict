@@ -25,23 +25,27 @@ type HeaderLabel struct {
 }
 
 func CreateHeaderLabel(app *Application) *HeaderLabel {
-	qlabel := widgets.NewQLabel(nil, 0)
-	qlabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
+	qLabel := widgets.NewQLabel(nil, 0)
+	qLabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
 	// | core.Qt__TextSelectableByKeyboard
-	qlabel.SetContentsMargins(0, 0, 0, 0)
-	qlabel.SetTextFormat(core.Qt__RichText)
-	qlabel.SetWordWrap(conf.HeaderWordWrap)
-	qlabel.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
+	qLabel.SetContentsMargins(0, 0, 0, 0)
+	qLabel.SetTextFormat(core.Qt__RichText)
+	qLabel.SetWordWrap(conf.HeaderWordWrap)
+	qLabel.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
 	label := &HeaderLabel{
-		QLabel: qlabel,
+		QLabel: qLabel,
 		app:    app,
 	}
-	qlabel.ConnectContextMenuEvent(func(event *gui.QContextMenuEvent) {
+	qLabel.ConnectContextMenuEvent(func(event *gui.QContextMenuEvent) {
 		event.Ignore()
-		menu := label.createContextMenu(qlabel.SelectedText() != "")
+		menu := label.createContextMenu(qLabel.SelectedText() != "")
 		menu.Popup(event.GlobalPos(), nil)
 	})
 	return label
+}
+
+func (label *HeaderLabel) ReloadConfig() {
+	label.SetWordWrap(conf.HeaderWordWrap)
 }
 
 func (label *HeaderLabel) SetText(text string) {
