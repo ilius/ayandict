@@ -27,6 +27,7 @@ const (
 func Run() {
 	app := &Application{
 		QApplication:   widgets.NewQApplication(len(os.Args), os.Args),
+		window:         widgets.NewQMainWindow(nil, 0),
 		allTextWidgets: []common.HasSetFont{},
 	}
 	qerr.ShowQtError = true
@@ -46,6 +47,8 @@ func Run() {
 
 type Application struct {
 	*widgets.QApplication
+
+	window *widgets.QMainWindow
 
 	dictManager *dictmgr.DictManager
 
@@ -76,7 +79,7 @@ func (app *Application) Run() {
 
 	// icon := gui.NewQIcon5("./img/icon.png")
 
-	window := widgets.NewQMainWindow(nil, 0)
+	window := app.window
 	window.SetWindowTitle("AyanDict")
 	window.Resize2(600, 400)
 
@@ -384,58 +387,37 @@ func (app *Application) Run() {
 		aboutClicked(window)
 	})
 
-	commonKeyPressEvent := func(event *gui.QKeyEvent) bool {
-		switch event.Text() {
-		case " ":
-			entry.SetFocus(core.Qt__ShortcutFocusReason)
-			return true
-		case "+", "=": // core.Qt__Key_Plus
-			articleView.ZoomIn(1)
-			return true
-		case "-": // core.Qt__Key_Minus
-			articleView.ZoomOut(1)
-			return true
-		case "\x1b": // Escape
-			resetQuery()
-			return true
-		}
-		return false
+	setupKeyPressEvent := func(widget KeyPressIface) {
+		widget.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
+			// log.Printf("KeyPressEvent: %T", widget)
+			switch event.Text() {
+			case " ":
+				entry.SetFocus(core.Qt__ShortcutFocusReason)
+				return
+			case "+", "=": // core.Qt__Key_Plus
+				articleView.ZoomIn(1)
+				return
+			case "-": // core.Qt__Key_Minus
+				articleView.ZoomOut(1)
+				return
+			case "\x1b": // Escape
+				resetQuery()
+				return
+			}
+			widget.KeyPressEventDefault(event)
+		})
 	}
 
-	resultList.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
-		if commonKeyPressEvent(event) {
-			return
-		}
-		resultList.KeyPressEventDefault(event)
-	})
+	for _, widget := range []KeyPressIface{
+		resultList,
+		articleView,
+		historyView,
+	} {
+		setupKeyPressEvent(widget)
+	}
 
 	articleView.SetupCustomHandlers()
-	articleView.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
-		if commonKeyPressEvent(event) {
-			return
-		}
-		switch event.Key() {
-		case int(core.Qt__Key_Up):
-			if conf.ArticleArrowKeys {
-				articleView.VerticalScrollBar().TriggerAction(widgets.QAbstractSlider__SliderSingleStepSub)
-				return
-			}
-		case int(core.Qt__Key_Down):
-			if conf.ArticleArrowKeys {
-				articleView.VerticalScrollBar().TriggerAction(widgets.QAbstractSlider__SliderSingleStepAdd)
-				return
-			}
-		}
-		articleView.KeyPressEventDefault(event)
-	})
-
 	historyView.SetupCustomHandlers()
-	historyView.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
-		if commonKeyPressEvent(event) {
-			return
-		}
-		historyView.KeyPressEventDefault(event)
-	})
 
 	frequencyTable.ConnectItemActivated(func(item *widgets.QTableWidgetItem) {
 		key := frequencyTable.Keys[item.Row()]
@@ -483,14 +465,7 @@ func (app *Application) Run() {
 	})
 
 	dictsButton.ConnectClicked(func(checked bool) {
-		if app.dictManager == nil {
-			app.dictManager = dictmgr.NewDictManager(app.QApplication, window, conf)
-			app.allTextWidgets = append(
-				app.allTextWidgets,
-				app.dictManager.TextWidgets...,
-			)
-		}
-		if app.dictManager.Run() {
+		if app.runDictManager() {
 			onQuery(entry.Text(), queryArgs, false)
 		}
 	})
@@ -569,4 +544,15 @@ func (app *Application) Run() {
 
 	window.Show()
 	app.Exec()
+}
+
+func (app *Application) runDictManager() bool {
+	if app.dictManager == nil {
+		app.dictManager = dictmgr.NewDictManager(app.QApplication, app.window, conf)
+		app.allTextWidgets = append(
+			app.allTextWidgets,
+			app.dictManager.TextWidgets...,
+		)
+	}
+	return app.dictManager.Run()
 }

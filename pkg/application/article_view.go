@@ -359,3 +359,19 @@ func (view *ArticleView) SetupCustomHandlers() {
 		view.zoom(delta)
 	})
 }
+
+func (view *ArticleView) KeyPressEventDefault(event gui.QKeyEvent_ITF) {
+	switch event.QKeyEvent_PTR().Key() {
+	case int(core.Qt__Key_Up):
+		if conf.ArticleArrowKeys {
+			view.VerticalScrollBar().TriggerAction(widgets.QAbstractSlider__SliderSingleStepSub)
+			return
+		}
+	case int(core.Qt__Key_Down):
+		if conf.ArticleArrowKeys {
+			view.VerticalScrollBar().TriggerAction(widgets.QAbstractSlider__SliderSingleStepAdd)
+			return
+		}
+	}
+	view.QTextBrowser.KeyPressEventDefault(event)
+}

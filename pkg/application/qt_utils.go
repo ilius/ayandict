@@ -9,6 +9,11 @@ import (
 	"github.com/therecipe/qt/gui"
 )
 
+type KeyPressIface interface {
+	ConnectKeyPressEvent(func(event *gui.QKeyEvent))
+	KeyPressEventDefault(event gui.QKeyEvent_ITF)
+}
+
 func filePathFromQUrl(qUrl *core.QUrl) string {
 	fpath := qUrl.Path(core.QUrl__FullyDecoded)
 	if fpath == "" {
