@@ -7,12 +7,17 @@ import (
 	"os"
 	"sort"
 	"strconv"
+	"sync"
 
+	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
 )
 
-func NewFrequencyView(maxSize int) *FrequencyTable {
+func NewFrequencyView(
+	filePath string,
+	maxSize int,
+) *FrequencyTable {
 	widget := widgets.NewQTableWidget(nil)
 	widget.SetColumnCount(2)
 
@@ -22,6 +27,7 @@ func NewFrequencyView(maxSize int) *FrequencyTable {
 
 	return &FrequencyTable{
 		QTableWidget: widget,
+		filePath:     filePath,
 		maxSize:      maxSize,
 		KeyMap:       map[string]int{},
 		Counts:       map[string]int{},
@@ -31,11 +37,15 @@ func NewFrequencyView(maxSize int) *FrequencyTable {
 type FrequencyTable struct {
 	*widgets.QTableWidget
 
+	filePath string
+
 	maxSize int
 
 	Counts map[string]int
 	Keys   []string
 	KeyMap map[string]int
+
+	saveMutex sync.Mutex
 }
 
 func (view *FrequencyTable) Clear() {
@@ -155,14 +165,23 @@ func (view *FrequencyTable) Trim() {
 	view.SetRowCount(maxSize)
 }
 
-func (view *FrequencyTable) SaveToFile(pathStr string) error {
+func (view *FrequencyTable) Save() error {
+	view.saveMutex.Lock()
+	defer view.saveMutex.Unlock()
 	jsonBytes, err := json.MarshalIndent(view.Counts, "", "\t")
 	if err != nil {
 		panic(err)
 	}
-	err = ioutil.WriteFile(pathStr, jsonBytes, 0o644)
+	err = ioutil.WriteFile(view.filePath, jsonBytes, 0o644)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (view *FrequencyTable) SaveNoError() {
+	err := view.Save()
+	if err != nil {
+		qerr.Errorf("Error saving frequency: %v", err)
+	}
 }

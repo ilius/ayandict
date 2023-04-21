@@ -28,7 +28,7 @@ func (w *QueryArgs) AddHistoryAndFrequency(query string) {
 	if !conf.MostFrequentDisable {
 		frequencyTable.Add(query, 1)
 		if conf.MostFrequentAutoSave {
-			SaveFrequency()
+			frequencyTable.SaveNoError()
 		}
 	}
 }

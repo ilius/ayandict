@@ -13,12 +13,11 @@ import (
 )
 
 var (
-	history            = []string{}
-	historyMaxSize     = 100
-	historyMutex       sync.Mutex
-	historySaveMutex   sync.Mutex
-	frequencyMutex     sync.Mutex
-	frequencySaveMutex sync.Mutex
+	history          = []string{}
+	historyMaxSize   = 100
+	historyMutex     sync.Mutex
+	historySaveMutex sync.Mutex
+	frequencyMutex   sync.Mutex
 )
 
 const (
@@ -69,15 +68,6 @@ func SaveHistory() {
 		panic(err)
 	}
 	err = ioutil.WriteFile(historyFilePath(), jsonBytes, 0o644)
-	if err != nil {
-		qerr.Errorf("Error saving history: %v", err)
-	}
-}
-
-func SaveFrequency() {
-	frequencySaveMutex.Lock()
-	defer frequencySaveMutex.Unlock()
-	err := frequencyTable.SaveToFile(frequencyFilePath())
 	if err != nil {
 		qerr.Errorf("Error saving history: %v", err)
 	}

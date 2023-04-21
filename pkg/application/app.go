@@ -75,7 +75,10 @@ func (app *Application) Run() {
 	LoadUserStyle(app)
 	dictmgr.InitDicts(conf)
 
-	frequencyTable = frequency.NewFrequencyView(conf.MostFrequentMaxSize)
+	frequencyTable = frequency.NewFrequencyView(
+		frequencyFilePath(),
+		conf.MostFrequentMaxSize,
+	)
 
 	// icon := gui.NewQIcon5("./img/icon.png")
 
@@ -450,12 +453,12 @@ func (app *Application) Run() {
 	})
 	saveHistoryButton.ConnectClicked(func(checked bool) {
 		SaveHistory()
-		SaveFrequency()
+		frequencyTable.SaveNoError()
 	})
 	clearHistoryButton.ConnectClicked(func(checked bool) {
 		historyView.ClearHistory()
 		frequencyTable.Clear()
-		SaveFrequency()
+		frequencyTable.SaveNoError()
 	})
 	saveFavoritesButton.ConnectClicked(func(checked bool) {
 		favoritesWidget.Save()
