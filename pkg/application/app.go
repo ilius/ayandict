@@ -500,11 +500,7 @@ func (app *Application) Run() {
 			return
 		}
 		term := resultList.Active.Terms()[0]
-		if checked {
-			favoritesWidget.AddFavorite(term)
-		} else {
-			favoritesWidget.RemoveFavorite(term)
-		}
+		favoritesWidget.SetFavorite(term, checked)
 		if term == entry.Text() {
 			queryFavoriteButton.SetChecked(checked)
 		}
@@ -515,11 +511,7 @@ func (app *Application) Run() {
 			queryFavoriteButton.SetChecked(false)
 			return
 		}
-		if checked {
-			favoritesWidget.AddFavorite(term)
-		} else {
-			favoritesWidget.RemoveFavorite(term)
-		}
+		favoritesWidget.SetFavorite(term, checked)
 		if resultList.Active != nil && term == resultList.Active.Terms()[0] {
 			favoriteButton.SetChecked(checked)
 		}

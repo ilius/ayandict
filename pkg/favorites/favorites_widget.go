@@ -65,3 +65,11 @@ func (w *FavoritesWidget) RemoveFavorite(item string) {
 		w.Save()
 	}
 }
+
+func (w *FavoritesWidget) SetFavorite(item string, favorite bool) {
+	if favorite {
+		w.AddFavorite(item)
+	} else {
+		w.RemoveFavorite(item)
+	}
+}
