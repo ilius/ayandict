@@ -17,7 +17,7 @@ const (
 	serverAppName = "app-name"
 )
 
-var client = http.Client{
+var client = &http.Client{
 	Timeout: 100 * time.Millisecond,
 }
 

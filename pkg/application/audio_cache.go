@@ -17,25 +17,37 @@ import (
 
 var (
 	cacheDir   = config.GetCacheDir()
-	downloader = http.Client{
-		Timeout: 1000 * time.Millisecond,
-	}
+	audioCache = NewAudioCache()
 )
-var audioCache = NewAudioCache()
 
 func NewAudioCache() *AudioCache {
+	dir := ""
+	if cacheDir == "" {
+		qerr.Error("cacheDir is empty")
+	} else {
+		dir = filepath.Join(cacheDir, "audio")
+	}
+
 	return &AudioCache{
-		m: map[string]*core.QUrl{},
+		m:   map[string]*core.QUrl{},
+		dir: dir,
+
+		downloader: &http.Client{
+			Timeout: 1000 * time.Millisecond,
+		},
 	}
 }
 
 type AudioCache struct {
 	m     map[string]*core.QUrl
 	mlock sync.RWMutex
+	dir   string
+
+	downloader *http.Client
 }
 
 func (c *AudioCache) download(urlStr string, fpath string) error {
-	res, err := downloader.Get(urlStr)
+	res, err := c.downloader.Get(urlStr)
 	if err != nil {
 		return err
 	}
@@ -65,11 +77,11 @@ func (c *AudioCache) Get(urlStr string) (*core.QUrl, error) {
 	qUrl = core.NewQUrl3(urlStr, core.QUrl__TolerantMode)
 	host := qUrl.Host(core.QUrl__FullyEncoded)
 	// also add possible port?
-	if cacheDir == "" {
-		return nil, fmt.Errorf("cacheDir is empty")
+	if c.dir == "" {
+		return nil, fmt.Errorf("audio cache dir is empty")
 	}
 	fpath := filepath.Join(
-		cacheDir,
+		c.dir,
 		host,
 		qUrl.Path(core.QUrl__FullyEncoded),
 	)
