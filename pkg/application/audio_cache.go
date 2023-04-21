@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
-	"time"
 
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/qerr"
@@ -33,7 +32,7 @@ func NewAudioCache() *AudioCache {
 		dir: dir,
 
 		downloader: &http.Client{
-			Timeout: 1000 * time.Millisecond,
+			Timeout: conf.AudioDownloadTimeout,
 		},
 	}
 }
@@ -44,6 +43,10 @@ type AudioCache struct {
 	dir   string
 
 	downloader *http.Client
+}
+
+func (c *AudioCache) ReloadConfig() {
+	c.downloader.Timeout = conf.AudioDownloadTimeout
 }
 
 func (c *AudioCache) download(urlStr string, fpath string) error {

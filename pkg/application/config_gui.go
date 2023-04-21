@@ -104,6 +104,7 @@ func ReloadConfig(app *Application) {
 		app.dictManager = nil
 	}
 	app.headerLabel.SetWordWrap(conf.HeaderWordWrap)
+	audioCache.ReloadConfig()
 }
 
 func OpenConfig() {

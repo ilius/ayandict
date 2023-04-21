@@ -106,6 +106,12 @@ Enable audio in article
 
 Default value: ``true``
 
+``audio_download_timeout``
+--------------------------
+Timeout for downloading audio files
+
+Default value: ``"1s"``
+
 ``audio_auto_play``
 -------------------
 Number of audio file to auto-play, set ``0`` to disable.

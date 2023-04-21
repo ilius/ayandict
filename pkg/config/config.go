@@ -46,6 +46,8 @@ type Config struct {
 
 	Audio bool `toml:"audio"`
 
+	AudioDownloadTimeout time.Duration `toml:"audio_download_timeout"`
+
 	AudioAutoPlay int `toml:"audio_auto_play"`
 
 	AudioAutoPlayWaitBetween time.Duration `toml:"audio_auto_play_wait_between"`
@@ -115,6 +117,8 @@ func Default() *Config {
 		MaxResultsTotal: 40,
 
 		Audio: true,
+
+		AudioDownloadTimeout: 1000 * time.Millisecond,
 
 		AudioAutoPlay: 1,
 

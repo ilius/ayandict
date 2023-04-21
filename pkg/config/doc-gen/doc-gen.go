@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"reflect"
 	"strings"
@@ -43,6 +44,9 @@ func printAll() {
 		fieldVal := val.Field(i)
 		fieldValIn := fieldVal.Interface()
 		comment := commentMap[key]
+		if comment == "" {
+			log.Fatalln("No comment for", key)
+		}
 		fmt.Printf(
 			"name=%v, toml=%v, default=%#v, comment=%#v\n\n",
 			name,
@@ -63,6 +67,9 @@ func printMarkdown() {
 		fieldVal := val.Field(i)
 		fieldValIn := fieldVal.Interface()
 		comment := commentMap[key]
+		if comment == "" {
+			log.Fatalln("No comment for", key)
+		}
 
 		keyCode := codeValue(key)
 		fmt.Println(keyCode)

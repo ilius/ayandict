@@ -27,6 +27,8 @@ var commentMap = map[string]string{
 
 	"audio": "Enable audio in article",
 
+	"audio_download_timeout": "Timeout for downloading audio files",
+
 	"audio_auto_play": "Number of audio file to auto-play, set ``0`` to disable.",
 
 	"audio_auto_play_wait_between": "Wait time between multiple audio files on auto-play",
