@@ -17,7 +17,7 @@ func main() {
 	entry.SetPlaceholderText("")
 	entry.SetFixedHeight(25)
 
-	view := frequency.NewFrequencyView(6)
+	view := frequency.NewFrequencyView("", 6)
 	view.SetHorizontalHeaderItem(0, widgets.NewQTableWidgetItem2("Key", 0))
 	view.SetHorizontalHeaderItem(1, widgets.NewQTableWidgetItem2("Count", 0))
 

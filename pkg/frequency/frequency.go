@@ -166,6 +166,9 @@ func (view *FrequencyTable) Trim() {
 }
 
 func (view *FrequencyTable) Save() error {
+	if view.filePath == "" {
+		return fmt.Errorf("FrequencyTable: filePath is empty")
+	}
 	view.saveMutex.Lock()
 	defer view.saveMutex.Unlock()
 	jsonBytes, err := json.MarshalIndent(view.Counts, "", "\t")
