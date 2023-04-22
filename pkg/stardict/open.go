@@ -1,6 +1,7 @@
 package stardict
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -9,7 +10,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ilius/ayandict/pkg/qerr"
 	common "github.com/ilius/go-dict-commons"
 )
 
@@ -19,6 +19,10 @@ func isDir(pathStr string) bool {
 		return false
 	}
 	return stat.IsDir()
+}
+
+var ErrorHandler = func(err error) {
+	log.Println(err)
 }
 
 // Open open directories
@@ -95,13 +99,13 @@ func Open(dirPathList []string, order map[string]int) ([]common.Dictionary, erro
 
 		dirEntries, err := ioutil.ReadDir(dirPath)
 		if err != nil {
-			qerr.Error(err)
+			ErrorHandler(err)
 			continue
 		}
 		for _, fi := range dirEntries {
 			err := checkDirEntry(filepath.Join(dirPath, fi.Name()), fi)
 			if err != nil {
-				go qerr.Error(err)
+				go ErrorHandler(err)
 			}
 		}
 	}
@@ -111,8 +115,7 @@ func Open(dirPathList []string, order map[string]int) ([]common.Dictionary, erro
 		defer wg.Done()
 		err = dic.Load()
 		if err != nil {
-			qerr.Errorf("error loading %#v: %v", dic.DictName(), err)
-			log.Printf("error loading %#v: %v", dic.DictName(), err)
+			ErrorHandler(fmt.Errorf("error loading %#v: %v", dic.DictName(), err))
 		} else {
 			log.Printf("Loaded index %#v\n", dic.IndexPath())
 		}
