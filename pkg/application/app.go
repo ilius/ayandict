@@ -24,6 +24,11 @@ const (
 	QS_frequencyTable = "frequencytable"
 )
 
+// basePx is %66 of the font size in pixels,
+// I'm using it for spacing between widgets
+// kinda like "em" in html, but probably not exactly the same
+var basePx = float32(10)
+
 func Run() {
 	app := &Application{
 		QApplication:   widgets.NewQApplication(len(os.Args), os.Args),
@@ -75,6 +80,14 @@ func (app *Application) Run() {
 	app.LoadUserStyle()
 	dictmgr.InitDicts(conf)
 
+	basePx = float32(fontPixelSize(
+		app.Font(),
+		app.PrimaryScreen().PhysicalDotsPerInch(),
+	) * 0.66)
+
+	basePxI := int(basePx)
+	basePxHalf := int(basePx / 2)
+
 	frequencyTable = frequency.NewFrequencyView(
 		frequencyFilePath(),
 		conf.MostFrequentMaxSize,
@@ -124,8 +137,8 @@ func (app *Application) Run() {
 	queryLabel := widgets.NewQLabel2("Query:", nil, 0)
 	queryBox := widgets.NewQFrame(nil, 0)
 	queryBoxLayout := widgets.NewQHBoxLayout2(queryBox)
-	queryBoxLayout.SetContentsMargins(5, 5, 5, 0)
-	queryBoxLayout.SetSpacing(10)
+	queryBoxLayout.SetContentsMargins(basePxHalf, basePxHalf, basePxHalf, 0)
+	queryBoxLayout.SetSpacing(basePxI)
 	queryBoxLayout.AddWidget(queryLabel, 0, 0)
 	queryBoxLayout.AddWidget(entry, 0, 0)
 	queryBoxLayout.AddWidget(queryModeCombo, 0, 0)
@@ -141,11 +154,11 @@ func (app *Application) Run() {
 	headerBoxLayout := widgets.NewQHBoxLayout2(headerBox)
 	// headerBoxLayout.SetSizeConstraint(widgets.QLayout__SetMinimumSize)
 	headerBoxLayout.SetContentsMargins(0, 0, 0, 0)
-	headerBoxLayout.AddSpacing(5)
+	headerBoxLayout.AddSpacing(basePxHalf)
 	headerBoxLayout.AddWidget(headerLabel, 1, 0)
 	// headerBoxLayout.AddLayout(favoriteButtonVBox, 0)
 	headerBoxLayout.AddWidget(favoriteButton, 0, core.Qt__AlignRight)
-	headerBoxLayout.AddSpacing(15)
+	headerBoxLayout.AddSpacing(int(basePx * 1.5))
 	headerBox.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
 
 	articleView := NewArticleView(app)
@@ -195,7 +208,7 @@ func (app *Application) Run() {
 
 	buttonBox := widgets.NewQHBoxLayout()
 	buttonBox.SetContentsMargins(0, 0, 0, 0)
-	buttonBox.SetSpacing(5)
+	buttonBox.SetSpacing(basePxHalf)
 
 	bottomBoxStyleOpt := widgets.NewQStyleOptionButton()
 	style := app.Style()
@@ -240,11 +253,11 @@ func (app *Application) Run() {
 	leftMainLayout.SetContentsMargins(0, 0, 0, 0)
 	leftMainLayout.SetSpacing(0)
 	leftMainLayout.AddWidget(queryBox, 0, 0)
-	leftMainLayout.AddSpacing(5)
+	leftMainLayout.AddSpacing(basePxHalf)
 	leftMainLayout.AddWidget(headerBox, 0, 0)
-	leftMainLayout.AddSpacing(5)
+	leftMainLayout.AddSpacing(basePxHalf)
 	leftMainLayout.AddWidget(articleView, 0, 0)
-	leftMainLayout.AddSpacing(5)
+	leftMainLayout.AddSpacing(basePxHalf)
 	leftMainLayout.AddLayout(buttonBox, 0)
 
 	activityTypeCombo := widgets.NewQComboBox(nil)
@@ -325,8 +338,8 @@ func (app *Application) Run() {
 	historyView.doQuery = doQuery
 
 	rightPanel := widgets.NewQTabWidget(nil)
-	rightPanel.AddTab(activityWidget, "Activity")
-	rightPanel.AddTab(miscBox, "Misc")
+	rightPanel.AddTab(activityWidget, " Activity ")
+	rightPanel.AddTab(miscBox, " Misc ")
 
 	mainSplitter := widgets.NewQSplitter(nil)
 	mainSplitter.SetSizePolicy2(expanding, expanding)
