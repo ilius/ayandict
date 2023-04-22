@@ -2,7 +2,7 @@ package application
 
 import (
 	"github.com/ilius/ayandict/pkg/frequency"
-	"github.com/therecipe/qt/widgets"
+	"github.com/ilius/qt/widgets"
 )
 
 const (

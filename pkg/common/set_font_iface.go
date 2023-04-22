@@ -1,6 +1,6 @@
 package common
 
-import "github.com/therecipe/qt/gui"
+import "github.com/ilius/qt/gui"
 
 type HasSetFont interface {
 	SetFont(gui.QFont_ITF)

@@ -3,7 +3,7 @@ package application
 import (
 	"fmt"
 
-	"github.com/therecipe/qt/widgets"
+	"github.com/ilius/qt/widgets"
 )
 
 func NewPNGIconTextButton(label string, imageName string) *widgets.QPushButton {

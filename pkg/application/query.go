@@ -8,7 +8,7 @@ import (
 
 	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/dictmgr"
-	"github.com/therecipe/qt/widgets"
+	"github.com/ilius/qt/widgets"
 )
 
 type QueryArgs struct {

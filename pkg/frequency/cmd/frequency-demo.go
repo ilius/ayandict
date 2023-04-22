@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/ilius/ayandict/pkg/frequency"
-	"github.com/therecipe/qt/widgets"
+	"github.com/ilius/qt/widgets"
 )
 
 func main() {

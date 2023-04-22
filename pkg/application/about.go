@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/ilius/ayandict/pkg/common"
-	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/widgets"
+	"github.com/ilius/qt/core"
+	"github.com/ilius/qt/widgets"
 )
 
 func addTabWithIcon(

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/therecipe/qt/widgets"
+	"github.com/ilius/qt/widgets"
 )
 
 var ShowQtError = false

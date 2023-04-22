@@ -4,7 +4,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/therecipe/qt/gui"
+	"github.com/ilius/qt/gui"
 )
 
 var (

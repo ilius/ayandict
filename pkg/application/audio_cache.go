@@ -11,7 +11,7 @@ import (
 
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/qerr"
-	"github.com/therecipe/qt/core"
+	"github.com/ilius/qt/core"
 )
 
 var (

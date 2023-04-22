@@ -2,7 +2,7 @@ package favorites
 
 import (
 	"github.com/ilius/ayandict/pkg/config"
-	"github.com/therecipe/qt/widgets"
+	"github.com/ilius/qt/widgets"
 )
 
 func NewFavoritesWidget(conf *config.Config) *FavoritesWidget {
