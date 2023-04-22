@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/ilius/ayandict/pkg/qerr"
-	"github.com/ilius/go-dict-commons"
+	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
 	"github.com/ilius/qt/widgets"
@@ -17,7 +17,7 @@ type HeaderLabel struct {
 
 	app *Application
 
-	result commons.SearchResultIface
+	result common.SearchResultIface
 
 	text string
 
@@ -59,7 +59,7 @@ func (label *HeaderLabel) SetText(text string) {
 	parent.AdjustSize()
 }
 
-func (label *HeaderLabel) SetResult(res commons.SearchResultIface) {
+func (label *HeaderLabel) SetResult(res common.SearchResultIface) {
 	label.result = res
 	terms := res.Terms()
 	termsJoined := html.EscapeString(strings.Join(terms, " | "))

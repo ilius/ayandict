@@ -10,7 +10,7 @@ import (
 	"github.com/ilius/ayandict/pkg/iface"
 	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/ilius/ayandict/pkg/settings"
-	commons "github.com/ilius/go-dict-commons"
+	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
 	"github.com/ilius/qt/widgets"
@@ -31,8 +31,8 @@ type DictManager struct {
 	TextWidgets []iface.HasSetFont
 }
 
-func makeDictInfoMap(infos []commons.Dictionary) map[string]commons.Dictionary {
-	infoMap := make(map[string]commons.Dictionary, len(infos))
+func makeDictInfoMap(infos []common.Dictionary) map[string]common.Dictionary {
+	infoMap := make(map[string]common.Dictionary, len(infos))
 	for _, info := range infos {
 		infoMap[info.DictName()] = info
 	}
@@ -119,7 +119,7 @@ func NewDictManager(
 		item.SetFlags(core.Qt__ItemIsSelectable | core.Qt__ItemIsEnabled)
 		return item
 	}
-	setItem := func(index int, dictName string, ds *commons.DictSettings) {
+	setItem := func(index int, dictName string, ds *common.DictSettings) {
 		info, ok := infoMap[dictName]
 		if !ok {
 			log.Printf("dictName=%#v not in infoMap\n", dictName)
@@ -247,7 +247,7 @@ func NewDictManager(
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
 			log.Printf("dict manager: found new dict: %v\n", dictName)
-			ds = commons.NewDictSettings(dic, index)
+			ds = common.NewDictSettings(dic, index)
 			ds.Hash = Hash(dic)
 			dictSettingsMap[dictName] = ds
 		}
@@ -294,7 +294,7 @@ func (dm *DictManager) updateMap() map[string]int {
 		order[dictName] = value
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
-			ds = &commons.DictSettings{}
+			ds = &common.DictSettings{}
 			dictSettingsMap[dictName] = ds
 		}
 		ds.Symbol = symbol

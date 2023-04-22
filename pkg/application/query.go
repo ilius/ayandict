@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/ilius/ayandict/pkg/dictmgr"
-	"github.com/ilius/go-dict-commons"
+	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/widgets"
 )
 
@@ -77,9 +77,9 @@ func NewResultListWidget(
 type ResultListWidget struct {
 	*widgets.QListWidget
 
-	results []commons.SearchResultIface
+	results []common.SearchResultIface
 
-	Active commons.SearchResultIface
+	Active common.SearchResultIface
 
 	HeaderLabel *HeaderLabel
 	ArticleView *ArticleView
@@ -87,7 +87,7 @@ type ResultListWidget struct {
 	onResultDisplay func(terms []string)
 }
 
-func (w *ResultListWidget) SetResults(results []commons.SearchResultIface) {
+func (w *ResultListWidget) SetResults(results []common.SearchResultIface) {
 	w.QListWidget.Clear()
 	w.results = results
 	for _, res := range results {

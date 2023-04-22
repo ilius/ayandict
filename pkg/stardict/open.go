@@ -10,7 +10,7 @@ import (
 	"sync"
 
 	"github.com/ilius/ayandict/pkg/qerr"
-	"github.com/ilius/go-dict-commons"
+	common "github.com/ilius/go-dict-commons"
 )
 
 func isDir(pathStr string) bool {
@@ -22,8 +22,8 @@ func isDir(pathStr string) bool {
 }
 
 // Open open directories
-func Open(dirPathList []string, order map[string]int) ([]commons.Dictionary, error) {
-	var dicList []commons.Dictionary
+func Open(dirPathList []string, order map[string]int) ([]common.Dictionary, error) {
+	var dicList []common.Dictionary
 	const ext = ".ifo"
 
 	findIfoFile := func(path string) (string, os.FileInfo, error) {
@@ -107,7 +107,7 @@ func Open(dirPathList []string, order map[string]int) ([]commons.Dictionary, err
 	}
 	log.Println("Starting to load indexes")
 	var wg sync.WaitGroup
-	load := func(dic commons.Dictionary) {
+	load := func(dic common.Dictionary) {
 		defer wg.Done()
 		err = dic.Load()
 		if err != nil {

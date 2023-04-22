@@ -15,7 +15,7 @@ import (
 
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/html"
-	"github.com/ilius/go-dict-commons"
+	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 )
 
@@ -260,7 +260,7 @@ func fixDefiHTML(
 	defi string,
 	resURL string,
 	conf *config.Config,
-	dic commons.Dictionary,
+	dic common.Dictionary,
 ) string {
 	var playImage string
 	if conf.Audio {

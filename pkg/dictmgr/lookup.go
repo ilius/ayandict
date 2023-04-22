@@ -5,7 +5,7 @@ import (
 
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/qerr"
-	"github.com/ilius/go-dict-commons"
+	common "github.com/ilius/go-dict-commons"
 )
 
 type QueryMode uint8
@@ -18,11 +18,11 @@ const (
 )
 
 func search(
-	dic commons.Dictionary,
+	dic common.Dictionary,
 	conf *config.Config,
 	mode QueryMode,
 	query string,
-) []*commons.SearchResultLow {
+) []*common.SearchResultLow {
 	workerCount := conf.SearchWorkerCount
 	timeout := conf.SearchTimeout
 	switch mode {
@@ -50,8 +50,8 @@ func LookupHTML(
 	query string,
 	conf *config.Config,
 	mode QueryMode,
-) []commons.SearchResultIface {
-	results := []commons.SearchResultIface{}
+) []common.SearchResultIface {
+	results := []common.SearchResultIface{}
 
 	for _, dic := range dicList {
 		if dic.Disabled() || !dic.Loaded() {

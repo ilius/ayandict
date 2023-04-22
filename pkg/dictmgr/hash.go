@@ -5,10 +5,10 @@ import (
 	"log"
 
 	"github.com/ilius/ayandict/pkg/qerr"
-	commons "github.com/ilius/go-dict-commons"
+	common "github.com/ilius/go-dict-commons"
 )
 
-func Hash(info commons.Dictionary) string {
+func Hash(info common.Dictionary) string {
 	log.Println("Calculating hash for", info.DictName())
 	b_hash, err := info.CalcHash()
 	if err != nil {
