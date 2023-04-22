@@ -9,10 +9,10 @@ import (
 	"sort"
 	"time"
 
-	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/ilius/ayandict/pkg/stardict"
+	commons "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/widgets"
 )
@@ -20,10 +20,10 @@ import (
 const dictsJsonFilename = "dicts.json"
 
 var (
-	dicList         []common.Dictionary
-	dicMap          = map[string]common.Dictionary{}
+	dicList         []commons.Dictionary
+	dicMap          = map[string]commons.Dictionary{}
 	dictsOrder      map[string]int
-	dictSettingsMap = map[string]*common.DictSettings{}
+	dictSettingsMap = map[string]*commons.DictSettings{}
 )
 
 func absInt(x int) int {
@@ -35,7 +35,7 @@ func absInt(x int) int {
 
 type DicListSorter struct {
 	Order map[string]int
-	List  []common.Dictionary
+	List  []commons.Dictionary
 }
 
 func (s DicListSorter) Len() int {
@@ -74,9 +74,9 @@ func loadingDictsPopup(conf *config.Config) *widgets.QLabel {
 	return popup
 }
 
-func loadDictsSettings() (map[string]*common.DictSettings, map[string]int, error) {
+func loadDictsSettings() (map[string]*commons.DictSettings, map[string]int, error) {
 	order := map[string]int{}
-	settingsMap := map[string]*common.DictSettings{}
+	settingsMap := map[string]*commons.DictSettings{}
 	fpath := filepath.Join(config.GetConfigDir(), dictsJsonFilename)
 	jsonBytes, err := ioutil.ReadFile(fpath)
 	if err != nil {
@@ -92,13 +92,13 @@ func loadDictsSettings() (map[string]*common.DictSettings, map[string]int, error
 	for dictName, ds := range settingsMap {
 		order[dictName] = ds.Order
 		if ds.Symbol == "" {
-			ds.Symbol = common.DefaultSymbol(dictName)
+			ds.Symbol = commons.DefaultSymbol(dictName)
 		}
 	}
 	return settingsMap, order, nil
 }
 
-func saveDictsSettings(settingsMap map[string]*common.DictSettings) error {
+func saveDictsSettings(settingsMap map[string]*commons.DictSettings) error {
 	jsonBytes, err := json.MarshalIndent(settingsMap, "", "\t")
 	if err != nil {
 		return err
@@ -149,8 +149,8 @@ func InitDicts(conf *config.Config) {
 
 	nameByHash := getDictNameByHashMap()
 
-	newDictSettings := func(dic common.Dictionary, index int) *common.DictSettings {
-		hash := common.Hash(dic)
+	newDictSettings := func(dic commons.Dictionary, index int) *commons.DictSettings {
+		hash := Hash(dic)
 		if hash != "" {
 			prevNames := nameByHash[hash]
 			if len(prevNames) > 0 {
@@ -161,8 +161,8 @@ func InitDicts(conf *config.Config) {
 				return ds
 			}
 		}
-		return &common.DictSettings{
-			Symbol: common.DefaultSymbol(dic.DictName()),
+		return &commons.DictSettings{
+			Symbol: commons.DefaultSymbol(dic.DictName()),
 			Order:  index,
 			Hash:   hash,
 		}
@@ -181,7 +181,7 @@ func InitDicts(conf *config.Config) {
 			continue
 		}
 		if ds.Hash == "" {
-			hash := common.Hash(dic)
+			hash := Hash(dic)
 			if hash != "" {
 				ds.Hash = hash
 				modified = true

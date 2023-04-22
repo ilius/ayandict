@@ -4,13 +4,13 @@ import (
 	"fmt"
 	std_html "html"
 
-	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/config"
+	"github.com/ilius/go-dict-commons"
 )
 
 type SearchResult struct {
-	*common.SearchResultLow
-	dic    common.Dictionary
+	*commons.SearchResultLow
+	dic    commons.Dictionary
 	conf   *config.Config
 	hDefis []string
 }

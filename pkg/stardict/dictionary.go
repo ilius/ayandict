@@ -13,9 +13,9 @@ import (
 	"unicode/utf8"
 
 	"github.com/gobwas/glob"
-	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/levenshtein"
 	"github.com/ilius/ayandict/pkg/murmur3"
+	"github.com/ilius/go-dict-commons"
 )
 
 // dictionaryImp stardict dictionary
@@ -31,7 +31,7 @@ type dictionaryImp struct {
 	resDir   string
 	resURL   string
 
-	decodeData func(data []byte) []*common.SearchResultItem
+	decodeData func(data []byte) []*commons.SearchResultItem
 }
 
 func (d *dictionaryImp) Disabled() bool {
@@ -100,8 +100,8 @@ func (d *dictionaryImp) runWorkers(
 	N int,
 	workerCount int,
 	timeout time.Duration,
-	worker func(int, int) []*common.SearchResultLow,
-) []*common.SearchResultLow {
+	worker func(int, int) []*commons.SearchResultLow,
+) []*commons.SearchResultLow {
 	if workerCount < 2 {
 		return worker(0, N)
 	}
@@ -109,7 +109,7 @@ func (d *dictionaryImp) runWorkers(
 		return worker(0, N)
 	}
 
-	ch := make(chan []*common.SearchResultLow, workerCount)
+	ch := make(chan []*commons.SearchResultLow, workerCount)
 
 	sender := func(start int, end int) {
 		ch <- worker(start, end)
@@ -124,7 +124,7 @@ func (d *dictionaryImp) runWorkers(
 	}
 	go sender(start, N)
 
-	results := []*common.SearchResultLow{}
+	results := []*commons.SearchResultLow{}
 	timeoutCh := time.NewTimer(timeout)
 	for i := 0; i < workerCount; i++ {
 		select {
@@ -145,7 +145,7 @@ func (d *dictionaryImp) SearchFuzzy(
 	query string,
 	workerCount int,
 	timeout time.Duration,
-) []*common.SearchResultLow {
+) []*commons.SearchResultLow {
 	// if len(query) < 2 {
 	// 	return d.searchVeryShort(query)
 	// }
@@ -237,18 +237,18 @@ func (d *dictionaryImp) SearchFuzzy(
 		N,
 		workerCount,
 		timeout,
-		func(start int, end int) []*common.SearchResultLow {
-			var results []*common.SearchResultLow
+		func(start int, end int) []*commons.SearchResultLow {
+			var results []*commons.SearchResultLow
 			for i := start; i < end; i++ {
 				entry := idx.entries[entryIndexes[i]]
 				score := checkEntry(entry)
 				if score < minScore {
 					continue
 				}
-				results = append(results, &common.SearchResultLow{
+				results = append(results, &commons.SearchResultLow{
 					F_Score: score,
 					F_Terms: entry.terms,
-					Items: func() []*common.SearchResultItem {
+					Items: func() []*commons.SearchResultItem {
 						return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
 					},
 					F_EntryIndex: uint64(i),
@@ -270,7 +270,7 @@ func (d *dictionaryImp) SearchStartWith(
 	query string,
 	workerCount int,
 	timeout time.Duration,
-) []*common.SearchResultLow {
+) []*commons.SearchResultLow {
 	idx := d.idx
 	const minScore = uint8(140)
 
@@ -311,18 +311,18 @@ func (d *dictionaryImp) SearchStartWith(
 		N,
 		workerCount,
 		timeout,
-		func(start int, end int) []*common.SearchResultLow {
-			var results []*common.SearchResultLow
+		func(start int, end int) []*commons.SearchResultLow {
+			var results []*commons.SearchResultLow
 			for i := start; i < end; i++ {
 				entry := idx.entries[entryIndexes[i]]
 				score := checkEntry(entry)
 				if score < minScore {
 					continue
 				}
-				results = append(results, &common.SearchResultLow{
+				results = append(results, &commons.SearchResultLow{
 					F_Score: score,
 					F_Terms: entry.terms,
-					Items: func() []*common.SearchResultItem {
+					Items: func() []*commons.SearchResultItem {
 						return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
 					},
 				})
@@ -343,7 +343,7 @@ func (d *dictionaryImp) searchPattern(
 	workerCount int,
 	timeout time.Duration,
 	checkTerm func(string) uint8,
-) []*common.SearchResultLow {
+) []*commons.SearchResultLow {
 	idx := d.idx
 	const minScore = uint8(140)
 
@@ -352,8 +352,8 @@ func (d *dictionaryImp) searchPattern(
 		N,
 		workerCount,
 		timeout,
-		func(start int, end int) []*common.SearchResultLow {
-			var results []*common.SearchResultLow
+		func(start int, end int) []*commons.SearchResultLow {
+			var results []*commons.SearchResultLow
 			for entryI := start; entryI < end; entryI++ {
 				entry := idx.entries[entryI]
 				score := uint8(0)
@@ -367,10 +367,10 @@ func (d *dictionaryImp) searchPattern(
 				if score < minScore {
 					continue
 				}
-				results = append(results, &common.SearchResultLow{
+				results = append(results, &commons.SearchResultLow{
 					F_Score: score,
 					F_Terms: entry.terms,
-					Items: func() []*common.SearchResultItem {
+					Items: func() []*commons.SearchResultItem {
 						return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
 					},
 				})
@@ -384,7 +384,7 @@ func (d *dictionaryImp) SearchRegex(
 	query string,
 	workerCount int,
 	timeout time.Duration,
-) ([]*common.SearchResultLow, error) {
+) ([]*commons.SearchResultLow, error) {
 	re, err := regexp.Compile("^" + query + "$")
 	if err != nil {
 		return nil, err
@@ -411,7 +411,7 @@ func (d *dictionaryImp) SearchGlob(
 	query string,
 	workerCount int,
 	timeout time.Duration,
-) ([]*common.SearchResultLow, error) {
+) ([]*commons.SearchResultLow, error) {
 	pattern, err := glob.Compile(query)
 	if err != nil {
 		return nil, err
@@ -434,7 +434,7 @@ func (d *dictionaryImp) SearchGlob(
 	return results, nil
 }
 
-func (d *dictionaryImp) decodeWithSametypesequence(data []byte) (items []*common.SearchResultItem) {
+func (d *dictionaryImp) decodeWithSametypesequence(data []byte) (items []*commons.SearchResultItem) {
 	seq := d.Options["sametypesequence"]
 
 	seqLen := len(seq)
@@ -447,18 +447,18 @@ func (d *dictionaryImp) decodeWithSametypesequence(data []byte) (items []*common
 		case 'm', 'l', 'g', 't', 'x', 'y', 'k', 'w', 'h', 'r':
 			// if last seq item
 			if i == seqLen-1 {
-				items = append(items, &common.SearchResultItem{Type: t, Data: data[dataPos:dataSize]})
+				items = append(items, &commons.SearchResultItem{Type: t, Data: data[dataPos:dataSize]})
 			} else {
 				end := bytes.IndexRune(data[dataPos:], '\000')
-				items = append(items, &common.SearchResultItem{Type: t, Data: data[dataPos : dataPos+end+1]})
+				items = append(items, &commons.SearchResultItem{Type: t, Data: data[dataPos : dataPos+end+1]})
 				dataPos += end + 1
 			}
 		case 'W', 'P':
 			if i == seqLen-1 {
-				items = append(items, &common.SearchResultItem{Type: t, Data: data[dataPos:dataSize]})
+				items = append(items, &commons.SearchResultItem{Type: t, Data: data[dataPos:dataSize]})
 			} else {
 				size := binary.BigEndian.Uint32(data[dataPos : dataPos+4])
-				items = append(items, &common.SearchResultItem{Type: t, Data: data[dataPos+4 : dataPos+int(size)+5]})
+				items = append(items, &commons.SearchResultItem{Type: t, Data: data[dataPos+4 : dataPos+int(size)+5]})
 				dataPos += int(size) + 5
 			}
 		}
@@ -467,7 +467,7 @@ func (d *dictionaryImp) decodeWithSametypesequence(data []byte) (items []*common
 	return
 }
 
-func (d *dictionaryImp) decodeWithoutSametypesequence(data []byte) (items []*common.SearchResultItem) {
+func (d *dictionaryImp) decodeWithoutSametypesequence(data []byte) (items []*commons.SearchResultItem) {
 	var dataPos int
 	dataSize := len(data)
 
@@ -481,15 +481,15 @@ func (d *dictionaryImp) decodeWithoutSametypesequence(data []byte) (items []*com
 			end := bytes.IndexRune(data[dataPos:], '\000')
 
 			if end < 0 { // last item
-				items = append(items, &common.SearchResultItem{Type: rune(t), Data: data[dataPos:dataSize]})
+				items = append(items, &commons.SearchResultItem{Type: rune(t), Data: data[dataPos:dataSize]})
 				dataPos = dataSize
 			} else {
-				items = append(items, &common.SearchResultItem{Type: rune(t), Data: data[dataPos : dataPos+end+1]})
+				items = append(items, &commons.SearchResultItem{Type: rune(t), Data: data[dataPos : dataPos+end+1]})
 				dataPos += end + 1
 			}
 		case 'W', 'P':
 			size := binary.BigEndian.Uint32(data[dataPos : dataPos+4])
-			items = append(items, &common.SearchResultItem{Type: rune(t), Data: data[dataPos+4 : dataPos+int(size)+5]})
+			items = append(items, &commons.SearchResultItem{Type: rune(t), Data: data[dataPos+4 : dataPos+int(size)+5]})
 			dataPos += int(size) + 5
 		}
 

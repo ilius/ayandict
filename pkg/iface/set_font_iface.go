@@ -1,4 +1,4 @@
-package common
+package iface
 
 import "github.com/ilius/qt/gui"
 

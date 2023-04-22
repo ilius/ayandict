@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ilius/ayandict/pkg/common"
+	"github.com/ilius/ayandict/pkg/appinfo"
 	"github.com/ilius/ayandict/pkg/qerr"
 )
 
@@ -14,7 +14,7 @@ const (
 )
 
 func handleGetAppName(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(common.APP_NAME))
+	w.Write([]byte(appinfo.APP_NAME))
 }
 
 func StartServer(port string) {

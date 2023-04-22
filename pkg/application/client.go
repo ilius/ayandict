@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/ilius/ayandict/pkg/common"
+	"github.com/ilius/ayandict/pkg/appinfo"
 	"github.com/ilius/ayandict/pkg/qerr"
 )
 
@@ -46,7 +46,7 @@ func findLocalServer(ports []string) (bool, string) {
 			continue
 		}
 		res.Body.Close()
-		if string(data) == common.APP_NAME {
+		if string(data) == appinfo.APP_NAME {
 			return true, port
 		}
 	}

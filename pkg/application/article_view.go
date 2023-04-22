@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/mp3duration"
+	commons "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
 	"github.com/ilius/qt/multimedia"
@@ -118,7 +118,7 @@ func (view *ArticleView) autoPlay(text string, count int) {
 	}
 }
 
-func (view *ArticleView) SetResult(res common.SearchResultIface) {
+func (view *ArticleView) SetResult(res commons.SearchResultIface) {
 	text := strings.Join(
 		res.DefinitionsHTML(),
 		"\n<br/>\n",

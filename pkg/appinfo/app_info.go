@@ -1,4 +1,4 @@
-package common
+package appinfo
 
 const APP_NAME = "ayandict"
 

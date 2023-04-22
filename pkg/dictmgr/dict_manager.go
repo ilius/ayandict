@@ -6,10 +6,11 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/config"
+	"github.com/ilius/ayandict/pkg/iface"
 	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/ilius/ayandict/pkg/settings"
+	commons "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
 	"github.com/ilius/qt/widgets"
@@ -27,11 +28,11 @@ const (
 type DictManager struct {
 	Dialog      *widgets.QDialog
 	TableWidget *widgets.QTableWidget
-	TextWidgets []common.HasSetFont
+	TextWidgets []iface.HasSetFont
 }
 
-func makeDictInfoMap(infos []common.Dictionary) map[string]common.Dictionary {
-	infoMap := make(map[string]common.Dictionary, len(infos))
+func makeDictInfoMap(infos []commons.Dictionary) map[string]commons.Dictionary {
+	infoMap := make(map[string]commons.Dictionary, len(infos))
 	for _, info := range infos {
 		infoMap[info.DictName()] = info
 	}
@@ -118,7 +119,7 @@ func NewDictManager(
 		item.SetFlags(core.Qt__ItemIsSelectable | core.Qt__ItemIsEnabled)
 		return item
 	}
-	setItem := func(index int, dictName string, ds *common.DictSettings) {
+	setItem := func(index int, dictName string, ds *commons.DictSettings) {
 		info, ok := infoMap[dictName]
 		if !ok {
 			log.Printf("dictName=%#v not in infoMap\n", dictName)
@@ -241,12 +242,13 @@ func NewDictManager(
 	mainBox.AddWidget(buttonBox, 0, 0)
 
 	table.SetRowCount(len(dicList))
-	for index, info := range dicList {
-		dictName := info.DictName()
+	for index, dic := range dicList {
+		dictName := dic.DictName()
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
 			log.Printf("dict manager: found new dict: %v\n", dictName)
-			ds = common.NewDictSettings(info, index)
+			ds = commons.NewDictSettings(dic, index)
+			ds.Hash = Hash(dic)
 			dictSettingsMap[dictName] = ds
 		}
 		setItem(index, dictName, ds)
@@ -266,7 +268,7 @@ func NewDictManager(
 	return &DictManager{
 		Dialog:      window,
 		TableWidget: table,
-		TextWidgets: []common.HasSetFont{
+		TextWidgets: []iface.HasSetFont{
 			table,
 			toolbar,
 			okButton,
@@ -292,7 +294,7 @@ func (dm *DictManager) updateMap() map[string]int {
 		order[dictName] = value
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
-			ds = &common.DictSettings{}
+			ds = &commons.DictSettings{}
 			dictSettingsMap[dictName] = ds
 		}
 		ds.Symbol = symbol

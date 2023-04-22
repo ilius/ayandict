@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/ilius/ayandict/pkg/common"
+	"github.com/ilius/go-dict-commons"
 )
 
 func main() {
-	fmt.Println(common.VERSION)
+	fmt.Println(commons.VERSION)
 }

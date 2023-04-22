@@ -6,11 +6,11 @@ import (
 
 	// "github.com/ilius/qt/webengine"
 
-	"github.com/ilius/ayandict/pkg/common"
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/dictmgr"
 	"github.com/ilius/ayandict/pkg/favorites"
 	"github.com/ilius/ayandict/pkg/frequency"
+	"github.com/ilius/ayandict/pkg/iface"
 	"github.com/ilius/ayandict/pkg/qerr"
 	"github.com/ilius/ayandict/pkg/server"
 	"github.com/ilius/ayandict/pkg/settings"
@@ -33,7 +33,7 @@ func Run() {
 	app := &Application{
 		QApplication:   widgets.NewQApplication(len(os.Args), os.Args),
 		window:         widgets.NewQMainWindow(nil, 0),
-		allTextWidgets: []common.HasSetFont{},
+		allTextWidgets: []iface.HasSetFont{},
 	}
 	qerr.ShowQtError = true
 
@@ -57,7 +57,7 @@ type Application struct {
 
 	dictManager *dictmgr.DictManager
 
-	allTextWidgets []common.HasSetFont
+	allTextWidgets []iface.HasSetFont
 
 	headerLabel *HeaderLabel
 }
@@ -354,7 +354,7 @@ func (app *Application) Run() {
 
 	app.SetFont(ConfigFont(), "")
 
-	app.allTextWidgets = []common.HasSetFont{
+	app.allTextWidgets = []iface.HasSetFont{
 		queryLabel,
 		entry,
 		okButton,
