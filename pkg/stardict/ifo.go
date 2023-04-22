@@ -91,12 +91,12 @@ func ReadInfo(filename string) (info *Info, err error) {
 	}
 
 	if key != "version" {
-		err = errors.New("Version missing (should be on second line)")
+		err = errors.New("version missing (should be on second line)")
 		return
 	}
 
 	if value != "2.4.2" && value != "3.0.0" {
-		err = errors.New("Stardict version should be either 2.4.2 or 3.0.0")
+		err = errors.New("stardict version should be either 2.4.2 or 3.0.0")
 		return
 	}
 

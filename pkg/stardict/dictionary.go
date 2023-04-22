@@ -96,47 +96,15 @@ func similarity(r1 []rune, r2 []rune, subtract uint8) uint8 {
 	return score - subtract
 }
 
-func (d *dictionaryImp) runWorkers(
-	N int,
-	workerCount int,
-	timeout time.Duration,
-	worker func(int, int) []*common.SearchResultLow,
-) []*common.SearchResultLow {
-	if workerCount < 2 {
-		return worker(0, N)
+func (d *dictionaryImp) newResult(entry *IdxEntry, entryIndex int, score uint8) *common.SearchResultLow {
+	return &common.SearchResultLow{
+		F_Score: score,
+		F_Terms: entry.terms,
+		Items: func() []*common.SearchResultItem {
+			return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
+		},
+		F_EntryIndex: uint64(entryIndex),
 	}
-	if N < 2*workerCount {
-		return worker(0, N)
-	}
-
-	ch := make(chan []*common.SearchResultLow, workerCount)
-
-	sender := func(start int, end int) {
-		ch <- worker(start, end)
-	}
-
-	step := N / workerCount
-	start := 0
-	for i := 0; i < workerCount-1; i++ {
-		end := start + step
-		go sender(start, end)
-		start = end
-	}
-	go sender(start, N)
-
-	results := []*common.SearchResultLow{}
-	timeoutCh := time.NewTimer(timeout)
-	for i := 0; i < workerCount; i++ {
-		select {
-		case wRes := <-ch:
-			results = append(results, wRes...)
-		case <-timeoutCh.C:
-			log.Println("Search Timeout")
-			return results
-		}
-	}
-
-	return results
 }
 
 // SearchFuzzy: run a fuzzy search with similarity scores
@@ -174,66 +142,22 @@ func (d *dictionaryImp) SearchFuzzy(
 		queryWordCount++
 	}
 
-	checkEntry := func(entry *IdxEntry) uint8 {
-		terms := entry.terms
-		bestScore := uint8(0)
-		for termI, termOrig := range terms {
-			subtract := uint8(3)
-			if termI < 3 {
-				subtract = uint8(termI)
-			}
-			term := strings.ToLower(termOrig)
-			if term == query {
-				return 200 - subtract
-			}
-			words := strings.Split(term, " ")
-			if len(words) < minWordCount {
-				continue
-			}
-			score := similarity(queryRunes, []rune(term), subtract)
-			if score > bestScore {
-				bestScore = score
-				if score >= 180 {
-					continue
-				}
-			}
-			if len(words) > 1 {
-				bestWordScore := uint8(0)
-				for wordI, word := range words {
-					wordScore := similarity(queryMainWord, []rune(word), subtract)
-					if wordScore < 50 {
-						continue
-					}
-					if wordI == mainWordIndex {
-						wordScore -= 1
-					} else {
-						wordScore -= wordScore / 10
-					}
-					if wordScore > bestWordScore {
-						bestWordScore = wordScore
-					}
-				}
-				if bestWordScore < 50 {
-					continue
-				}
-				if queryWordCount > 1 {
-					bestWordScore = bestWordScore>>1 + bestWordScore/7
-				}
-				if bestWordScore > bestScore {
-					bestScore = bestWordScore
-				}
-			}
-		}
-		return bestScore
-	}
-
 	prefix := queryMainWord[0]
 	entryIndexes := idx.byWordPrefix[prefix]
 
 	t1 := time.Now()
 	N := len(entryIndexes)
 
-	results := d.runWorkers(
+	args := &ScoreFuzzyArgs{
+		Query:          query,
+		QueryRunes:     queryRunes,
+		QueryMainWord:  queryMainWord,
+		QueryWordCount: queryWordCount,
+		MinWordCount:   minWordCount,
+		MainWordIndex:  mainWordIndex,
+	}
+
+	results := runWorkers(
 		N,
 		workerCount,
 		timeout,
@@ -241,24 +165,17 @@ func (d *dictionaryImp) SearchFuzzy(
 			var results []*common.SearchResultLow
 			for i := start; i < end; i++ {
 				entry := idx.entries[entryIndexes[i]]
-				score := checkEntry(entry)
+				score := scoreEntryFuzzy(entry.terms, args)
 				if score < minScore {
 					continue
 				}
-				results = append(results, &common.SearchResultLow{
-					F_Score: score,
-					F_Terms: entry.terms,
-					Items: func() []*common.SearchResultItem {
-						return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
-					},
-					F_EntryIndex: uint64(i),
-				})
+				results = append(results, d.newResult(entry, i, score))
 			}
 			return results
 		},
 	)
 
-	dt := time.Now().Sub(t1)
+	dt := time.Since(t1)
 	if dt > time.Millisecond {
 		log.Printf("SearchFuzzy index loop took %v for %#v on %s\n", dt, query, d.DictName())
 	}
@@ -276,38 +193,13 @@ func (d *dictionaryImp) SearchStartWith(
 
 	query = strings.ToLower(strings.TrimSpace(query))
 
-	checkEntry := func(entry *IdxEntry) uint8 {
-		terms := entry.terms
-		bestScore := uint8(0)
-		for termI, termOrig := range terms {
-			term := strings.ToLower(termOrig)
-			if !strings.HasPrefix(term, query) {
-				continue
-			}
-			subtract := uint8(3)
-			if termI < 3 {
-				subtract = uint8(termI)
-			}
-			deltaLen := len(term) - len(query)
-			subtract2 := uint8(20)
-			if deltaLen < 20 {
-				subtract2 = uint8(deltaLen)
-			}
-			score := 200 - subtract - subtract2
-			if score > bestScore {
-				bestScore = score
-			}
-		}
-		return bestScore
-	}
-
 	prefix, _ := utf8.DecodeRuneInString(query)
 	entryIndexes := idx.byWordPrefix[prefix]
 
 	t1 := time.Now()
 	N := len(entryIndexes)
 
-	results := d.runWorkers(
+	results := runWorkers(
 		N,
 		workerCount,
 		timeout,
@@ -315,23 +207,17 @@ func (d *dictionaryImp) SearchStartWith(
 			var results []*common.SearchResultLow
 			for i := start; i < end; i++ {
 				entry := idx.entries[entryIndexes[i]]
-				score := checkEntry(entry)
+				score := ScoreStartsWith(entry.terms, query)
 				if score < minScore {
 					continue
 				}
-				results = append(results, &common.SearchResultLow{
-					F_Score: score,
-					F_Terms: entry.terms,
-					Items: func() []*common.SearchResultItem {
-						return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
-					},
-				})
+				results = append(results, d.newResult(entry, i, score))
 			}
 			return results
 		},
 	)
 
-	dt := time.Now().Sub(t1)
+	dt := time.Since(t1)
 	if dt > time.Millisecond {
 		log.Printf("SearchStartWith index loop took %v for %#v on %s\n", dt, query, d.DictName())
 	}
@@ -348,7 +234,7 @@ func (d *dictionaryImp) searchPattern(
 	const minScore = uint8(140)
 
 	N := len(idx.entries)
-	return d.runWorkers(
+	return runWorkers(
 		N,
 		workerCount,
 		timeout,
@@ -367,13 +253,7 @@ func (d *dictionaryImp) searchPattern(
 				if score < minScore {
 					continue
 				}
-				results = append(results, &common.SearchResultLow{
-					F_Score: score,
-					F_Terms: entry.terms,
-					Items: func() []*common.SearchResultItem {
-						return d.decodeData(d.dict.GetSequence(entry.offset, entry.size))
-					},
-				})
+				results = append(results, d.newResult(entry, entryI, score))
 			}
 			return results
 		},
@@ -400,7 +280,7 @@ func (d *dictionaryImp) SearchRegex(
 		}
 		return 180
 	})
-	dt := time.Now().Sub(t1)
+	dt := time.Since(t1)
 	if dt > time.Millisecond {
 		log.Printf("SearchRegex index loop took %v for %#v on %s\n", dt, query, d.DictName())
 	}
@@ -427,7 +307,7 @@ func (d *dictionaryImp) SearchGlob(
 		}
 		return 180
 	})
-	dt := time.Now().Sub(t1)
+	dt := time.Since(t1)
 	if dt > time.Millisecond {
 		log.Printf("SearchGlob index loop took %v for %#v on %s\n", dt, query, d.DictName())
 	}
@@ -510,7 +390,7 @@ func (d *dictionaryImp) DictName() string {
 // path - path to dictionary files
 // name - name of dictionary to parse
 func NewDictionary(path string, name string) (*dictionaryImp, error) {
-	d := new(dictionaryImp)
+	d := &dictionaryImp{}
 
 	path = filepath.Clean(path)
 

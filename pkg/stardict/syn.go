@@ -20,19 +20,19 @@ func readSyn(idx *Idx, synPath string, wordPrefixMap WordPrefixMap) error {
 		// Python: pos = data.find("\x00", beg)
 		offset := bytes.Index(data[beg:], []byte{0})
 		if offset < 0 {
-			return fmt.Errorf("Synonym file is corrupted")
+			return fmt.Errorf("synonym file is corrupted")
 		}
 		pos = offset + beg
 		b_alt := data[beg:pos]
 		pos += 1
 		if pos+4 > len(data) {
-			return fmt.Errorf("Synonym file is corrupted")
+			return fmt.Errorf("synonym file is corrupted")
 		}
 		termIndex := int(binary.BigEndian.Uint32(data[pos : pos+4]))
 		pos += 4
 		if termIndex >= len(idx.entries) {
 			return fmt.Errorf(
-				"Corrupted synonym file. Word %#v references invalid item",
+				"corrupted synonym file. Word %#v references invalid item",
 				string(b_alt),
 			)
 		}
