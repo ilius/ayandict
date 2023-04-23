@@ -14,6 +14,7 @@ import (
 
 	"github.com/gobwas/glob"
 	"github.com/ilius/ayandict/pkg/murmur3"
+	su "github.com/ilius/ayandict/pkg/search_utils"
 	common "github.com/ilius/go-dict-commons"
 )
 
@@ -130,7 +131,7 @@ func (d *dictionaryImp) SearchFuzzy(
 	t1 := time.Now()
 	N := len(entryIndexes)
 
-	args := &ScoreFuzzyArgs{
+	args := &su.ScoreFuzzyArgs{
 		Query:          query,
 		QueryRunes:     queryRunes,
 		QueryMainWord:  queryMainWord,
@@ -139,7 +140,7 @@ func (d *dictionaryImp) SearchFuzzy(
 		MainWordIndex:  mainWordIndex,
 	}
 
-	results := runWorkers(
+	results := su.RunWorkers(
 		N,
 		workerCount,
 		timeout,
@@ -147,7 +148,7 @@ func (d *dictionaryImp) SearchFuzzy(
 			var results []*common.SearchResultLow
 			for i := start; i < end; i++ {
 				entry := idx.entries[entryIndexes[i]]
-				score := scoreEntryFuzzy(entry.terms, args)
+				score := su.ScoreEntryFuzzy(entry.terms, args)
 				if score < minScore {
 					continue
 				}
@@ -181,7 +182,7 @@ func (d *dictionaryImp) SearchStartWith(
 	t1 := time.Now()
 	N := len(entryIndexes)
 
-	results := runWorkers(
+	results := su.RunWorkers(
 		N,
 		workerCount,
 		timeout,
@@ -189,7 +190,7 @@ func (d *dictionaryImp) SearchStartWith(
 			var results []*common.SearchResultLow
 			for i := start; i < end; i++ {
 				entry := idx.entries[entryIndexes[i]]
-				score := ScoreStartsWith(entry.terms, query)
+				score := su.ScoreStartsWith(entry.terms, query)
 				if score < minScore {
 					continue
 				}
@@ -216,7 +217,7 @@ func (d *dictionaryImp) searchPattern(
 	const minScore = uint8(140)
 
 	N := len(idx.entries)
-	return runWorkers(
+	return su.RunWorkers(
 		N,
 		workerCount,
 		timeout,

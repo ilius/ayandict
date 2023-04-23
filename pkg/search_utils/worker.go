@@ -1,4 +1,4 @@
-package stardict
+package search_utils
 
 import (
 	"log"
@@ -7,7 +7,7 @@ import (
 	common "github.com/ilius/go-dict-commons"
 )
 
-func runWorkers(
+func RunWorkers(
 	N int,
 	workerCount int,
 	timeout time.Duration,

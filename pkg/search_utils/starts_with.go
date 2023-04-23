@@ -1,4 +1,4 @@
-package stardict
+package search_utils
 
 import "strings"
 

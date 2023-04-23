@@ -1,10 +1,10 @@
-package stardict
+package search_utils
 
 import (
 	"github.com/ilius/ayandict/pkg/levenshtein"
 )
 
-func similarity(r1 []rune, r2 []rune, subtract uint8) uint8 {
+func Similarity(r1 []rune, r2 []rune, subtract uint8) uint8 {
 	if len(r1) > len(r2) {
 		r1, r2 = r2, r1
 	}

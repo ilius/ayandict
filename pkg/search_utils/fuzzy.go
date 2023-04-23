@@ -1,4 +1,4 @@
-package stardict
+package search_utils
 
 import "strings"
 
@@ -11,7 +11,7 @@ type ScoreFuzzyArgs struct {
 	MainWordIndex  int
 }
 
-func scoreEntryFuzzy(
+func ScoreEntryFuzzy(
 	terms []string,
 	args *ScoreFuzzyArgs,
 ) uint8 {
@@ -29,7 +29,7 @@ func scoreEntryFuzzy(
 		if len(words) < args.MinWordCount {
 			continue
 		}
-		score := similarity(args.QueryRunes, []rune(term), subtract)
+		score := Similarity(args.QueryRunes, []rune(term), subtract)
 		if score > bestScore {
 			bestScore = score
 			if score >= 180 {
@@ -39,7 +39,7 @@ func scoreEntryFuzzy(
 		if len(words) > 1 {
 			bestWordScore := uint8(0)
 			for wordI, word := range words {
-				wordScore := similarity(args.QueryMainWord, []rune(word), subtract)
+				wordScore := Similarity(args.QueryMainWord, []rune(word), subtract)
 				if wordScore < 50 {
 					continue
 				}
