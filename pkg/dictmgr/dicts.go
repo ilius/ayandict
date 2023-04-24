@@ -11,6 +11,7 @@ import (
 
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/qerr"
+	"github.com/ilius/ayandict/pkg/sqldict"
 	"github.com/ilius/ayandict/pkg/stardict"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
@@ -137,15 +138,19 @@ func InitDicts(conf *config.Config) {
 	if err != nil {
 		panic(err)
 	}
-	for _, dic := range dicList {
-		dicMap[dic.DictName()] = dic
+	if len(conf.SqlDictList) > 0 {
+		dicList = append(dicList, sqldict.Open(conf.SqlDictList, dictsOrder)...)
 	}
 
 	// to support another format, you can call pkg.Open just like stardict
 	// and append them new dicList to this dicList. since we are sorting them
 	// here in Reorder after loading all dictionaries
 
-	log.Println("Loading dictionaries took", time.Now().Sub(t))
+	for _, dic := range dicList {
+		dicMap[dic.DictName()] = dic
+	}
+
+	log.Println("Loading dictionaries took", time.Since(t))
 
 	nameByHash := getDictNameByHashMap()
 

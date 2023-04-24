@@ -2,10 +2,13 @@ package main
 
 var commentMap = map[string]string{
 	"directory_list": "List of dictionary directory paths (absolute or relative to home)",
-	"style":          "Path to application stylesheet file (.qss)",
-	"article_style":  "Path to article stylesheet file (.css)",
-	"font_family":    "Application font family",
-	"font_size":      "Application font size",
+
+	"sql_dict_list": "List of SQL databases, only SQLite is currently supported",
+
+	"style":         "Path to application stylesheet file (.qss)",
+	"article_style": "Path to article stylesheet file (.css)",
+	"font_family":   "Application font family",
+	"font_size":     "Application font size",
 
 	"search_on_type":            "Enable/disable search-on-type",
 	"search_on_type_min_length": "Minimum query length for search-on-type",
