@@ -497,17 +497,21 @@ func (app *Application) Run() {
 
 	entry.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
 		entry.KeyPressEventDefault(event)
-		switch event.Text() {
-		case "", "\b":
+		if !conf.SearchOnType {
 			return
 		}
-		if conf.SearchOnType {
-			text := entry.Text()
-			if len(text) < conf.SearchOnTypeMinLength {
-				return
-			}
-			onQuery(text, queryArgs, true)
+		// log.Printf("event text=%#v, key=%x, modifiers=%x", event.Text(), event.Key(), event.Modifiers())
+		if event.Key() >= 0x01000000 {
+			return
 		}
+		if event.Modifiers() > core.Qt__ShiftModifier {
+			return
+		}
+		text := entry.Text()
+		if len(text) < conf.SearchOnTypeMinLength {
+			return
+		}
+		onQuery(text, queryArgs, true)
 	})
 
 	favoriteButton.ConnectClicked(func(checked bool) {
