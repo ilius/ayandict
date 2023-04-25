@@ -6,7 +6,7 @@ import (
 
 	"github.com/ilius/ayandict/pkg/application"
 	"github.com/ilius/ayandict/pkg/qerr"
-	"github.com/ilius/ayandict/pkg/stardict"
+	"github.com/ilius/go-stardict/v2"
 )
 
 func main() {

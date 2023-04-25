@@ -11,9 +11,9 @@ import (
 
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/qerr"
-	"github.com/ilius/ayandict/pkg/stardict"
 	common "github.com/ilius/go-dict-commons"
 	sqldict "github.com/ilius/go-dict-sql"
+	"github.com/ilius/go-stardict/v2"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/widgets"
 )
