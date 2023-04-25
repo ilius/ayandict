@@ -27,6 +27,15 @@ var (
 	dictSettingsMap = map[string]*common.DictSettings{}
 )
 
+func init() {
+	stardict.ErrorHandler = func(err error) {
+		qerr.Error(err)
+	}
+	sqldict.ErrorHandler = func(err error) {
+		qerr.Error(err)
+	}
+}
+
 func absInt(x int) int {
 	if x < 0 {
 		return -x
