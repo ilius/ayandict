@@ -14,8 +14,8 @@ import (
 
 	"github.com/gobwas/glob"
 	"github.com/ilius/ayandict/pkg/murmur3"
-	su "github.com/ilius/ayandict/pkg/search_utils"
 	common "github.com/ilius/go-dict-commons"
+	su "github.com/ilius/go-dict-commons/search_utils"
 )
 
 // dictionaryImp stardict dictionary

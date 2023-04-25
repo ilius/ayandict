@@ -12,8 +12,8 @@ import (
 
 	// _ "github.com/glebarez/go-sqlite"
 	"github.com/ilius/ayandict/pkg/qerr"
-	su "github.com/ilius/ayandict/pkg/search_utils"
 	common "github.com/ilius/go-dict-commons"
+	su "github.com/ilius/go-dict-commons/search_utils"
 	"modernc.org/sqlite"
 )
 
