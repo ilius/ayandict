@@ -11,7 +11,6 @@ import (
 	"github.com/ilius/ayandict/pkg/config"
 	"github.com/ilius/ayandict/pkg/qerr"
 	common "github.com/ilius/go-dict-commons"
-	sqldict "github.com/ilius/go-dict-sql"
 	"github.com/ilius/go-stardict/v2"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/widgets"
@@ -26,11 +25,12 @@ var (
 	dictSettingsMap = map[string]*common.DictSettings{}
 )
 
+var sqldictOpen = func([]string, map[string]int) []common.Dictionary {
+	return nil
+}
+
 func init() {
 	stardict.ErrorHandler = func(err error) {
-		qerr.Error(err)
-	}
-	sqldict.ErrorHandler = func(err error) {
 		qerr.Error(err)
 	}
 }
@@ -147,7 +147,7 @@ func InitDicts(conf *config.Config) {
 		panic(err)
 	}
 	if len(conf.SqlDictList) > 0 {
-		dicList = append(dicList, sqldict.Open(conf.SqlDictList, dictsOrder)...)
+		dicList = append(dicList, sqldictOpen(conf.SqlDictList, dictsOrder)...)
 	}
 
 	// to support another format, you can call pkg.Open just like stardict
