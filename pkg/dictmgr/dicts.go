@@ -2,7 +2,6 @@ package dictmgr
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -88,7 +87,7 @@ func loadDictsSettings() (map[string]*common.DictSettings, map[string]int, error
 	order := map[string]int{}
 	settingsMap := map[string]*common.DictSettings{}
 	fpath := filepath.Join(config.GetConfigDir(), dictsJsonFilename)
-	jsonBytes, err := ioutil.ReadFile(fpath)
+	jsonBytes, err := os.ReadFile(fpath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return settingsMap, order, nil
@@ -114,7 +113,7 @@ func saveDictsSettings(settingsMap map[string]*common.DictSettings) error {
 		return err
 	}
 	fpath := filepath.Join(config.GetConfigDir(), dictsJsonFilename)
-	err = ioutil.WriteFile(fpath, jsonBytes, 0o644)
+	err = os.WriteFile(fpath, jsonBytes, 0o644)
 	if err != nil {
 		return err
 	}

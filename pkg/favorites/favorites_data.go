@@ -2,7 +2,6 @@ package favorites
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"os"
 )
@@ -41,7 +40,7 @@ func (fav *Favorites) Remove(item string) int {
 }
 
 func (fav *Favorites) Load(fpath string) error {
-	jsonBytes, err := ioutil.ReadFile(fpath)
+	jsonBytes, err := os.ReadFile(fpath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil
@@ -62,7 +61,7 @@ func (fav *Favorites) Save(fpath string) error {
 		return err
 	}
 	log.Println("Saving", fpath)
-	err = ioutil.WriteFile(fpath, jsonBytes, 0o644)
+	err = os.WriteFile(fpath, jsonBytes, 0o644)
 	if err != nil {
 		return err
 	}

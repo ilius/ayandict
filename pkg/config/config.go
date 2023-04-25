@@ -2,7 +2,6 @@ package config
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -159,7 +158,7 @@ func loadFile() ([]byte, error) {
 	defer mutex.Unlock()
 
 	pathStr := filepath.Join(GetConfigDir(), fileName)
-	tomlBytes, err := ioutil.ReadFile(pathStr)
+	tomlBytes, err := os.ReadFile(pathStr)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil
@@ -221,7 +220,7 @@ func Save(conf *Config) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	err = ioutil.WriteFile(pathStr, buf.Bytes(), 0o644)
+	err = os.WriteFile(pathStr, buf.Bytes(), 0o644)
 	if err != nil {
 		return err
 	}

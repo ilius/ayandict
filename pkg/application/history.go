@@ -3,7 +3,6 @@ package application
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
@@ -46,16 +45,16 @@ func LoadHistory() error {
 	historyMutex.Lock()
 	defer historyMutex.Unlock()
 	pathStr := historyFilePath()
-	jsonBytes, err := ioutil.ReadFile(pathStr)
+	jsonBytes, err := os.ReadFile(pathStr)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			return fmt.Errorf("Error loading history: %v\n", err)
+			return fmt.Errorf("error loading history: %v", err)
 		}
 		return nil
 	}
 	err = json.Unmarshal(jsonBytes, &history)
 	if err != nil {
-		return fmt.Errorf("Bad history file %#v: %v\n", pathStr, err)
+		return fmt.Errorf("bad history file %#v: %v", pathStr, err)
 	}
 	return nil
 }
@@ -67,7 +66,7 @@ func SaveHistory() {
 	if err != nil {
 		panic(err)
 	}
-	err = ioutil.WriteFile(historyFilePath(), jsonBytes, 0o644)
+	err = os.WriteFile(historyFilePath(), jsonBytes, 0o644)
 	if err != nil {
 		qerr.Errorf("Error saving history: %v", err)
 	}

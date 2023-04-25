@@ -1,7 +1,6 @@
 package application
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -29,7 +28,7 @@ func readArticleStyle(stylePath string) error {
 	if err != nil {
 		return err
 	}
-	styleBytes, err := ioutil.ReadFile(stylePath)
+	styleBytes, err := os.ReadFile(stylePath)
 	if err != nil {
 		return err
 	}

@@ -2,7 +2,7 @@ package application
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -54,7 +54,7 @@ func (c *AudioCache) download(urlStr string, fpath string) error {
 	if err != nil {
 		return err
 	}
-	data, err := ioutil.ReadAll(res.Body)
+	data, err := io.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
@@ -62,7 +62,7 @@ func (c *AudioCache) download(urlStr string, fpath string) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(fpath, data, 0o644)
+	err = os.WriteFile(fpath, data, 0o644)
 	if err != nil {
 		return err
 	}

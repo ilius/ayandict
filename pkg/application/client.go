@@ -1,7 +1,7 @@
 package application
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -40,7 +40,7 @@ func findLocalServer(ports []string) (bool, string) {
 			continue
 		}
 		log.Printf("%s responded in %v", _urlStr, time.Now().Sub(t))
-		data, err := ioutil.ReadAll(res.Body)
+		data, err := io.ReadAll(res.Body)
 		if err != nil {
 			qerr.Error(err)
 			continue

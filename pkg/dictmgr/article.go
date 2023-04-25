@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	std_html "html"
-	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -192,7 +191,7 @@ func embedExternalStyle(defi string, resDir string) string {
 			// TODO: download?
 			return match
 		}
-		data, err := ioutil.ReadFile(filepath.Join(resDir, href))
+		data, err := os.ReadFile(filepath.Join(resDir, href))
 		if err != nil {
 			if !os.IsNotExist(err) {
 				log.Println(err)

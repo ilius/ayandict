@@ -3,7 +3,6 @@ package frequency
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"sort"
 	"strconv"
@@ -115,17 +114,17 @@ func (view *FrequencyTable) Add(key string, plus int) {
 }
 
 func (view *FrequencyTable) LoadFromFile(pathStr string) error {
-	jsonBytes, err := ioutil.ReadFile(pathStr)
+	jsonBytes, err := os.ReadFile(pathStr)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			return fmt.Errorf("Error loading history: %v\n", err)
+			return fmt.Errorf("error loading frequency: %v", err)
 		}
 		return nil
 	}
 	countMap := map[string]int{}
 	err = json.Unmarshal(jsonBytes, &countMap)
 	if err != nil {
-		return fmt.Errorf("Bad history file %#v: %v\n", pathStr, err)
+		return fmt.Errorf("bad frequency file %#v: %v", pathStr, err)
 	}
 	countList := [][2]any{}
 	for key, count := range countMap {
@@ -175,7 +174,7 @@ func (view *FrequencyTable) Save() error {
 	if err != nil {
 		panic(err)
 	}
-	err = ioutil.WriteFile(view.filePath, jsonBytes, 0o644)
+	err = os.WriteFile(view.filePath, jsonBytes, 0o644)
 	if err != nil {
 		return err
 	}
