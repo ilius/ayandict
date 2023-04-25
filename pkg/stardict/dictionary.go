@@ -148,7 +148,7 @@ func (d *dictionaryImp) SearchFuzzy(
 			var results []*common.SearchResultLow
 			for i := start; i < end; i++ {
 				entry := idx.entries[entryIndexes[i]]
-				score := su.ScoreEntryFuzzy(entry.terms, args)
+				score := su.ScoreFuzzy(entry.terms, args)
 				if score < minScore {
 					continue
 				}

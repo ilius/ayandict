@@ -11,7 +11,7 @@ type ScoreFuzzyArgs struct {
 	MainWordIndex  int
 }
 
-func ScoreEntryFuzzy(
+func ScoreFuzzy(
 	terms []string,
 	args *ScoreFuzzyArgs,
 ) uint8 {

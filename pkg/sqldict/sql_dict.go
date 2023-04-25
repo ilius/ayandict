@@ -267,7 +267,7 @@ func (d *dictionaryImp) SearchFuzzy(query string, _ int, _ time.Duration) []*com
 		}
 		// TODO: alts
 		terms := []string{term}
-		score := su.ScoreEntryFuzzy(terms, args)
+		score := su.ScoreFuzzy(terms, args)
 		if score < minScore {
 			continue
 		}
