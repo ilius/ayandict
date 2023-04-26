@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/ilius/ayandict/pkg/appinfo"
-	"github.com/ilius/ayandict/pkg/qerr"
+	"github.com/ilius/ayandict/v2/pkg/appinfo"
+	"github.com/ilius/ayandict/v2/pkg/qerr"
 )
 
 const (

@@ -5,7 +5,7 @@
 package html
 
 import (
-	"github.com/ilius/ayandict/pkg/html/atom"
+	"github.com/ilius/ayandict/v2/pkg/html/atom"
 )
 
 // A NodeType is the type of a Node.

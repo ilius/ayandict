@@ -3,8 +3,8 @@ package dictmgr
 import (
 	"sort"
 
-	"github.com/ilius/ayandict/pkg/config"
-	"github.com/ilius/ayandict/pkg/qerr"
+	"github.com/ilius/ayandict/v2/pkg/config"
+	"github.com/ilius/ayandict/v2/pkg/qerr"
 	common "github.com/ilius/go-dict-commons"
 )
 

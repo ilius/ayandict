@@ -1,6 +1,6 @@
 package main
 
-import "github.com/ilius/ayandict/pkg/config"
+import "github.com/ilius/ayandict/v2/pkg/config"
 
 func main() {
 	err := config.Save(&config.Config{

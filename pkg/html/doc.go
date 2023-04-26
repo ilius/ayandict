@@ -108,7 +108,7 @@ producing a literal interpretation of the input.
 If your use case requires semantically well-formed HTML, as defined by the
 WHATWG specification, the parser should be used rather than the tokenizer.
 */
-package html // import "github.com/ilius/ayandict/pkg/html"
+package html // import "github.com/ilius/ayandict/v2/pkg/html"
 
 // The tokenization algorithm implemented by this package is not a line-by-line
 // transliteration of the relatively verbose state-machine in the WHATWG

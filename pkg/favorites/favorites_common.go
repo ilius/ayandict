@@ -3,7 +3,7 @@ package favorites
 import (
 	"path/filepath"
 
-	"github.com/ilius/ayandict/pkg/config"
+	"github.com/ilius/ayandict/v2/pkg/config"
 )
 
 const favoritesFilename = "favorites.json"

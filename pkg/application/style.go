@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ilius/ayandict/pkg/config"
-	"github.com/ilius/ayandict/pkg/qerr"
+	"github.com/ilius/ayandict/v2/pkg/config"
+	"github.com/ilius/ayandict/v2/pkg/qerr"
 	"github.com/ilius/qt/core"
 )
 

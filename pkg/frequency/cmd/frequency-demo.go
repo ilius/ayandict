@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/ilius/ayandict/pkg/frequency"
+	"github.com/ilius/ayandict/v2/pkg/frequency"
 	"github.com/ilius/qt/widgets"
 )
 

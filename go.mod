@@ -1,4 +1,4 @@
-module github.com/ilius/ayandict
+module github.com/ilius/ayandict/v2
 
 go 1.19
 

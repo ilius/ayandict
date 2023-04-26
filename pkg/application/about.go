@@ -3,7 +3,7 @@ package application
 import (
 	"fmt"
 
-	"github.com/ilius/ayandict/pkg/appinfo"
+	"github.com/ilius/ayandict/v2/pkg/appinfo"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/widgets"
 )

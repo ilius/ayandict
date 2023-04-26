@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/BurntSushi/toml"
-	"github.com/ilius/ayandict/pkg/config"
+	"github.com/ilius/ayandict/v2/pkg/config"
 )
 
 func main() {

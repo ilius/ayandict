@@ -5,7 +5,7 @@ import (
 	"html"
 	"strings"
 
-	"github.com/ilius/ayandict/pkg/qerr"
+	"github.com/ilius/ayandict/v2/pkg/qerr"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"

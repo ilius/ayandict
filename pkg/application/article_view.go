@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ilius/ayandict/pkg/mp3duration"
+	"github.com/ilius/ayandict/v2/pkg/mp3duration"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"

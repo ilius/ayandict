@@ -1,7 +1,7 @@
 package favorites
 
 import (
-	"github.com/ilius/ayandict/pkg/config"
+	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/qt/widgets"
 )
 

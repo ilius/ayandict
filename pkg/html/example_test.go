@@ -10,7 +10,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/ilius/ayandict/pkg/html"
+	"github.com/ilius/ayandict/v2/pkg/html"
 )
 
 func ExampleParse() {

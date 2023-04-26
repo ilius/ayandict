@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/ilius/ayandict/pkg/application"
+	"github.com/ilius/ayandict/v2/pkg/application"
 )
 
 func main() {

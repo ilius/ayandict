@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/ilius/ayandict/pkg/qerr"
+	"github.com/ilius/ayandict/v2/pkg/qerr"
 	common "github.com/ilius/go-dict-commons"
 )
 

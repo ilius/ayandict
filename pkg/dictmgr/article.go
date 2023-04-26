@@ -12,8 +12,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ilius/ayandict/pkg/config"
-	"github.com/ilius/ayandict/pkg/html"
+	"github.com/ilius/ayandict/v2/pkg/config"
+	"github.com/ilius/ayandict/v2/pkg/html"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 )

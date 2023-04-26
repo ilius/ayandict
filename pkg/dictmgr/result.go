@@ -4,7 +4,7 @@ import (
 	"fmt"
 	std_html "html"
 
-	"github.com/ilius/ayandict/pkg/config"
+	"github.com/ilius/ayandict/v2/pkg/config"
 	common "github.com/ilius/go-dict-commons"
 )
 

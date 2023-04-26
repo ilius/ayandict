@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ilius/ayandict/pkg/dictmgr"
+	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/widgets"
 )
