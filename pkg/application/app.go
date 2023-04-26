@@ -357,6 +357,7 @@ func (app *Application) Run() {
 	app.allTextWidgets = []iface.HasSetFont{
 		queryLabel,
 		entry,
+		queryModeCombo,
 		okButton,
 		headerLabel,
 		articleView,
