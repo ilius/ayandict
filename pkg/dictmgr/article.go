@@ -30,7 +30,7 @@ var (
 	colorRE      = regexp.MustCompile(` color=["']#?[a-zA-Z0-9]+["']`)
 	styleColorRE = regexp.MustCompile(`color:#?[a-zA-Z0-9]+`)
 
-	hrefBwordSpaceRE = regexp.MustCompile(` href="bword://[^<>"]*?( |%20)[^<>" ]*?"`)
+	hrefBwordRE = regexp.MustCompile(` href="bword://[^<>"]*?"`)
 )
 
 func fixResURL(quoted string, resURL string) (bool, string) {
@@ -160,15 +160,22 @@ func fixFileSrc(defi string, resURL string) string {
 	return srcRE.ReplaceAllStringFunc(defi, srcSub)
 }
 
-// work around qt bug on internal entry links with space
+// hrefBwordSub fixes several problems, working around qt bugs
+// on handling links
+// problem 1: href value has space
 // for example: <a href="bword://abscisic acid">
 // clicking on these link do not work
 // ConnectAnchorClicked will get an empty url
 // link.ToString(core.QUrl__None) == ""
 // unless I remove `bword://` prefix
 // also tried replacing space with %20
-func hrefBwordSpaceSub(match string) string {
-	return ` href="` + match[len(` href="bword://`):]
+// problem 2: href value has quoted unicode characters, using &#...;
+// like "fl&#x205;k" for "flȅk", when you click on link, qt redirects to
+// a non-sense term, and does not even emit AnchorClicked signal
+func hrefBwordSub(match string) string {
+	ref := match[len(` href="bword://`):]
+	ref = html.UnescapeString(ref)
+	return ` href="` + ref
 }
 
 func embedExternalStyle(defi string, resDir string) string {
@@ -278,7 +285,7 @@ func fixDefiHTML(
 	if conf.EmbedExternalStylesheet {
 		defi = embedExternalStyle(defi, dic.ResourceDir())
 	}
-	defi = hrefBwordSpaceRE.ReplaceAllStringFunc(defi, hrefBwordSpaceSub)
+	defi = hrefBwordRE.ReplaceAllStringFunc(defi, hrefBwordSub)
 	if len(conf.ColorMapping) > 0 {
 		defi = applyColorMapping(defi, conf.ColorMapping)
 	}
