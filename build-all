@@ -6,32 +6,50 @@ FLAGS=(-ldflags '-s -w' -trimpath)
 VERSION=$(go run pkg/version/version.go)
 
 function build_for_os64() {
-	OUT=ayandict-$VERSION-$1-x86_64
-	GOOS=$1 GOARCH=amd64 go build -o $OUT "${FLAGS[@]}"
+	OS=$1
+	shift
+	OUT=ayandict-$VERSION-$OS-x86_64
+	GOOS=$OS GOARCH=amd64 go build -o $OUT "${FLAGS[@]}" "$@"
 	echo $OUT
 }
 
 function build_for_os32() {
-	OUT=ayandict-$VERSION-$1-x86
-	GOOS=$1 GOARCH=386 go build -o $OUT "${FLAGS[@]}"
+	OS=$1
+	shift
+	OUT=ayandict-$VERSION-$OS-x86
+	GOOS=$OS GOARCH=386 go build -o $OUT "${FLAGS[@]}" "$@"
 	echo $OUT
+}
+
+function build_for_win64() {
+	OUT=ayandict-$VERSION-windows-x86_64.exe
+	GOOS=windows GOARCH=amd64 go build -o $OUT "${FLAGS[@]}" "$@"
+	run_zip $OUT
+}
+
+function build_for_win32() {
+	OUT=ayandict-$VERSION-windows-x86.exe
+	GOOS=windows GOARCH=386 go build -o $OUT "${FLAGS[@]}" "$@"
+	run_zip $OUT
 }
 
 function build_for_mac() {
 	OUT=ayandict-$VERSION-mac-x86_64
-	GOOS=darwin GOARCH=amd64 go build -o $OUT "${FLAGS[@]}"
-	echo $OUT
+	GOOS=darwin GOARCH=amd64 go build -o $OUT "${FLAGS[@]}" "$@"
+	bzip2 -f $OUT
 }
 
 function run_zip() {
+	IN_PATH=$1
+	ZIP_PATH="${IN_PATH%.*}.zip"
 	if [ -f C:\\Windows\\System32\\tar.exe ] ; then
-		C:\\Windows\\System32\\tar.exe -a -c -f $1.zip $1
-		rm $1
+		C:\\Windows\\System32\\tar.exe -a -c -f $ZIP_PATH $IN_PATH
+		rm $IN_PATH
 		return
 	fi
 	if which zip ; then
-		zip $1.zip $1
-		rm $1
+		zip $ZIP_PATH $IN_PATH
+		rm $IN_PATH
 		return
 	fi
 }
@@ -39,11 +57,11 @@ function run_zip() {
 bzip2 -f $(build_for_os64 linux)
 bzip2 -f $(build_for_os32 linux)
 
-run_zip $(build_for_os64 windows)
-run_zip $(build_for_os32 windows)
+build_for_win64
+build_for_win32 -tags nosql
 
 bzip2 -f $(build_for_os64 freebsd)
 bzip2 -f $(build_for_os32 freebsd)
 
-bzip2 -f $(build_for_mac)
+build_for_mac
 
