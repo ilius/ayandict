@@ -22,34 +22,33 @@ It's good to know that the binary / executable file is completely portable, so y
 
 # Screenshots
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-wordnet.png" width="70%" height="70%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-linux-light-wordnet.png" width="70%" height="70%"/>
 
 Linux - light style (default)
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-dark-fa.png" width="70%" height="70%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-linux-dark-wordnet.png" width="70%" height="70%"/>
 
-Linux - dark style (Breeze)
+Linux - dark style (Breeze) + Favorites
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/windows-light-fa.png" width="70%" height="70%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-windows-light-wordnet.png" width="70%" height="70%"/>
 
 Windows - light style (default)
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/windows-dark-wordnet.png" width="70%" height="70%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-windows-dark-wordnet.png" width="70%" height="70%"/>
 
 Windows - dark style (Breeze)
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-wordnet-frequent.png" width="70%" height="70%"/>
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-wordnet-favorites.png" width="70%" height="70%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-linux-dark-frequent-wordnet.png" width="70%" height="70%"/>
 
-Most Frequent queries and Favorites
+Most Frequent queries
 
 ______________________________________________________________________
 
@@ -59,7 +58,7 @@ Dictionaries dialog
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-misc-empty.png" width="70%" height="70%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-linux-dark-misc-empty.png" width="70%" height="70%"/>
 
 Misc tab
 
