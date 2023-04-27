@@ -147,20 +147,20 @@ func (w *ResultListWidget) Clear() {
 
 func onQuery(
 	query string,
-	queryWidgets *QueryArgs,
+	queryArgs *QueryArgs,
 	isAuto bool,
 ) {
 	if query == "" {
 		if !isAuto {
-			queryWidgets.ArticleView.SetHtml("")
-			queryWidgets.HeaderLabel.SetText("")
+			queryArgs.ArticleView.SetHtml("")
+			queryArgs.HeaderLabel.SetText("")
 		}
 		return
 	}
 	// log.Printf("Query: %s\n", query)
 	t := time.Now()
 	mode := dictmgr.QueryModeFuzzy
-	switch queryWidgets.ModeCombo.CurrentIndex() {
+	switch queryArgs.ModeCombo.CurrentIndex() {
 	case 1:
 		mode = dictmgr.QueryModeStartWith
 	case 2:
@@ -170,14 +170,14 @@ func onQuery(
 	}
 	results := dictmgr.LookupHTML(query, conf, mode)
 	log.Printf("LookupHTML took %v for %#v", time.Now().Sub(t), query)
-	queryWidgets.ResultList.SetResults(results)
+	queryArgs.ResultList.SetResults(results)
 	if len(results) == 0 {
 		if !isAuto {
-			queryWidgets.SetNoResult(query)
+			queryArgs.SetNoResult(query)
 		}
 	}
 	if !isAuto {
-		queryWidgets.AddHistoryAndFrequency(query)
+		queryArgs.AddHistoryAndFrequency(query)
 	}
-	queryWidgets.PostQuery(query)
+	queryArgs.PostQuery(query)
 }

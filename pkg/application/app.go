@@ -14,6 +14,7 @@ import (
 	"github.com/ilius/ayandict/v2/pkg/qerr"
 	"github.com/ilius/ayandict/v2/pkg/server"
 	"github.com/ilius/ayandict/v2/pkg/settings"
+	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
 	"github.com/ilius/qt/widgets"
@@ -206,6 +207,9 @@ func (app *Application) Run() {
 	reloadStyleButton := widgets.NewQPushButton2("Reload Style", nil)
 	miscLayout.AddWidget(reloadStyleButton, 0, 0)
 
+	randomEntryButton := widgets.NewQPushButton2("Random Entry", nil)
+	miscLayout.AddWidget(randomEntryButton, 0, 0)
+
 	buttonBox := widgets.NewQHBoxLayout()
 	buttonBox.SetContentsMargins(0, 0, 0, 0)
 	buttonBox.SetSpacing(basePxHalf)
@@ -370,6 +374,7 @@ func (app *Application) Run() {
 		reloadDictsButton,
 		closeDictsButton,
 		reloadStyleButton,
+		randomEntryButton,
 		dictsButton,
 		aboutButton,
 		openConfigButton,
@@ -468,6 +473,17 @@ func (app *Application) Run() {
 	saveHistoryButton.ConnectClicked(func(checked bool) {
 		SaveHistory()
 		frequencyTable.SaveNoError()
+	})
+	randomEntryButton.ConnectClicked(func(checked bool) {
+		res := dictmgr.RandomEntry(conf)
+		if res == nil {
+			return
+		}
+		query := res.F_Terms[0]
+		entry.SetText(query)
+		queryArgs.ResultList.SetResults([]common.SearchResultIface{res})
+		queryArgs.AddHistoryAndFrequency(query)
+		queryArgs.PostQuery(query)
 	})
 	clearHistoryButton.ConnectClicked(func(checked bool) {
 		historyView.ClearHistory()
