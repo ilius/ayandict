@@ -48,20 +48,21 @@ func NewDictManager(
 
 	window := widgets.NewQDialog(parent, core.Qt__Dialog)
 	window.SetWindowTitle("Dictionaries")
-	window.Resize2(800, 600)
+	window.Resize2(900, 600)
 
 	qs := settings.GetQSettings(window)
 	settings.RestoreWinGeometry(app, qs, &window.QWidget, QS_dictManager)
 
-	const columns = 4
+	const columns = 5
 
 	table := widgets.NewQTableWidget(nil)
 	table.SetColumnCount(columns)
 	header := table.HorizontalHeader()
 	header.ResizeSection(0, 10)
-	header.ResizeSection(1, 20)
-	header.ResizeSection(2, 80)
-	header.ResizeSection(3, 500)
+	header.ResizeSection(1, 10)
+	header.ResizeSection(2, 20)
+	header.ResizeSection(3, 80)
+	header.ResizeSection(4, 500)
 
 	table.SetHorizontalHeaderItem(
 		0,
@@ -69,14 +70,18 @@ func NewDictManager(
 	)
 	table.SetHorizontalHeaderItem(
 		1,
-		widgets.NewQTableWidgetItem2("Sym", 0),
+		widgets.NewQTableWidgetItem2("Terms\nHeader", 0),
 	)
 	table.SetHorizontalHeaderItem(
 		2,
-		widgets.NewQTableWidgetItem2("Entries", 0),
+		widgets.NewQTableWidgetItem2("Sym", 0),
 	)
 	table.SetHorizontalHeaderItem(
 		3,
+		widgets.NewQTableWidgetItem2("Entries", 0),
+	)
+	table.SetHorizontalHeaderItem(
+		4,
 		widgets.NewQTableWidgetItem2("Name", 0),
 	)
 
@@ -125,27 +130,35 @@ func NewDictManager(
 			log.Printf("dictName=%#v not in infoMap\n", dictName)
 			return
 		}
-		checkItem := widgets.NewQTableWidgetItem(0)
+		enabledItem := widgets.NewQTableWidgetItem(0)
 		if ds.Order < 0 {
-			checkItem.SetCheckState(core.Qt__Unchecked)
+			enabledItem.SetCheckState(core.Qt__Unchecked)
 		} else {
-			checkItem.SetCheckState(core.Qt__Checked)
+			enabledItem.SetCheckState(core.Qt__Checked)
 		}
-		table.SetItem(index, 0, checkItem)
+		table.SetItem(index, 0, enabledItem)
+
+		headerItem := widgets.NewQTableWidgetItem(1)
+		if ds.HideTermsHeader {
+			headerItem.SetCheckState(core.Qt__Unchecked)
+		} else {
+			headerItem.SetCheckState(core.Qt__Checked)
+		}
+		table.SetItem(index, 1, headerItem)
 
 		symbolItem := newItem(ds.Symbol)
 		symbolItem.SetFlags(core.Qt__ItemIsEnabled |
 			core.Qt__ItemIsSelectable |
 			core.Qt__ItemIsEditable)
+		table.SetItem(index, 2, symbolItem)
 
-		table.SetItem(index, 1, symbolItem)
 		entries, err := info.EntryCount()
 		if err != nil {
 			qerr.Error(err)
 			return
 		}
-		table.SetItem(index, 2, newItem(strconv.FormatInt(int64(entries), 10)))
-		table.SetItem(index, 3, newItem(dictName))
+		table.SetItem(index, 3, newItem(strconv.FormatInt(int64(entries), 10)))
+		table.SetItem(index, 4, newItem(dictName))
 	}
 
 	// table.SelectedIndexes() panics/crashes
@@ -285,8 +298,9 @@ func (dm *DictManager) updateMap() map[string]int {
 	count := table.RowCount()
 	for index := 0; index < count; index++ {
 		disable := table.Item(index, 0).CheckState() != core.Qt__Checked
-		symbol := table.Item(index, 1).Text()
-		dictName := table.Item(index, 3).Text()
+		hideHeader := table.Item(index, 1).CheckState() != core.Qt__Checked
+		symbol := table.Item(index, 2).Text()
+		dictName := table.Item(index, 4).Text()
 		value := index + 1
 		if disable {
 			value = -value
@@ -297,6 +311,7 @@ func (dm *DictManager) updateMap() map[string]int {
 			ds = &common.DictSettings{}
 			dictSettingsMap[dictName] = ds
 		}
+		ds.HideTermsHeader = hideHeader
 		ds.Symbol = symbol
 		ds.Order = value
 	}

@@ -5,6 +5,7 @@ import (
 	"html"
 	"strings"
 
+	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	"github.com/ilius/ayandict/v2/pkg/qerr"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
@@ -64,11 +65,13 @@ func (label *HeaderLabel) SetResult(res common.SearchResultIface) {
 	terms := res.Terms()
 	termsJoined := html.EscapeString(strings.Join(terms, " | "))
 	headerBuf := bytes.NewBuffer(nil)
+	dictName := res.DictName()
 	err := headerTpl.Execute(headerBuf, HeaderTemplateInput{
-		Terms:    terms,
-		Term:     termsJoined,
-		DictName: res.DictName(),
-		Score:    res.Score() >> 1,
+		Terms:     terms,
+		Term:      termsJoined,
+		DictName:  dictName,
+		Score:     res.Score() >> 1,
+		ShowTerms: dictmgr.DictShowTerms(dictName),
 	})
 	if err != nil {
 		qerr.Errorf("Error formatting header label: %v", err)

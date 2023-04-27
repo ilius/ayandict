@@ -227,3 +227,11 @@ func DictSymbol(dictName string) string {
 	}
 	return ds.Symbol
 }
+
+func DictShowTerms(dictName string) bool {
+	ds := dictSettingsMap[dictName]
+	if ds == nil {
+		return true
+	}
+	return !ds.HideTermsHeader
+}
