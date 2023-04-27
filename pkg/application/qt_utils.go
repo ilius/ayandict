@@ -1,7 +1,6 @@
 package application
 
 import (
-	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -50,16 +49,16 @@ func fontPixelSize(font *gui.QFont, dpi float64) float64 {
 	return points * dpi / 72.0
 }
 
-func posStr(pos *core.QPoint) string {
-	if pos == nil {
-		return "nil"
-	}
-	return fmt.Sprintf("(%v, %v)", pos.X(), pos.Y())
-}
+// func posStr(pos *core.QPoint) string {
+// 	if pos == nil {
+// 		return "nil"
+// 	}
+// 	return fmt.Sprintf("(%v, %v)", pos.X(), pos.Y())
+// }
 
-func sizeStr(size *core.QSize) string {
-	if size == nil {
-		return "nil"
-	}
-	return fmt.Sprintf("(%v, %v)", size.Width(), size.Height())
-}
+// func sizeStr(size *core.QSize) string {
+// 	if size == nil {
+// 		return "nil"
+// 	}
+// 	return fmt.Sprintf("(%v, %v)", size.Width(), size.Height())
+// }

@@ -39,7 +39,7 @@ func findLocalServer(ports []string) (bool, string) {
 		if res.Body == nil {
 			continue
 		}
-		log.Printf("%s responded in %v", _urlStr, time.Now().Sub(t))
+		log.Printf("%s responded in %v", _urlStr, time.Since(t))
 		data, err := io.ReadAll(res.Body)
 		if err != nil {
 			qerr.Error(err)

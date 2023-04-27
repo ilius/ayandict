@@ -169,7 +169,7 @@ func onQuery(
 		mode = dictmgr.QueryModeGlob
 	}
 	results := dictmgr.LookupHTML(query, conf, mode)
-	log.Printf("LookupHTML took %v for %#v", time.Now().Sub(t), query)
+	log.Printf("LookupHTML took %v for %#v", time.Since(t), query)
 	queryArgs.ResultList.SetResults(results)
 	if len(results) == 0 {
 		if !isAuto {

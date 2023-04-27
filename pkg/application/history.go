@@ -16,7 +16,6 @@ var (
 	historyMaxSize   = 100
 	historyMutex     sync.Mutex
 	historySaveMutex sync.Mutex
-	frequencyMutex   sync.Mutex
 )
 
 const (
