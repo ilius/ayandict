@@ -30,7 +30,7 @@ ______________________________________________________________________
 
 <img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-linux-dark-wordnet.png" width="70%" height="70%"/>
 
-Linux - dark style (Breeze) + Favorites
+Linux - dark style ([Breeze](https://github.com/Alexhuszagh/BreezeStyleSheets)) + Favorites
 
 ______________________________________________________________________
 
@@ -42,7 +42,7 @@ ______________________________________________________________________
 
 <img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-windows-dark-wordnet.png" width="70%" height="70%"/>
 
-Windows - dark style (Breeze)
+Windows - dark style ([Breeze](https://github.com/Alexhuszagh/BreezeStyleSheets))
 
 ______________________________________________________________________
 
