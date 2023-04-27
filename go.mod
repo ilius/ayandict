@@ -4,8 +4,8 @@ go 1.19
 
 require (
 	github.com/BurntSushi/toml v1.2.1
-	github.com/ilius/go-dict-commons v0.2.0
-	github.com/ilius/go-dict-sql v0.2.0
+	github.com/ilius/go-dict-commons v0.2.1
+	github.com/ilius/go-dict-sql v0.2.1
 	github.com/ilius/go-stardict/v2 v2.1.2
 	github.com/ilius/qt v0.0.0-20230422004322-c855bcf0151b
 )
