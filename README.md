@@ -52,7 +52,7 @@ Most Frequent queries
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/linux-light-dicts.png" width="70%" height="70%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-linux-dark-dict-manager.png" width="70%" height="70%"/>
 
 Dictionaries dialog
 
