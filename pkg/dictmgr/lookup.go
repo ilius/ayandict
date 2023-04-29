@@ -25,10 +25,21 @@ func search(
 ) []*common.SearchResultLow {
 	workerCount := conf.SearchWorkerCount
 	timeout := conf.SearchTimeout
+	dictName := dic.DictName()
+	ds := dictSettingsMap[dictName]
+	if ds == nil {
+		ds = &DictSettings{}
+	}
 	switch mode {
 	case QueryModeStartWith:
+		if !ds.StartWith() {
+			return nil
+		}
 		return dic.SearchStartWith(query, workerCount, timeout)
 	case QueryModeRegex:
+		if !ds.Regex() {
+			return nil
+		}
 		results, err := dic.SearchRegex(query, workerCount, timeout)
 		if err != nil {
 			qerr.Error(err)
@@ -36,12 +47,18 @@ func search(
 		}
 		return results
 	case QueryModeGlob:
+		if !ds.Glob() {
+			return nil
+		}
 		results, err := dic.SearchGlob(query, workerCount, timeout)
 		if err != nil {
 			qerr.Error(err)
 			return nil
 		}
 		return results
+	}
+	if !ds.Fuzzy() {
+		return nil
 	}
 	return dic.SearchFuzzy(query, workerCount, timeout)
 }
@@ -52,7 +69,6 @@ func LookupHTML(
 	mode QueryMode,
 ) []common.SearchResultIface {
 	results := []common.SearchResultIface{}
-
 	for _, dic := range dicList {
 		if dic.Disabled() || !dic.Loaded() {
 			continue
