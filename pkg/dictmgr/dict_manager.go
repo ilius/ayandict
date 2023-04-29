@@ -124,7 +124,7 @@ func NewDictManager(
 		item.SetFlags(core.Qt__ItemIsSelectable | core.Qt__ItemIsEnabled)
 		return item
 	}
-	setItem := func(index int, dictName string, ds *common.DictSettings) {
+	setItem := func(index int, dictName string, ds *DictSettings) {
 		info, ok := infoMap[dictName]
 		if !ok {
 			log.Printf("dictName=%#v not in infoMap\n", dictName)
@@ -260,7 +260,7 @@ func NewDictManager(
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
 			log.Printf("dict manager: found new dict: %v\n", dictName)
-			ds = common.NewDictSettings(dic, index)
+			ds = NewDictSettings(dic, index)
 			ds.Hash = Hash(dic)
 			dictSettingsMap[dictName] = ds
 		}
@@ -308,7 +308,7 @@ func (dm *DictManager) updateMap() map[string]int {
 		order[dictName] = value
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
-			ds = &common.DictSettings{}
+			ds = &DictSettings{}
 			dictSettingsMap[dictName] = ds
 		}
 		ds.HideTermsHeader = hideHeader

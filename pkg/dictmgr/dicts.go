@@ -22,7 +22,7 @@ var (
 	dicList         []common.Dictionary
 	dicMap          = map[string]common.Dictionary{}
 	dictsOrder      map[string]int
-	dictSettingsMap = map[string]*common.DictSettings{}
+	dictSettingsMap = map[string]*DictSettings{}
 )
 
 var sqldictOpen = func([]string, map[string]int) []common.Dictionary {
@@ -83,9 +83,9 @@ func loadingDictsPopup(conf *config.Config) *widgets.QLabel {
 	return popup
 }
 
-func loadDictsSettings() (map[string]*common.DictSettings, map[string]int, error) {
+func loadDictsSettings() (map[string]*DictSettings, map[string]int, error) {
 	order := map[string]int{}
-	settingsMap := map[string]*common.DictSettings{}
+	settingsMap := map[string]*DictSettings{}
 	fpath := filepath.Join(config.GetConfigDir(), dictsJsonFilename)
 	jsonBytes, err := os.ReadFile(fpath)
 	if err != nil {
@@ -107,7 +107,7 @@ func loadDictsSettings() (map[string]*common.DictSettings, map[string]int, error
 	return settingsMap, order, nil
 }
 
-func saveDictsSettings(settingsMap map[string]*common.DictSettings) error {
+func saveDictsSettings(settingsMap map[string]*DictSettings) error {
 	jsonBytes, err := json.MarshalIndent(settingsMap, "", "\t")
 	if err != nil {
 		return err
@@ -162,7 +162,7 @@ func InitDicts(conf *config.Config) {
 
 	nameByHash := getDictNameByHashMap()
 
-	newDictSettings := func(dic common.Dictionary, index int) *common.DictSettings {
+	newDictSettings := func(dic common.Dictionary, index int) *DictSettings {
 		hash := Hash(dic)
 		if hash != "" {
 			prevNames := nameByHash[hash]
@@ -174,7 +174,7 @@ func InitDicts(conf *config.Config) {
 				return ds
 			}
 		}
-		return &common.DictSettings{
+		return &DictSettings{
 			Symbol: common.DefaultSymbol(dic.DictName()),
 			Order:  index,
 			Hash:   hash,
