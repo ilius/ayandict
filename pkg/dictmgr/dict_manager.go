@@ -196,7 +196,7 @@ func NewDictManager(
 		if row < 0 {
 			return
 		}
-		dictName := table.Item(row, 3).Text()
+		dictName := table.Item(row, 4).Text()
 		dic := dicMap[dictName]
 		if dic == nil {
 			qerr.Errorf("No dictionary %#v found", dictName)
