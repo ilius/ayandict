@@ -82,7 +82,7 @@ const defaultHeaderTemplate = `<b><font color='#55f'>{{.DictName}}</font></b>
 </div>
 {{range slice .Terms 1}}
 <span dir="ltr" style="font-size: large;font-weight:bold;">
-	<span style="color:#ff0000;font-weight:bold;"> | </span>
+	<span style="color:#ff0000;font-weight:bold;"> │ </span>
 	{{ . }}
 </span>
 {{end}}
