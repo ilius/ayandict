@@ -39,7 +39,7 @@ func (ds *DictSettings) Glob() bool {
 
 func (ds *DictSettings) SetFuzzy(enable bool) {
 	if enable {
-		ds.Flags |= ^FlagNoFuzzy
+		ds.Flags &= ^FlagNoFuzzy
 	} else {
 		ds.Flags |= FlagNoFuzzy
 	}
@@ -47,7 +47,7 @@ func (ds *DictSettings) SetFuzzy(enable bool) {
 
 func (ds *DictSettings) SetStartWith(enable bool) {
 	if enable {
-		ds.Flags |= ^FlagNoStartWith
+		ds.Flags &= ^FlagNoStartWith
 	} else {
 		ds.Flags |= FlagNoStartWith
 	}
@@ -55,7 +55,7 @@ func (ds *DictSettings) SetStartWith(enable bool) {
 
 func (ds *DictSettings) SetRegex(enable bool) {
 	if enable {
-		ds.Flags |= ^FlagNoRegex
+		ds.Flags &= ^FlagNoRegex
 	} else {
 		ds.Flags |= FlagNoRegex
 	}
@@ -63,7 +63,7 @@ func (ds *DictSettings) SetRegex(enable bool) {
 
 func (ds *DictSettings) SetGlob(enable bool) {
 	if enable {
-		ds.Flags |= ^FlagNoGlob
+		ds.Flags &= ^FlagNoGlob
 	} else {
 		ds.Flags |= FlagNoGlob
 	}

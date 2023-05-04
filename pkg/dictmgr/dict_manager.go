@@ -17,12 +17,18 @@ import (
 )
 
 const (
+	QS_dictManager = "dict_manager"
+
+	dm_col_enable   = 0
+	dm_col_header   = 1
+	dm_col_symbol   = 2
+	dm_col_entries  = 3
+	dm_col_dictName = 4
+
 	dictManager_up       = "Up"
 	dictManager_down     = "Down"
 	dictManager_openInfo = "Open Info File"
 	dictManager_openDirs = "Open Directories"
-
-	QS_dictManager = "dict_manager"
 )
 
 type DictManager struct {
@@ -48,7 +54,7 @@ func NewDictManager(
 
 	window := widgets.NewQDialog(parent, core.Qt__Dialog)
 	window.SetWindowTitle("Dictionaries")
-	window.Resize2(900, 600)
+	window.Resize2(900, 800)
 
 	qs := settings.GetQSettings(window)
 	settings.RestoreWinGeometry(app, qs, &window.QWidget, QS_dictManager)
@@ -58,35 +64,49 @@ func NewDictManager(
 	table := widgets.NewQTableWidget(nil)
 	table.SetColumnCount(columns)
 	header := table.HorizontalHeader()
-	header.ResizeSection(0, 10)
-	header.ResizeSection(1, 10)
-	header.ResizeSection(2, 20)
-	header.ResizeSection(3, 80)
-	header.ResizeSection(4, 500)
+	header.ResizeSection(dm_col_enable, 10)
+	header.ResizeSection(dm_col_header, 10)
+	header.ResizeSection(dm_col_symbol, 20)
+	header.ResizeSection(dm_col_entries, 80)
+	header.ResizeSection(dm_col_dictName, 500)
 
 	table.SetHorizontalHeaderItem(
-		0,
+		dm_col_enable,
 		widgets.NewQTableWidgetItem2("", 0),
 	)
 	table.SetHorizontalHeaderItem(
-		1,
+		dm_col_header,
 		widgets.NewQTableWidgetItem2("Terms\nHeader", 0),
 	)
 	table.SetHorizontalHeaderItem(
-		2,
+		dm_col_symbol,
 		widgets.NewQTableWidgetItem2("Sym", 0),
 	)
 	table.SetHorizontalHeaderItem(
-		3,
+		dm_col_entries,
 		widgets.NewQTableWidgetItem2("Entries", 0),
 	)
 	table.SetHorizontalHeaderItem(
-		4,
+		dm_col_dictName,
 		widgets.NewQTableWidgetItem2("Name", 0),
 	)
 
+	extraOptionsWidget := widgets.NewQWidget(nil, 0)
+	extraOptionsVBox := widgets.NewQVBoxLayout2(nil)
+	extraOptionsWidget.SetLayout(extraOptionsVBox)
+	extraOptionsWidget.Hide()
+
+	flagsCBWidget := NewDictFlagsCheckboxes(func() {
+		extraOptionsWidget.Hide()
+	})
+	extraOptionsVBox.AddWidget(flagsCBWidget, 0, 0)
+
+	mainVBox := widgets.NewQVBoxLayout2(nil)
+	mainVBox.AddWidget(table, 3, 0)
+	mainVBox.AddWidget(extraOptionsWidget, 1, 0)
+
 	mainHBox := widgets.NewQHBoxLayout2(nil)
-	mainHBox.AddWidget(table, 0, 0)
+	mainHBox.AddLayout(mainVBox, 1)
 
 	toolbar := widgets.NewQToolBar2(nil)
 	toolbarVBox := widgets.NewQVBoxLayout2(nil)
@@ -136,7 +156,7 @@ func NewDictManager(
 		} else {
 			enabledItem.SetCheckState(core.Qt__Checked)
 		}
-		table.SetItem(index, 0, enabledItem)
+		table.SetItem(index, dm_col_enable, enabledItem)
 
 		headerItem := widgets.NewQTableWidgetItem(1)
 		if ds.HideTermsHeader {
@@ -144,21 +164,24 @@ func NewDictManager(
 		} else {
 			headerItem.SetCheckState(core.Qt__Checked)
 		}
-		table.SetItem(index, 1, headerItem)
+		table.SetItem(index, dm_col_header, headerItem)
 
 		symbolItem := newItem(ds.Symbol)
 		symbolItem.SetFlags(core.Qt__ItemIsEnabled |
 			core.Qt__ItemIsSelectable |
 			core.Qt__ItemIsEditable)
-		table.SetItem(index, 2, symbolItem)
+		table.SetItem(index, dm_col_symbol, symbolItem)
 
 		entries, err := info.EntryCount()
 		if err != nil {
 			qerr.Error(err)
 			return
 		}
-		table.SetItem(index, 3, newItem(strconv.FormatInt(int64(entries), 10)))
-		table.SetItem(index, 4, newItem(dictName))
+		table.SetItem(
+			index, dm_col_entries,
+			newItem(strconv.FormatInt(int64(entries), 10)),
+		)
+		table.SetItem(index, dm_col_dictName, newItem(dictName))
 	}
 
 	// table.SelectedIndexes() panics/crashes
@@ -196,7 +219,7 @@ func NewDictManager(
 		if row < 0 {
 			return
 		}
-		dictName := table.Item(row, 4).Text()
+		dictName := table.Item(row, dm_col_dictName).Text()
 		dic := dicMap[dictName]
 		if dic == nil {
 			qerr.Errorf("No dictionary %#v found", dictName)
@@ -238,6 +261,17 @@ func NewDictManager(
 		case dictManager_openDirs:
 			openFolder()
 		}
+	})
+
+	table.ConnectCellClicked(func(row int, column int) {
+		dictName := table.Item(row, dm_col_dictName).Text()
+		ds := dictSettingsMap[dictName]
+		log.Println("table CellClicked", row, dictName, ds)
+		if ds == nil {
+			return
+		}
+		flagsCBWidget.SetActiveDictSetting(ds)
+		extraOptionsWidget.Show()
 	})
 
 	buttonBox := widgets.NewQDialogButtonBox(nil)
@@ -297,10 +331,10 @@ func (dm *DictManager) updateMap() map[string]int {
 	order := map[string]int{}
 	count := table.RowCount()
 	for index := 0; index < count; index++ {
-		disable := table.Item(index, 0).CheckState() != core.Qt__Checked
-		hideHeader := table.Item(index, 1).CheckState() != core.Qt__Checked
-		symbol := table.Item(index, 2).Text()
-		dictName := table.Item(index, 4).Text()
+		disable := table.Item(index, dm_col_enable).CheckState() != core.Qt__Checked
+		hideHeader := table.Item(index, dm_col_header).CheckState() != core.Qt__Checked
+		symbol := table.Item(index, dm_col_symbol).Text()
+		dictName := table.Item(index, dm_col_dictName).Text()
 		value := index + 1
 		if disable {
 			value = -value
