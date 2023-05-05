@@ -264,9 +264,11 @@ func NewDictManager(
 	})
 
 	table.ConnectCellClicked(func(row int, column int) {
+		if column < 3 {
+			return
+		}
 		dictName := table.Item(row, dm_col_dictName).Text()
 		ds := dictSettingsMap[dictName]
-		log.Println("table CellClicked", row, dictName, ds)
 		if ds == nil {
 			return
 		}
