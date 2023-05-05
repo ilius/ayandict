@@ -55,7 +55,7 @@ func (g *Graphemes) Next() bool {
 		return false
 	}
 	g.offset += len(g.cluster)
-	g.cluster, g.remaining, g.boundaries, g.state = StepString(g.remaining, g.state)
+	g.cluster, g.remaining, g.boundaries, g.state = stepString(g.remaining, g.state)
 	return true
 }
 

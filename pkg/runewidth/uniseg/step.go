@@ -1,6 +1,9 @@
 package uniseg
 
-import "unicode/utf8"
+import (
+	"log"
+	"unicode/utf8"
+)
 
 // The number of bits to shift the boundary information returned by [Step] to
 // obtain the monospace width of the grapheme cluster.
@@ -10,17 +13,14 @@ const ShiftWidth = 4
 // values must ensure state values defined for each of the boundary algorithms
 // don't overlap (and that they all still fit in a single int). These must
 // correspond to the Mask constants.
-const (
-	shiftPropState = 21 // No mask as these are always the remaining bits.
-)
+// No mask as these are always the remaining bits.
+const shiftPropState = 21
 
 // The bit mask used to extract the state returned by the [Step] function, after
 // shifting. These values must correspond to the shift constants.
-const (
-	maskGraphemeState = 0xf
-)
+const maskGraphemeState = 0xf
 
-// Step returns the first grapheme cluster (user-perceived character) found in
+// stepString returns the first grapheme cluster (user-perceived character) found in
 // the given byte slice. It also returns information about the boundary between
 // that grapheme cluster and the one following it as well as the monospace width
 // of the grapheme cluster. There are three types of boundary information: word
@@ -58,15 +58,13 @@ const (
 // [HasTrailingLineBreak] or [HasTrailingLineBreakInString] on the last rune.
 //
 // [UAX #14 LB3]: https://www.unicode.org/reports/tr14/#Algorithm
-// StepString is like [Step] but its input and outputs are strings.
-func StepString(str string, state int) (cluster, rest string, boundaries int, newState int) {
-	// An empty byte slice returns nothing.
-	if len(str) == 0 {
-		return
-	}
-
+func stepString(str string, state int) (cluster, rest string, boundaries int, newState int) {
 	// Extract the first rune.
 	r, length := utf8.DecodeRuneInString(str)
+	if r == utf8.RuneError {
+		log.Printf("RuneError from DecodeRuneInString for %#v", str)
+		return
+	}
 	if len(str) <= length { // If we're already past the end, there is nothing else to parse.
 		prop := property(graphemeCodePoints, r)
 		return str, "", runeWidth(r, prop) << ShiftWidth, grAny
@@ -85,14 +83,11 @@ func StepString(str string, state int) (cluster, rest string, boundaries int, ne
 	// Transition until we find a grapheme cluster boundary.
 	width := runeWidth(r, firstProp)
 	for {
-		var (
-			graphemeBoundary bool
-			prop             int
-		)
-
 		r, l := utf8.DecodeRuneInString(remainder)
 		remainder = str[length+l:]
 
+		graphemeBoundary := false
+		prop := 0
 		graphemeState, prop, graphemeBoundary = transitionGraphemeState(graphemeState, r)
 
 		if graphemeBoundary {
