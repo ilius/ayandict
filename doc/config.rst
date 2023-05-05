@@ -50,7 +50,7 @@ Default value: ``3``
 -------------------
 HTML template for header (dict name + entry terms)
 
-Default value: ``"<b><font color='#55f'>{{.DictName}}</font></b>\n<font color='#777'> [Score: %{{.Score}}]</font>\n{{if .ShowTerms }}\n<div dir=\"ltr\" style=\"font-size: xx-large;font-weight:bold;\">\n{{ index .Terms 0 }}\n</div>\n{{range slice .Terms 1}}\n<span dir=\"ltr\" style=\"font-size: large;font-weight:bold;\">\n\t<span style=\"color:#ff0000;font-weight:bold;\"> | </span>\n\t{{ . }}\n</span>\n{{end}}\n{{end}}"``
+Default value: ``"<b><font color='#55f'>{{.DictName}}</font></b>\n<font color='#777'> [Score: %{{.Score}}]</font>\n{{if .ShowTerms }}\n<div dir=\"ltr\" style=\"font-size: xx-large;font-weight:bold;\">\n{{ index .Terms 0 }}\n</div>\n{{range slice .Terms 1}}\n<span dir=\"ltr\" style=\"font-size: large;font-weight:bold;\">\n\t<span style=\"color:#ff0000;font-weight:bold;\"> │ </span>\n\t{{ . }}\n</span>\n{{end}}\n{{end}}"``
 
 ``header_word_wrap``
 --------------------
