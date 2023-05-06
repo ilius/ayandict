@@ -265,11 +265,13 @@ func NewDictManager(
 
 	table.ConnectCellClicked(func(row int, column int) {
 		if column < 3 {
+			extraOptionsWidget.Hide()
 			return
 		}
 		dictName := table.Item(row, dm_col_dictName).Text()
 		ds := dictSettingsMap[dictName]
 		if ds == nil {
+			extraOptionsWidget.Hide()
 			return
 		}
 		flagsCBWidget.SetActiveDictSetting(ds)
