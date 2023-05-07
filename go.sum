@@ -12,8 +12,8 @@ github.com/gopherjs/gopherjs v1.17.2 h1:fQnZVsXk8uxXIStYb0N4bGk7jeyTalG/wsZjQ25d
 github.com/gopherjs/gopherjs v1.17.2/go.mod h1:pRRIvn/QzFLrKfvEz3qUuEhtE/zLCWfreZ6J5gM2i+k=
 github.com/ilius/go-dict-commons v0.3.0 h1:SY4NggM9mgyly+wjZmYW2jfFUYL92qbX0oYpLPWmeAM=
 github.com/ilius/go-dict-commons v0.3.0/go.mod h1:z5IgcnlVQqE76GU603UjjnzoQBP04dmR6qUE5GJQRzY=
-github.com/ilius/go-dict-sql v0.3.0 h1:FuwRLxzwY5uvG5IlwZGjr09RVgp5DBkCDkVzlPyD1z8=
-github.com/ilius/go-dict-sql v0.3.0/go.mod h1:XnbifDOcHJ5aE/lsIB7v4IyrKuyxGr+wSyO/+9711ZI=
+github.com/ilius/go-dict-sql v0.3.2 h1:MGwRiYKm0NQ2q4pbN28w4+KUrVnjuGHkvh3QtZkFCVI=
+github.com/ilius/go-dict-sql v0.3.2/go.mod h1:XnbifDOcHJ5aE/lsIB7v4IyrKuyxGr+wSyO/+9711ZI=
 github.com/ilius/go-stardict/v2 v2.2.0 h1:Y1mDYk5AYMoi4D/LHL7Zlsf8u6A45NOpZxq88SzWzLc=
 github.com/ilius/go-stardict/v2 v2.2.0/go.mod h1:14dLdEIOgnQqvbf6Cw7GRMMMo3pMpLGWjnuQPbBburg=
 github.com/ilius/is/v2 v2.3.2 h1:14u2j/UTKeIHKlcp/48dabf7+7QJ9JJaaoeHVvfyAOk=
