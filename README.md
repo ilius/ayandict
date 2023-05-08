@@ -113,6 +113,9 @@ There are tons of web pages that let you download various usable dictionaries, b
 - [XDXF on SourceForge](https://sourceforge.net/projects/xdxf/files/)
 - [GoldenDict on SourceForge](https://sourceforge.net/projects/goldendict/files/dictionaries/)
 - [kdr2.com](https://kdr2.com/resource/stardict.html)
+- [BGL file collection on GDrive](https://drive.google.com/drive/mobile/folders/0BzrQwK2v03aKWjlsQ3NsaWJKalU?resourcekey=0-DtgqOJiVFSDI231ugoQgiQ)
+- [BGL files for Arabic](https://www.ahmadwadan.com/download.html)
+
 
 # Keyboard bindings/shortcuts
 
