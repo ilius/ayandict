@@ -27,8 +27,14 @@ func loadPNGFile(filename string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	file.Write(data)
-	file.Close()
+	_, err = file.Write(data)
+	if err != nil {
+		return "", err
+	}
+	err = file.Close()
+	if err != nil {
+		return "", err
+	}
 	imageTempMap[filename] = file.Name()
 	return file.Name(), nil
 }

@@ -2,6 +2,7 @@ package favorites
 
 import (
 	"github.com/ilius/ayandict/v2/pkg/config"
+	"github.com/ilius/ayandict/v2/pkg/qerr"
 	"github.com/ilius/qt/widgets"
 )
 
@@ -49,7 +50,10 @@ func (w *FavoritesWidget) AddFavorite(item string) {
 	w.Data.Add(item)
 	w.InsertItem2(0, item)
 	if w.conf.FavoritesAutoSave {
-		w.Save()
+		err := w.Save()
+		if err != nil {
+			qerr.Error(err)
+		}
 	}
 }
 
@@ -62,7 +66,10 @@ func (w *FavoritesWidget) RemoveFavorite(item string) {
 	// is N-index-1
 	w.TakeItem(w.Count() - index - 1)
 	if w.conf.FavoritesAutoSave {
-		w.Save()
+		err := w.Save()
+		if err != nil {
+			qerr.Error(err)
+		}
 	}
 }
 

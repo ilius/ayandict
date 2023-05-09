@@ -175,7 +175,10 @@ func (app *Application) Run() {
 		widgets.NewQTableWidgetItem2("Count", 0),
 	)
 	if !conf.MostFrequentDisable {
-		frequencyTable.LoadFromFile(frequencyFilePath())
+		err := frequencyTable.LoadFromFile(frequencyFilePath())
+		if err != nil {
+			qerr.Error(err)
+		}
 	}
 	// TODO: save the width of 2 columns
 
@@ -491,7 +494,10 @@ func (app *Application) Run() {
 		frequencyTable.SaveNoError()
 	})
 	saveFavoritesButton.ConnectClicked(func(checked bool) {
-		favoritesWidget.Save()
+		err := favoritesWidget.Save()
+		if err != nil {
+			qerr.Error(err)
+		}
 	})
 	clearButton.ConnectClicked(func(checked bool) {
 		resetQuery()

@@ -27,8 +27,14 @@ func loadPNGIcon(filename string) (*gui.QIcon, error) {
 	if err != nil {
 		return nil, err
 	}
-	file.Write(data)
-	file.Close()
+	_, err = file.Write(data)
+	if err != nil {
+		return nil, err
+	}
+	err = file.Close()
+	if err != nil {
+		return nil, err
+	}
 	pixmap := gui.NewQPixmap3(file.Name(), "PNG", 0)
 	icon = gui.NewQIcon2(pixmap)
 	iconMapMutex.Lock()

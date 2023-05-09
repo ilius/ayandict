@@ -14,7 +14,10 @@ const (
 )
 
 func handleGetAppName(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(appinfo.APP_NAME))
+	_, err := w.Write([]byte(appinfo.APP_NAME))
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func StartServer(port string) {

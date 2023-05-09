@@ -371,7 +371,10 @@ func (dm *DictManager) Run() bool {
 		disabled := dic.Disabled()
 		dic.SetDisabled(dictsOrder[dic.DictName()] < 0)
 		if disabled && !dic.Disabled() {
-			dic.Load()
+			err := dic.Load()
+			if err != nil {
+				qerr.Error(err)
+			}
 		}
 	}
 
