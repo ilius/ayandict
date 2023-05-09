@@ -1,14 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
-	"strings"
 	"time"
-
-	"github.com/BurntSushi/toml"
 )
 
 func codeValue(x any) string {
@@ -27,24 +22,24 @@ func jsonCodeValue(x any) string {
 }
 
 // toml.NewEncoder can only encode maps or structs
-func tomlObject(x any) string {
-	buf := bytes.NewBuffer(nil)
-	encoder := toml.NewEncoder(buf)
-	err := encoder.Encode(x)
-	if err != nil {
-		log.Printf("failed to encode %#v", x)
-		panic(err)
-	}
-	return buf.String()
-}
+// func tomlObject(x any) string {
+// 	buf := bytes.NewBuffer(nil)
+// 	encoder := toml.NewEncoder(buf)
+// 	err := encoder.Encode(x)
+// 	if err != nil {
+// 		log.Printf("failed to encode %#v", x)
+// 		panic(err)
+// 	}
+// 	return buf.String()
+// }
 
-func tableRowSep(width []int, c string) string {
-	parts := make([]string, len(width))
-	for i, w := range width {
-		parts[i] = strings.Repeat(c, w)
-	}
-	return "+" + c + strings.Join(parts, c+"+"+c) + c + "+"
-}
+// func tableRowSep(width []int, c string) string {
+// 	parts := make([]string, len(width))
+// 	for i, w := range width {
+// 		parts[i] = strings.Repeat(c, w)
+// 	}
+// 	return "+" + c + strings.Join(parts, c+"+"+c) + c + "+"
+// }
 
 /*
 func renderTable(header []string, rows [][]any) string {
