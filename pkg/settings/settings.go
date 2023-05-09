@@ -256,22 +256,15 @@ func RestoreSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainK
 func actionSaveLoop(ch <-chan time.Time, callable func()) {
 	var lastSave time.Time
 	for {
-		var lastEvent *time.Time
-		select {
-		case t := <-ch:
-			lastEvent = &t
-		}
+		lastEvent := <-ch
 	Loop1:
 		for {
 			select {
 			case t := <-ch:
-				lastEvent = &t
+				lastEvent = t
 			case <-time.After(500 * time.Millisecond):
 				break Loop1
 			}
-		}
-		if lastEvent == nil {
-			continue
 		}
 		if lastEvent.After(lastSave) {
 			callable()
