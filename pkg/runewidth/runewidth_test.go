@@ -231,7 +231,7 @@ func TestRuneWidth(t *testing.T) {
 	}
 }
 
-var isambiguouswidthtests = []struct {
+var isAmbiguousWidthTests = []struct {
 	in  rune
 	out bool
 }{
@@ -261,6 +261,20 @@ var isambiguouswidthtests = []struct {
 	{'⑲', true},
 	{'⑳', true},
 	{'☆', true},
+}
+
+func TestIsAmbiguousWidth(t *testing.T) {
+	cond := NewCondition()
+	cond.EastAsianWidth = true
+	for _, tt := range isAmbiguousWidthTests {
+		width := cond.RuneWidth(tt.in)
+		if width != 2 {
+			t.Fatalf("in=%#v, width=%v", tt.in, width)
+		}
+		// if out := IsAmbiguousWidth(tt.in); out != tt.out {
+		// 		t.Errorf("IsAmbiguousWidth(%q) = %v, want %v", tt.in, out, tt.out)
+		// }
+	}
 }
 
 var stringwidthtests = []struct {
@@ -296,18 +310,29 @@ func TestStringWidthInvalid(t *testing.T) {
 	}
 }
 
-var isneutralwidthtests = []struct {
-	in  rune
-	out bool
-}{
-	{'→', false},
-	{'┊', false},
-	{'┈', false},
-	{'～', false},
-	{'└', false},
-	{'⣀', true},
-	{'⣀', true},
-}
+// var isNeutralWidthTests = []struct {
+// 	in  rune
+// 	out bool
+// }{
+// 	{'→', false},
+// 	{'┊', false},
+// 	{'┈', false},
+// 	{'～', false},
+// 	{'└', false},
+// 	{'⣀', true},
+// 	{'⣀', true},
+// }
+
+// func TestIsNeutralWidth(t *testing.T) {
+// 	c := NewCondition()
+// 	for _, tt := range isNeutralWidthTests {
+// 		width := c.RuneWidth(tt.in)
+// 		t.Log(width, string(tt.in))
+// 		// if out := IsNeutralWidth(tt.in); out != tt.out {
+// 		// 	t.Errorf("IsNeutralWidth(%q) = %v, want %v", tt.in, out, tt.out)
+// 		// }
+// 	}
+// }
 
 func TestEnv(t *testing.T) {
 	old := os.Getenv("RUNEWIDTH_EASTASIAN")

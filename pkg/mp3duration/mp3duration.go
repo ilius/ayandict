@@ -167,8 +167,7 @@ func Calculate(filename string) (time.Duration, error) {
 		return 0, err
 	}
 	if bytesRead < 100 {
-		err = errors.New("Corrupt file")
-		return 0, err
+		return 0, errors.New("corrupt file")
 	}
 	offset := int64(skipID3(buffer))
 
