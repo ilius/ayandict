@@ -64,7 +64,8 @@ func skipID3(buffer []byte) int {
 	var tagSize, footerSize int
 
 	// http://id3.org/d3v2.3.0
-	if buffer[0] == 0x49 && buffer[1] == 0x44 && buffer[2] == 0x33 { //'ID3'
+	if buffer[0] == 0x49 && buffer[1] == 0x44 && buffer[2] == 0x33 {
+		// 'ID3'
 		id3v2Flags = buffer[5]
 		if (id3v2Flags & 0x10) != 0 {
 			footerSize = 10
@@ -91,11 +92,12 @@ func skipID3(buffer []byte) int {
 func frameSize(samples int, layer string, bitRate, sampleRate, paddingBit int) int {
 	if sampleRate == 0 {
 		return 0
-	} else if layer == "1" {
-		return ((samples * bitRate * 125 / sampleRate) + paddingBit*4)
-	} else { // layer 2, 3
-		return (((samples * bitRate * 125) / sampleRate) + paddingBit)
 	}
+	if layer == "1" {
+		return ((samples * bitRate * 125 / sampleRate) + paddingBit*4)
+	}
+	// layer 2, 3
+	return (((samples * bitRate * 125) / sampleRate) + paddingBit)
 }
 
 func parseFrameHeader(header []byte) *frame {
@@ -182,19 +184,23 @@ func Calculate(filename string) (time.Duration, error) {
 			return time.Duration(duration*1000.0) * time.Millisecond, nil
 		}
 
-		if buffer[0] == 0xff && (buffer[1]&0xe0) == 0xe0 {
+		if buffer[0] == 0xff && buffer[1]&0xe0 == 0xe0 {
 			info := parseFrameHeader(buffer)
 			if info.frameSize > 0 && info.sample > 0 {
 				offset += int64(info.frameSize)
-				duration += (float64(info.sample) / float64(info.sampleRate))
+				duration += float64(info.sample) / float64(info.sampleRate)
 			} else {
 				offset++ // Corrupt file?
 			}
-		} else if buffer[0] == 0x54 && buffer[1] == 0x41 && buffer[2] == 0x47 { //'TAG'
-			offset += 128 // Skip over id3v1 tag size
-		} else {
-			offset++ // Corrupt file?
+			continue
 		}
+		if buffer[0] == 0x54 && buffer[1] == 0x41 && buffer[2] == 0x47 {
+			// 'TAG'
+			offset += 128 // Skip over id3v1 tag size
+			continue
+		}
+		// Corrupt file?
+		offset++
 	}
 
 	return time.Duration(duration*1000.0) * time.Millisecond, nil
