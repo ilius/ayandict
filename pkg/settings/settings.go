@@ -23,6 +23,9 @@ const (
 	QS_columnwidth = "columnwidth"
 
 	QS_sizes = "sizes"
+
+	QS_search     = "search"
+	QS_searchMode = "mode"
 )
 
 func joinIntList(nums []int) string {
@@ -76,6 +79,23 @@ func restoreBoolSetting(
 		return
 	}
 	apply(qs.Value(key, core.NewQVariant1(nil)).ToBool())
+}
+
+func restoreIntSetting(
+	qs *core.QSettings,
+	key string,
+	apply func(int),
+) {
+	if !qs.Contains(key) {
+		return
+	}
+	value := qs.Value(key, core.NewQVariant1(nil))
+	valueInt, err := strconv.ParseInt(value.ToString(), 10, 64)
+	if err != nil {
+		qerr.Error(err)
+		return
+	}
+	apply(int(valueInt))
 }
 
 func saveMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
@@ -313,4 +333,20 @@ func SetupMainWinGeometrySave(qs *core.QSettings, window *widgets.QMainWindow) {
 	go actionSaveLoop(ch, func() {
 		saveMainWinGeometry(qs, window)
 	})
+}
+
+func SaveSearchSettings(qs *core.QSettings, combo *widgets.QComboBox) {
+	qs.BeginGroup(QS_search)
+	defer qs.EndGroup()
+
+	qs.SetValue(QS_searchMode, core.NewQVariant1(
+		strconv.FormatInt(int64(combo.CurrentIndex()), 10),
+	))
+}
+
+func RestoreSearchSettings(qs *core.QSettings, combo *widgets.QComboBox) {
+	qs.BeginGroup(QS_search)
+	defer qs.EndGroup()
+
+	restoreIntSetting(qs, QS_searchMode, combo.SetCurrentIndex)
 }

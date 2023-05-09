@@ -401,13 +401,6 @@ func (app *Application) Run() {
 	okButton.ConnectClicked(func(bool) {
 		onQuery(entry.Text(), queryArgs, false)
 	})
-	queryModeCombo.ConnectCurrentIndexChanged(func(i int) {
-		text := entry.Text()
-		if text == "" {
-			return
-		}
-		onQuery(text, queryArgs, false)
-	})
 	aboutButton.ConnectClicked(func(bool) {
 		aboutClicked(window)
 	})
@@ -561,6 +554,15 @@ func (app *Application) Run() {
 	})
 
 	qs := settings.GetQSettings(window)
+
+	queryModeCombo.ConnectCurrentIndexChanged(func(i int) {
+		text := entry.Text()
+		if text != "" {
+			onQuery(text, queryArgs, false)
+		}
+		go settings.SaveSearchSettings(qs, queryModeCombo)
+	})
+
 	settings.RestoreSplitterSizes(qs, mainSplitter, QS_mainSplitter)
 	settings.RestoreMainWinGeometry(app.QApplication, qs, window)
 	settings.SetupMainWinGeometrySave(qs, window)
@@ -576,6 +578,8 @@ func (app *Application) Run() {
 	})
 
 	settings.SetupSplitterSizesSave(qs, mainSplitter, QS_mainSplitter)
+
+	settings.RestoreSearchSettings(qs, queryModeCombo)
 
 	window.Show()
 	app.Exec()
