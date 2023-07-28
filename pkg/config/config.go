@@ -9,11 +9,20 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/ilius/ayandict/v2/pkg/qerr"
 )
 
 const fileName = "config.toml"
 
 var mutex sync.Mutex
+
+func init() {
+	dir := GetConfigDir()
+	err := os.MkdirAll(dir, 0o755)
+	if err != nil {
+		qerr.Error(err)
+	}
+}
 
 type Config struct {
 	DirectoryList []string `toml:"directory_list"`
