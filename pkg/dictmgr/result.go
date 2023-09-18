@@ -19,6 +19,10 @@ func (r *SearchResult) DictName() string {
 	return r.dic.DictName()
 }
 
+func (r *SearchResult) ResourceDir() string {
+	return r.dic.ResourceDir()
+}
+
 func (r *SearchResult) DefinitionsHTML() []string {
 	if r.hDefis != nil {
 		return r.hDefis
@@ -39,8 +43,4 @@ func (r *SearchResult) DefinitionsHTML() []string {
 	}
 	r.hDefis = definitions
 	return definitions
-}
-
-func (r *SearchResult) ResourceDir() string {
-	return r.dic.ResourceDir()
 }
