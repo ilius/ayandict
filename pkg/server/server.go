@@ -22,6 +22,13 @@ const (
 
 var conf *config.Config
 
+const resultFlags = uint32(0)
+
+// common.ResultFlag_FixAudio &
+// 	common.ResultFlag_FixFileSrc &
+// 	common.ResultFlag_FixWordLink &
+// 	common.ResultFlag_ColorMapping)
+
 func init() {
 	var err error
 	conf, err = config.Load()
@@ -74,7 +81,7 @@ func query(w http.ResponseWriter, r *http.Request) {
 		results[i] = Result{
 			DictName:        rr.DictName(),
 			Terms:           rr.Terms(),
-			DefinitionsHTML: rr.DefinitionsHTML(),
+			DefinitionsHTML: rr.DefinitionsHTML(resultFlags),
 			EntryIndex:      rr.EntryIndex(),
 			Score:           rr.Score(),
 		}

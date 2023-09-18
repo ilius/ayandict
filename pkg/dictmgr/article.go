@@ -267,26 +267,29 @@ func fixDefiHTML(
 	resURL string,
 	conf *config.Config,
 	dic common.Dictionary,
+	flags uint32,
 ) string {
 	var playImage string
-	if conf.Audio {
+	if conf.Audio && flags&common.ResultFlag_FixAudio > 0 {
 		playImage = getPlayImage()
 		defi = fixEmptySoundLink(defi, playImage)
 		if resURL != "" {
 			defi = fixHrefSound(defi, resURL)
 		}
 	}
-	if resURL != "" {
+	if resURL != "" && flags&common.ResultFlag_FixFileSrc > 0 {
 		defi = fixFileSrc(defi, resURL)
 	}
-	if conf.Audio {
+	if conf.Audio && flags&common.ResultFlag_FixAudio > 0 {
 		defi = fixAudioTag(defi, resURL, playImage)
 	}
 	if conf.EmbedExternalStylesheet {
 		defi = embedExternalStyle(defi, dic.ResourceDir())
 	}
-	defi = hrefBwordRE.ReplaceAllStringFunc(defi, hrefBwordSub)
-	if len(conf.ColorMapping) > 0 {
+	if flags&common.ResultFlag_FixWordLink > 0 {
+		defi = hrefBwordRE.ReplaceAllStringFunc(defi, hrefBwordSub)
+	}
+	if len(conf.ColorMapping) > 0 && flags&common.ResultFlag_ColorMapping > 0 {
 		defi = applyColorMapping(defi, conf.ColorMapping)
 	}
 	return defi
