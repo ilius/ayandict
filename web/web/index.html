@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8" />
+  <head>
+    <title>AyanDict Web</title>
+    <link rel="stylesheet" type="text/css" href="web/style.css" />
+    <script type="text/javascript" src="web/brython@3.11.0/brython.min.js">
+    </script>
+    <script type="text/javascript" src="web/brython@3.11.0/brython_stdlib.js">
+    </script>
+  </head>
+  <body class="horizontal" onload="brython()">
+    <div id="lookup-container" class="vertical">
+      <div id="word-container" class="horizontal">
+        <input
+          id="lookup-input"
+          name="word"
+          placeholder="Lookup..."
+          type="search"
+          autocomplete="off"
+          autofocus
+        />
+        <a id="random-link" href="#">⚅</a>
+      </div>
+      <div id="result-list"></div>
+    </div>
+
+    <div id="content-container" class="vertical">
+      <div id="content-header" class="horizontal">
+        <span id="header-label"></span>
+      </div>
+      <div id="content" name="content" class="vertical" style="padding: 20px;"></div>
+    </div>
+    <script type="text/python">
+from browser import document, html
+from browser import ajax
+
+input = document["lookup-input"]
+resultListElem = document["result-list"]
+content = document["content"]
+headerLabel = document["header-label"]
+
+def on_result_row_click(result):
+    # print("on_result_row_click:", result)
+    defi = "<br/>".join(result["definitionsHTML"])
+    # print(defi)
+    content.html = defi
+    headerLabel.clear()
+    headerLabel <= html.B(html.FONT(
+        result["dictName"],
+        color="#55f",
+    ))
+    terms = result["terms"]
+    headerLabel <= html.DIV(
+        terms[0],
+        style="font-size: xx-large;font-weight:bold;",
+    )
+    for term in terms[1:]:
+        headerLabel <= html.SPAN(
+           html.SPAN(" │ ", style="color:#ff0000;font-weight:bold;") + term,
+           style="font-size: large;font-weight:bold;",
+        )
+
+    
+def on_query_result(ajax):
+    results = ajax.json
+    resultListElem.clear()
+    ul = html.UL()
+    for result in results:
+        a = html.A(href="#")
+        a.bind("click", lambda event, result=result: on_result_row_click(result))
+        a <= html.DIV(html.STRONG(" | ".join(result["terms"])))
+        a <= html.SMALL(result["dictName"])
+        ul <= html.LI(a)
+    resultListElem <= ul
+
+def on_lookup_input_keypress(event):
+    if event.key != "Enter":
+        return
+    ajax.post(
+        "/query?query=" + input.value,
+        cache=False,
+        oncomplete=on_query_result,
+    )
+  
+
+input.bind("keypress", on_lookup_input_keypress)
+
+    </script>
+  </body>
+</html>

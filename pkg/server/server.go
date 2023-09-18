@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -10,6 +11,7 @@ import (
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	"github.com/ilius/ayandict/v2/pkg/qerr"
+	"github.com/ilius/ayandict/v2/web"
 )
 
 const (
@@ -88,9 +90,28 @@ func query(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func home(w http.ResponseWriter, r *http.Request) {
+	file, err := web.FS.Open("web/index.html")
+	if err != nil {
+		w.WriteHeader(404)
+		return
+	}
+	content := file.(io.ReadSeeker)
+	http.ServeContent(w, r, "", time.Now(), content)
+}
+
 func StartServer(port string) {
 	http.HandleFunc("/"+path_appName, getAppName)
 	http.HandleFunc("/"+path_query, query)
+	http.HandleFunc("/", home)
+
+	fs := &httpFileSystem{
+		fs:     web.FS,
+		prefix: "web",
+	}
+	// http.Handle("/web", http.StripPrefix("/web", http.FileServer(fs)))
+	http.Handle("/web/", http.FileServer(fs))
+
 	log.Println("Starting local server on port", port)
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
