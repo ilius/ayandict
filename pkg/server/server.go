@@ -24,9 +24,9 @@ var conf *config.Config
 
 const resultFlags = uint32(0)
 
-// common.ResultFlag_FixAudio &
-// 	common.ResultFlag_FixFileSrc &
-// 	common.ResultFlag_FixWordLink &
+// common.ResultFlag_FixAudio |
+// 	common.ResultFlag_FixFileSrc |
+// 	common.ResultFlag_FixWordLink |
 // 	common.ResultFlag_ColorMapping)
 
 func init() {
