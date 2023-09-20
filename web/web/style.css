@@ -115,7 +115,7 @@ li {
 	margin-right: 0.5rem;
 }
 
-li a {
+a.result-list-item {
 	text-decoration: none;
 	padding: 0.5rem;
 	padding-top: 0.6rem;
@@ -128,7 +128,7 @@ li a {
 	vertical-align: middle;
 }
 
-li a:hover {
+a.result-list-item:hover {
 	background: darkgray;
 }
 

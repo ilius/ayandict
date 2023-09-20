@@ -36,9 +36,30 @@ content = document["content"]
 headerLabel = document["header-label"]
 
 
+def is_word_link(target):
+	if "://" not in target:
+		return True
+	if target.startswith("bword://"):
+		return True
+	return False
+
+
+def fix_content_word_links():
+	for a in content.select('a'):
+		target = a.attrs["href"]
+		if not is_word_link(target):
+			continue
+		a.attrs["dict_target"] = target
+		a.attrs["href"] = "#"
+		a.bind("click", on_word_link_click)
+
+
 def on_result_row_click(result):
 	defi = "<br/>".join(result["definitionsHTML"])
 	content.html = defi
+
+	fix_content_word_links()
+
 	headerLabel.clear()
 	headerLabel <= html.B(html.FONT(
 		result["dictName"],
@@ -64,23 +85,39 @@ def on_query_result(ajax):
 	results = ajax.json
 	resultListElem.clear()
 	ul = html.UL()
-	for result in results:
-		a = html.A(href="#")
+	for index, result in enumerate(results):
+		a = html.A(href="#", **{"class": "result-list-item"})
 		a.bind("click", lambda event, result=result: on_result_row_click(result))
 		a <= html.DIV(html.STRONG(" | ".join(result["terms"])))
 		a <= html.SMALL(result["dictName"])
 		ul <= html.LI(a)
+		if index == 0:
+			on_result_row_click(result)
 	resultListElem <= ul
+
+
+def ajax_query(query):
+	ajax.post(
+		"/query?query=" + query,
+		cache=False,
+		oncomplete=on_query_result,
+	)
 
 
 def on_lookup_input_keypress(event):
 	if event.key != "Enter":
 		return
-	ajax.post(
-		"/query?query=" + input.value,
-		cache=False,
-		oncomplete=on_query_result,
-	)
+	ajax_query(input.value)
+
+
+def on_word_link_click(event):
+	event.preventDefault()
+	a = event.target
+	target = a.attrs["dict_target"]
+	if target.startswith("bword://"):
+		target = target[8:]
+	input.value = target
+	ajax_query(target)
 
 
 input.bind("keypress", on_lookup_input_keypress)
