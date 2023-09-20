@@ -106,7 +106,7 @@ func (app *Application) ReloadConfig() {
 		app.ReloadUserStyle()
 	}
 	if shouldReloadDicts(currentDirList, conf.DirectoryList) {
-		dictmgr.InitDicts(conf)
+		dictmgr.InitDicts(conf, true)
 		app.dictManager = nil
 	}
 	app.headerLabel.ReloadConfig()

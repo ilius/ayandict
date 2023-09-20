@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	// "github.com/ilius/qt/webengine"
@@ -30,13 +31,24 @@ const (
 // kinda like "em" in html, but probably not exactly the same
 var basePx = float32(10)
 
+func showErrorMessage(msg string) {
+	defer func() {
+		r := recover()
+		if r != nil {
+			log.Println(r)
+		}
+	}()
+	d := widgets.NewQErrorMessage(nil)
+	d.ShowMessage(msg)
+}
+
 func Run() {
 	app := &Application{
 		QApplication:   widgets.NewQApplication(len(os.Args), os.Args),
 		window:         widgets.NewQMainWindow(nil, 0),
 		allTextWidgets: []iface.HasSetFont{},
 	}
-	qerr.ShowQtError = true
+	qerr.ShowMessage = showErrorMessage
 
 	if cacheDir == "" {
 		qerr.Error(cacheDir)
@@ -79,7 +91,7 @@ func (app *Application) Run() {
 	go server.StartServer(conf.LocalServerPorts[0])
 
 	app.LoadUserStyle()
-	dictmgr.InitDicts(conf)
+	dictmgr.InitDicts(conf, true)
 
 	basePx = float32(fontPixelSize(
 		app.Font(),
@@ -448,7 +460,7 @@ func (app *Application) Run() {
 		doQuery(item.Text())
 	})
 	reloadDictsButton.ConnectClicked(func(checked bool) {
-		dictmgr.InitDicts(conf)
+		dictmgr.InitDicts(conf, true)
 		app.dictManager = nil
 		onQuery(entry.Text(), queryArgs, false)
 	})

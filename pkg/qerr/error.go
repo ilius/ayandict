@@ -3,40 +3,19 @@ package qerr
 import (
 	"fmt"
 	"log"
-
-	"github.com/ilius/qt/widgets"
 )
 
-var ShowQtError = false
+// ShowMessage: set in GUI application
+var ShowMessage = func(msg string) {}
 
 func Error(args ...any) {
 	msg := fmt.Sprint(args...)
 	log.Println(msg) // TODO: stderr
-	if !ShowQtError {
-		return
-	}
-	defer func() {
-		r := recover()
-		if r != nil {
-			log.Println(r)
-		}
-	}()
-	d := widgets.NewQErrorMessage(nil)
-	d.ShowMessage(msg)
+	ShowMessage(msg)
 }
 
 func Errorf(format string, args ...any) {
 	msg := fmt.Sprintf(format, args...)
 	log.Println(msg) // TODO: stderr
-	if !ShowQtError {
-		return
-	}
-	defer func() {
-		r := recover()
-		if r != nil {
-			log.Println(r)
-		}
-	}()
-	d := widgets.NewQErrorMessage(nil)
-	d.ShowMessage(msg)
+	ShowMessage(msg)
 }

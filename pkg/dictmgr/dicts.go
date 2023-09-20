@@ -131,10 +131,12 @@ func getDictNameByHashMap() map[string][]string {
 	return byHash
 }
 
-func InitDicts(conf *config.Config) {
+func InitDicts(conf *config.Config, popup bool) {
 	var err error
-	popup := loadingDictsPopup(conf)
-	defer popup.Destroy(true, true)
+	if popup {
+		popupLabel := loadingDictsPopup(conf)
+		defer popupLabel.Destroy(true, true)
+	}
 
 	dictSettingsMap, dictsOrder, err = loadDictsSettings()
 	if err != nil {
