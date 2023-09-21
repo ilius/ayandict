@@ -53,6 +53,7 @@ var commentMap = map[string]string{
 	"local_client_timeout": "Timeout for local web client",
 
 	"web_enable": "Set true/false and restart to enable/disable web service & web app",
+	"web_expose": "Expose web service & web app to outside (otherwise only available to 127.0.0.1)",
 
 	"search_worker_count": "The number of workers / goroutines used for search",
 

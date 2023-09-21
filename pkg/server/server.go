@@ -127,7 +127,11 @@ func StartServer(port string) {
 	}
 
 	log.Println("Starting local server on port", port)
-	err := http.ListenAndServe(":"+port, nil)
+	addr := "127.0.0.1:" + port
+	if conf.WebExpose {
+		addr = ":" + port
+	}
+	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		qerr.Error(err)
 	}

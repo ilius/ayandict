@@ -184,6 +184,12 @@ Set true/false and restart to enable/disable web service & web app
 
 Default value: ``false``
 
+``web_expose``
+--------------
+Expose web service & web app to outside (otherwise only available to 127.0.0.1)
+
+Default value: ``false``
+
 ``search_worker_count``
 -----------------------
 The number of workers / goroutines used for search
