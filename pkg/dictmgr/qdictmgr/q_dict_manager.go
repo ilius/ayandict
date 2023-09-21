@@ -8,8 +8,8 @@ import (
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
-	"github.com/ilius/ayandict/v2/pkg/iface"
 	"github.com/ilius/ayandict/v2/pkg/qerr"
+	"github.com/ilius/ayandict/v2/pkg/qutils"
 	"github.com/ilius/ayandict/v2/pkg/settings"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
@@ -35,7 +35,7 @@ const (
 type DictManager struct {
 	Dialog      *widgets.QDialog
 	TableWidget *widgets.QTableWidget
-	TextWidgets []iface.HasSetFont
+	TextWidgets []qutils.HasSetFont
 }
 
 func makeDictInfoMap(infos []common.Dictionary) map[string]common.Dictionary {
@@ -320,7 +320,7 @@ func NewDictManager(
 	return &DictManager{
 		Dialog:      window,
 		TableWidget: table,
-		TextWidgets: []iface.HasSetFont{
+		TextWidgets: []qutils.HasSetFont{
 			table,
 			toolbar,
 			okButton,

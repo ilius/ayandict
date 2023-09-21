@@ -1,4 +1,4 @@
-package iface
+package qutils
 
 import "github.com/ilius/qt/gui"
 
