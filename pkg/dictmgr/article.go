@@ -32,10 +32,17 @@ var (
 	hrefBwordRE = regexp.MustCompile(` href="bword://[^<>"]*?"`)
 )
 
+const (
+	webPlayImage = "/web/audio-play.png"
+)
+
 func fixResURL(quoted string, resURL string) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
 		log.Println(err)
+		return false, ""
+	}
+	if urlStr == webPlayImage {
 		return false, ""
 	}
 	_url, err := url.Parse(urlStr)
@@ -247,7 +254,12 @@ func applyColorMapping(defi string, colorMapping map[string]string) string {
 	return defi
 }
 
-func getPlayImage() string {
+func getPlayImage(flags uint32) string {
+	if flags&common.ResultFlag_Web > 0 {
+		return fmt.Sprintf(
+			`<img src="%s" />`, webPlayImage,
+		)
+	}
 	imgPath, err := loadPNGFile("audio-play.png")
 	if err != nil {
 		log.Println(err)
@@ -271,7 +283,7 @@ func fixDefiHTML(
 ) string {
 	var playImage string
 	if conf.Audio && flags&common.ResultFlag_FixAudio > 0 {
-		playImage = getPlayImage()
+		playImage = getPlayImage(flags)
 		defi = fixEmptySoundLink(defi, playImage)
 		if resURL != "" {
 			defi = fixHrefSound(defi, resURL)
