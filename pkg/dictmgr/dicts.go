@@ -1,6 +1,12 @@
 package dictmgr
 
-import "github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
+import (
+	"log"
+	"os"
+	"path/filepath"
+
+	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
+)
 
 func DictSymbol(dictName string) string {
 	ds := dicts.DictSettingsMap[dictName]
@@ -25,4 +31,24 @@ func CloseDicts() {
 		}
 		dic.Close()
 	}
+}
+
+func DictResFile(dictName string, resPath string) (string, bool) {
+	dic, ok := dicts.DicMap[dictName]
+	if !ok {
+		return "", false
+	}
+	resDir := dic.ResourceDir()
+	if resDir == "" {
+		return "", false
+	}
+	fpath := filepath.Join(resDir, resPath)
+	_, err := os.Stat(fpath)
+	if err != nil {
+		if err != os.ErrNotExist {
+			log.Println(err)
+		}
+		return "", false
+	}
+	return fpath, true
 }

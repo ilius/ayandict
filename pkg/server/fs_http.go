@@ -2,9 +2,6 @@ package server
 
 import (
 	"embed"
-	"errors"
-	"io"
-	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -14,19 +11,6 @@ import (
 type httpFileSystem struct {
 	fs     embed.FS
 	prefix string
-}
-
-type localFile interface {
-	fs.File
-	io.Seeker
-}
-
-type httpFile struct {
-	localFile
-}
-
-func (f *httpFile) Readdir(count int) ([]fs.FileInfo, error) {
-	return nil, errors.New("not a directory")
 }
 
 func (f *httpFileSystem) Open(name string) (http.File, error) {

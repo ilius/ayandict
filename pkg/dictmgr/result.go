@@ -29,6 +29,9 @@ func (r *SearchResult) DefinitionsHTML(flags uint32) []string {
 	}
 	definitions := []string{}
 	resURL := r.dic.ResourceURL()
+	if flags&common.ResultFlag_Web > 0 {
+		resURL = "/dict-res/" + r.DictName()
+	}
 	for _, item := range r.Items() {
 		if item.Type == 'h' {
 			itemDefi := string(item.Data)

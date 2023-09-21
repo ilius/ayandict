@@ -111,12 +111,13 @@ func addWebHandlers() {
 	http.HandleFunc("/"+path_query, query)
 	http.HandleFunc("/", home)
 
-	fs := &httpFileSystem{
+	http.Handle("/web/", http.FileServer(&httpFileSystem{
 		fs:     web.FS,
 		prefix: "web",
-	}
-	// http.Handle("/web", http.StripPrefix("/web", http.FileServer(fs)))
-	http.Handle("/web/", http.FileServer(fs))
+	}))
+	http.Handle("/dict-res/", http.FileServer(&dictResFileSystem{
+		fs: web.FS,
+	}))
 }
 
 func StartServer(port string) {
