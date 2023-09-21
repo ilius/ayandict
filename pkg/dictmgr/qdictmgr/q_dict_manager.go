@@ -145,7 +145,11 @@ func NewDictManager(
 		item.SetFlags(core.Qt__ItemIsSelectable | core.Qt__ItemIsEnabled)
 		return item
 	}
-	setItem := func(index int, dictName string, ds *dicts.DictSettings) {
+	setItem := func(
+		index int,
+		dictName string,
+		ds *dicts.DictionarySettings,
+	) {
 		info, ok := infoMap[dictName]
 		if !ok {
 			log.Printf("dictName=%#v not in infoMap\n", dictName)
@@ -347,7 +351,7 @@ func (dm *DictManager) updateMap() map[string]int {
 		order[dictName] = value
 		ds := dicts.DictSettingsMap[dictName]
 		if ds == nil {
-			ds = &dicts.DictSettings{}
+			ds = &dicts.DictionarySettings{}
 			dicts.DictSettingsMap[dictName] = ds
 		}
 		ds.HideTermsHeader = hideHeader

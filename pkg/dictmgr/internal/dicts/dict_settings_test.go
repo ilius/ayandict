@@ -9,16 +9,16 @@ import (
 func TestDictSettingsFuzzy(t *testing.T) {
 	is := is.New(t)
 	{
-		ds := &DictSettings{}
+		ds := &DictionarySettings{}
 		is.True(ds.Fuzzy())
 	}
 	{
-		ds := &DictSettings{}
+		ds := &DictionarySettings{}
 		ds.SetFuzzy(true)
 		is.True(ds.Fuzzy())
 	}
 	{
-		ds := &DictSettings{}
+		ds := &DictionarySettings{}
 		ds.SetFuzzy(false)
 		is.False(ds.Fuzzy())
 	}
@@ -27,16 +27,16 @@ func TestDictSettingsFuzzy(t *testing.T) {
 func TestDictSettingsStartWith(t *testing.T) {
 	is := is.New(t)
 	{
-		ds := &DictSettings{}
+		ds := &DictionarySettings{}
 		is.True(ds.StartWith())
 	}
 	{
-		ds := &DictSettings{}
+		ds := &DictionarySettings{}
 		ds.SetStartWith(true)
 		is.True(ds.StartWith())
 	}
 	{
-		ds := &DictSettings{}
+		ds := &DictionarySettings{}
 		ds.SetStartWith(false)
 		is.False(ds.StartWith())
 	}
@@ -45,16 +45,16 @@ func TestDictSettingsStartWith(t *testing.T) {
 func TestDictSettingsRegex(t *testing.T) {
 	is := is.New(t)
 	{
-		ds := &DictSettings{}
+		ds := &DictionarySettings{}
 		is.True(ds.Regex())
 	}
 	{
-		ds := &DictSettings{}
+		ds := &DictionarySettings{}
 		ds.SetRegex(true)
 		is.True(ds.Regex())
 	}
 	{
-		ds := &DictSettings{}
+		ds := &DictionarySettings{}
 		ds.SetRegex(false)
 		is.False(ds.Regex())
 	}
@@ -63,16 +63,16 @@ func TestDictSettingsRegex(t *testing.T) {
 func TestDictSettingsGlob(t *testing.T) {
 	is := is.New(t)
 	{
-		ds := &DictSettings{}
+		ds := &DictionarySettings{}
 		is.True(ds.Glob())
 	}
 	{
-		ds := &DictSettings{}
+		ds := &DictionarySettings{}
 		ds.SetGlob(true)
 		is.True(ds.Glob())
 	}
 	{
-		ds := &DictSettings{}
+		ds := &DictionarySettings{}
 		ds.SetGlob(false)
 		is.False(ds.Glob())
 	}
@@ -81,7 +81,7 @@ func TestDictSettingsGlob(t *testing.T) {
 func TestDictSettingsFlagsMixed(t *testing.T) {
 	is := is.New(t)
 	{
-		ds := &DictSettings{}
+		ds := &DictionarySettings{}
 		is.True(ds.Fuzzy())
 		is.True(ds.StartWith())
 		is.True(ds.Regex())
@@ -108,7 +108,7 @@ func TestDictSettingsFlagsMixed(t *testing.T) {
 		is.False(ds.Glob())
 	}
 	{
-		ds := &DictSettings{}
+		ds := &DictionarySettings{}
 		is.True(ds.Fuzzy())
 		is.True(ds.StartWith())
 		is.True(ds.Regex())

@@ -183,8 +183,9 @@ func hrefBwordSub(match string) string {
 	return ` href="` + ref
 }
 
-func embedExternalStyle(defi string, resDir string) string {
+func embedExternalStyle(defi string, dic common.Dictionary) string {
 	const pre = len(` href=`)
+	resDir := dic.ResourceDir()
 
 	subFunc := func(match string) string {
 		i := strings.Index(match, ` href=`)
@@ -281,7 +282,8 @@ func fixDefiHTML(
 ) string {
 	var playImage string
 	hasResource := dic.ResourceDir() != ""
-	if conf.Audio && flags&common.ResultFlag_FixAudio > 0 {
+	_fixAudio := conf.Audio && flags&common.ResultFlag_FixAudio > 0
+	if _fixAudio {
 		playImage = getPlayImage(flags)
 		defi = fixEmptySoundLink(defi, playImage)
 		if hasResource {
@@ -291,11 +293,11 @@ func fixDefiHTML(
 	if hasResource && flags&common.ResultFlag_FixFileSrc > 0 {
 		defi = fixFileSrc(defi, dic, flags)
 	}
-	if conf.Audio && flags&common.ResultFlag_FixAudio > 0 {
+	if _fixAudio {
 		defi = fixAudioTag(defi, playImage)
 	}
 	if conf.EmbedExternalStylesheet {
-		defi = embedExternalStyle(defi, dic.ResourceDir())
+		defi = embedExternalStyle(defi, dic)
 	}
 	if flags&common.ResultFlag_FixWordLink > 0 {
 		defi = hrefBwordRE.ReplaceAllStringFunc(defi, hrefBwordSub)

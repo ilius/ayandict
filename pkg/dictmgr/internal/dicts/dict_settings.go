@@ -11,7 +11,7 @@ const (
 	FlagNoGlob
 )
 
-type DictSettings struct {
+type DictionarySettings struct {
 	Symbol string `json:"symbol"`
 	Order  int    `json:"order"`
 	Hash   string `json:"hash"`
@@ -21,23 +21,23 @@ type DictSettings struct {
 	HideTermsHeader bool `json:"terms_header"`
 }
 
-func (ds *DictSettings) Fuzzy() bool {
+func (ds *DictionarySettings) Fuzzy() bool {
 	return ds.Flags&FlagNoFuzzy == 0
 }
 
-func (ds *DictSettings) StartWith() bool {
+func (ds *DictionarySettings) StartWith() bool {
 	return ds.Flags&FlagNoStartWith == 0
 }
 
-func (ds *DictSettings) Regex() bool {
+func (ds *DictionarySettings) Regex() bool {
 	return ds.Flags&FlagNoRegex == 0
 }
 
-func (ds *DictSettings) Glob() bool {
+func (ds *DictionarySettings) Glob() bool {
 	return ds.Flags&FlagNoGlob == 0
 }
 
-func (ds *DictSettings) SetFuzzy(enable bool) {
+func (ds *DictionarySettings) SetFuzzy(enable bool) {
 	if enable {
 		ds.Flags &= ^FlagNoFuzzy
 	} else {
@@ -45,7 +45,7 @@ func (ds *DictSettings) SetFuzzy(enable bool) {
 	}
 }
 
-func (ds *DictSettings) SetStartWith(enable bool) {
+func (ds *DictionarySettings) SetStartWith(enable bool) {
 	if enable {
 		ds.Flags &= ^FlagNoStartWith
 	} else {
@@ -53,7 +53,7 @@ func (ds *DictSettings) SetStartWith(enable bool) {
 	}
 }
 
-func (ds *DictSettings) SetRegex(enable bool) {
+func (ds *DictionarySettings) SetRegex(enable bool) {
 	if enable {
 		ds.Flags &= ^FlagNoRegex
 	} else {
@@ -61,7 +61,7 @@ func (ds *DictSettings) SetRegex(enable bool) {
 	}
 }
 
-func (ds *DictSettings) SetGlob(enable bool) {
+func (ds *DictionarySettings) SetGlob(enable bool) {
 	if enable {
 		ds.Flags &= ^FlagNoGlob
 	} else {
@@ -69,8 +69,8 @@ func (ds *DictSettings) SetGlob(enable bool) {
 	}
 }
 
-func NewDictSettings(dic common.Dictionary, index int) *DictSettings {
-	return &DictSettings{
+func NewDictSettings(dic common.Dictionary, index int) *DictionarySettings {
+	return &DictionarySettings{
 		Symbol: common.DefaultSymbol(dic.DictName()),
 		Order:  index,
 		Hash:   "",

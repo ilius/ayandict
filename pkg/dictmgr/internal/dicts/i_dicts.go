@@ -20,7 +20,7 @@ var (
 	DictList        []common.Dictionary
 	DictByName      = map[string]common.Dictionary{}
 	DictsOrder      map[string]int
-	DictSettingsMap = map[string]*DictSettings{}
+	DictSettingsMap = map[string]*DictionarySettings{}
 )
 
 var sqldictOpen = func([]string, map[string]int) []common.Dictionary {
@@ -40,33 +40,37 @@ func absInt(x int) int {
 	return x
 }
 
-type DicListSorter struct {
+type DictionaryListSorter struct {
 	Order map[string]int
 	List  []common.Dictionary
 }
 
-func (s DicListSorter) Len() int {
+func (s DictionaryListSorter) Len() int {
 	return len(s.List)
 }
 
-func (s DicListSorter) Swap(i, j int) {
+func (s DictionaryListSorter) Swap(i, j int) {
 	s.List[i], s.List[j] = s.List[j], s.List[i]
 }
 
-func (s DicListSorter) Less(i, j int) bool {
+func (s DictionaryListSorter) Less(i, j int) bool {
 	return absInt(s.Order[s.List[i].DictName()]) < absInt(s.Order[s.List[j].DictName()])
 }
 
 func Reorder(order map[string]int) {
-	sort.Sort(DicListSorter{
+	sort.Sort(DictionaryListSorter{
 		List:  DictList,
 		Order: order,
 	})
 }
 
-func loadDictsSettings() (map[string]*DictSettings, map[string]int, error) {
+func loadDictsSettings() (
+	map[string]*DictionarySettings,
+	map[string]int,
+	error,
+) {
 	order := map[string]int{}
-	settingsMap := map[string]*DictSettings{}
+	settingsMap := map[string]*DictionarySettings{}
 	fpath := filepath.Join(config.GetConfigDir(), dictsJsonFilename)
 	jsonBytes, err := os.ReadFile(fpath)
 	if err != nil {
@@ -88,7 +92,7 @@ func loadDictsSettings() (map[string]*DictSettings, map[string]int, error) {
 	return settingsMap, order, nil
 }
 
-func SaveDictsSettings(settingsMap map[string]*DictSettings) error {
+func SaveDictsSettings(settingsMap map[string]*DictionarySettings) error {
 	jsonBytes, err := json.MarshalIndent(settingsMap, "", "\t")
 	if err != nil {
 		return err
@@ -140,7 +144,7 @@ func InitDicts(conf *config.Config) {
 
 	nameByHash := getDictNameByHashMap()
 
-	newDictSettings := func(dic common.Dictionary, index int) *DictSettings {
+	newDictSettings := func(dic common.Dictionary, index int) *DictionarySettings {
 		hash := Hash(dic)
 		if hash != "" {
 			prevNames := nameByHash[hash]
@@ -152,7 +156,7 @@ func InitDicts(conf *config.Config) {
 				return ds
 			}
 		}
-		return &DictSettings{
+		return &DictionarySettings{
 			Symbol: common.DefaultSymbol(dic.DictName()),
 			Order:  index,
 			Hash:   hash,

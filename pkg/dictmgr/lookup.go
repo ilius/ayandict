@@ -29,7 +29,7 @@ func search(
 	dictName := dic.DictName()
 	ds := dicts.DictSettingsMap[dictName]
 	if ds == nil {
-		ds = &dicts.DictSettings{}
+		ds = &dicts.DictionarySettings{}
 	}
 	switch mode {
 	case QueryModeStartWith:

@@ -41,12 +41,12 @@ type DictFlagsCheckboxes struct {
 
 	checkList []*widgets.QPushButton
 
-	ds *dicts.DictSettings
+	ds *dicts.DictionarySettings
 
 	flagsMutex sync.Mutex
 }
 
-func (w *DictFlagsCheckboxes) SetActiveDictSetting(ds *dicts.DictSettings) {
+func (w *DictFlagsCheckboxes) SetActiveDictSetting(ds *dicts.DictionarySettings) {
 	w.ds = ds
 	w.checkList[0].SetChecked(ds.Fuzzy())
 	w.checkList[1].SetChecked(ds.StartWith())
