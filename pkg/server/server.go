@@ -107,8 +107,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 	http.ServeContent(w, r, "", time.Now(), content)
 }
 
-func StartServer(port string) {
-	http.HandleFunc("/"+path_appName, getAppName)
+func addWebHandlers() {
 	http.HandleFunc("/"+path_query, query)
 	http.HandleFunc("/", home)
 
@@ -118,6 +117,14 @@ func StartServer(port string) {
 	}
 	// http.Handle("/web", http.StripPrefix("/web", http.FileServer(fs)))
 	http.Handle("/web/", http.FileServer(fs))
+}
+
+func StartServer(port string) {
+	http.HandleFunc("/"+path_appName, getAppName)
+
+	if conf.WebEnable {
+		addWebHandlers()
+	}
 
 	log.Println("Starting local server on port", port)
 	err := http.ListenAndServe(":"+port, nil)

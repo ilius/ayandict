@@ -2,6 +2,7 @@
 ayandict
 ayandict-*
 qtbox
+pkg/config/doc-gen/doc-gen
 *.exe
 *.exe~
 *.bin

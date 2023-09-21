@@ -52,6 +52,8 @@ var commentMap = map[string]string{
 
 	"local_client_timeout": "Timeout for local web client",
 
+	"web_enable": "Set true/false and restart to enable/disable web service & web app",
+
 	"search_worker_count": "The number of workers / goroutines used for search",
 
 	"search_timeout": "Timeout for search on each dictionary. Only works if ``search_worker_count > 1``",

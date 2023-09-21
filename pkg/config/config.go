@@ -78,6 +78,8 @@ type Config struct {
 
 	LocalClientTimeout time.Duration `toml:"local_client_timeout"`
 
+	WebEnable bool `toml:"web_enable"`
+
 	SearchWorkerCount int `toml:"search_worker_count"`
 
 	SearchTimeout time.Duration `toml:"search_timeout"`
@@ -153,6 +155,8 @@ func Default() *Config {
 		},
 
 		LocalClientTimeout: 100 * time.Millisecond,
+
+		WebEnable: false,
 
 		SearchWorkerCount: 8,
 

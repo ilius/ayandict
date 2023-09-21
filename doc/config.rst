@@ -178,6 +178,12 @@ Timeout for local web client
 
 Default value: ``"100ms"``
 
+``web_enable``
+--------------
+Set true/false and restart to enable/disable web service & web app
+
+Default value: ``false``
+
 ``search_worker_count``
 -----------------------
 The number of workers / goroutines used for search
