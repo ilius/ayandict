@@ -13,9 +13,9 @@ import (
 	"github.com/ilius/ayandict/v2/pkg/favorites"
 	"github.com/ilius/ayandict/v2/pkg/frequency"
 	"github.com/ilius/ayandict/v2/pkg/qerr"
+	"github.com/ilius/ayandict/v2/pkg/qsettings"
 	"github.com/ilius/ayandict/v2/pkg/qutils"
 	"github.com/ilius/ayandict/v2/pkg/server"
-	"github.com/ilius/ayandict/v2/pkg/settings"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
@@ -566,33 +566,33 @@ func (app *Application) Run() {
 		}
 	})
 
-	qs := settings.GetQSettings(window)
+	qs := qsettings.GetQSettings(window)
 
 	queryModeCombo.ConnectCurrentIndexChanged(func(i int) {
 		text := entry.Text()
 		if text != "" {
 			onQuery(text, queryArgs, false)
 		}
-		go settings.SaveSearchSettings(qs, queryModeCombo)
+		go qsettings.SaveSearchSettings(qs, queryModeCombo)
 	})
 
-	settings.RestoreSplitterSizes(qs, mainSplitter, QS_mainSplitter)
-	settings.RestoreMainWinGeometry(app.QApplication, qs, window)
-	settings.SetupMainWinGeometrySave(qs, window)
+	qsettings.RestoreSplitterSizes(qs, mainSplitter, QS_mainSplitter)
+	qsettings.RestoreMainWinGeometry(app.QApplication, qs, window)
+	qsettings.SetupMainWinGeometrySave(qs, window)
 
-	settings.RestoreTableColumnsWidth(
+	qsettings.RestoreTableColumnsWidth(
 		qs,
 		frequencyTable.QTableWidget,
 		QS_frequencyTable,
 	)
 	// frequencyTable.ConnectColumnResized does not work
 	frequencyTable.HorizontalHeader().ConnectSectionResized(func(logicalIndex int, oldSize int, newSize int) {
-		settings.SaveTableColumnsWidth(qs, frequencyTable.QTableWidget, QS_frequencyTable)
+		qsettings.SaveTableColumnsWidth(qs, frequencyTable.QTableWidget, QS_frequencyTable)
 	})
 
-	settings.SetupSplitterSizesSave(qs, mainSplitter, QS_mainSplitter)
+	qsettings.SetupSplitterSizesSave(qs, mainSplitter, QS_mainSplitter)
 
-	settings.RestoreSearchSettings(qs, queryModeCombo)
+	qsettings.RestoreSearchSettings(qs, queryModeCombo)
 
 	window.Show()
 	app.Exec()

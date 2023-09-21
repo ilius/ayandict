@@ -9,8 +9,8 @@ import (
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
 	"github.com/ilius/ayandict/v2/pkg/qerr"
+	"github.com/ilius/ayandict/v2/pkg/qsettings"
 	"github.com/ilius/ayandict/v2/pkg/qutils"
-	"github.com/ilius/ayandict/v2/pkg/settings"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
@@ -57,8 +57,8 @@ func NewDictManager(
 	window.SetWindowTitle("Dictionaries")
 	window.Resize2(900, 800)
 
-	qs := settings.GetQSettings(window)
-	settings.RestoreWinGeometry(app, qs, &window.QWidget, QS_dictManager)
+	qs := qsettings.GetQSettings(window)
+	qsettings.RestoreWinGeometry(app, qs, &window.QWidget, QS_dictManager)
 
 	const columns = 5
 
@@ -306,16 +306,16 @@ func NewDictManager(
 		setItem(index, dictName, ds)
 	}
 
-	settings.RestoreTableColumnsWidth(
+	qsettings.RestoreTableColumnsWidth(
 		qs,
 		table,
 		QS_dictManager,
 	)
 	table.HorizontalHeader().ConnectSectionResized(func(logicalIndex int, oldSize int, newSize int) {
-		settings.SaveTableColumnsWidth(qs, table, QS_dictManager)
+		qsettings.SaveTableColumnsWidth(qs, table, QS_dictManager)
 	})
 
-	settings.SetupWinGeometrySave(qs, &window.QWidget, QS_dictManager)
+	qsettings.SetupWinGeometrySave(qs, &window.QWidget, QS_dictManager)
 
 	return &DictManager{
 		Dialog:      window,
