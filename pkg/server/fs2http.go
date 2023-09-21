@@ -44,6 +44,5 @@ func (f *httpFileSystem) Open(name string) (http.File, error) {
 		log.Printf("file %#v is not a seeker", name)
 		return nil, os.ErrNotExist
 	}
-	log.Println("serving", name)
 	return &httpFile{file2}, nil
 }
