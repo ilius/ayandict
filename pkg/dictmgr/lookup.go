@@ -4,6 +4,7 @@ import (
 	"sort"
 
 	"github.com/ilius/ayandict/v2/pkg/config"
+	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
 	"github.com/ilius/ayandict/v2/pkg/qerr"
 	common "github.com/ilius/go-dict-commons"
 )
@@ -26,9 +27,9 @@ func search(
 	workerCount := conf.SearchWorkerCount
 	timeout := conf.SearchTimeout
 	dictName := dic.DictName()
-	ds := dictSettingsMap[dictName]
+	ds := dicts.DictSettingsMap[dictName]
 	if ds == nil {
-		ds = &DictSettings{}
+		ds = &dicts.DictSettings{}
 	}
 	switch mode {
 	case QueryModeStartWith:
@@ -69,7 +70,7 @@ func LookupHTML(
 	mode QueryMode,
 ) []common.SearchResultIface {
 	results := []common.SearchResultIface{}
-	for _, dic := range dicList {
+	for _, dic := range dicts.DicList {
 		if dic.Disabled() || !dic.Loaded() {
 			continue
 		}
@@ -89,8 +90,8 @@ func LookupHTML(
 		if score1 != score2 {
 			return score1 > score2
 		}
-		do1 := dictsOrder[res1.DictName()]
-		do2 := dictsOrder[res2.DictName()]
+		do1 := dicts.DictsOrder[res1.DictName()]
+		do2 := dicts.DictsOrder[res2.DictName()]
 		if do1 != do2 {
 			return do1 < do2
 		}

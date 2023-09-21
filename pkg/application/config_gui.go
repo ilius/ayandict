@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/dictmgr"
+	"github.com/ilius/ayandict/v2/pkg/dictmgr/qdictmgr"
 	"github.com/ilius/ayandict/v2/pkg/qerr"
 	"github.com/ilius/ayandict/v2/pkg/wordwrap"
 	"github.com/ilius/qt/core"
@@ -106,7 +106,7 @@ func (app *Application) ReloadConfig() {
 		app.ReloadUserStyle()
 	}
 	if shouldReloadDicts(currentDirList, conf.DirectoryList) {
-		dictmgr.InitDicts(conf, true)
+		qdictmgr.InitDicts(conf, true)
 		app.dictManager = nil
 	}
 	app.headerLabel.ReloadConfig()

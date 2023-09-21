@@ -1,4 +1,4 @@
-package dictmgr
+package qdictmgr
 
 import (
 	"log"
@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/ilius/ayandict/v2/pkg/config"
+	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
 	"github.com/ilius/ayandict/v2/pkg/iface"
 	"github.com/ilius/ayandict/v2/pkg/qerr"
 	"github.com/ilius/ayandict/v2/pkg/settings"
@@ -50,7 +51,7 @@ func NewDictManager(
 	parent widgets.QWidget_ITF,
 	conf *config.Config,
 ) *DictManager {
-	infoMap := makeDictInfoMap(dicList)
+	infoMap := makeDictInfoMap(dicts.DicList)
 
 	window := widgets.NewQDialog(parent, core.Qt__Dialog)
 	window.SetWindowTitle("Dictionaries")
@@ -144,7 +145,7 @@ func NewDictManager(
 		item.SetFlags(core.Qt__ItemIsSelectable | core.Qt__ItemIsEnabled)
 		return item
 	}
-	setItem := func(index int, dictName string, ds *DictSettings) {
+	setItem := func(index int, dictName string, ds *dicts.DictSettings) {
 		info, ok := infoMap[dictName]
 		if !ok {
 			log.Printf("dictName=%#v not in infoMap\n", dictName)
@@ -220,7 +221,7 @@ func NewDictManager(
 			return
 		}
 		dictName := table.Item(row, dm_col_dictName).Text()
-		dic := dicMap[dictName]
+		dic := dicts.DicMap[dictName]
 		if dic == nil {
 			qerr.Errorf("No dictionary %#v found", dictName)
 			return
@@ -269,7 +270,7 @@ func NewDictManager(
 			return
 		}
 		dictName := table.Item(row, dm_col_dictName).Text()
-		ds := dictSettingsMap[dictName]
+		ds := dicts.DictSettingsMap[dictName]
 		if ds == nil {
 			extraOptionsWidget.Hide()
 			return
@@ -292,15 +293,15 @@ func NewDictManager(
 	mainBox.AddLayout(mainHBox, 1)
 	mainBox.AddWidget(buttonBox, 0, 0)
 
-	table.SetRowCount(len(dicList))
-	for index, dic := range dicList {
+	table.SetRowCount(len(dicts.DicList))
+	for index, dic := range dicts.DicList {
 		dictName := dic.DictName()
-		ds := dictSettingsMap[dictName]
+		ds := dicts.DictSettingsMap[dictName]
 		if ds == nil {
 			log.Printf("dict manager: found new dict: %v\n", dictName)
-			ds = NewDictSettings(dic, index)
-			ds.Hash = Hash(dic)
-			dictSettingsMap[dictName] = ds
+			ds = dicts.NewDictSettings(dic, index)
+			ds.Hash = dicts.Hash(dic)
+			dicts.DictSettingsMap[dictName] = ds
 		}
 		setItem(index, dictName, ds)
 	}
@@ -344,10 +345,10 @@ func (dm *DictManager) updateMap() map[string]int {
 			value = -value
 		}
 		order[dictName] = value
-		ds := dictSettingsMap[dictName]
+		ds := dicts.DictSettingsMap[dictName]
 		if ds == nil {
-			ds = &DictSettings{}
-			dictSettingsMap[dictName] = ds
+			ds = &dicts.DictSettings{}
+			dicts.DictSettingsMap[dictName] = ds
 		}
 		ds.HideTermsHeader = hideHeader
 		ds.Symbol = symbol
@@ -363,13 +364,13 @@ func (dm *DictManager) Run() bool {
 	if dm.Dialog.Exec() != int(widgets.QDialog__Accepted) {
 		return false
 	}
-	dictsOrder = dm.updateMap()
+	dicts.DictsOrder = dm.updateMap()
 
-	Reorder(dictsOrder)
+	dicts.Reorder(dicts.DictsOrder)
 
-	for _, dic := range dicList {
+	for _, dic := range dicts.DicList {
 		disabled := dic.Disabled()
-		dic.SetDisabled(dictsOrder[dic.DictName()] < 0)
+		dic.SetDisabled(dicts.DictsOrder[dic.DictName()] < 0)
 		if disabled && !dic.Disabled() {
 			err := dic.Load()
 			if err != nil {
@@ -378,7 +379,7 @@ func (dm *DictManager) Run() bool {
 		}
 	}
 
-	err := saveDictsSettings(dictSettingsMap)
+	err := dicts.SaveDictsSettings(dicts.DictSettingsMap)
 	if err != nil {
 		qerr.Error(err)
 	}

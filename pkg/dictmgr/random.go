@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ilius/ayandict/v2/pkg/config"
+	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
 	common "github.com/ilius/go-dict-commons"
 )
 
@@ -26,9 +27,9 @@ func entryCount(dic common.Dictionary) int {
 }
 
 func RandomEntry(conf *config.Config) *SearchResult {
-	dn := len(dicList)
+	dn := len(dicts.DicList)
 	sums := make([]int, dn+1)
-	for i, dic := range dicList {
+	for i, dic := range dicts.DicList {
 		sums[i+1] = sums[i] + entryCount(dic)
 	}
 	totalEntryN := sums[dn]
@@ -39,7 +40,7 @@ func RandomEntry(conf *config.Config) *SearchResult {
 	dicIndex := sort.Search(dn, func(i int) bool {
 		return totalEntryI < sums[i+1]
 	})
-	dic := dicList[dicIndex]
+	dic := dicts.DicList[dicIndex]
 	relEntryI := totalEntryI - sums[dicIndex]
 	log.Printf("RandomEntry: %v from %v", relEntryI, dic.DictName())
 	entry := dic.EntryByIndex(relEntryI)

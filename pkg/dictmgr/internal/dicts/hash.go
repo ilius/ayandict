@@ -1,4 +1,4 @@
-package dictmgr
+package dicts
 
 import (
 	"fmt"

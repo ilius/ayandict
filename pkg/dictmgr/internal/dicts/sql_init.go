@@ -1,6 +1,6 @@
 //go:build !nosql
 
-package dictmgr
+package dicts
 
 import (
 	"github.com/ilius/ayandict/v2/pkg/qerr"

@@ -12,6 +12,7 @@ import (
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	"github.com/ilius/ayandict/v2/pkg/qerr"
 	"github.com/ilius/ayandict/v2/web"
+	common "github.com/ilius/go-dict-commons"
 )
 
 const (
@@ -22,10 +23,9 @@ const (
 
 var conf *config.Config
 
-const resultFlags = uint32(0)
+const resultFlags = common.ResultFlag_FixAudio |
+	common.ResultFlag_FixFileSrc
 
-// common.ResultFlag_FixAudio |
-// 	common.ResultFlag_FixFileSrc |
 // 	common.ResultFlag_FixWordLink |
 // 	common.ResultFlag_ColorMapping)
 

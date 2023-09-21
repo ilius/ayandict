@@ -9,6 +9,7 @@ import (
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
+	"github.com/ilius/ayandict/v2/pkg/dictmgr/qdictmgr"
 	"github.com/ilius/ayandict/v2/pkg/favorites"
 	"github.com/ilius/ayandict/v2/pkg/frequency"
 	"github.com/ilius/ayandict/v2/pkg/iface"
@@ -68,7 +69,7 @@ type Application struct {
 
 	window *widgets.QMainWindow
 
-	dictManager *dictmgr.DictManager
+	dictManager *qdictmgr.DictManager
 
 	allTextWidgets []iface.HasSetFont
 
@@ -91,7 +92,7 @@ func (app *Application) Run() {
 	go server.StartServer(conf.LocalServerPorts[0])
 
 	app.LoadUserStyle()
-	dictmgr.InitDicts(conf, true)
+	qdictmgr.InitDicts(conf, true)
 
 	basePx = float32(fontPixelSize(
 		app.Font(),
@@ -460,7 +461,7 @@ func (app *Application) Run() {
 		doQuery(item.Text())
 	})
 	reloadDictsButton.ConnectClicked(func(checked bool) {
-		dictmgr.InitDicts(conf, true)
+		qdictmgr.InitDicts(conf, true)
 		app.dictManager = nil
 		onQuery(entry.Text(), queryArgs, false)
 	})
@@ -599,7 +600,7 @@ func (app *Application) Run() {
 
 func (app *Application) runDictManager() bool {
 	if app.dictManager == nil {
-		app.dictManager = dictmgr.NewDictManager(app.QApplication, app.window, conf)
+		app.dictManager = qdictmgr.NewDictManager(app.QApplication, app.window, conf)
 		app.allTextWidgets = append(
 			app.allTextWidgets,
 			app.dictManager.TextWidgets...,

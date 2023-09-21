@@ -1,9 +1,10 @@
-package dictmgr
+package qdictmgr
 
 import (
 	"log"
 	"sync"
 
+	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
 	"github.com/ilius/qt/widgets"
 )
 
@@ -18,10 +19,10 @@ func NewDictFlagsCheckboxes(hide func()) *DictFlagsCheckboxes {
 		hbox:    hbox,
 	}
 
-	w.addCheckBox("Fuzzy", FlagNoFuzzy)
-	w.addCheckBox("Start with", FlagNoStartWith)
-	w.addCheckBox("Regex", FlagNoRegex)
-	w.addCheckBox("Glob", FlagNoGlob)
+	w.addCheckBox("Fuzzy", dicts.FlagNoFuzzy)
+	w.addCheckBox("Start with", dicts.FlagNoStartWith)
+	w.addCheckBox("Regex", dicts.FlagNoRegex)
+	w.addCheckBox("Glob", dicts.FlagNoGlob)
 
 	hbox.AddSpacing(30) // FIXME
 	hideButton := widgets.NewQPushButton2("Hide", nil)
@@ -40,12 +41,12 @@ type DictFlagsCheckboxes struct {
 
 	checkList []*widgets.QPushButton
 
-	ds *DictSettings
+	ds *dicts.DictSettings
 
 	flagsMutex sync.Mutex
 }
 
-func (w *DictFlagsCheckboxes) SetActiveDictSetting(ds *DictSettings) {
+func (w *DictFlagsCheckboxes) SetActiveDictSetting(ds *dicts.DictSettings) {
 	w.ds = ds
 	w.checkList[0].SetChecked(ds.Fuzzy())
 	w.checkList[1].SetChecked(ds.StartWith())

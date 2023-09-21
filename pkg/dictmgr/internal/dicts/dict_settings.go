@@ -1,4 +1,4 @@
-package dictmgr
+package dicts
 
 import (
 	common "github.com/ilius/go-dict-commons"
