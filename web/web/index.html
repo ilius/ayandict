@@ -26,6 +26,14 @@
 		</div>
 		<div id="content" name="content" class="vertical" style="padding: 20px;"></div>
 	</div>
+	<script type="text/javascript">
+
+function playAudioA(a) {
+	var audio = new Audio(a.href)
+	audio.play();
+}
+
+	</script>
 	<script type="text/python">
 from browser import document, html, ajax
 
@@ -44,9 +52,14 @@ def is_word_link(target):
 	return False
 
 
-def fix_content_word_links():
+def fix_content_links():
 	for a in content.select('a'):
-		target = a.attrs["href"]
+		target = a.attrs.get("href")
+		if not target:
+			continue
+		if target.endswith((".mp3", ".wav", ".ogg")):
+			a.attrs["onclick"] = "playAudioA(this); return false"
+			continue
 		if not is_word_link(target):
 			continue
 		a.attrs["dict_target"] = target
@@ -58,7 +71,7 @@ def on_result_row_click(result):
 	defi = "<br/>".join(result["definitionsHTML"])
 	content.html = defi
 
-	fix_content_word_links()
+	fix_content_links()
 
 	headerLabel.clear()
 	headerLabel <= html.B(html.FONT(
@@ -113,7 +126,9 @@ def on_lookup_input_keypress(event):
 def on_word_link_click(event):
 	event.preventDefault()
 	a = event.target
-	target = a.attrs["dict_target"]
+	target = a.attrs.get("dict_target")
+	if not target:
+		return
 	if target.startswith("bword://"):
 		target = target[8:]
 	input.value = target
