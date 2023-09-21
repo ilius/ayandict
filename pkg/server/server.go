@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/ilius/ayandict/v2/pkg/appinfo"
@@ -107,16 +108,42 @@ func home(w http.ResponseWriter, r *http.Request) {
 	http.ServeContent(w, r, "", time.Now(), content)
 }
 
+func dictRes(w http.ResponseWriter, r *http.Request) {
+	dictName := r.FormValue("dictName")
+	path := r.FormValue("path")
+	if dictName == "" {
+		w.Write([]byte("missing dictName"))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if path == "" {
+		w.Write([]byte("missing path"))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	fpath, ok := dictmgr.DictResFile(dictName, path)
+	if !ok {
+		w.Write([]byte("file not found"))
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	file, err := os.Open(fpath)
+	if err != nil {
+		w.Write([]byte("file not found"))
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	http.ServeContent(w, r, "", time.Now(), file)
+}
+
 func addWebHandlers() {
 	http.HandleFunc("/"+path_query, query)
 	http.HandleFunc("/", home)
+	http.HandleFunc(dictmgr.DictResPathBase, dictRes)
 
 	http.Handle("/web/", http.FileServer(&httpFileSystem{
 		fs:     web.FS,
 		prefix: "web",
-	}))
-	http.Handle("/dict-res/", http.FileServer(&dictResFileSystem{
-		fs: web.FS,
 	}))
 }
 

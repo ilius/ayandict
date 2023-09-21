@@ -36,7 +36,7 @@ const (
 	webPlayImage = "/web/audio-play.png"
 )
 
-func fixResURL(quoted string, resURL string) (bool, string) {
+func fixResURL(quoted string, dic common.Dictionary, flags uint32) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
 		log.Println(err)
@@ -53,16 +53,16 @@ func fixResURL(quoted string, resURL string) (bool, string) {
 	if _url.Scheme != "" || _url.Host != "" {
 		return false, ""
 	}
-	return true, resURL + "/" + _url.Path
+	return true, dictResURL(dic, _url.Path, flags)
 }
 
-func fixSoundURL(quoted string, resURL string) (bool, string) {
+func fixSoundURL(quoted string, dic common.Dictionary, flags uint32) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
 		log.Println(err)
 		return false, ""
 	}
-	return true, resURL + "/" + urlStr[len("sound://"):]
+	return true, dictResURL(dic, urlStr[len("sound://"):], flags)
 }
 
 func fixEmptySoundLink(defi string, playImg string) string {
@@ -72,10 +72,10 @@ func fixEmptySoundLink(defi string, playImg string) string {
 	return emptySoundRE.ReplaceAllStringFunc(defi, subFunc)
 }
 
-func fixHrefSound(defi string, resURL string) string {
+func fixHrefSound(defi string, dic common.Dictionary, flags uint32) string {
 	subFunc := func(match string) string {
 		// log.Println("hrefSoundSub: match:", match)
-		ok, _url := fixSoundURL(match[6:], resURL)
+		ok, _url := fixSoundURL(match[6:], dic, flags)
 		if !ok {
 			return match
 		}
@@ -118,7 +118,6 @@ func getAttr(node *html.Node, attrName string) string {
 
 func fixAudioTag(
 	defi string,
-	resURL string,
 	playImage string,
 ) string {
 	// fix <audio ...><source src="..."></audio>
@@ -153,9 +152,9 @@ func fixAudioTag(
 	return defi
 }
 
-func fixFileSrc(defi string, resURL string) string {
+func fixFileSrc(defi string, dic common.Dictionary, flags uint32) string {
 	srcSub := func(match string) string {
-		ok, _url := fixResURL(match[5:], resURL)
+		ok, _url := fixResURL(match[5:], dic, flags)
 		if !ok {
 			return match
 		}
@@ -276,24 +275,24 @@ func getPlayImage(flags uint32) string {
 
 func fixDefiHTML(
 	defi string,
-	resURL string,
 	conf *config.Config,
 	dic common.Dictionary,
 	flags uint32,
 ) string {
 	var playImage string
+	hasResource := dic.ResourceDir() != ""
 	if conf.Audio && flags&common.ResultFlag_FixAudio > 0 {
 		playImage = getPlayImage(flags)
 		defi = fixEmptySoundLink(defi, playImage)
-		if resURL != "" {
-			defi = fixHrefSound(defi, resURL)
+		if hasResource {
+			defi = fixHrefSound(defi, dic, flags)
 		}
 	}
-	if resURL != "" && flags&common.ResultFlag_FixFileSrc > 0 {
-		defi = fixFileSrc(defi, resURL)
+	if hasResource && flags&common.ResultFlag_FixFileSrc > 0 {
+		defi = fixFileSrc(defi, dic, flags)
 	}
 	if conf.Audio && flags&common.ResultFlag_FixAudio > 0 {
-		defi = fixAudioTag(defi, resURL, playImage)
+		defi = fixAudioTag(defi, playImage)
 	}
 	if conf.EmbedExternalStylesheet {
 		defi = embedExternalStyle(defi, dic.ResourceDir())
