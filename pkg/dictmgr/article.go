@@ -15,7 +15,6 @@ import (
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/html"
 	common "github.com/ilius/go-dict-commons"
-	"github.com/ilius/qt/core"
 )
 
 var (
@@ -253,12 +252,13 @@ func getPlayImage() string {
 	if err != nil {
 		log.Println(err)
 	}
-	qUrl := core.NewQUrl()
-	qUrl.SetScheme("file")
-	qUrl.SetPath(imgPath, core.QUrl__TolerantMode)
+	_url := url.URL{}
+	_url.Scheme = "file"
+	_url.Path = imgPath
+	_urlStr := _url.String()
 	return fmt.Sprintf(
 		`<img src=%s />`,
-		strconv.Quote(qUrl.ToString(core.QUrl__None)),
+		strconv.Quote(_urlStr),
 	)
 }
 
