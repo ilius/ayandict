@@ -70,7 +70,7 @@ func LookupHTML(
 	mode QueryMode,
 ) []common.SearchResultIface {
 	results := []common.SearchResultIface{}
-	for _, dic := range dicts.DicList {
+	for _, dic := range dicts.DictList {
 		if dic.Disabled() || !dic.Loaded() {
 			continue
 		}

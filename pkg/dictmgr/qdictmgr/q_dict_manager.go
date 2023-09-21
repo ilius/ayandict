@@ -51,7 +51,7 @@ func NewDictManager(
 	parent widgets.QWidget_ITF,
 	conf *config.Config,
 ) *DictManager {
-	infoMap := makeDictInfoMap(dicts.DicList)
+	infoMap := makeDictInfoMap(dicts.DictList)
 
 	window := widgets.NewQDialog(parent, core.Qt__Dialog)
 	window.SetWindowTitle("Dictionaries")
@@ -221,7 +221,7 @@ func NewDictManager(
 			return
 		}
 		dictName := table.Item(row, dm_col_dictName).Text()
-		dic := dicts.DicMap[dictName]
+		dic := dicts.DictByName[dictName]
 		if dic == nil {
 			qerr.Errorf("No dictionary %#v found", dictName)
 			return
@@ -293,8 +293,8 @@ func NewDictManager(
 	mainBox.AddLayout(mainHBox, 1)
 	mainBox.AddWidget(buttonBox, 0, 0)
 
-	table.SetRowCount(len(dicts.DicList))
-	for index, dic := range dicts.DicList {
+	table.SetRowCount(len(dicts.DictList))
+	for index, dic := range dicts.DictList {
 		dictName := dic.DictName()
 		ds := dicts.DictSettingsMap[dictName]
 		if ds == nil {
@@ -368,7 +368,7 @@ func (dm *DictManager) Run() bool {
 
 	dicts.Reorder(dicts.DictsOrder)
 
-	for _, dic := range dicts.DicList {
+	for _, dic := range dicts.DictList {
 		disabled := dic.Disabled()
 		dic.SetDisabled(dicts.DictsOrder[dic.DictName()] < 0)
 		if disabled && !dic.Disabled() {

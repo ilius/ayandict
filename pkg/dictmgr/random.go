@@ -27,9 +27,9 @@ func entryCount(dic common.Dictionary) int {
 }
 
 func RandomEntry(conf *config.Config) *SearchResult {
-	dn := len(dicts.DicList)
+	dn := len(dicts.DictList)
 	sums := make([]int, dn+1)
-	for i, dic := range dicts.DicList {
+	for i, dic := range dicts.DictList {
 		sums[i+1] = sums[i] + entryCount(dic)
 	}
 	totalEntryN := sums[dn]
@@ -40,7 +40,7 @@ func RandomEntry(conf *config.Config) *SearchResult {
 	dicIndex := sort.Search(dn, func(i int) bool {
 		return totalEntryI < sums[i+1]
 	})
-	dic := dicts.DicList[dicIndex]
+	dic := dicts.DictList[dicIndex]
 	relEntryI := totalEntryI - sums[dicIndex]
 	log.Printf("RandomEntry: %v from %v", relEntryI, dic.DictName())
 	entry := dic.EntryByIndex(relEntryI)

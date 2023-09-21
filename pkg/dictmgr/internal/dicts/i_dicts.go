@@ -17,8 +17,8 @@ import (
 const dictsJsonFilename = "dicts.json"
 
 var (
-	DicList         []common.Dictionary
-	DicMap          = map[string]common.Dictionary{}
+	DictList        []common.Dictionary
+	DictByName      = map[string]common.Dictionary{}
 	DictsOrder      map[string]int
 	DictSettingsMap = map[string]*DictSettings{}
 )
@@ -59,7 +59,7 @@ func (s DicListSorter) Less(i, j int) bool {
 
 func Reorder(order map[string]int) {
 	sort.Sort(DicListSorter{
-		List:  DicList,
+		List:  DictList,
 		Order: order,
 	})
 }
@@ -120,20 +120,20 @@ func InitDicts(conf *config.Config) {
 	}
 
 	t := time.Now()
-	DicList, err = stardict.Open(conf.DirectoryList, DictsOrder)
+	DictList, err = stardict.Open(conf.DirectoryList, DictsOrder)
 	if err != nil {
 		panic(err)
 	}
 	if len(conf.SqlDictList) > 0 {
-		DicList = append(DicList, sqldictOpen(conf.SqlDictList, DictsOrder)...)
+		DictList = append(DictList, sqldictOpen(conf.SqlDictList, DictsOrder)...)
 	}
 
 	// to support another format, you can call pkg.Open just like stardict
 	// and append them new dicList to this dicList. since we are sorting them
 	// here in Reorder after loading all dictionaries
 
-	for _, dic := range DicList {
-		DicMap[dic.DictName()] = dic
+	for _, dic := range DictList {
+		DictByName[dic.DictName()] = dic
 	}
 
 	log.Println("Loading dictionaries took", time.Since(t))
@@ -160,7 +160,7 @@ func InitDicts(conf *config.Config) {
 	}
 
 	modified := false
-	for index, dic := range DicList {
+	for index, dic := range DictList {
 		dictName := dic.DictName()
 		ds := DictSettingsMap[dictName]
 		if ds == nil {

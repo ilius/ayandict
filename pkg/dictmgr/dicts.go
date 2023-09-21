@@ -29,7 +29,7 @@ func DictShowTerms(dictName string) bool {
 }
 
 func CloseDicts() {
-	for _, dic := range dicts.DicList {
+	for _, dic := range dicts.DictList {
 		if dic.Disabled() {
 			continue
 		}
@@ -38,7 +38,7 @@ func CloseDicts() {
 }
 
 func DictResFile(dictName string, resPath string) (string, bool) {
-	dic, ok := dicts.DicMap[dictName]
+	dic, ok := dicts.DictByName[dictName]
 	if !ok {
 		return "", false
 	}
