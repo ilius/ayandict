@@ -15,6 +15,7 @@ github.com/ilius/go-dict-sql v0.3.2 h1:MGwRiYKm0NQ2q4pbN28w4+KUrVnjuGHkvh3QtZkFC
 github.com/ilius/go-dict-sql v0.3.2/go.mod h1:XnbifDOcHJ5aE/lsIB7v4IyrKuyxGr+wSyO/+9711ZI=
 github.com/ilius/go-stardict/v2 v2.2.2 h1:Pn37qA8Ppx2t3PR4KFbnLr043Dg7yPMLuk/a1CjPrOc=
 github.com/ilius/go-stardict/v2 v2.2.2/go.mod h1:14dLdEIOgnQqvbf6Cw7GRMMMo3pMpLGWjnuQPbBburg=
+github.com/ilius/is/v2 v2.3.2 h1:14u2j/UTKeIHKlcp/48dabf7+7QJ9JJaaoeHVvfyAOk=
 github.com/ilius/is/v2 v2.3.2/go.mod h1:OMGTmQDDc3Svaj3EoQHeNnXHP0R1HCb5u/Hfm7kuYIM=
 github.com/ilius/qt v0.0.0-20230422004322-c855bcf0151b h1:so6ndDlj5MkK/IWNMDhGLGyHjP+HJIMk7PkkAtbXZl8=
 github.com/ilius/qt v0.0.0-20230422004322-c855bcf0151b/go.mod h1:BkQcF3GtkapAqQ6Z6/Of2PZaAy1QEEApLBjw+PXUFM0=
