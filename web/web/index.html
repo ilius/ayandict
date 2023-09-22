@@ -125,8 +125,17 @@ def ajax_query(query):
 	)
 
 
+def clear_results():
+	resultListElem.clear()
+	headerLabel.clear()
+	content.clear()
+
+
 def on_lookup_input_keypress(event):
 	if event.key != "Enter":
+		return
+	if not input.value:
+		clear_results()
 		return
 	ajax_query(input.value)
 
