@@ -11,6 +11,12 @@ import (
 	"github.com/ilius/qt/widgets"
 )
 
+const resultFlags = uint32(
+	common.ResultFlag_FixAudio |
+		common.ResultFlag_FixFileSrc |
+		common.ResultFlag_FixWordLink |
+		common.ResultFlag_ColorMapping)
+
 type QueryArgs struct {
 	ArticleView *ArticleView
 	ResultList  *ResultListWidget
@@ -169,7 +175,7 @@ func onQuery(
 	case 3:
 		mode = dictmgr.QueryModeGlob
 	}
-	results := dictmgr.LookupHTML(query, conf, mode)
+	results := dictmgr.LookupHTML(query, conf, mode, resultFlags)
 	log.Printf("LookupHTML took %v for %#v", time.Since(t), query)
 	queryArgs.ResultList.SetResults(results)
 	if len(results) == 0 {

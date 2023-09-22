@@ -12,6 +12,7 @@ func NewSearchResult(
 	res *common.SearchResultLow,
 	dic common.Dictionary,
 	conf *config.Config,
+	flags uint32,
 ) *SearchResult {
 	return &SearchResult{
 		SearchResultLow: res,
@@ -19,13 +20,16 @@ func NewSearchResult(
 		proc: &DictProcessor{
 			Dictionary: dic,
 			conf:       conf,
+			flags:      flags,
 		},
+		flags: flags,
 	}
 }
 
 type SearchResult struct {
 	*common.SearchResultLow
 	proc   *DictProcessor
+	flags  uint32
 	hDefis []string
 }
 
@@ -37,7 +41,7 @@ func (r *SearchResult) ResourceDir() string {
 	return r.proc.ResourceDir()
 }
 
-func (r *SearchResult) DefinitionsHTML(flags uint32) []string {
+func (r *SearchResult) DefinitionsHTML() []string {
 	if r.hDefis != nil {
 		return r.hDefis
 	}
@@ -45,10 +49,7 @@ func (r *SearchResult) DefinitionsHTML(flags uint32) []string {
 	for _, item := range r.Items() {
 		if item.Type == 'h' {
 			itemDefi := string(item.Data)
-			itemDefi = r.proc.fixDefiHTML(
-				itemDefi,
-				flags,
-			)
+			itemDefi = r.proc.FixDefiHTML(itemDefi)
 			definitions = append(definitions, itemDefi+"<br/>\n")
 			continue
 		}

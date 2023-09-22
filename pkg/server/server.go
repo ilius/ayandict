@@ -68,13 +68,14 @@ func query(w http.ResponseWriter, r *http.Request) {
 	// mode = dictmgr.QueryModeRegex
 	// mode = dictmgr.QueryModeGlob
 
-	raw_results := dictmgr.LookupHTML(query, conf, mode)
+	raw_results := dictmgr.LookupHTML(query, conf, mode, resultFlags)
+	// pass resultFlags to LookupHTML
 	results := make([]Result, len(raw_results))
 	for i, rr := range raw_results {
 		results[i] = Result{
 			DictName:        rr.DictName(),
 			Terms:           rr.Terms(),
-			DefinitionsHTML: rr.DefinitionsHTML(resultFlags),
+			DefinitionsHTML: rr.DefinitionsHTML(),
 			EntryIndex:      rr.EntryIndex(),
 			Score:           rr.Score(),
 		}

@@ -26,7 +26,7 @@ func entryCount(dic common.Dictionary) int {
 	return n
 }
 
-func RandomEntry(conf *config.Config) *SearchResult {
+func RandomEntry(conf *config.Config, resultFlags uint32) *SearchResult {
 	dn := len(dicts.DictList)
 	sums := make([]int, dn+1)
 	for i, dic := range dicts.DictList {
@@ -49,5 +49,5 @@ func RandomEntry(conf *config.Config) *SearchResult {
 		return nil
 	}
 	entry.F_Score = 200
-	return NewSearchResult(entry, dic, conf)
+	return NewSearchResult(entry, dic, conf, resultFlags)
 }

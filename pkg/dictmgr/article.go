@@ -38,10 +38,21 @@ const (
 
 type DictProcessor struct {
 	common.Dictionary
-	conf *config.Config
+	conf  *config.Config
+	flags uint32
 }
 
-func (p *DictProcessor) fixResURL(quoted string, flags uint32) (bool, string) {
+func (p *DictProcessor) dictResURL(relPath string) string {
+	if p.flags&common.ResultFlag_Web > 0 {
+		values := url.Values{}
+		values.Add("dictName", p.DictName())
+		values.Add("path", relPath)
+		return DictResPathBase + "?" + values.Encode()
+	}
+	return p.ResourceURL() + "/" + relPath
+}
+
+func (p *DictProcessor) fixResURL(quoted string) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
 		log.Println(err)
@@ -58,16 +69,16 @@ func (p *DictProcessor) fixResURL(quoted string, flags uint32) (bool, string) {
 	if _url.Scheme != "" || _url.Host != "" {
 		return false, ""
 	}
-	return true, dictResURL(p.Dictionary, _url.Path, flags)
+	return true, p.dictResURL(_url.Path)
 }
 
-func (p *DictProcessor) fixSoundURL(quoted string, flags uint32) (bool, string) {
+func (p *DictProcessor) fixSoundURL(quoted string) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
 		log.Println(err)
 		return false, ""
 	}
-	return true, dictResURL(p.Dictionary, urlStr[len("sound://"):], flags)
+	return true, p.dictResURL(urlStr[len("sound://"):])
 }
 
 func (p *DictProcessor) fixEmptySoundLink(defi string, playImg string) string {
@@ -77,10 +88,10 @@ func (p *DictProcessor) fixEmptySoundLink(defi string, playImg string) string {
 	return emptySoundRE.ReplaceAllStringFunc(defi, subFunc)
 }
 
-func (p *DictProcessor) fixHrefSound(defi string, flags uint32) string {
+func (p *DictProcessor) fixHrefSound(defi string) string {
 	subFunc := func(match string) string {
 		// log.Println("hrefSoundSub: match:", match)
-		ok, _url := p.fixSoundURL(match[6:], flags)
+		ok, _url := p.fixSoundURL(match[6:])
 		if !ok {
 			return match
 		}
@@ -157,9 +168,9 @@ func (p *DictProcessor) fixAudioTag(
 	return defi
 }
 
-func (p *DictProcessor) fixFileSrc(defi string, flags uint32) string {
+func (p *DictProcessor) fixFileSrc(defi string) string {
 	srcSub := func(match string) string {
-		ok, _url := p.fixResURL(match[5:], flags)
+		ok, _url := p.fixResURL(match[5:])
 		if !ok {
 			return match
 		}
@@ -263,8 +274,8 @@ func (p *DictProcessor) applyColorMapping(defi string) string {
 	return defi
 }
 
-func (p *DictProcessor) getPlayImage(flags uint32) string {
-	if flags&common.ResultFlag_Web > 0 {
+func (p *DictProcessor) getPlayImage() string {
+	if p.flags&common.ResultFlag_Web > 0 {
 		return fmt.Sprintf(
 			`<img src="%s" />`, webPlayImage,
 		)
@@ -283,20 +294,21 @@ func (p *DictProcessor) getPlayImage(flags uint32) string {
 	)
 }
 
-func (p *DictProcessor) fixDefiHTML(defi string, flags uint32) string {
+func (p *DictProcessor) FixDefiHTML(defi string) string {
 	conf := p.conf
+	flags := p.flags
 	var playImage string
 	hasResource := p.ResourceDir() != ""
 	_fixAudio := conf.Audio && flags&common.ResultFlag_FixAudio > 0
 	if _fixAudio {
-		playImage = p.getPlayImage(flags)
+		playImage = p.getPlayImage()
 		defi = p.fixEmptySoundLink(defi, playImage)
 		if hasResource {
-			defi = p.fixHrefSound(defi, flags)
+			defi = p.fixHrefSound(defi)
 		}
 	}
 	if hasResource && flags&common.ResultFlag_FixFileSrc > 0 {
-		defi = p.fixFileSrc(defi, flags)
+		defi = p.fixFileSrc(defi)
 	}
 	if _fixAudio {
 		defi = p.fixAudioTag(defi, playImage)

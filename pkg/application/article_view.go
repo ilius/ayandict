@@ -36,8 +36,6 @@ type ArticleView struct {
 	dpi     float64
 	doQuery func(string)
 
-	resultFlags uint32
-
 	mediaPlayer *multimedia.QMediaPlayer
 
 	rightClickOnWord string
@@ -53,16 +51,10 @@ func NewArticleView(app *Application) *ArticleView {
 	widget.SetOpenExternalLinks(true)
 	widget.SetOpenLinks(false)
 	dpi := app.PrimaryScreen().PhysicalDotsPerInch()
-	flags := uint32(
-		common.ResultFlag_FixAudio |
-			common.ResultFlag_FixFileSrc |
-			common.ResultFlag_FixWordLink |
-			common.ResultFlag_ColorMapping)
 	return &ArticleView{
 		QTextBrowser: widget,
 		app:          app,
 		dpi:          dpi,
-		resultFlags:  flags,
 	}
 }
 
@@ -128,7 +120,7 @@ func (view *ArticleView) autoPlay(text string, count int) {
 
 func (view *ArticleView) SetResult(res common.SearchResultIface) {
 	text := strings.Join(
-		res.DefinitionsHTML(view.resultFlags),
+		res.DefinitionsHTML(),
 		"\n<br/>\n",
 	)
 	text2 := text

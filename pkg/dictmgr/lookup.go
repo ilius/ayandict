@@ -68,6 +68,7 @@ func LookupHTML(
 	query string,
 	conf *config.Config,
 	mode QueryMode,
+	resultFlags uint32,
 ) []common.SearchResultIface {
 	results := []common.SearchResultIface{}
 	for _, dic := range dicts.DictList {
@@ -75,7 +76,7 @@ func LookupHTML(
 			continue
 		}
 		for _, res := range search(dic, conf, mode, query) {
-			results = append(results, NewSearchResult(res, dic, conf))
+			results = append(results, NewSearchResult(res, dic, conf, resultFlags))
 		}
 	}
 	sort.Slice(results, func(i, j int) bool {

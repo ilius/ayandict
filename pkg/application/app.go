@@ -484,7 +484,7 @@ func (app *Application) Run() {
 		frequencyTable.SaveNoError()
 	})
 	randomEntryButton.ConnectClicked(func(checked bool) {
-		res := dictmgr.RandomEntry(conf)
+		res := dictmgr.RandomEntry(conf, resultFlags)
 		if res == nil {
 			return
 		}
