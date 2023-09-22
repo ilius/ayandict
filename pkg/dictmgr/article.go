@@ -81,7 +81,7 @@ func (p *DictProcessor) fixSoundURL(quoted string) (bool, string) {
 	return true, p.dictResURL(urlStr[len("sound://"):])
 }
 
-func (p *DictProcessor) fixEmptySoundLink(defi string, playImg string) string {
+func (*DictProcessor) fixEmptySoundLink(defi string, playImg string) string {
 	subFunc := func(match string) string {
 		return match[:len(match)-4] + playImg + "</a>"
 	}
@@ -102,7 +102,7 @@ func (p *DictProcessor) fixHrefSound(defi string) string {
 	return hrefSoundRE.ReplaceAllStringFunc(defi, subFunc)
 }
 
-func (p *DictProcessor) findParsedTags(node *html.Node, tagName string) []*html.Node {
+func (*DictProcessor) findParsedTags(node *html.Node, tagName string) []*html.Node {
 	result := []*html.Node{}
 
 	var recurse func(argNode *html.Node)
@@ -123,7 +123,7 @@ func (p *DictProcessor) findParsedTags(node *html.Node, tagName string) []*html.
 	return result
 }
 
-func (p *DictProcessor) getAttr(node *html.Node, attrName string) string {
+func (*DictProcessor) getAttr(node *html.Node, attrName string) string {
 	for _, attr := range node.Attr {
 		if attr.Key == attrName {
 			return attr.Val
