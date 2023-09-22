@@ -85,17 +85,23 @@ func (view *ArticleView) playAudioRVLC(urlStr string) bool {
 			defer stdin.Close()
 		}
 		if err != nil {
-			log.Println("error in StdinPipe:", err)
+			log.Println("error in rvlc: StdinPipe:", err)
 			return
 		}
 		err = cmd.Start()
 		if err != nil {
-			log.Println("error in cmd.Start():", err)
+			log.Println("error in rvlc: Start:", err)
 			return
 		}
 		time.Sleep(2 * time.Second)
-		stdin.Write([]byte("q\n"))
-		cmd.Wait()
+		_, err = stdin.Write([]byte("q\n"))
+		if err != nil {
+			log.Println("error in rvlc: stdin.Write:", err)
+		}
+		err = cmd.Wait()
+		if err != nil {
+			log.Println("error in rvlc: Wait:", err)
+		}
 	}()
 	return true
 }

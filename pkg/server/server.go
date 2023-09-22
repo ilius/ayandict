@@ -43,11 +43,15 @@ type Result struct {
 	// ResourceDir string
 }
 
-func getAppName(w http.ResponseWriter, r *http.Request) {
-	_, err := w.Write([]byte(appinfo.APP_NAME))
+func writeMsg(w http.ResponseWriter, msg string) {
+	_, err := w.Write([]byte(msg))
 	if err != nil {
-		log.Println(err)
+		log.Println("error in Write:", err)
 	}
+}
+
+func getAppName(w http.ResponseWriter, r *http.Request) {
+	writeMsg(w, appinfo.APP_NAME)
 }
 
 func query(w http.ResponseWriter, r *http.Request) {
@@ -59,8 +63,11 @@ func query(w http.ResponseWriter, r *http.Request) {
 
 	query := r.FormValue("query")
 	if query == "" {
-		jsonEncoder.Encode(ErrorResponse{Error: "missing query"})
-		w.WriteHeader(400)
+		err := jsonEncoder.Encode(ErrorResponse{Error: "missing query"})
+		if err != nil {
+			log.Println(err)
+		}
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -85,8 +92,11 @@ func query(w http.ResponseWriter, r *http.Request) {
 	err := jsonEncoder.Encode(results)
 	if err != nil {
 		log.Println(err)
-		jsonEncoder.Encode(ErrorResponse{Error: err.Error()})
-		w.WriteHeader(500)
+		err2 := jsonEncoder.Encode(ErrorResponse{Error: err.Error()})
+		if err2 != nil {
+			log.Println(err2)
+		}
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 }
@@ -94,7 +104,7 @@ func query(w http.ResponseWriter, r *http.Request) {
 func home(w http.ResponseWriter, r *http.Request) {
 	file, err := web.FS.Open("web/index.html")
 	if err != nil {
-		w.WriteHeader(404)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 	content := file.(io.ReadSeeker)
@@ -105,24 +115,24 @@ func dictRes(w http.ResponseWriter, r *http.Request) {
 	dictName := r.FormValue("dictName")
 	path := r.FormValue("path")
 	if dictName == "" {
-		w.Write([]byte("missing dictName"))
+		writeMsg(w, "missing dictName")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	if path == "" {
-		w.Write([]byte("missing path"))
+		writeMsg(w, "missing path")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	fpath, ok := dictmgr.DictResFile(dictName, path)
 	if !ok {
-		w.Write([]byte("file not found"))
+		writeMsg(w, "file not found")
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 	file, err := os.Open(fpath)
 	if err != nil {
-		w.Write([]byte("file not found"))
+		writeMsg(w, "file not found")
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
