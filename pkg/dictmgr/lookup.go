@@ -75,11 +75,7 @@ func LookupHTML(
 			continue
 		}
 		for _, res := range search(dic, conf, mode, query) {
-			results = append(results, &SearchResult{
-				SearchResultLow: res,
-				dic:             dic,
-				conf:            conf,
-			})
+			results = append(results, NewSearchResult(res, dic, conf))
 		}
 	}
 	sort.Slice(results, func(i, j int) bool {

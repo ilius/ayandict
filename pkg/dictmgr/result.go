@@ -8,6 +8,18 @@ import (
 	common "github.com/ilius/go-dict-commons"
 )
 
+func NewSearchResult(
+	res *common.SearchResultLow,
+	dic common.Dictionary,
+	conf *config.Config,
+) *SearchResult {
+	return &SearchResult{
+		SearchResultLow: res,
+		dic:             dic,
+		conf:            conf,
+	}
+}
+
 type SearchResult struct {
 	*common.SearchResultLow
 	dic    common.Dictionary

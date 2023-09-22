@@ -49,9 +49,5 @@ func RandomEntry(conf *config.Config) *SearchResult {
 		return nil
 	}
 	entry.F_Score = 200
-	return &SearchResult{
-		SearchResultLow: entry,
-		dic:             dic,
-		conf:            conf,
-	}
+	return NewSearchResult(entry, dic, conf)
 }
