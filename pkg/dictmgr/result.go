@@ -22,14 +22,12 @@ func NewSearchResult(
 			conf:       conf,
 			flags:      flags,
 		},
-		flags: flags,
 	}
 }
 
 type SearchResult struct {
 	*common.SearchResultLow
 	proc   *DictProcessor
-	flags  uint32
 	hDefis []string
 }
 
