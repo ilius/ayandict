@@ -22,21 +22,13 @@ const (
 	path_query   = "query"
 )
 
-var conf *config.Config
+var conf = config.MustLoad()
 
 const resultFlags = common.ResultFlag_Web |
 	common.ResultFlag_FixAudio |
 	common.ResultFlag_FixFileSrc
 
 // 	common.ResultFlag_ColorMapping)
-
-func init() {
-	var err error
-	conf, err = config.Load()
-	if err != nil {
-		panic(err)
-	}
-}
 
 type ErrorResponse struct {
 	Error string `json:"error"`
