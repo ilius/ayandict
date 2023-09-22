@@ -2,6 +2,8 @@ package application
 
 import (
 	"log"
+	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -60,8 +62,50 @@ func NewArticleView(app *Application) *ArticleView {
 
 var audioUrlRE = regexp.MustCompile(`href="[^<>"]+\.mp3"`)
 
+func (view *ArticleView) playAudioRVLC(urlStr string) bool {
+	path, err := exec.LookPath("rvlc")
+	if err != nil {
+		log.Println("error in LookPath:", err)
+		return false
+	}
+	log.Println(path, urlStr)
+	cmd := exec.Cmd{
+		Path: path,
+		Args: []string{
+			path, // OMG, why is this needed?!
+			urlStr,
+			"--audio",
+		},
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
+	}
+	go func() {
+		stdin, err := cmd.StdinPipe()
+		if stdin != nil {
+			defer stdin.Close()
+		}
+		if err != nil {
+			log.Println("error in StdinPipe:", err)
+			return
+		}
+		err = cmd.Start()
+		if err != nil {
+			log.Println("error in cmd.Start():", err)
+			return
+		}
+		time.Sleep(2 * time.Second)
+		stdin.Write([]byte("q\n"))
+		cmd.Wait()
+	}()
+	return true
+}
+
 func (view *ArticleView) playAudio(qUrl *core.QUrl) {
-	log.Println("Playing audio", qUrl.ToString(core.QUrl__PreferLocalFile))
+	urlStr := qUrl.ToString(core.QUrl__PreferLocalFile)
+	log.Println("Playing audio", urlStr)
+	if conf.AudioRVLC && view.playAudioRVLC(urlStr) {
+		return
+	}
 	player := view.mediaPlayer
 	content := multimedia.NewQMediaContent2(qUrl)
 	player.SetMedia(content, nil)

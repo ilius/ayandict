@@ -30,6 +30,8 @@ var commentMap = map[string]string{
 
 	"audio": "Enable audio in article",
 
+	"audio_rvlc": "Use 'rvlc' command for playing audio",
+
 	"audio_download_timeout": "Timeout for downloading audio files",
 
 	"audio_auto_play": "Number of audio file to auto-play, set ``0`` to disable.",
