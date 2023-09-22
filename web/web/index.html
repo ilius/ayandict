@@ -17,14 +17,22 @@
 			<input id="lookup-input" name="word" placeholder="Lookup..." type="search" autocomplete="off" autofocus />
 			<a id="random-link" href="#">⚅</a>
 		</div>
-		<div id="result-list"></div>
+		<div id="result-list"
+			style="padding: 10px; overflow: auto; max-height: 100vh;">
+		</div>
 	</div>
-
 	<div id="content-container" class="vertical">
 		<div id="content-header" class="horizontal">
 			<span id="header-label"></span>
 		</div>
-		<div id="content" name="content" class="vertical" style="padding: 20px;"></div>
+		<div id="content" name="content" class="vertical" 
+			style="padding: 20px; overflow: auto; max-height: 100vh;">
+		</div>
+		<div style="padding: 10px;">
+			Powered by <a href="https://github.com/ilius/ayandict">AyanDict</a>,
+			<a href="https://go.dev/">Go</a> 
+			and <a href="https://brython.info/">Brython</a>
+		</div>
 	</div>
 	<script type="text/javascript">
 
