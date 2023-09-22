@@ -36,7 +36,12 @@ const (
 	webPlayImage = "/web/audio-play.png"
 )
 
-func fixResURL(quoted string, dic common.Dictionary, flags uint32) (bool, string) {
+type DictProcessor struct {
+	common.Dictionary
+	conf *config.Config
+}
+
+func (p *DictProcessor) fixResURL(quoted string, flags uint32) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
 		log.Println(err)
@@ -53,29 +58,29 @@ func fixResURL(quoted string, dic common.Dictionary, flags uint32) (bool, string
 	if _url.Scheme != "" || _url.Host != "" {
 		return false, ""
 	}
-	return true, dictResURL(dic, _url.Path, flags)
+	return true, dictResURL(p.Dictionary, _url.Path, flags)
 }
 
-func fixSoundURL(quoted string, dic common.Dictionary, flags uint32) (bool, string) {
+func (p *DictProcessor) fixSoundURL(quoted string, flags uint32) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
 		log.Println(err)
 		return false, ""
 	}
-	return true, dictResURL(dic, urlStr[len("sound://"):], flags)
+	return true, dictResURL(p.Dictionary, urlStr[len("sound://"):], flags)
 }
 
-func fixEmptySoundLink(defi string, playImg string) string {
+func (p *DictProcessor) fixEmptySoundLink(defi string, playImg string) string {
 	subFunc := func(match string) string {
 		return match[:len(match)-4] + playImg + "</a>"
 	}
 	return emptySoundRE.ReplaceAllStringFunc(defi, subFunc)
 }
 
-func fixHrefSound(defi string, dic common.Dictionary, flags uint32) string {
+func (p *DictProcessor) fixHrefSound(defi string, flags uint32) string {
 	subFunc := func(match string) string {
 		// log.Println("hrefSoundSub: match:", match)
-		ok, _url := fixSoundURL(match[6:], dic, flags)
+		ok, _url := p.fixSoundURL(match[6:], flags)
 		if !ok {
 			return match
 		}
@@ -86,7 +91,7 @@ func fixHrefSound(defi string, dic common.Dictionary, flags uint32) string {
 	return hrefSoundRE.ReplaceAllStringFunc(defi, subFunc)
 }
 
-func findParsedTags(node *html.Node, tagName string) []*html.Node {
+func (p *DictProcessor) findParsedTags(node *html.Node, tagName string) []*html.Node {
 	result := []*html.Node{}
 
 	var recurse func(argNode *html.Node)
@@ -107,7 +112,7 @@ func findParsedTags(node *html.Node, tagName string) []*html.Node {
 	return result
 }
 
-func getAttr(node *html.Node, attrName string) string {
+func (p *DictProcessor) getAttr(node *html.Node, attrName string) string {
 	for _, attr := range node.Attr {
 		if attr.Key == attrName {
 			return attr.Val
@@ -116,7 +121,7 @@ func getAttr(node *html.Node, attrName string) string {
 	return ""
 }
 
-func fixAudioTag(
+func (p *DictProcessor) fixAudioTag(
 	defi string,
 	playImage string,
 ) string {
@@ -137,8 +142,8 @@ func fixAudioTag(
 			return match
 		}
 		parts := []string{}
-		for _, sourceNode := range findParsedTags(root, "source") {
-			src := getAttr(sourceNode, "src")
+		for _, sourceNode := range p.findParsedTags(root, "source") {
+			src := p.getAttr(sourceNode, "src")
 			if src == "" {
 				continue
 			}
@@ -152,9 +157,9 @@ func fixAudioTag(
 	return defi
 }
 
-func fixFileSrc(defi string, dic common.Dictionary, flags uint32) string {
+func (p *DictProcessor) fixFileSrc(defi string, flags uint32) string {
 	srcSub := func(match string) string {
-		ok, _url := fixResURL(match[5:], dic, flags)
+		ok, _url := p.fixResURL(match[5:], flags)
 		if !ok {
 			return match
 		}
@@ -177,15 +182,15 @@ func fixFileSrc(defi string, dic common.Dictionary, flags uint32) string {
 // problem 2: href value has quoted unicode characters, using &#...;
 // like "fl&#x205;k" for "flȅk", when you click on link, qt redirects to
 // a non-sense term, and does not even emit AnchorClicked signal
-func hrefBwordSub(match string) string {
+func (p *DictProcessor) hrefBwordSub(match string) string {
 	ref := match[len(` href="bword://`):]
 	ref = html.UnescapeString(ref)
 	return ` href="` + ref
 }
 
-func embedExternalStyle(defi string, dic common.Dictionary) string {
+func (p *DictProcessor) embedExternalStyle(defi string) string {
 	const pre = len(` href=`)
-	resDir := dic.ResourceDir()
+	resDir := p.ResourceDir()
 
 	subFunc := func(match string) string {
 		i := strings.Index(match, ` href=`)
@@ -219,7 +224,11 @@ func embedExternalStyle(defi string, dic common.Dictionary) string {
 	return defi
 }
 
-func applyColorMapping(defi string, colorMapping map[string]string) string {
+func (p *DictProcessor) applyColorMapping(defi string) string {
+	colorMapping := p.conf.ColorMapping
+	if len(colorMapping) == 0 {
+		return defi
+	}
 	colorSub := func(match string) string {
 		key := match[len(` color="`) : len(match)-1]
 		if key == "" {
@@ -254,7 +263,7 @@ func applyColorMapping(defi string, colorMapping map[string]string) string {
 	return defi
 }
 
-func getPlayImage(flags uint32) string {
+func (p *DictProcessor) getPlayImage(flags uint32) string {
 	if flags&common.ResultFlag_Web > 0 {
 		return fmt.Sprintf(
 			`<img src="%s" />`, webPlayImage,
@@ -274,36 +283,32 @@ func getPlayImage(flags uint32) string {
 	)
 }
 
-func fixDefiHTML(
-	defi string,
-	conf *config.Config,
-	dic common.Dictionary,
-	flags uint32,
-) string {
+func (p *DictProcessor) fixDefiHTML(defi string, flags uint32) string {
+	conf := p.conf
 	var playImage string
-	hasResource := dic.ResourceDir() != ""
+	hasResource := p.ResourceDir() != ""
 	_fixAudio := conf.Audio && flags&common.ResultFlag_FixAudio > 0
 	if _fixAudio {
-		playImage = getPlayImage(flags)
-		defi = fixEmptySoundLink(defi, playImage)
+		playImage = p.getPlayImage(flags)
+		defi = p.fixEmptySoundLink(defi, playImage)
 		if hasResource {
-			defi = fixHrefSound(defi, dic, flags)
+			defi = p.fixHrefSound(defi, flags)
 		}
 	}
 	if hasResource && flags&common.ResultFlag_FixFileSrc > 0 {
-		defi = fixFileSrc(defi, dic, flags)
+		defi = p.fixFileSrc(defi, flags)
 	}
 	if _fixAudio {
-		defi = fixAudioTag(defi, playImage)
+		defi = p.fixAudioTag(defi, playImage)
 	}
 	if conf.EmbedExternalStylesheet {
-		defi = embedExternalStyle(defi, dic)
+		defi = p.embedExternalStyle(defi)
 	}
 	if flags&common.ResultFlag_FixWordLink > 0 {
-		defi = hrefBwordRE.ReplaceAllStringFunc(defi, hrefBwordSub)
+		defi = hrefBwordRE.ReplaceAllStringFunc(defi, p.hrefBwordSub)
 	}
-	if len(conf.ColorMapping) > 0 && flags&common.ResultFlag_ColorMapping > 0 {
-		defi = applyColorMapping(defi, conf.ColorMapping)
+	if flags&common.ResultFlag_ColorMapping > 0 {
+		defi = p.applyColorMapping(defi)
 	}
 	return defi
 }

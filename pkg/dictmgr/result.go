@@ -15,24 +15,26 @@ func NewSearchResult(
 ) *SearchResult {
 	return &SearchResult{
 		SearchResultLow: res,
-		dic:             dic,
-		conf:            conf,
+
+		proc: &DictProcessor{
+			Dictionary: dic,
+			conf:       conf,
+		},
 	}
 }
 
 type SearchResult struct {
 	*common.SearchResultLow
-	dic    common.Dictionary
-	conf   *config.Config
+	proc   *DictProcessor
 	hDefis []string
 }
 
 func (r *SearchResult) DictName() string {
-	return r.dic.DictName()
+	return r.proc.DictName()
 }
 
 func (r *SearchResult) ResourceDir() string {
-	return r.dic.ResourceDir()
+	return r.proc.ResourceDir()
 }
 
 func (r *SearchResult) DefinitionsHTML(flags uint32) []string {
@@ -43,10 +45,8 @@ func (r *SearchResult) DefinitionsHTML(flags uint32) []string {
 	for _, item := range r.Items() {
 		if item.Type == 'h' {
 			itemDefi := string(item.Data)
-			itemDefi = fixDefiHTML(
+			itemDefi = r.proc.fixDefiHTML(
 				itemDefi,
-				r.conf,
-				r.dic,
 				flags,
 			)
 			definitions = append(definitions, itemDefi+"<br/>\n")
