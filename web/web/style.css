@@ -26,11 +26,6 @@ body {
 	flex-grow: 0;
 }
 
-#word-container {
-	flex-shrink: 0;
-	flex-grow: 0;
-}
-
 #dict-link {
 	font-size: small;
 	color: #6a6a6a;
@@ -57,12 +52,17 @@ body {
 	flex-shrink: 0;
 }
 
-#word {
+#lookup-input {
 	flex-shrink: 1;
 	flex-grow: 1;
 	font-size: medium;
 	margin: 0.4rem;
 	padding: 0.4rem;
+}
+
+#input-container {
+	flex-shrink: 0;
+	flex-grow: 0;
 }
 
 #header-title {
