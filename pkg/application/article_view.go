@@ -73,12 +73,26 @@ func (view *ArticleView) playAudioRVLC(urlStr string) bool {
 		Path: path,
 		Args: []string{
 			path, // OMG, why is this needed?!
-			urlStr,
 			"--audio",
+			"--no-video",
+			"--play-and-exit",
+			// "--volume", "200",
+			urlStr,
 		},
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 	}
+	// you either have to set Stdin field, or use cmd.StdinPipe()
+	// otherwise it won't play, even with --no-interact flag!
+	// Stdin=os.Stdin works, but I'm not sure it's a good idea to rely on it
+	// --play-and-exit flag saves us the trouble of waiting 2 seconds and
+	// then sending "q\n" command!
+	// I tested --volume flag by guess and it works, but it's not in `man rvlc`
+	// nor is it in `rvlc --help`.
+	// Same for --no-video flag!
+	// This command is just weird! But it works!
+	// We can set a different volume for each dictionary to kinda "normalize it"
+	// and fix too low or too high volumes.
 	go func() {
 		stdin, err := cmd.StdinPipe()
 		if stdin != nil {
@@ -88,19 +102,10 @@ func (view *ArticleView) playAudioRVLC(urlStr string) bool {
 			log.Println("error in rvlc: StdinPipe:", err)
 			return
 		}
-		err = cmd.Start()
+		err = cmd.Run()
 		if err != nil {
-			log.Println("error in rvlc: Start:", err)
+			log.Println("error in rvlc: Run:", err)
 			return
-		}
-		time.Sleep(2 * time.Second)
-		_, err = stdin.Write([]byte("q\n"))
-		if err != nil {
-			log.Println("error in rvlc: stdin.Write:", err)
-		}
-		err = cmd.Wait()
-		if err != nil {
-			log.Println("error in rvlc: Wait:", err)
 		}
 	}()
 	return true
