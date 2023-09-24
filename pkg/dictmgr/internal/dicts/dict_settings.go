@@ -16,11 +16,11 @@ type DictionarySettings struct {
 	Order  int    `json:"order"`
 	Hash   string `json:"hash"`
 
-	Flags uint16 `json:"flags"`
+	Flags uint16 `json:"flags,omitempty"`
 
-	HideTermsHeader bool `json:"terms_header"`
+	HideTermsHeader bool `json:"hide_terms_header,omitempty"`
 
-	AudioVolume int `json:"audio_volume"`
+	AudioVolume int `json:"audio_volume,omitempty"`
 }
 
 func (ds *DictionarySettings) Fuzzy() bool {
