@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	"github.com/ilius/ayandict/v2/pkg/mp3duration"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
@@ -44,6 +45,8 @@ type ArticleView struct {
 	rightClickOnUrl  string
 
 	autoPlayMutex sync.Mutex
+
+	dictName string
 }
 
 func NewArticleView(app *Application) *ArticleView {
@@ -68,17 +71,19 @@ func (view *ArticleView) playAudioRVLC(urlStr string) bool {
 		log.Println("error in LookPath:", err)
 		return false
 	}
-	log.Println(path, urlStr)
+	// log.Println(path, urlStr)
+	volume := dictmgr.AudioVolume(view.dictName)
+	volumeStr := strconv.FormatInt(int64(volume), 10)
+	args := []string{
+		path, // OMG, why is this needed?!
+		"--audio",
+		"--no-video",
+		"--play-and-exit",
+	}
+	// log.Printf("%#v", args)
 	cmd := exec.Cmd{
-		Path: path,
-		Args: []string{
-			path, // OMG, why is this needed?!
-			"--audio",
-			"--no-video",
-			"--play-and-exit",
-			// "--volume", "200",
-			urlStr,
-		},
+		Path:   path,
+		Args:   args,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 	}
@@ -87,11 +92,11 @@ func (view *ArticleView) playAudioRVLC(urlStr string) bool {
 	// Stdin=os.Stdin works, but I'm not sure it's a good idea to rely on it
 	// --play-and-exit flag saves us the trouble of waiting 2 seconds and
 	// then sending "q\n" command!
-	// I tested --volume flag by guess and it works, but it's not in `man rvlc`
+	// Option --volume no longer exists! (warning in interactive) Why?!
+	// I tested --no-video flag by guess and it works, but it's not in `man rvlc`
 	// nor is it in `rvlc --help`.
-	// Same for --no-video flag!
 	// This command is just weird! But it works!
-	// We can set a different volume for each dictionary to kinda "normalize it"
+	// We set a different volume for each dictionary to kinda "normalize it"
 	// and fix too low or too high volumes.
 	go func() {
 		stdin, err := cmd.StdinPipe()
@@ -102,9 +107,24 @@ func (view *ArticleView) playAudioRVLC(urlStr string) bool {
 			log.Println("error in rvlc: StdinPipe:", err)
 			return
 		}
-		err = cmd.Run()
+		err = cmd.Start()
 		if err != nil {
-			log.Println("error in rvlc: Run:", err)
+			log.Println("error in rvlc: Start:", err)
+			return
+		}
+		_, err = stdin.Write([]byte("volume " + volumeStr + "\n"))
+		if err != nil {
+			log.Println("error in rvlc: Write:", err)
+			return
+		}
+		_, err = stdin.Write([]byte("add " + urlStr + "\n"))
+		if err != nil {
+			log.Println("error in rvlc: Write:", err)
+			return
+		}
+		err = cmd.Wait()
+		if err != nil {
+			log.Println("error in rvlc: Wait:", err)
 			return
 		}
 	}()
@@ -174,6 +194,7 @@ func (view *ArticleView) autoPlay(text string, count int) {
 }
 
 func (view *ArticleView) SetResult(res common.SearchResultIface) {
+	view.dictName = res.DictName()
 	text := strings.Join(
 		res.DefinitionsHTML(),
 		"\n<br/>\n",

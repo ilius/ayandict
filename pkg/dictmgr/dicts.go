@@ -54,3 +54,15 @@ func DictResFile(dictName string, resPath string) (string, bool) {
 	}
 	return fpath, true
 }
+
+func AudioVolume(dictName string) int {
+	ds := dicts.DictSettingsMap[dictName]
+	if ds == nil {
+		log.Printf("AudioVolume: no Settings value for dictName=%#v", dictName)
+		return 200
+	}
+	if ds.AudioVolume == 0 {
+		return 200
+	}
+	return ds.AudioVolume
+}

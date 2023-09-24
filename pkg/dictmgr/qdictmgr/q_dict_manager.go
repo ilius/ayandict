@@ -35,6 +35,7 @@ const (
 type DictManager struct {
 	Dialog      *widgets.QDialog
 	TableWidget *widgets.QTableWidget
+	VolumeInput *widgets.QSpinBox
 	TextWidgets []qutils.HasSetFont
 }
 
@@ -59,6 +60,8 @@ func NewDictManager(
 
 	qs := qsettings.GetQSettings(window)
 	qsettings.RestoreWinGeometry(app, qs, &window.QWidget, QS_dictManager)
+
+	var selectedDictSettings *dicts.DictionarySettings
 
 	const columns = 5
 
@@ -101,6 +104,22 @@ func NewDictManager(
 		extraOptionsWidget.Hide()
 	})
 	extraOptionsVBox.AddWidget(flagsCBWidget, 0, 0)
+
+	volumeHBox := widgets.NewQHBoxLayout2(nil)
+	volumeHBox.AddWidget(widgets.NewQLabel2("Audio Volume:", nil, 0), 0, 0)
+	volumeInput := widgets.NewQSpinBox(nil)
+	volumeInput.SetMinimum(0)
+	volumeInput.SetMaximum(999)
+	volumeHBox.AddWidget(volumeInput, 0, 0)
+	volumeHBox.AddWidget(widgets.NewQLabel2("", nil, 0), 1, 0)
+	extraOptionsVBox.AddLayout(volumeHBox, 0)
+	volumeInput.ConnectValueChanged(func(value int) {
+		if selectedDictSettings == nil {
+			log.Println("ConnectValueChanged: selectedDictSettings == nil")
+			return
+		}
+		selectedDictSettings.AudioVolume = value
+	})
 
 	mainVBox := widgets.NewQVBoxLayout2(nil)
 	mainVBox.AddWidget(table, 3, 0)
@@ -279,7 +298,9 @@ func NewDictManager(
 			extraOptionsWidget.Hide()
 			return
 		}
+		selectedDictSettings = ds
 		flagsCBWidget.SetActiveDictSetting(ds)
+		volumeInput.SetValue(ds.AudioVolume)
 		extraOptionsWidget.Show()
 	})
 
@@ -324,6 +345,7 @@ func NewDictManager(
 	return &DictManager{
 		Dialog:      window,
 		TableWidget: table,
+		VolumeInput: volumeInput,
 		TextWidgets: []qutils.HasSetFont{
 			table,
 			toolbar,

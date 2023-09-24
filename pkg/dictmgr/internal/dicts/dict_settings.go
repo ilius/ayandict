@@ -19,6 +19,8 @@ type DictionarySettings struct {
 	Flags uint16 `json:"flags"`
 
 	HideTermsHeader bool `json:"terms_header"`
+
+	AudioVolume int `json:"audio_volume"`
 }
 
 func (ds *DictionarySettings) Fuzzy() bool {
