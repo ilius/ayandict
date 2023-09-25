@@ -79,15 +79,15 @@ func query(w http.ResponseWriter, r *http.Request) {
 	raw_results := dictmgr.LookupHTML(query, conf, mode, resultFlags)
 	// pass resultFlags to LookupHTML
 	results := make([]Result, len(raw_results))
-	for i, rr := range raw_results {
+	for i, entry := range raw_results {
 		results[i] = Result{
-			DictName:        rr.DictName(),
-			Terms:           rr.Terms(),
-			DefinitionsHTML: rr.DefinitionsHTML(),
-			EntryIndex:      rr.EntryIndex(),
-			Score:           rr.Score(),
+			DictName:        entry.DictName(),
+			Terms:           entry.Terms(),
+			DefinitionsHTML: entry.DefinitionsHTML(),
+			EntryIndex:      entry.EntryIndex(),
+			Score:           entry.Score(),
 		}
-		// rr.ResourceDir()
+		// entry.ResourceDir()
 	}
 	log.Printf("LookupHTML took %v for %#v", time.Since(t), query)
 	err := jsonEncoder.Encode(results)
