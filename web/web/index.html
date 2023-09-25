@@ -76,9 +76,8 @@ def fix_content_links():
 		a.bind("click", on_word_link_click)
 
 
-def on_result_row_click(result):
-	defi = "<br/>".join(result["definitionsHTML"])
-	content.html = defi
+def show_result_content(result):
+	content.html = "<br/>".join(result["definitionsHTML"])
 
 	fix_content_links()
 
@@ -103,18 +102,23 @@ def on_result_row_click(result):
 		)
 
 
-def on_query_result(ajax):
-	results = ajax.json
+def add_result_list_item(result, ul):
+	a = html.A(href="#", **{"class": "result-list-item"})
+	a.bind("click", lambda event, result=result: show_result_content(result))
+	a <= html.DIV(html.STRONG(" | ".join(result["terms"])))
+	a <= html.SMALL(result["dictName"])
+	ul <= html.LI(a)
+
+
+def on_query_result(res):
+	# res is an Ajax object
+	results = res.json
 	resultListElem.clear()
 	ul = html.UL()
 	for index, result in enumerate(results):
-		a = html.A(href="#", **{"class": "result-list-item"})
-		a.bind("click", lambda event, result=result: on_result_row_click(result))
-		a <= html.DIV(html.STRONG(" | ".join(result["terms"])))
-		a <= html.SMALL(result["dictName"])
-		ul <= html.LI(a)
+		add_result_list_item(result, ul)
 		if index == 0:
-			on_result_row_click(result)
+			show_result_content(result)
 	resultListElem <= ul
 
 
@@ -153,7 +157,26 @@ def on_word_link_click(event):
 	ajax_query(target)
 
 
+def on_random_result(res):
+	result = res.json
+	input.value = result["terms"][0]
+	resultListElem.clear()
+	ul = html.UL()
+	add_result_list_item(result, ul)
+	resultListElem <= ul
+	show_result_content(result)
+
+
+def on_random_click(event):
+	ajax.post(
+		"/random",
+		cache=False,
+		oncomplete=on_random_result,
+	)
+
+
 input.bind("keypress", on_lookup_input_keypress)
+document["random-link"].bind("click", on_random_click)
 
 	</script>
 </body>
