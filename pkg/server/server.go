@@ -20,6 +20,7 @@ const (
 	localhost    = "127.0.0.1"
 	path_appName = "app-name"
 	path_query   = "query"
+	path_random  = "random"
 )
 
 var conf = config.MustLoad()
@@ -101,6 +102,29 @@ func query(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func random(w http.ResponseWriter, r *http.Request) {
+	jsonEncoder := json.NewEncoder(w)
+	w.Header().Set("Content-Type", "application/json")
+
+	entry := dictmgr.RandomEntry(conf, resultFlags)
+	err := jsonEncoder.Encode(Result{
+		DictName:        entry.DictName(),
+		Terms:           entry.Terms(),
+		DefinitionsHTML: entry.DefinitionsHTML(),
+		EntryIndex:      entry.EntryIndex(),
+		Score:           entry.Score(),
+	})
+	if err != nil {
+		log.Println(err)
+		err2 := jsonEncoder.Encode(ErrorResponse{Error: err.Error()})
+		if err2 != nil {
+			log.Println(err2)
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
 func home(w http.ResponseWriter, r *http.Request) {
 	file, err := web.FS.Open("web/index.html")
 	if err != nil {
@@ -141,6 +165,7 @@ func dictRes(w http.ResponseWriter, r *http.Request) {
 
 func addWebHandlers() {
 	http.HandleFunc("/"+path_query, query)
+	http.HandleFunc("/"+path_random, random)
 	http.HandleFunc("/", home)
 	http.HandleFunc(dictmgr.DictResPathBase, dictRes)
 
