@@ -29,11 +29,13 @@
 		<div id="content" name="content" class="vertical" 
 			style="overflow: auto; height: 100vh;">
 		</div>
-		<div style="">
+		{{if .Config.WebShowPoweredBy}}
+		<div id="powered-by">
 			Powered by <a href="https://github.com/ilius/ayandict">AyanDict</a>,
 			<a href="https://go.dev/">Go</a> 
 			and <a href="https://brython.info/">Brython</a>
 		</div>
+		{{end}}
 	</div>
 	<script type="text/javascript">
 

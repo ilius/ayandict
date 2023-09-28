@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"text/template"
 	"time"
 
 	"github.com/ilius/ayandict/v2/pkg/appinfo"
@@ -23,7 +24,11 @@ const (
 	path_random  = "random"
 )
 
-var conf = config.MustLoad()
+var (
+	conf = config.MustLoad()
+
+	homeTpl *template.Template
+)
 
 const resultFlags = common.ResultFlag_Web |
 	common.ResultFlag_FixAudio |
@@ -125,14 +130,18 @@ func random(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type homeTemplateParams struct {
+	Config *config.Config
+}
+
 func home(w http.ResponseWriter, r *http.Request) {
-	file, err := web.FS.Open("web/index.html")
+	err := homeTpl.Execute(w, homeTemplateParams{
+		Config: conf,
+	})
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	content := file.(io.ReadSeeker)
-	http.ServeContent(w, r, "", time.Now(), content)
 }
 
 func dictRes(w http.ResponseWriter, r *http.Request) {
@@ -175,10 +184,31 @@ func addWebHandlers() {
 	}))
 }
 
+func loadWebTemplates() error {
+	file, err := web.FS.Open("web/index.html")
+	if err != nil {
+		return err
+	}
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return err
+	}
+	tpl, err := template.New("index").Parse(string(data))
+	if err != nil {
+		return err
+	}
+	homeTpl = tpl
+	return nil
+}
+
 func StartServer(port string) {
 	http.HandleFunc("/"+path_appName, getAppName)
 
 	if conf.WebEnable {
+		err := loadWebTemplates()
+		if err != nil {
+			panic(err)
+		}
 		addWebHandlers()
 	}
 

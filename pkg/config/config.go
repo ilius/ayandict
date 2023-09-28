@@ -83,6 +83,8 @@ type Config struct {
 	WebEnable bool `toml:"web_enable"`
 	WebExpose bool `toml:"web_expose"`
 
+	WebShowPoweredBy bool `toml:"web_show_powered_by"`
+
 	SearchWorkerCount int `toml:"search_worker_count"`
 
 	SearchTimeout time.Duration `toml:"search_timeout"`
@@ -161,8 +163,9 @@ func Default() *Config {
 
 		LocalClientTimeout: 100 * time.Millisecond,
 
-		WebEnable: false,
-		WebExpose: false,
+		WebEnable:        false,
+		WebExpose:        false,
+		WebShowPoweredBy: true,
 
 		SearchWorkerCount: 8,
 
