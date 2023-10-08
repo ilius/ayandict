@@ -24,6 +24,9 @@ jobs:
     - name: Build
       run: go build -v ./...
 
+    - name: Build nogui
+      run: go build -v -tags nogui
+
     - name: Test
       run: go test -v ./...
 
