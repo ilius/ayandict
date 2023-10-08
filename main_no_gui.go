@@ -17,6 +17,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	dictmgr.InitDicts(conf, false)
+	dictmgr.InitDicts(conf)
 	server.StartServer(conf.LocalServerPorts[0])
 }
