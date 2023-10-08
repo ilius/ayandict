@@ -8,10 +8,7 @@ import (
 	"path/filepath"
 )
 
-func GetConfigDir() string {
-	if os.Getenv("CONFIG_FILE") != "" {
-		return filepath.Dir(Path())
-	}
+func platformConfigDir() string {
 	parent := os.Getenv("XDG_CONFIG_HOME")
 	if parent == "" {
 		parent = filepath.Join(os.Getenv("HOME"), ".config")

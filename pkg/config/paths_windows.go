@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 )
 
-func GetConfigDir() string {
+func platformConfigDir() string {
 	// HOMEDRIVE := os.Getenv("HOMEDRIVE")
 	// HOMEPATH := os.Getenv("HOMEPATH")
 	// homeDir := filepath.Join(HOMEDRIVE, HOMEPATH)

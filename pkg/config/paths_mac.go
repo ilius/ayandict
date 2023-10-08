@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-func GetConfigDir() string {
+func platformConfigDir() string {
 	return filepath.Join(
 		os.Getenv("HOME"),
 		"Library/Preferences/AyanDict",

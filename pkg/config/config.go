@@ -187,6 +187,13 @@ func Path() string {
 	return filepath.Join(GetConfigDir(), fileName)
 }
 
+func GetConfigDir() string {
+	if os.Getenv("CONFIG_FILE") != "" {
+		return filepath.Dir(Path())
+	}
+	return platformConfigDir()
+}
+
 func loadFile() ([]byte, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
