@@ -9,6 +9,9 @@ import (
 )
 
 func GetConfigDir() string {
+	if os.Getenv("CONFIG_FILE") != "" {
+		return filepath.Dir(Path())
+	}
 	parent := os.Getenv("XDG_CONFIG_HOME")
 	if parent == "" {
 		parent = filepath.Join(os.Getenv("HOME"), ".config")

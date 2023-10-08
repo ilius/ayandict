@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -174,6 +175,15 @@ func Default() *Config {
 }
 
 func Path() string {
+	_path := os.Getenv("CONFIG_FILE")
+	if _path != "" {
+		absPath, err := filepath.Abs(_path)
+		if err == nil {
+			return absPath
+		} else {
+			log.Printf("bad CONFIG_FILE=%#v, error: %v", _path, err)
+		}
+	}
 	return filepath.Join(GetConfigDir(), fileName)
 }
 
@@ -181,7 +191,7 @@ func loadFile() ([]byte, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	pathStr := filepath.Join(GetConfigDir(), fileName)
+	pathStr := Path()
 	tomlBytes, err := os.ReadFile(pathStr)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -217,7 +227,7 @@ func MustLoad() *Config {
 }
 
 func EnsureExists(conf *Config) error {
-	_, err := os.Stat(filepath.Join(GetConfigDir(), fileName))
+	_, err := os.Stat(Path())
 	if err == nil {
 		return nil
 	}
@@ -233,7 +243,7 @@ func Save(conf *Config) error {
 	if err != nil {
 		return err
 	}
-	pathStr := filepath.Join(configDir, fileName)
+	pathStr := Path()
 	buf := bytes.NewBuffer(nil)
 	encoder := toml.NewEncoder(buf)
 	err = encoder.Encode(conf)
