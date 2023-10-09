@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  ayandict-web:
+    build:
+      context: .
+    environment:
+      CONFIG_FILE: /app/config.toml
+      GOPROXY: https://goproxy.io,direct
+    volumes:
+      - $PWD/docker-config.toml:/app/config.toml:ro
+      - $HOME/.stardict/dic:/root/.stardict/dic:ro
+    ports:
+      - 8357:8357

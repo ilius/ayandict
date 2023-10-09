@@ -1,0 +1,8 @@
+web_enable = true
+web_expose = true
+local_server_ports = ["8357"]
+
+directory_list = ["/root/.stardict/dic"]
+
+search_worker_count = 8
+search_timeout = "5s"
