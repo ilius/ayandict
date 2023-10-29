@@ -55,6 +55,7 @@ type Config struct {
 
 	Audio bool `toml:"audio"`
 
+	AudioMPV  bool `toml:"audio_mpv"`
 	AudioRVLC bool `toml:"audio_rvlc"`
 
 	AudioDownloadTimeout time.Duration `toml:"audio_download_timeout"`
@@ -136,6 +137,7 @@ func Default() *Config {
 
 		Audio: true,
 
+		AudioMPV:  false,
 		AudioRVLC: false,
 
 		AudioDownloadTimeout: 1000 * time.Millisecond,

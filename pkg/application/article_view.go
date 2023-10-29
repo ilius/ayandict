@@ -131,9 +131,44 @@ func (view *ArticleView) playAudioRVLC(urlStr string) bool {
 	return true
 }
 
+func (view *ArticleView) playAudioMPV(urlStr string) bool {
+	path, err := exec.LookPath("mpv")
+	if err != nil {
+		log.Println("error in LookPath:", err)
+		return false
+	}
+	// log.Println(path, urlStr)
+	args := []string{
+		path,
+		"--no-video",
+		urlStr,
+	}
+	volume := dictmgr.AudioVolume(view.dictName)
+	if volume > 0 {
+		volumeStr := strconv.FormatInt(int64(volume), 10)
+		args = append(args, "--volume="+volumeStr)
+	}
+	// log.Printf("%#v", args)
+	cmd := exec.Cmd{
+		Path:   path,
+		Args:   args,
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
+	}
+	err = cmd.Start()
+	if err != nil {
+		log.Println("error in mpv: Start:", err)
+		return false
+	}
+	return true
+}
+
 func (view *ArticleView) playAudio(qUrl *core.QUrl) {
 	urlStr := qUrl.ToString(core.QUrl__PreferLocalFile)
 	log.Println("Playing audio", urlStr)
+	if conf.AudioMPV && view.playAudioMPV(urlStr) {
+		return
+	}
 	if conf.AudioRVLC && view.playAudioRVLC(urlStr) {
 		return
 	}

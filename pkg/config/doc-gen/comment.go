@@ -30,7 +30,8 @@ var commentMap = map[string]string{
 
 	"audio": "Enable audio in article",
 
-	"audio_rvlc": "Use 'rvlc' command for playing audio",
+	"audio_mpv":  "Use `mpv` command for playing audio",
+	"audio_rvlc": "Use `rvlc` command for playing audio",
 
 	"audio_download_timeout": "Timeout for downloading audio files",
 
@@ -56,6 +57,8 @@ var commentMap = map[string]string{
 
 	"web_enable": "Set true/false and restart to enable/disable web service & web app",
 	"web_expose": "Expose web service & web app to outside (otherwise only available to 127.0.0.1)",
+
+	"web_show_powered_by": "Show 'Powered By ...' footer in web.",
 
 	"search_worker_count": "The number of workers / goroutines used for search",
 

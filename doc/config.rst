@@ -112,9 +112,15 @@ Enable audio in article
 
 Default value: ``true``
 
+``audio_mpv``
+-------------
+Use `mpv` command for playing audio
+
+Default value: ``false``
+
 ``audio_rvlc``
 --------------
-Use 'rvlc' command for playing audio
+Use `rvlc` command for playing audio
 
 Default value: ``false``
 
@@ -195,6 +201,12 @@ Default value: ``false``
 Expose web service & web app to outside (otherwise only available to 127.0.0.1)
 
 Default value: ``false``
+
+``web_show_powered_by``
+-----------------------
+Show 'Powered By ...' footer in web.
+
+Default value: ``true``
 
 ``search_worker_count``
 -----------------------
