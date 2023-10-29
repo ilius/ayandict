@@ -35,7 +35,7 @@ var commentMap = map[string]string{
 
 	"audio_download_timeout": "Timeout for downloading audio files",
 
-	"audio_auto_play": "Number of audio file to auto-play, set ``0`` to disable.",
+	"audio_auto_play": "Number of audio file to auto-play, set `0` to disable.",
 
 	"audio_auto_play_wait_between": "Wait time between multiple audio files on auto-play",
 
@@ -62,5 +62,5 @@ var commentMap = map[string]string{
 
 	"search_worker_count": "The number of workers / goroutines used for search",
 
-	"search_timeout": "Timeout for search on each dictionary. Only works if ``search_worker_count > 1``",
+	"search_timeout": "Timeout for search on each dictionary. Only works if `search_worker_count > 1`",
 }

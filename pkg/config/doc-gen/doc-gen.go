@@ -70,6 +70,7 @@ func printMarkdown() {
 		if comment == "" {
 			log.Fatalln("No comment for", key)
 		}
+		comment = strings.ReplaceAll(comment, "`", "``")
 
 		keyCode := codeValue(key)
 		fmt.Println(keyCode)

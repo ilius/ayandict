@@ -114,13 +114,13 @@ Default value: ``true``
 
 ``audio_mpv``
 -------------
-Use `mpv` command for playing audio
+Use ``mpv`` command for playing audio
 
 Default value: ``false``
 
 ``audio_rvlc``
 --------------
-Use `rvlc` command for playing audio
+Use ``rvlc`` command for playing audio
 
 Default value: ``false``
 
