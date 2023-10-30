@@ -65,72 +65,6 @@ func NewArticleView(app *Application) *ArticleView {
 
 var audioUrlRE = regexp.MustCompile(`href="[^<>"]+\.mp3"`)
 
-func (view *ArticleView) playAudioRVLC(urlStr string) bool {
-	path, err := exec.LookPath("rvlc")
-	if err != nil {
-		log.Println("error in LookPath:", err)
-		return false
-	}
-	// log.Println(path, urlStr)
-	volume := dictmgr.AudioVolume(view.dictName)
-	volumeStr := strconv.FormatInt(int64(volume), 10)
-	args := []string{
-		path, // OMG, why is this needed?!
-		"--audio",
-		"--no-video",
-		"--play-and-exit",
-	}
-	// log.Printf("%#v", args)
-	cmd := exec.Cmd{
-		Path:   path,
-		Args:   args,
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
-	}
-	// you either have to set Stdin field, or use cmd.StdinPipe()
-	// otherwise it won't play, even with --no-interact flag!
-	// Stdin=os.Stdin works, but I'm not sure it's a good idea to rely on it
-	// --play-and-exit flag saves us the trouble of waiting 2 seconds and
-	// then sending "q\n" command!
-	// Option --volume no longer exists! (warning in interactive) Why?!
-	// I tested --no-video flag by guess and it works, but it's not in `man rvlc`
-	// nor is it in `rvlc --help`.
-	// This command is just weird! But it works!
-	// We set a different volume for each dictionary to kinda "normalize it"
-	// and fix too low or too high volumes.
-	go func() {
-		stdin, err := cmd.StdinPipe()
-		if stdin != nil {
-			defer stdin.Close()
-		}
-		if err != nil {
-			log.Println("error in rvlc: StdinPipe:", err)
-			return
-		}
-		err = cmd.Start()
-		if err != nil {
-			log.Println("error in rvlc: Start:", err)
-			return
-		}
-		_, err = stdin.Write([]byte("volume " + volumeStr + "\n"))
-		if err != nil {
-			log.Println("error in rvlc: Write:", err)
-			return
-		}
-		_, err = stdin.Write([]byte("add " + urlStr + "\n"))
-		if err != nil {
-			log.Println("error in rvlc: Write:", err)
-			return
-		}
-		err = cmd.Wait()
-		if err != nil {
-			log.Println("error in rvlc: Wait:", err)
-			return
-		}
-	}()
-	return true
-}
-
 func (view *ArticleView) playAudioMPV(urlStr string) bool {
 	path, err := exec.LookPath("mpv")
 	if err != nil {
@@ -167,9 +101,6 @@ func (view *ArticleView) playAudio(qUrl *core.QUrl) {
 	urlStr := qUrl.ToString(core.QUrl__PreferLocalFile)
 	log.Println("Playing audio", urlStr)
 	if conf.AudioMPV && view.playAudioMPV(urlStr) {
-		return
-	}
-	if conf.AudioRVLC && view.playAudioRVLC(urlStr) {
 		return
 	}
 	player := view.mediaPlayer

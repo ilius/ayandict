@@ -118,12 +118,6 @@ Use ``mpv`` command for playing audio
 
 Default value: ``false``
 
-``audio_rvlc``
---------------
-Use ``rvlc`` command for playing audio
-
-Default value: ``false``
-
 ``audio_download_timeout``
 --------------------------
 Timeout for downloading audio files
