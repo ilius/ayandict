@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -140,9 +139,16 @@ func readParseTest(r *bufio.Reader) (*testAttrs, error) {
 }
 
 func dumpIndent(w io.Writer, level int) {
-	io.WriteString(w, "| ")
+	_, err := io.WriteString(w, "| ")
+	if err != nil {
+		panic(err)
+	}
 	for i := 0; i < level; i++ {
-		io.WriteString(w, "  ")
+		_, err := io.WriteString(w, "  ")
+		if err != nil {
+			panic(err)
+		}
+
 	}
 }
 
@@ -180,7 +186,10 @@ func dumpLevel(w io.Writer, n *Node, level int) error {
 		attr := sortedAttributes(n.Attr)
 		sort.Sort(attr)
 		for _, a := range attr {
-			io.WriteString(w, "\n")
+			_, err := io.WriteString(w, "\n")
+			if err != nil {
+				panic(err)
+			}
 			dumpIndent(w, level)
 			if a.Namespace != "" {
 				fmt.Fprintf(w, `%s %s="%s"`, a.Namespace, a.Key, a.Val)
@@ -189,10 +198,16 @@ func dumpLevel(w io.Writer, n *Node, level int) error {
 			}
 		}
 		if n.Namespace == "" && n.DataAtom == atom.Template {
-			io.WriteString(w, "\n")
+			_, err := io.WriteString(w, "\n")
+			if err != nil {
+				panic(err)
+			}
 			dumpIndent(w, level)
 			level++
-			io.WriteString(w, "content")
+			_, err = io.WriteString(w, "content")
+			if err != nil {
+				panic(err)
+			}
 		}
 	case TextNode:
 		fmt.Fprintf(w, `"%s"`, n.Data)
@@ -215,13 +230,19 @@ func dumpLevel(w io.Writer, n *Node, level int) error {
 				fmt.Fprintf(w, ` "%s"`, s)
 			}
 		}
-		io.WriteString(w, ">")
+		_, err := io.WriteString(w, ">")
+		if err != nil {
+			panic(err)
+		}
 	case scopeMarkerNode:
 		return errors.New("unexpected scopeMarkerNode")
 	default:
 		return errors.New("unknown node type")
 	}
-	io.WriteString(w, "\n")
+	_, err := io.WriteString(w, "\n")
+	if err != nil {
+		panic(err)
+	}
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		if err := dumpLevel(w, c, level); err != nil {
 			return err
@@ -462,7 +483,10 @@ func TestNodeConsistency(t *testing.T) {
 
 func TestParseFragmentWithNilContext(t *testing.T) {
 	// This shouldn't panic.
-	ParseFragment(strings.NewReader("<p>hello</p>"), nil)
+	_, err := ParseFragment(strings.NewReader("<p>hello</p>"), nil)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func TestParseFragmentForeignContentTemplates(t *testing.T) {
@@ -472,12 +496,15 @@ func TestParseFragmentForeignContentTemplates(t *testing.T) {
 	}
 	for _, src := range srcs {
 		// The next line shouldn't infinite-loop.
-		ParseFragment(strings.NewReader(src), nil)
+		_, err := ParseFragment(strings.NewReader(src), nil)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
 func BenchmarkParser(b *testing.B) {
-	buf, err := ioutil.ReadFile("testdata/go1.html")
+	buf, err := os.ReadFile("testdata/go1.html")
 	if err != nil {
 		b.Fatalf("could not read testdata/go1.html: %v", err)
 	}
@@ -486,6 +513,9 @@ func BenchmarkParser(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		Parse(bytes.NewBuffer(buf))
+		_, err := Parse(bytes.NewBuffer(buf))
+		if err != nil {
+			panic(err)
+		}
 	}
 }

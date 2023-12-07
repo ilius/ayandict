@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"log"
 	"strconv"
 	"strings"
 
@@ -90,7 +91,10 @@ func (t Token) tagString() string {
 		buf.WriteByte(' ')
 		buf.WriteString(a.Key)
 		buf.WriteString(`="`)
-		escape(buf, a.Val)
+		err := escape(buf, a.Val)
+		if err != nil {
+			log.Println(err)
+		}
 		buf.WriteByte('"')
 	}
 	return buf.String()

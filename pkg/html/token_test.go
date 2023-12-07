@@ -7,7 +7,7 @@ package html
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
+	"os"
 	"reflect"
 	"runtime"
 	"strings"
@@ -654,7 +654,7 @@ tests:
 				}
 			}
 			// Anything tokenized along with untokenized input or data left in the reader.
-			assembled, err := ioutil.ReadAll(io.MultiReader(&tokenized, bytes.NewReader(z.Buffered()), r))
+			assembled, err := io.ReadAll(io.MultiReader(&tokenized, bytes.NewReader(z.Buffered()), r))
 			if err != nil {
 				t.Errorf("%s: ReadAll: %v", test.desc, err)
 				continue tests
@@ -721,7 +721,7 @@ loop:
 		}
 	}
 	u := "14567"
-	v := string(result.Bytes())
+	v := result.String()
 	if u != v {
 		t.Errorf("TestBufAPI: want %q got %q", u, v)
 	}
@@ -840,7 +840,7 @@ const (
 )
 
 func benchmarkTokenizer(b *testing.B, level int) {
-	buf, err := ioutil.ReadFile("testdata/go1.html")
+	buf, err := os.ReadFile("testdata/go1.html")
 	if err != nil {
 		b.Fatalf("could not read testdata/go1.html: %v", err)
 	}
