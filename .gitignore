@@ -12,6 +12,9 @@ pkg/config/doc-gen/doc-gen
 
 .vscode
 
+*.dot
+*.svg
+
 # Test binary, built with `go test -c`
 *.test
 
