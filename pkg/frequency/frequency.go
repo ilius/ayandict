@@ -117,14 +117,14 @@ func (view *FrequencyTable) LoadFromFile(pathStr string) error {
 	jsonBytes, err := os.ReadFile(pathStr)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			return fmt.Errorf("error loading frequency: %v", err)
+			return fmt.Errorf("error loading frequency: %w", err)
 		}
 		return nil
 	}
 	countMap := map[string]int{}
 	err = json.Unmarshal(jsonBytes, &countMap)
 	if err != nil {
-		return fmt.Errorf("bad frequency file %#v: %v", pathStr, err)
+		return fmt.Errorf("bad frequency file %#v: %w", pathStr, err)
 	}
 	countList := [][2]any{}
 	for key, count := range countMap {

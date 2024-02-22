@@ -32,7 +32,6 @@ func findLocalServer(ports []string) (bool, string) {
 		log.Println("Trying", _urlStr)
 		t := time.Now()
 		res, err := client.Get(_urlStr)
-		// fmt.Printf("%T, %v", err, err)
 		if err != nil {
 			continue
 		}

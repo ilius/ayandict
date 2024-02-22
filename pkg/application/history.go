@@ -47,13 +47,13 @@ func LoadHistory() error {
 	jsonBytes, err := os.ReadFile(pathStr)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			return fmt.Errorf("error loading history: %v", err)
+			return fmt.Errorf("error loading history: %w", err)
 		}
 		return nil
 	}
 	err = json.Unmarshal(jsonBytes, &history)
 	if err != nil {
-		return fmt.Errorf("bad history file %#v: %v", pathStr, err)
+		return fmt.Errorf("bad history file %#v: %w", pathStr, err)
 	}
 	return nil
 }

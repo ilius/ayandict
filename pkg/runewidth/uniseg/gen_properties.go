@@ -135,7 +135,7 @@ func parse(propertyURL, emojiProperty string, includeGeneralCategory bool) (stri
 			// Everything else must be a code point range, a property and a comment.
 			from, to, property, comment, err := parseProperty(line)
 			if err != nil {
-				return "", fmt.Errorf("%s line %d: %v", os.Args[4], num, err)
+				return "", fmt.Errorf("%s line %d: %w", os.Args[4], num, err)
 			}
 			properties = append(properties, [4]string{from, to, property, comment})
 		}
@@ -170,7 +170,7 @@ func parse(propertyURL, emojiProperty string, includeGeneralCategory bool) (stri
 			// Everything else must be a code point range, a property and a comment.
 			from, to, property, comment, err := parseProperty(line)
 			if err != nil {
-				return "", fmt.Errorf("emojis line %d: %v", num, err)
+				return "", fmt.Errorf("emojis line %d: %w", num, err)
 			}
 			properties = append(properties, [4]string{from, to, property, comment})
 		}
