@@ -243,28 +243,26 @@ func (view *ArticleView) selectedHTML() string {
 	return text
 }
 
-func (view *ArticleView) zoom(delta int) {
+func (view *ArticleView) ZoomIn() {
 	doc := view.Document()
 	font := doc.DefaultFont()
 	points := fontPointSize(font, view.dpi)
 	if points <= 0 {
-		log.Printf("bad font size: points=%v, pixels=%v", font.PointSizeF(), font.PixelSize())
 		return
 	}
-	if delta > 0 {
-		font.SetPointSizeF(points * conf.ArticleZoomFactor)
-	} else {
-		font.SetPointSizeF(points / conf.ArticleZoomFactor)
-	}
+	font.SetPointSizeF(points * conf.ArticleZoomFactor)
 	doc.SetDefaultFont(font)
 }
 
-func (view *ArticleView) ZoomIn(ran int) {
-	view.zoom(1)
-}
-
-func (view *ArticleView) ZoomOut(ran int) {
-	view.zoom(-1)
+func (view *ArticleView) ZoomOut() {
+	doc := view.Document()
+	font := doc.DefaultFont()
+	points := fontPointSize(font, view.dpi)
+	if points <= 0 {
+		return
+	}
+	font.SetPointSizeF(points / conf.ArticleZoomFactor)
+	doc.SetDefaultFont(font)
 }
 
 func (view *ArticleView) findLinkOnCursor(cursor *gui.QTextCursor) string {
@@ -409,7 +407,11 @@ func (view *ArticleView) SetupCustomHandlers() {
 		if delta == 0 {
 			return
 		}
-		view.zoom(delta)
+		if delta > 0 {
+			view.ZoomIn()
+		} else {
+			view.ZoomOut()
+		}
 	})
 }
 

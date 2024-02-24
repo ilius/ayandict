@@ -426,10 +426,10 @@ func (app *Application) Run() {
 				entry.SetFocus(core.Qt__ShortcutFocusReason)
 				return
 			case "+", "=": // core.Qt__Key_Plus
-				articleView.ZoomIn(1)
+				articleView.ZoomIn()
 				return
 			case "-": // core.Qt__Key_Minus
-				articleView.ZoomOut(1)
+				articleView.ZoomOut()
 				return
 			case "\x1b": // Escape
 				resetQuery()
