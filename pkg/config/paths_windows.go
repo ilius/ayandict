@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/ilius/ayandict/v2/pkg/appinfo"
 )
 
 func platformConfigDir() string {
@@ -16,7 +18,7 @@ func platformConfigDir() string {
 	// user := os.Getenv("USERNAME")
 	// tmpDir := os.Getenv("TEMP")
 	appData := os.Getenv("APPDATA")
-	confDir := filepath.Join(appData, "AyanDict")
+	confDir := filepath.Join(appData, appinfo.APP_DESC)
 	return confDir
 }
 
@@ -32,5 +34,5 @@ func GetCacheDir() string {
 			return ""
 		}
 	}
-	return filepath.Join(localAppData, "AyanDict", "Cache")
+	return filepath.Join(localAppData, appinfo.APP_DESC, "Cache")
 }

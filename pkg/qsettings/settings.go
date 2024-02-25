@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ilius/ayandict/v2/pkg/appinfo"
 	"github.com/ilius/ayandict/v2/pkg/qerr"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
@@ -59,7 +60,7 @@ func splitterSizes(splitter *widgets.QSplitter) []int {
 }
 
 func GetQSettings(parent core.QObject_ITF) *core.QSettings {
-	return core.NewQSettings("ilius", "ayandict", parent)
+	return core.NewQSettings("ilius", appinfo.APP_NAME, parent)
 }
 
 func restoreSetting(qs *core.QSettings, key string, apply func(*core.QVariant)) {

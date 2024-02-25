@@ -1,8 +1,10 @@
 package appinfo
 
-const APP_NAME = "ayandict"
-
-const VERSION = "v2.0.0"
+const (
+	APP_NAME = "ayandict"
+	APP_DESC = "AyanDict"
+	VERSION  = "v2.0.0"
+)
 
 const ABOUT = `AyanDict is simple dictionary application based on Qt and written in Go.
 

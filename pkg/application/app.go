@@ -7,6 +7,7 @@ import (
 
 	// "github.com/ilius/qt/webengine"
 
+	"github.com/ilius/ayandict/v2/pkg/appinfo"
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/qdictmgr"
@@ -110,7 +111,7 @@ func (app *Application) Run() {
 	// icon := gui.NewQIcon5("./img/icon.png")
 
 	window := app.window
-	window.SetWindowTitle("AyanDict")
+	window.SetWindowTitle(appinfo.APP_DESC)
 	window.Resize2(600, 400)
 
 	entry := widgets.NewQLineEdit(nil)
