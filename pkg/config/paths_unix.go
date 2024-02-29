@@ -15,9 +15,9 @@ func platformConfigDir() string {
 	if parent == "" {
 		parent = filepath.Join(os.Getenv(S_HOME), ".config")
 	}
-	return filepath.Join(parent, appinfo.APP_DESC)
+	return filepath.Join(parent, appinfo.APP_NAME)
 }
 
 func GetCacheDir() string {
-	return filepath.Join(os.Getenv(S_HOME), ".cache", appinfo.APP_DESC)
+	return filepath.Join(os.Getenv(S_HOME), ".cache", appinfo.APP_NAME)
 }
