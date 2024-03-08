@@ -45,13 +45,6 @@ func (w *QueryArgs) SetNoResult(query string) {
 	w.AddHistoryAndFrequency(query)
 }
 
-func (w *QueryArgs) ResetQuery() {
-	w.Entry.SetText("")
-	w.ResultList.Clear()
-	w.HeaderLabel.SetText("")
-	w.ArticleView.SetHtml("")
-}
-
 func NewResultListWidget(
 	articleView *ArticleView,
 	headerLabel *HeaderLabel,

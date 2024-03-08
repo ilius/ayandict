@@ -291,26 +291,7 @@ func (view *ArticleView) findLinkOnCursor(cursor *gui.QTextCursor) string {
 	return urlStr
 }
 
-func (view *ArticleView) SetupCustomHandlers() {
-	doQuery := view.doQuery
-	if doQuery == nil {
-		panic("doQuery is not set")
-	}
-	mediaPlayer := multimedia.NewQMediaPlayer(nil, 0)
-	view.mediaPlayer = mediaPlayer
-
-	copyAction := widgets.NewQAction2("Copy", view)
-	view.AddAction(copyAction)
-	copyAction.SetShortcut(gui.NewQKeySequence2("Ctrl+C", gui.QKeySequence__PortableText))
-	copyAction.ConnectTriggered(func(checked bool) {
-		text := view.TextCursor().SelectedText()
-		if text == "" {
-			return
-		}
-		text = strings.TrimSpace(text)
-		view.app.Clipboard().SetText(text, gui.QClipboard__Clipboard)
-	})
-
+func (view *ArticleView) setupAnchorClicked() {
 	view.ConnectAnchorClicked(func(qUrl *core.QUrl) {
 		host := qUrl.Host(core.QUrl__FullyDecoded)
 		// log.Printf(
@@ -321,7 +302,7 @@ func (view *ArticleView) SetupCustomHandlers() {
 		// )
 		if qUrl.Scheme() == "bword" {
 			if host != "" {
-				doQuery(host)
+				view.doQuery(host)
 			} else {
 				log.Printf("AnchorClicked: %#v\n", qUrl.ToString(core.QUrl__None))
 			}
@@ -331,7 +312,7 @@ func (view *ArticleView) SetupCustomHandlers() {
 		// log.Printf("scheme=%#v, host=%#v, path=%#v", link.Scheme(), host, path)
 		switch qUrl.Scheme() {
 		case "":
-			doQuery(path)
+			view.doQuery(path)
 			return
 		case "file":
 			// log.Printf("host=%#v, ext=%#v", host, ext)
@@ -356,25 +337,15 @@ func (view *ArticleView) SetupCustomHandlers() {
 		}
 		gui.QDesktopServices_OpenUrl(qUrl)
 	})
-	// menuStyleOpt := widgets.NewQStyleOptionMenuItem()
-	// style := app.Style()
-	// queryMenuIcon := style.StandardIcon(widgets.QStyle__SP_ArrowUp, menuStyleOpt, nil)
+}
 
-	// we set this on right-button MouseRelease when no text is selected
-	// and read it when Query is selected from context menu
-	// may not be pretty or concurrent-safe! but seems to work!
-
-	view.ConnectContextMenuEvent(func(event *gui.QContextMenuEvent) {
-		event.Ignore()
-		menu := view.createContextMenu()
-		menu.Popup(event.GlobalPos(), nil)
-	})
+func (view *ArticleView) setupMouseReleaseEvent() {
 	view.ConnectMouseReleaseEvent(func(event *gui.QMouseEvent) {
 		text := view.TextCursor().SelectedText()
 		switch event.Button() {
 		case core.Qt__MiddleButton:
 			if text != "" {
-				doQuery(strings.Trim(text, queryForceTrimChars))
+				view.doQuery(strings.Trim(text, queryForceTrimChars))
 			}
 			return
 		case core.Qt__RightButton:
@@ -397,7 +368,9 @@ func (view *ArticleView) SetupCustomHandlers() {
 		}
 		view.MouseReleaseEventDefault(event)
 	})
+}
 
+func (view *ArticleView) setupWheelEvent() {
 	view.ConnectWheelEvent(func(event *gui.QWheelEvent) {
 		if event.Modifiers()&core.Qt__ControlModifier == 0 {
 			view.WheelEventDefault(event)
@@ -413,6 +386,46 @@ func (view *ArticleView) SetupCustomHandlers() {
 			view.ZoomOut()
 		}
 	})
+}
+
+// TODO: break down
+func (view *ArticleView) SetupCustomHandlers() {
+	doQuery := view.doQuery
+	if doQuery == nil {
+		panic("doQuery is not set")
+	}
+	mediaPlayer := multimedia.NewQMediaPlayer(nil, 0)
+	view.mediaPlayer = mediaPlayer
+
+	copyAction := widgets.NewQAction2("Copy", view)
+	view.AddAction(copyAction)
+	copyAction.SetShortcut(gui.NewQKeySequence2("Ctrl+C", gui.QKeySequence__PortableText))
+	copyAction.ConnectTriggered(func(checked bool) {
+		text := view.TextCursor().SelectedText()
+		if text == "" {
+			return
+		}
+		text = strings.TrimSpace(text)
+		view.app.Clipboard().SetText(text, gui.QClipboard__Clipboard)
+	})
+
+	view.setupAnchorClicked()
+
+	// menuStyleOpt := widgets.NewQStyleOptionMenuItem()
+	// style := app.Style()
+	// queryMenuIcon := style.StandardIcon(widgets.QStyle__SP_ArrowUp, menuStyleOpt, nil)
+
+	// we set this on right-button MouseRelease when no text is selected
+	// and read it when Query is selected from context menu
+	// may not be pretty or concurrent-safe! but seems to work!
+
+	view.ConnectContextMenuEvent(func(event *gui.QContextMenuEvent) {
+		event.Ignore()
+		menu := view.createContextMenu()
+		menu.Popup(event.GlobalPos(), nil)
+	})
+	view.setupMouseReleaseEvent()
+	view.setupWheelEvent()
 }
 
 func (view *ArticleView) KeyPressEventDefault(event gui.QKeyEvent_ITF) {

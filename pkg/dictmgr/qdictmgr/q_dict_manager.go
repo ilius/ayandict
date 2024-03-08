@@ -30,6 +30,8 @@ const (
 	dictManager_down     = "Down"
 	dictManager_openInfo = "Open Info File"
 	dictManager_openDirs = "Open Directories"
+
+	columns = 5
 )
 
 type DictManager struct {
@@ -37,6 +39,15 @@ type DictManager struct {
 	TableWidget *widgets.QTableWidget
 	VolumeInput *widgets.QSpinBox
 	TextWidgets []qutils.HasSetFont
+
+	infoMap map[string]common.Dictionary
+
+	app *widgets.QApplication
+
+	toolbar   *widgets.QToolBar
+	buttonBox *widgets.QDialogButtonBox
+
+	settings *core.QSettings
 }
 
 func makeDictInfoMap(infos []common.Dictionary) map[string]common.Dictionary {
@@ -47,25 +58,186 @@ func makeDictInfoMap(infos []common.Dictionary) map[string]common.Dictionary {
 	return infoMap
 }
 
+// TODO: break down
 func NewDictManager(
 	app *widgets.QApplication,
 	parent widgets.QWidget_ITF,
 	conf *config.Config,
 ) *DictManager {
-	infoMap := makeDictInfoMap(dicts.DictList)
-
 	window := widgets.NewQDialog(parent, core.Qt__Dialog)
 	window.SetWindowTitle("Dictionaries")
 	window.Resize2(900, 800)
 
+	infoMap := makeDictInfoMap(dicts.DictList)
+
 	qs := qsettings.GetQSettings(window)
 	qsettings.RestoreWinGeometry(app, qs, &window.QWidget, QS_dictManager)
 
+	table := widgets.NewQTableWidget(nil)
+	volumeInput := widgets.NewQSpinBox(nil)
+	toolbar := widgets.NewQToolBar2(nil)
+
+	buttonBox := widgets.NewQDialogButtonBox(nil)
+	okButton := buttonBox.AddButton2("OK", widgets.QDialogButtonBox__AcceptRole)
+	cancelButton := buttonBox.AddButton2("Cancel", widgets.QDialogButtonBox__RejectRole)
+
+	okButton.ConnectClicked(func(checked bool) {
+		window.Accept()
+	})
+	cancelButton.ConnectClicked(func(checked bool) {
+		window.Reject()
+	})
+
+	dictMgr := &DictManager{
+		Dialog:      window,
+		TableWidget: table,
+		VolumeInput: volumeInput,
+		TextWidgets: []qutils.HasSetFont{
+			table,
+			toolbar,
+			okButton,
+			cancelButton,
+		},
+		infoMap:   infoMap,
+		app:       app,
+		toolbar:   toolbar,
+		buttonBox: buttonBox,
+		settings:  qs,
+	}
+	dictMgr.prepareWidgets(conf)
+	return dictMgr
+}
+
+func (dm *DictManager) newItem(text string) *widgets.QTableWidgetItem {
+	item := widgets.NewQTableWidgetItem2(text, 0)
+	item.SetFlags(core.Qt__ItemIsSelectable | core.Qt__ItemIsEnabled)
+	return item
+}
+
+func (dm *DictManager) setItem(
+	index int,
+	dictName string,
+	ds *dicts.DictionarySettings,
+) {
+	table := dm.TableWidget
+	info, ok := dm.infoMap[dictName]
+	if !ok {
+		log.Printf("dictName=%#v not in infoMap\n", dictName)
+		return
+	}
+	enabledItem := widgets.NewQTableWidgetItem(0)
+	if ds.Order < 0 {
+		enabledItem.SetCheckState(core.Qt__Unchecked)
+	} else {
+		enabledItem.SetCheckState(core.Qt__Checked)
+	}
+	table.SetItem(index, dm_col_enable, enabledItem)
+
+	headerItem := widgets.NewQTableWidgetItem(1)
+	if ds.HideTermsHeader {
+		headerItem.SetCheckState(core.Qt__Unchecked)
+	} else {
+		headerItem.SetCheckState(core.Qt__Checked)
+	}
+	table.SetItem(index, dm_col_header, headerItem)
+
+	symbolItem := dm.newItem(ds.Symbol)
+	symbolItem.SetFlags(core.Qt__ItemIsEnabled |
+		core.Qt__ItemIsSelectable |
+		core.Qt__ItemIsEditable)
+	table.SetItem(index, dm_col_symbol, symbolItem)
+
+	entries, err := info.EntryCount()
+	if err != nil {
+		qerr.Error(err)
+		return
+	}
+	table.SetItem(
+		index, dm_col_entries,
+		dm.newItem(strconv.FormatInt(int64(entries), 10)),
+	)
+	table.SetItem(index, dm_col_dictName, dm.newItem(dictName))
+}
+
+// table.SelectedIndexes() panics/crashes
+// so do methods in table.SelectionModel()
+// you have to use table.CurrentRow(), table.CurrentIndex()
+// or table.CurrentItem()
+func (dm *DictManager) toolbarUp() {
+	table := dm.TableWidget
+	row := table.CurrentRow()
+	if row < 1 {
+		return
+	}
+	for col := 0; col < columns; col++ {
+		item1 := table.TakeItem(row, col)
+		item2 := table.TakeItem(row-1, col)
+		table.SetItem(row-1, col, item1)
+		table.SetItem(row, col, item2)
+	}
+	table.SetCurrentCell(row-1, table.CurrentColumn())
+}
+
+func (dm *DictManager) toolbarDown() {
+	table := dm.TableWidget
+	row := table.CurrentRow()
+	if row > table.RowCount()-2 {
+		return
+	}
+	for col := 0; col < columns; col++ {
+		item1 := table.TakeItem(row, col)
+		item2 := table.TakeItem(row+1, col)
+		table.SetItem(row+1, col, item1)
+		table.SetItem(row, col, item2)
+	}
+	table.SetCurrentCell(row+1, table.CurrentColumn())
+}
+
+func (dm *DictManager) openInfoFile() {
+	table := dm.TableWidget
+	row := table.CurrentRow()
+	if row < 0 {
+		return
+	}
+	dictName := table.Item(row, dm_col_dictName).Text()
+	dic := dicts.DictByName[dictName]
+	if dic == nil {
+		qerr.Errorf("No dictionary %#v found", dictName)
+		return
+	}
+	path := dic.InfoPath()
+	if path == "" {
+		return
+	}
+	url := core.NewQUrl()
+	url.SetScheme("file")
+	url.SetPath(path, core.QUrl__TolerantMode)
+	gui.QDesktopServices_OpenUrl(url)
+}
+
+func (dm *DictManager) openFolder(conf *config.Config) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		qerr.Error(err)
+		return
+	}
+	for _, p := range conf.DirectoryList {
+		if !filepath.IsAbs(p) {
+			p = filepath.Join(homeDir, p)
+		}
+		url := core.NewQUrl()
+		url.SetScheme("file")
+		url.SetPath(p, core.QUrl__TolerantMode)
+		gui.QDesktopServices_OpenUrl(url)
+	}
+}
+
+func (dm *DictManager) prepareWidgets(conf *config.Config) {
 	var selectedDictSettings *dicts.DictionarySettings
 
-	const columns = 5
+	table := dm.TableWidget
+	volumeInput := dm.VolumeInput
 
-	table := widgets.NewQTableWidget(nil)
 	table.SetColumnCount(columns)
 	header := table.HorizontalHeader()
 	header.ResizeSection(dm_col_enable, 10)
@@ -107,7 +279,6 @@ func NewDictManager(
 
 	volumeHBox := widgets.NewQHBoxLayout2(nil)
 	volumeHBox.AddWidget(widgets.NewQLabel2("Audio Volume:", nil, 0), 0, 0)
-	volumeInput := widgets.NewQSpinBox(nil)
 	volumeInput.SetMinimum(0)
 	volumeInput.SetMaximum(999)
 	volumeHBox.AddWidget(volumeInput, 0, 0)
@@ -128,7 +299,7 @@ func NewDictManager(
 	mainHBox := widgets.NewQHBoxLayout2(nil)
 	mainHBox.AddLayout(mainVBox, 1)
 
-	toolbar := widgets.NewQToolBar2(nil)
+	toolbar := dm.toolbar
 	toolbarVBox := widgets.NewQVBoxLayout2(nil)
 	toolbarVBox.AddSpacing(80)
 	toolbarVBox.AddWidget(toolbar, 0, 0)
@@ -137,7 +308,7 @@ func NewDictManager(
 	mainHBox.AddLayout(toolbarVBox, 0)
 	toolbar.SetOrientation(core.Qt__Vertical)
 
-	style := app.Style()
+	style := dm.app.Style()
 	tbOpt := widgets.NewQStyleOptionToolBar()
 	toolbar.SetIconSize(core.NewQSize2(48, 48))
 	{
@@ -159,131 +330,17 @@ func NewDictManager(
 		icon := style.StandardIcon(widgets.QStyle__SP_DirOpenIcon, tbOpt, nil)
 		toolbar.AddAction2(icon, dictManager_openDirs)
 	}
-	newItem := func(text string) *widgets.QTableWidgetItem {
-		item := widgets.NewQTableWidgetItem2(text, 0)
-		item.SetFlags(core.Qt__ItemIsSelectable | core.Qt__ItemIsEnabled)
-		return item
-	}
-	setItem := func(
-		index int,
-		dictName string,
-		ds *dicts.DictionarySettings,
-	) {
-		info, ok := infoMap[dictName]
-		if !ok {
-			log.Printf("dictName=%#v not in infoMap\n", dictName)
-			return
-		}
-		enabledItem := widgets.NewQTableWidgetItem(0)
-		if ds.Order < 0 {
-			enabledItem.SetCheckState(core.Qt__Unchecked)
-		} else {
-			enabledItem.SetCheckState(core.Qt__Checked)
-		}
-		table.SetItem(index, dm_col_enable, enabledItem)
 
-		headerItem := widgets.NewQTableWidgetItem(1)
-		if ds.HideTermsHeader {
-			headerItem.SetCheckState(core.Qt__Unchecked)
-		} else {
-			headerItem.SetCheckState(core.Qt__Checked)
-		}
-		table.SetItem(index, dm_col_header, headerItem)
-
-		symbolItem := newItem(ds.Symbol)
-		symbolItem.SetFlags(core.Qt__ItemIsEnabled |
-			core.Qt__ItemIsSelectable |
-			core.Qt__ItemIsEditable)
-		table.SetItem(index, dm_col_symbol, symbolItem)
-
-		entries, err := info.EntryCount()
-		if err != nil {
-			qerr.Error(err)
-			return
-		}
-		table.SetItem(
-			index, dm_col_entries,
-			newItem(strconv.FormatInt(int64(entries), 10)),
-		)
-		table.SetItem(index, dm_col_dictName, newItem(dictName))
-	}
-
-	// table.SelectedIndexes() panics/crashes
-	// so do methods in table.SelectionModel()
-	// you have to use table.CurrentRow(), table.CurrentIndex()
-	// or table.CurrentItem()
-	toolbarUp := func() {
-		row := table.CurrentRow()
-		if row < 1 {
-			return
-		}
-		for col := 0; col < columns; col++ {
-			item1 := table.TakeItem(row, col)
-			item2 := table.TakeItem(row-1, col)
-			table.SetItem(row-1, col, item1)
-			table.SetItem(row, col, item2)
-		}
-		table.SetCurrentCell(row-1, table.CurrentColumn())
-	}
-	toolbarDown := func() {
-		row := table.CurrentRow()
-		if row > table.RowCount()-2 {
-			return
-		}
-		for col := 0; col < columns; col++ {
-			item1 := table.TakeItem(row, col)
-			item2 := table.TakeItem(row+1, col)
-			table.SetItem(row+1, col, item1)
-			table.SetItem(row, col, item2)
-		}
-		table.SetCurrentCell(row+1, table.CurrentColumn())
-	}
-	openInfoFile := func() {
-		row := table.CurrentRow()
-		if row < 0 {
-			return
-		}
-		dictName := table.Item(row, dm_col_dictName).Text()
-		dic := dicts.DictByName[dictName]
-		if dic == nil {
-			qerr.Errorf("No dictionary %#v found", dictName)
-			return
-		}
-		path := dic.InfoPath()
-		if path == "" {
-			return
-		}
-		url := core.NewQUrl()
-		url.SetScheme("file")
-		url.SetPath(path, core.QUrl__TolerantMode)
-		gui.QDesktopServices_OpenUrl(url)
-	}
-	openFolder := func() {
-		homeDir, err := os.UserHomeDir()
-		if err != nil {
-			qerr.Error(err)
-			return
-		}
-		for _, p := range conf.DirectoryList {
-			if !filepath.IsAbs(p) {
-				p = filepath.Join(homeDir, p)
-			}
-			url := core.NewQUrl()
-			url.SetScheme("file")
-			url.SetPath(p, core.QUrl__TolerantMode)
-			gui.QDesktopServices_OpenUrl(url)
-		}
-	}
 	toolbar.ConnectActionTriggered(func(action *widgets.QAction) {
 		switch action.Text() {
 		case dictManager_up:
-			toolbarUp()
+			dm.toolbarUp()
 		case dictManager_down:
-			toolbarDown()
+			dm.toolbarDown()
 		case dictManager_openInfo:
-			openInfoFile()
+			dm.openInfoFile()
 		case dictManager_openDirs:
-			openFolder()
+			dm.openFolder(conf)
 		}
 	})
 
@@ -304,19 +361,9 @@ func NewDictManager(
 		extraOptionsWidget.Show()
 	})
 
-	buttonBox := widgets.NewQDialogButtonBox(nil)
-	okButton := buttonBox.AddButton2("OK", widgets.QDialogButtonBox__AcceptRole)
-	okButton.ConnectClicked(func(checked bool) {
-		window.Accept()
-	})
-	cancelButton := buttonBox.AddButton2("Cancel", widgets.QDialogButtonBox__RejectRole)
-	cancelButton.ConnectClicked(func(checked bool) {
-		window.Reject()
-	})
-
-	mainBox := widgets.NewQVBoxLayout2(window)
+	mainBox := widgets.NewQVBoxLayout2(dm.Dialog)
 	mainBox.AddLayout(mainHBox, 1)
-	mainBox.AddWidget(buttonBox, 0, 0)
+	mainBox.AddWidget(dm.buttonBox, 0, 0)
 
 	table.SetRowCount(len(dicts.DictList))
 	for index, dic := range dicts.DictList {
@@ -328,9 +375,10 @@ func NewDictManager(
 			ds.Hash = dicts.Hash(dic)
 			dicts.DictSettingsMap[dictName] = ds
 		}
-		setItem(index, dictName, ds)
+		dm.setItem(index, dictName, ds)
 	}
 
+	qs := dm.settings
 	qsettings.RestoreTableColumnsWidth(
 		qs,
 		table,
@@ -340,19 +388,7 @@ func NewDictManager(
 		qsettings.SaveTableColumnsWidth(qs, table, QS_dictManager)
 	})
 
-	qsettings.SetupWinGeometrySave(qs, &window.QWidget, QS_dictManager)
-
-	return &DictManager{
-		Dialog:      window,
-		TableWidget: table,
-		VolumeInput: volumeInput,
-		TextWidgets: []qutils.HasSetFont{
-			table,
-			toolbar,
-			okButton,
-			cancelButton,
-		},
-	}
+	qsettings.SetupWinGeometrySave(qs, &dm.Dialog.QWidget, QS_dictManager)
 }
 
 // updates global var dictSettingsMap

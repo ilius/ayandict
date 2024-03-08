@@ -12,7 +12,7 @@ func NewDictFlagsCheckboxes(hide func()) *DictFlagsCheckboxes {
 	widget := widgets.NewQWidget(nil, 0)
 	hbox := widgets.NewQHBoxLayout2(nil)
 	widget.SetLayout(hbox)
-	hbox.SetSpacing(10) // FIXME
+	hbox.SetSpacing(10) // TODO: parameterize
 
 	w := &DictFlagsCheckboxes{
 		QWidget: widget,
@@ -24,7 +24,7 @@ func NewDictFlagsCheckboxes(hide func()) *DictFlagsCheckboxes {
 	w.addCheckBox("Regex", dicts.FlagNoRegex)
 	w.addCheckBox("Glob", dicts.FlagNoGlob)
 
-	hbox.AddSpacing(30) // FIXME
+	hbox.AddSpacing(30) // TODO: parameterize
 	hideButton := widgets.NewQPushButton2("Hide", nil)
 	hideButton.ConnectClicked(func(bool) {
 		hide()
