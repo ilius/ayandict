@@ -159,6 +159,23 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 	})
 }
 
+func (app *Application) activityComboChanged(index int) {
+	switch index {
+	case 0:
+		app.historyView.Show()
+		frequencyTable.Hide()
+		app.favoritesWidget.Hide()
+	case 1:
+		app.historyView.Hide()
+		frequencyTable.Show()
+		app.favoritesWidget.Hide()
+	case 2:
+		app.historyView.Hide()
+		frequencyTable.Hide()
+		app.favoritesWidget.Show()
+	}
+}
+
 // TODO: break down
 func (app *Application) Run() {
 	app.init()
@@ -182,34 +199,30 @@ func (app *Application) Run() {
 	window.SetWindowTitle(appinfo.APP_DESC)
 	window.Resize2(600, 400)
 
-	entry := widgets.NewQLineEdit(nil)
-	app.entry = entry
-	entry.SetPlaceholderText("Type search query and press Enter")
+	app.entry = widgets.NewQLineEdit(nil)
+	app.entry.SetPlaceholderText("Type search query and press Enter")
 	// to reduce inner margins:
-	entry.SetTextMargins(0, -3, 0, -3)
+	app.entry.SetTextMargins(0, -3, 0, -3)
 
-	queryModeCombo := widgets.NewQComboBox(nil)
-	queryModeCombo.AddItems([]string{
+	app.queryModeCombo = widgets.NewQComboBox(nil)
+	app.queryModeCombo.AddItems([]string{
 		"Fuzzy",
 		"Start with",
 		"Regex",
 		"Glob",
 	})
-	app.queryModeCombo = queryModeCombo
 
 	okButton := widgets.NewQPushButton2(" OK ", nil)
 
-	queryFavoriteButton := NewPNGIconTextButton("", "favorite.png")
-	app.queryFavoriteButton = queryFavoriteButton
-	queryFavoriteButton.SetCheckable(true)
-	queryFavoriteButton.SetToolTip("Add this query to favorites")
+	app.queryFavoriteButton = NewPNGIconTextButton("", "favorite.png")
+	app.queryFavoriteButton.SetCheckable(true)
+	app.queryFavoriteButton.SetToolTip("Add this query to favorites")
 
 	// favoriteButtonVBox := widgets.NewQVBoxLayout()
-	favoriteButton := NewPNGIconTextButton("", "favorite.png")
-	app.favoriteButton = favoriteButton
-	favoriteButton.SetCheckable(true)
-	favoriteButton.SetToolTip("Add this term to favorites")
-	favoriteButton.Hide()
+	app.favoriteButton = NewPNGIconTextButton("", "favorite.png")
+	app.favoriteButton.SetCheckable(true)
+	app.favoriteButton.SetToolTip("Add this term to favorites")
+	app.favoriteButton.Hide()
 	// favoriteButtonVBox.AddWidget(favoriteButton, 0, core.Qt__AlignBottom)
 
 	okButton.ConnectResizeEvent(func(event *gui.QResizeEvent) {
@@ -217,8 +230,8 @@ func (app *Application) Run() {
 		if h > 100 {
 			return
 		}
-		queryFavoriteButton.SetFixedSize2(h, h)
-		favoriteButton.SetFixedSize2(h, h)
+		app.queryFavoriteButton.SetFixedSize2(h, h)
+		app.favoriteButton.SetFixedSize2(h, h)
 	})
 
 	queryLabel := widgets.NewQLabel2("Query:", nil, 0)
@@ -227,14 +240,13 @@ func (app *Application) Run() {
 	queryBoxLayout.SetContentsMargins(basePxHalf, basePxHalf, basePxHalf, 0)
 	queryBoxLayout.SetSpacing(basePxI)
 	queryBoxLayout.AddWidget(queryLabel, 0, 0)
-	queryBoxLayout.AddWidget(entry, 0, 0)
-	queryBoxLayout.AddWidget(queryModeCombo, 0, 0)
-	queryBoxLayout.AddWidget(queryFavoriteButton, 0, 0)
+	queryBoxLayout.AddWidget(app.entry, 0, 0)
+	queryBoxLayout.AddWidget(app.queryModeCombo, 0, 0)
+	queryBoxLayout.AddWidget(app.queryFavoriteButton, 0, 0)
 	queryBoxLayout.AddWidget(okButton, 0, 0)
 
-	headerLabel := CreateHeaderLabel(app)
-	app.headerLabel = headerLabel
-	headerLabel.SetAlignment(core.Qt__AlignLeft)
+	app.headerLabel = CreateHeaderLabel(app)
+	app.headerLabel.SetAlignment(core.Qt__AlignLeft)
 
 	headerBox := widgets.NewQWidget(nil, 0)
 	headerBox.SetSizePolicy2(widgets.QSizePolicy__Preferred, widgets.QSizePolicy__Minimum)
@@ -242,17 +254,15 @@ func (app *Application) Run() {
 	// headerBoxLayout.SetSizeConstraint(widgets.QLayout__SetMinimumSize)
 	headerBoxLayout.SetContentsMargins(0, 0, 0, 0)
 	headerBoxLayout.AddSpacing(basePxHalf)
-	headerBoxLayout.AddWidget(headerLabel, 1, 0)
+	headerBoxLayout.AddWidget(app.headerLabel, 1, 0)
 	// headerBoxLayout.AddLayout(favoriteButtonVBox, 0)
-	headerBoxLayout.AddWidget(favoriteButton, 0, core.Qt__AlignRight)
+	headerBoxLayout.AddWidget(app.favoriteButton, 0, core.Qt__AlignRight)
 	headerBoxLayout.AddSpacing(int(basePx * 1.5))
 	headerBox.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
 
-	articleView := NewArticleView(app)
-	app.articleView = articleView
+	app.articleView = NewArticleView(app)
 
-	historyView := NewHistoryView()
-	app.historyView = historyView
+	app.historyView = NewHistoryView()
 
 	frequencyTable.SetHorizontalHeaderItem(
 		0,
@@ -270,10 +280,9 @@ func (app *Application) Run() {
 	}
 	// TODO: save the width of 2 columns
 
-	favoritesWidget := favorites.NewFavoritesWidget(conf)
-	app.favoritesWidget = favoritesWidget
+	app.favoritesWidget = favorites.NewFavoritesWidget(conf)
 	{
-		err := favoritesWidget.Load()
+		err := app.favoritesWidget.Load()
 		if err != nil {
 			// conf.FavoritesAutoSave = false
 			fmt.Println(err)
@@ -284,33 +293,26 @@ func (app *Application) Run() {
 	miscLayout := widgets.NewQVBoxLayout2(miscBox)
 	miscLayout.SetContentsMargins(0, 0, 0, 0)
 
-	saveHistoryButton := widgets.NewQPushButton2("Save History", nil)
-	app.saveHistoryButton = saveHistoryButton
-	miscLayout.AddWidget(saveHistoryButton, 0, 0)
+	app.saveHistoryButton = widgets.NewQPushButton2("Save History", nil)
+	miscLayout.AddWidget(app.saveHistoryButton, 0, 0)
 
-	clearHistoryButton := widgets.NewQPushButton2("Clear History", nil)
-	app.clearHistoryButton = clearHistoryButton
-	miscLayout.AddWidget(clearHistoryButton, 0, 0)
+	app.clearHistoryButton = widgets.NewQPushButton2("Clear History", nil)
+	miscLayout.AddWidget(app.clearHistoryButton, 0, 0)
 
-	saveFavoritesButton := widgets.NewQPushButton2("Save Favorites", nil)
-	app.saveFavoritesButton = saveFavoritesButton
-	miscLayout.AddWidget(saveFavoritesButton, 0, 0)
+	app.saveFavoritesButton = widgets.NewQPushButton2("Save Favorites", nil)
+	miscLayout.AddWidget(app.saveFavoritesButton, 0, 0)
 
-	reloadDictsButton := widgets.NewQPushButton2("Reload Dicts", nil)
-	app.reloadDictsButton = reloadDictsButton
-	miscLayout.AddWidget(reloadDictsButton, 0, 0)
+	app.reloadDictsButton = widgets.NewQPushButton2("Reload Dicts", nil)
+	miscLayout.AddWidget(app.reloadDictsButton, 0, 0)
 
-	closeDictsButton := widgets.NewQPushButton2("Close Dicts", nil)
-	app.closeDictsButton = closeDictsButton
-	miscLayout.AddWidget(closeDictsButton, 0, 0)
+	app.closeDictsButton = widgets.NewQPushButton2("Close Dicts", nil)
+	miscLayout.AddWidget(app.closeDictsButton, 0, 0)
 
-	reloadStyleButton := widgets.NewQPushButton2("Reload Style", nil)
-	app.reloadStyleButton = reloadStyleButton
-	miscLayout.AddWidget(reloadStyleButton, 0, 0)
+	app.reloadStyleButton = widgets.NewQPushButton2("Reload Style", nil)
+	miscLayout.AddWidget(app.reloadStyleButton, 0, 0)
 
-	randomEntryButton := widgets.NewQPushButton2("Random Entry", nil)
-	app.randomEntryButton = randomEntryButton
-	miscLayout.AddWidget(randomEntryButton, 0, 0)
+	app.randomEntryButton = widgets.NewQPushButton2("Random Entry", nil)
+	miscLayout.AddWidget(app.randomEntryButton, 0, 0)
 
 	buttonBox := widgets.NewQHBoxLayout()
 	buttonBox.SetContentsMargins(0, 0, 0, 0)
@@ -332,9 +334,8 @@ func (app *Application) Run() {
 	if conf.ReduceMinimumWindowWidth {
 		dictsButtonLabel = "Dicts"
 	}
-	dictsButton := newIconTextButton(dictsButtonLabel, widgets.QStyle__SP_FileDialogDetailedView)
-	app.dictsButton = dictsButton
-	buttonBox.AddWidget(dictsButton, 0, core.Qt__AlignLeft)
+	app.dictsButton = newIconTextButton(dictsButtonLabel, widgets.QStyle__SP_FileDialogDetailedView)
+	buttonBox.AddWidget(app.dictsButton, 0, core.Qt__AlignLeft)
 
 	aboutButtonLabel := "About"
 	if conf.ReduceMinimumWindowWidth {
@@ -345,13 +346,11 @@ func (app *Application) Run() {
 
 	buttonBox.AddStretch(1)
 
-	openConfigButton := NewPNGIconTextButton("Config", "preferences-system-22.png")
-	app.openConfigButton = openConfigButton
-	buttonBox.AddWidget(openConfigButton, 0, 0)
+	app.openConfigButton = NewPNGIconTextButton("Config", "preferences-system-22.png")
+	buttonBox.AddWidget(app.openConfigButton, 0, 0)
 
-	reloadConfigButton := newIconTextButton("Reload", widgets.QStyle__SP_BrowserReload)
-	app.reloadConfigButton = reloadConfigButton
-	buttonBox.AddWidget(reloadConfigButton, 0, 0)
+	app.reloadConfigButton = newIconTextButton("Reload", widgets.QStyle__SP_BrowserReload)
+	buttonBox.AddWidget(app.reloadConfigButton, 0, 0)
 
 	buttonBox.AddStretch(1)
 
@@ -367,7 +366,7 @@ func (app *Application) Run() {
 	leftMainLayout.AddSpacing(basePxHalf)
 	leftMainLayout.AddWidget(headerBox, 0, 0)
 	leftMainLayout.AddSpacing(basePxHalf)
-	leftMainLayout.AddWidget(articleView, 0, 0)
+	leftMainLayout.AddWidget(app.articleView, 0, 0)
 	leftMainLayout.AddSpacing(basePxHalf)
 	leftMainLayout.AddLayout(buttonBox, 0)
 
@@ -379,64 +378,46 @@ func (app *Application) Run() {
 	})
 
 	frequencyTable.Hide()
-	favoritesWidget.Hide()
+	app.favoritesWidget.Hide()
 
 	activityWidget := widgets.NewQWidget(nil, 0)
 	activityLayout := widgets.NewQVBoxLayout2(activityWidget)
 	activityLayout.SetContentsMargins(5, 5, 5, 5)
 	activityLayout.AddWidget(activityTypeCombo, 0, 0)
-	activityLayout.AddWidget(historyView, 0, 0)
+	activityLayout.AddWidget(app.historyView, 0, 0)
 	activityLayout.AddWidget(frequencyTable, 0, 0)
-	activityLayout.AddWidget(favoritesWidget, 0, 0)
+	activityLayout.AddWidget(app.favoritesWidget, 0, 0)
 
-	activityTypeCombo.ConnectCurrentIndexChanged(func(index int) {
-		switch index {
-		case 0:
-			historyView.Show()
-			frequencyTable.Hide()
-			favoritesWidget.Hide()
-		case 1:
-			historyView.Hide()
-			frequencyTable.Show()
-			favoritesWidget.Hide()
-		case 2:
-			historyView.Hide()
-			frequencyTable.Hide()
-			favoritesWidget.Show()
-		}
-	})
+	activityTypeCombo.ConnectCurrentIndexChanged(app.activityComboChanged)
 
 	onResultDisplay := func(terms []string) {
-		favoriteButton.Show()
-		isFav := favoritesWidget.HasFavorite(terms[0])
-		favoriteButton.SetChecked(isFav)
+		app.favoriteButton.Show()
+		app.favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(terms[0]))
 	}
 
 	leftPanel := widgets.NewQWidget(nil, 0)
 	leftPanelLayout := widgets.NewQVBoxLayout2(leftPanel)
 	leftPanelLayout.AddWidget(widgets.NewQLabel2("Results", nil, 0), 0, 0)
-	resultList := NewResultListWidget(
-		articleView,
-		headerLabel,
+	app.resultList = NewResultListWidget(
+		app.articleView,
+		app.headerLabel,
 		onResultDisplay,
 	)
-	app.resultList = resultList
-	leftPanelLayout.AddWidget(resultList, 0, 0)
+	leftPanelLayout.AddWidget(app.resultList, 0, 0)
 
-	queryArgs := &QueryArgs{
-		ArticleView: articleView,
-		ResultList:  resultList,
-		HeaderLabel: headerLabel,
-		HistoryView: historyView,
+	app.queryArgs = &QueryArgs{
+		ArticleView: app.articleView,
+		ResultList:  app.resultList,
+		HeaderLabel: app.headerLabel,
+		HistoryView: app.historyView,
 		PostQuery:   app.postQuery,
-		Entry:       entry,
-		ModeCombo:   queryModeCombo,
+		Entry:       app.entry,
+		ModeCombo:   app.queryModeCombo,
 	}
-	app.queryArgs = queryArgs
 
-	headerLabel.doQuery = app.doQuery
-	articleView.doQuery = app.doQuery
-	historyView.doQuery = app.doQuery
+	app.headerLabel.doQuery = app.doQuery
+	app.articleView.doQuery = app.doQuery
+	app.historyView.doQuery = app.doQuery
 
 	rightPanel := widgets.NewQTabWidget(nil)
 	rightPanel.AddTab(activityWidget, " Activity ")
@@ -457,46 +438,43 @@ func (app *Application) Run() {
 
 	app.allTextWidgets = []qutils.HasSetFont{
 		queryLabel,
-		entry,
-		queryModeCombo,
+		app.entry,
+		app.queryModeCombo,
 		okButton,
-		headerLabel,
-		articleView,
-		historyView,
+		app.headerLabel,
+		app.articleView,
+		app.historyView,
 		frequencyTable,
-		favoritesWidget,
-		saveHistoryButton,
-		clearHistoryButton,
-		saveFavoritesButton,
-		reloadDictsButton,
-		closeDictsButton,
-		reloadStyleButton,
-		randomEntryButton,
-		dictsButton,
+		app.favoritesWidget,
+		app.saveHistoryButton,
+		app.clearHistoryButton,
+		app.saveFavoritesButton,
+		app.reloadDictsButton,
+		app.closeDictsButton,
+		app.reloadStyleButton,
+		app.randomEntryButton,
+		app.dictsButton,
 		aboutButton,
-		openConfigButton,
-		reloadConfigButton,
+		app.openConfigButton,
+		app.reloadConfigButton,
 		clearButton,
 		activityTypeCombo,
-		resultList,
+		app.resultList,
 		rightPanel,
 	}
 	app.ReloadFont()
 
-	entry.ConnectReturnPressed(func() {
-		onQuery(entry.Text(), queryArgs, false)
-	})
 	okButton.ConnectClicked(func(bool) {
-		onQuery(entry.Text(), queryArgs, false)
+		onQuery(app.entry.Text(), app.queryArgs, false)
 	})
 	aboutButton.ConnectClicked(func(bool) {
 		aboutClicked(window)
 	})
 
 	for _, widget := range []KeyPressIface{
-		resultList,
-		articleView,
-		historyView,
+		app.resultList,
+		app.articleView,
+		app.historyView,
 	} {
 		app.setupKeyPressEvent(widget)
 	}
@@ -510,65 +488,29 @@ func (app *Application) Run() {
 		if err != nil {
 			qerr.Error(err)
 		} else {
-			historyView.AddHistoryList(history)
+			app.historyView.AddHistoryList(history)
 		}
 	}
 
-	entry.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
-		entry.KeyPressEventDefault(event)
-		if !conf.SearchOnType {
-			return
-		}
-		// log.Printf("event text=%#v, key=%x, modifiers=%x", event.Text(), event.Key(), event.Modifiers())
-		if event.Key() >= 0x01000000 {
-			return
-		}
-		if event.Modifiers() > core.Qt__ShiftModifier {
-			return
-		}
-		text := entry.Text()
-		if len(text) < conf.SearchOnTypeMinLength {
-			return
-		}
-		onQuery(text, queryArgs, true)
-	})
-
-	favoriteButton.ConnectClicked(func(checked bool) {
-		if resultList.Active == nil {
-			favoriteButton.SetChecked(false)
-			return
-		}
-		term := resultList.Active.Terms()[0]
-		favoritesWidget.SetFavorite(term, checked)
-		if term == entry.Text() {
-			queryFavoriteButton.SetChecked(checked)
-		}
-	})
-	queryFavoriteButton.ConnectClicked(func(checked bool) {
-		term := entry.Text()
-		if term == "" {
-			queryFavoriteButton.SetChecked(false)
-			return
-		}
-		favoritesWidget.SetFavorite(term, checked)
-		if resultList.Active != nil && term == resultList.Active.Terms()[0] {
-			favoriteButton.SetChecked(checked)
-		}
-	})
-
 	qs := qsettings.GetQSettings(window)
+	app.setupSettings(qs, mainSplitter)
 
-	queryModeCombo.ConnectCurrentIndexChanged(func(i int) {
-		text := entry.Text()
+	window.Show()
+	app.Exec()
+}
+
+func (app *Application) setupSettings(qs *core.QSettings, mainSplitter *widgets.QSplitter) {
+	app.queryModeCombo.ConnectCurrentIndexChanged(func(i int) {
+		text := app.entry.Text()
 		if text != "" {
-			onQuery(text, queryArgs, false)
+			onQuery(text, app.queryArgs, false)
 		}
-		go qsettings.SaveSearchSettings(qs, queryModeCombo)
+		go qsettings.SaveSearchSettings(qs, app.queryModeCombo)
 	})
 
 	qsettings.RestoreSplitterSizes(qs, mainSplitter, QS_mainSplitter)
-	qsettings.RestoreMainWinGeometry(app.QApplication, qs, window)
-	qsettings.SetupMainWinGeometrySave(qs, window)
+	qsettings.RestoreMainWinGeometry(app.QApplication, qs, app.window)
+	qsettings.SetupMainWinGeometrySave(qs, app.window)
 
 	qsettings.RestoreTableColumnsWidth(
 		qs,
@@ -582,10 +524,7 @@ func (app *Application) Run() {
 
 	qsettings.SetupSplitterSizesSave(qs, mainSplitter, QS_mainSplitter)
 
-	qsettings.RestoreSearchSettings(qs, queryModeCombo)
-
-	window.Show()
-	app.Exec()
+	qsettings.RestoreSearchSettings(qs, app.queryModeCombo)
 }
 
 func (app *Application) setupHandlers() {
@@ -658,5 +597,49 @@ func (app *Application) setupHandlers() {
 		if app.runDictManager() {
 			onQuery(entry.Text(), queryArgs, false)
 		}
+	})
+	entry.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
+		entry.KeyPressEventDefault(event)
+		if !conf.SearchOnType {
+			return
+		}
+		// log.Printf("event text=%#v, key=%x, modifiers=%x", event.Text(), event.Key(), event.Modifiers())
+		if event.Key() >= 0x01000000 {
+			return
+		}
+		if event.Modifiers() > core.Qt__ShiftModifier {
+			return
+		}
+		text := entry.Text()
+		if len(text) < conf.SearchOnTypeMinLength {
+			return
+		}
+		onQuery(text, app.queryArgs, true)
+	})
+
+	app.favoriteButton.ConnectClicked(func(checked bool) {
+		if app.resultList.Active == nil {
+			app.favoriteButton.SetChecked(false)
+			return
+		}
+		term := app.resultList.Active.Terms()[0]
+		app.favoritesWidget.SetFavorite(term, checked)
+		if term == entry.Text() {
+			app.queryFavoriteButton.SetChecked(checked)
+		}
+	})
+	app.queryFavoriteButton.ConnectClicked(func(checked bool) {
+		term := entry.Text()
+		if term == "" {
+			app.queryFavoriteButton.SetChecked(false)
+			return
+		}
+		app.favoritesWidget.SetFavorite(term, checked)
+		if app.resultList.Active != nil && term == app.resultList.Active.Terms()[0] {
+			app.favoriteButton.SetChecked(checked)
+		}
+	})
+	app.entry.ConnectReturnPressed(func() {
+		onQuery(entry.Text(), app.queryArgs, false)
 	})
 }
