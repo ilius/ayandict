@@ -32,31 +32,14 @@ const (
 // kinda like "em" in html, but probably not exactly the same
 var basePx = float32(10)
 
-func Run() {
-	app := &Application{
-		QApplication:   widgets.NewQApplication(len(os.Args), os.Args),
-		window:         widgets.NewQMainWindow(nil, 0),
-		allTextWidgets: []qutils.HasSetFont{},
-	}
-	qerr.ShowMessage = showErrorMessage
-
-	if cacheDir == "" {
-		qerr.Error(cacheDir)
-	}
-	{
-		err := os.MkdirAll(cacheDir, 0o755)
-		if err != nil {
-			qerr.Error(err)
-		}
-	}
-
-	app.Run()
-}
-
 type Application struct {
 	*widgets.QApplication
 
 	window *widgets.QMainWindow
+
+	style *widgets.QStyle
+
+	bottomBoxStyleOpt *widgets.QStyleOptionButton
 
 	dictManager *qdictmgr.DictManager
 
@@ -86,6 +69,29 @@ type Application struct {
 	dictsButton         *widgets.QPushButton
 }
 
+func Run() {
+	app := &Application{
+		QApplication:   widgets.NewQApplication(len(os.Args), os.Args),
+		window:         widgets.NewQMainWindow(nil, 0),
+		allTextWidgets: []qutils.HasSetFont{},
+	}
+	qerr.ShowMessage = showErrorMessage
+	app.style = app.Style()
+	app.bottomBoxStyleOpt = widgets.NewQStyleOptionButton()
+
+	if cacheDir == "" {
+		qerr.Error(cacheDir)
+	}
+	{
+		err := os.MkdirAll(cacheDir, 0o755)
+		if err != nil {
+			qerr.Error(err)
+		}
+	}
+
+	app.Run()
+}
+
 func (app *Application) init() {
 	if !LoadConfig() {
 		conf = config.Default()
@@ -103,6 +109,15 @@ func (app *Application) init() {
 
 	app.LoadUserStyle()
 	qdictmgr.InitDicts(conf, true)
+}
+
+func (app *Application) newIconTextButton(label string, pix widgets.QStyle__StandardPixmap) *widgets.QPushButton {
+	return widgets.NewQPushButton3(
+		app.style.StandardIcon(
+			pix, app.bottomBoxStyleOpt, nil,
+		),
+		label, nil,
+	)
 }
 
 func (app *Application) doQuery(query string) {
@@ -318,30 +333,14 @@ func (app *Application) Run() {
 	buttonBox.SetContentsMargins(0, 0, 0, 0)
 	buttonBox.SetSpacing(basePxHalf)
 
-	bottomBoxStyleOpt := widgets.NewQStyleOptionButton()
-	style := app.Style()
-
-	newIconTextButton := func(label string, pix widgets.QStyle__StandardPixmap) *widgets.QPushButton {
-		return widgets.NewQPushButton3(
-			style.StandardIcon(
-				pix, bottomBoxStyleOpt, nil,
-			),
-			label, nil,
-		)
-	}
-
 	dictsButtonLabel := "Dictionaries"
 	if conf.ReduceMinimumWindowWidth {
 		dictsButtonLabel = "Dicts"
 	}
-	app.dictsButton = newIconTextButton(dictsButtonLabel, widgets.QStyle__SP_FileDialogDetailedView)
+	app.dictsButton = app.newIconTextButton(dictsButtonLabel, widgets.QStyle__SP_FileDialogDetailedView)
 	buttonBox.AddWidget(app.dictsButton, 0, core.Qt__AlignLeft)
 
-	aboutButtonLabel := "About"
-	if conf.ReduceMinimumWindowWidth {
-		aboutButtonLabel = "\u200c"
-	}
-	aboutButton := newIconTextButton(aboutButtonLabel, widgets.QStyle__SP_MessageBoxInformation)
+	aboutButton := app.makeAboutButton(conf)
 	buttonBox.AddWidget(aboutButton, 0, core.Qt__AlignLeft)
 
 	buttonBox.AddStretch(1)
@@ -349,14 +348,13 @@ func (app *Application) Run() {
 	app.openConfigButton = NewPNGIconTextButton("Config", "preferences-system-22.png")
 	buttonBox.AddWidget(app.openConfigButton, 0, 0)
 
-	app.reloadConfigButton = newIconTextButton("Reload", widgets.QStyle__SP_BrowserReload)
+	app.reloadConfigButton = app.newIconTextButton("Reload", widgets.QStyle__SP_BrowserReload)
 	buttonBox.AddWidget(app.reloadConfigButton, 0, 0)
 
 	buttonBox.AddStretch(1)
 
-	clearButton := widgets.NewQPushButton2("Clear", nil)
-	app.clearButton = clearButton
-	buttonBox.AddWidget(clearButton, 0, core.Qt__AlignRight)
+	app.clearButton = widgets.NewQPushButton2("Clear", nil)
+	buttonBox.AddWidget(app.clearButton, 0, core.Qt__AlignRight)
 
 	leftMainWidget := widgets.NewQWidget(nil, 0)
 	leftMainLayout := widgets.NewQVBoxLayout2(leftMainWidget)
@@ -457,7 +455,7 @@ func (app *Application) Run() {
 		aboutButton,
 		app.openConfigButton,
 		app.reloadConfigButton,
-		clearButton,
+		app.clearButton,
 		activityTypeCombo,
 		app.resultList,
 		rightPanel,
@@ -466,9 +464,6 @@ func (app *Application) Run() {
 
 	okButton.ConnectClicked(func(bool) {
 		onQuery(app.entry.Text(), app.queryArgs, false)
-	})
-	aboutButton.ConnectClicked(func(bool) {
-		aboutClicked(window)
 	})
 
 	for _, widget := range []KeyPressIface{
@@ -497,6 +492,18 @@ func (app *Application) Run() {
 
 	window.Show()
 	app.Exec()
+}
+
+func (app *Application) makeAboutButton(conf *config.Config) *widgets.QPushButton {
+	aboutButtonLabel := "About"
+	if conf.ReduceMinimumWindowWidth {
+		aboutButtonLabel = "\u200c"
+	}
+	aboutButton := app.newIconTextButton(aboutButtonLabel, widgets.QStyle__SP_MessageBoxInformation)
+	aboutButton.ConnectClicked(func(bool) {
+		aboutClicked(app.window)
+	})
+	return aboutButton
 }
 
 func (app *Application) setupSettings(qs *core.QSettings, mainSplitter *widgets.QSplitter) {
