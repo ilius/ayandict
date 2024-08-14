@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/BurntSushi/toml v1.3.2
 	github.com/ilius/go-dict-commons v0.4.2
-	github.com/ilius/go-dict-sql v0.3.3
+	github.com/ilius/go-dict-sql v0.4.0
 	github.com/ilius/go-stardict/v2 v2.3.0
 	github.com/ilius/is/v2 v2.3.2
 	github.com/ilius/qt v0.0.0-20230422004322-c855bcf0151b

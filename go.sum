@@ -16,6 +16,8 @@ github.com/ilius/go-dict-commons v0.4.2 h1:Twfn0BPUHyqXmhPK8lytpRY5/47wYjgyCdO0/
 github.com/ilius/go-dict-commons v0.4.2/go.mod h1:z5IgcnlVQqE76GU603UjjnzoQBP04dmR6qUE5GJQRzY=
 github.com/ilius/go-dict-sql v0.3.3 h1:eJHBm/rz4qKXX9Ev9s2YvcSMwSu/ijIjEfYytLGdrZ0=
 github.com/ilius/go-dict-sql v0.3.3/go.mod h1:jI6I1sR5fXSBRIKBt6jk3vci5sYjc/ovzEYXxti5rYw=
+github.com/ilius/go-dict-sql v0.4.0 h1:UQOweJHbEGjMmnUdXMDCm3c/nQVbdM0TD0252NG7bP4=
+github.com/ilius/go-dict-sql v0.4.0/go.mod h1:jI6I1sR5fXSBRIKBt6jk3vci5sYjc/ovzEYXxti5rYw=
 github.com/ilius/go-stardict/v2 v2.3.0 h1:S5hwBrZNBSEi0eBAbzNwUa/gYuTnpST/PbZpkmpIAlo=
 github.com/ilius/go-stardict/v2 v2.3.0/go.mod h1:SMYH/gv1pRqVYB+6VnqBKsgvgEEjExZk+ItX2vVeyOo=
 github.com/ilius/is/v2 v2.3.2 h1:14u2j/UTKeIHKlcp/48dabf7+7QJ9JJaaoeHVvfyAOk=
