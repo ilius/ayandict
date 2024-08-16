@@ -4,16 +4,11 @@ import (
 	"log"
 	"math/rand"
 	"sort"
-	"time"
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
 	common "github.com/ilius/go-dict-commons"
 )
-
-func init() {
-	rand.Seed(time.Now().UnixMicro())
-}
 
 func entryCount(dic common.Dictionary) int {
 	if dic.Disabled() {
