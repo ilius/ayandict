@@ -90,7 +90,7 @@ Here is a [list of all config parameters](./doc/config.rst).
 
 # Dictionaries
 
-As you see in screenshots, there is a button called "Dictionaries". It opens a dialog and lets you disable, enable and change order of dictionaries.
+As you see in screenshots, there is a button called "Dicts". It opens a dialog and lets you disable, enable and change order of dictionaries.
 
 Each dictionary has a "Symbol" which by default is the first letter of its name in curly brackets (for example `[W]` for WordNet). This symbol is shown in the list of results that is in the left side of window, as seen in screenshots. It is meant to show you which dictionary it comes from at first glance. You can change this symbol through "Dictionaries" dialog. Symbol can be empty, or be as long as you want (though it is 3 characters by default).
 
