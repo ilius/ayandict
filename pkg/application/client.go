@@ -29,7 +29,7 @@ func findLocalServer(ports []string) (bool, string) {
 			Path:   serverAppName,
 		}
 		_urlStr := _url.String()
-		slog.Info("Trying", _urlStr)
+		slog.Debug("findLocalServer, trying " + _urlStr)
 		t := time.Now()
 		res, err := client.Get(_urlStr)
 		if err != nil {

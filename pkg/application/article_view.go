@@ -68,7 +68,7 @@ var audioUrlRE = regexp.MustCompile(`href="[^<>"]+\.mp3"`)
 func (view *ArticleView) playAudioMPV(urlStr string) bool {
 	path, err := exec.LookPath("mpv")
 	if err != nil {
-		slog.Error("error in LookPath:", err)
+		slog.Error("error in LookPath", "err", err)
 		return false
 	}
 	args := []string{
@@ -89,7 +89,7 @@ func (view *ArticleView) playAudioMPV(urlStr string) bool {
 	}
 	err = cmd.Start()
 	if err != nil {
-		slog.Error("error in mpv: Start:", err)
+		slog.Error("error in mpv: Start", "err", err)
 		return false
 	}
 	return true
@@ -97,7 +97,7 @@ func (view *ArticleView) playAudioMPV(urlStr string) bool {
 
 func (view *ArticleView) playAudio(qUrl *core.QUrl) {
 	urlStr := qUrl.ToString(core.QUrl__PreferLocalFile)
-	slog.Info("Playing audio", urlStr)
+	slog.Info("Playing audio", "url", urlStr)
 	if conf.AudioMPV && view.playAudioMPV(urlStr) {
 		return
 	}
