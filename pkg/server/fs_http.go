@@ -2,7 +2,7 @@ package server
 
 import (
 	"embed"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"strings"
@@ -20,12 +20,12 @@ func (f *httpFileSystem) Open(name string) (http.File, error) {
 	}
 	file, err := f.fs.Open(name)
 	if err != nil {
-		log.Println(err)
+		slog.Error("error opening file", "err", err, "name", name)
 		return nil, err
 	}
 	file2, ok := file.(localFile)
 	if !ok {
-		log.Printf("file %#v is not a seeker", name)
+		slog.Error("file is not a seeker", "name", name)
 		return nil, os.ErrNotExist
 	}
 	return &httpFile{file2}, nil

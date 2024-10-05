@@ -3,7 +3,7 @@ package server
 import (
 	"encoding/json"
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"text/template"
@@ -52,7 +52,7 @@ type Result struct {
 func writeMsg(w http.ResponseWriter, msg string) {
 	_, err := w.Write([]byte(msg))
 	if err != nil {
-		log.Println("error in Write:", err)
+		slog.Error("error in Write", "err", err)
 	}
 }
 
@@ -71,7 +71,7 @@ func query(w http.ResponseWriter, r *http.Request) {
 	if query == "" {
 		err := jsonEncoder.Encode(ErrorResponse{Error: "missing query"})
 		if err != nil {
-			log.Println(err)
+			slog.Error("error in jsonEncoder.Encode", "err", err)
 		}
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -94,13 +94,13 @@ func query(w http.ResponseWriter, r *http.Request) {
 		}
 		// entry.ResourceDir()
 	}
-	log.Printf("LookupHTML took %v for %#v", time.Since(t), query)
+	slog.Info("LookupHTML running time", "dt", time.Since(t), "query", query)
 	err := jsonEncoder.Encode(results)
 	if err != nil {
-		log.Println(err)
+		slog.Error("error in jsonEncoder.Encode", "err", err)
 		err2 := jsonEncoder.Encode(ErrorResponse{Error: err.Error()})
 		if err2 != nil {
-			log.Println(err2)
+			slog.Error("error in jsonEncoder.Encode", "err2", err2)
 		}
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -120,10 +120,10 @@ func random(w http.ResponseWriter, r *http.Request) {
 		Score:           entry.Score(),
 	})
 	if err != nil {
-		log.Println(err)
+		slog.Error("error in jsonEncoder.Encode", "err", err)
 		err2 := jsonEncoder.Encode(ErrorResponse{Error: err.Error()})
 		if err2 != nil {
-			log.Println(err2)
+			slog.Error("error in jsonEncoder.Encode", "err2", err2)
 		}
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -212,7 +212,7 @@ func StartServer(port string) {
 		addWebHandlers()
 	}
 
-	log.Println("Starting local server on port", port)
+	slog.Info("Starting local server", "port", port)
 	addr := "127.0.0.1:" + port
 	if conf.WebExpose {
 		addr = ":" + port
