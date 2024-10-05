@@ -1,7 +1,8 @@
-package favorites
+package qfavorites
 
 import (
 	"github.com/ilius/ayandict/v2/pkg/config"
+	"github.com/ilius/ayandict/v2/pkg/favorites"
 	"github.com/ilius/ayandict/v2/pkg/qerr"
 	"github.com/ilius/qt/widgets"
 )
@@ -13,7 +14,7 @@ func NewFavoritesWidget(conf *config.Config) *FavoritesWidget {
 	})
 	return &FavoritesWidget{
 		QListWidget: widget,
-		Data: &Favorites{
+		Data: &favorites.Favorites{
 			Map: map[string]int{},
 		},
 		conf: conf,
@@ -22,12 +23,12 @@ func NewFavoritesWidget(conf *config.Config) *FavoritesWidget {
 
 type FavoritesWidget struct {
 	*widgets.QListWidget
-	Data *Favorites
+	Data *favorites.Favorites
 	conf *config.Config
 }
 
 func (w *FavoritesWidget) Load() error {
-	err := w.Data.Load(Path())
+	err := w.Data.Load(favorites.Path())
 	if err != nil {
 		return err
 	}
@@ -38,7 +39,7 @@ func (w *FavoritesWidget) Load() error {
 }
 
 func (w *FavoritesWidget) Save() error {
-	return w.Data.Save(Path())
+	return w.Data.Save(favorites.Path())
 }
 
 func (w *FavoritesWidget) HasFavorite(item string) bool {

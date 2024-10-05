@@ -7,10 +7,10 @@ import (
 	// "github.com/ilius/qt/webengine"
 
 	"github.com/ilius/ayandict/v2/pkg/appinfo"
+	"github.com/ilius/ayandict/v2/pkg/application/qfavorites"
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/qdictmgr"
-	"github.com/ilius/ayandict/v2/pkg/favorites"
 	"github.com/ilius/ayandict/v2/pkg/frequency"
 	"github.com/ilius/ayandict/v2/pkg/qerr"
 	"github.com/ilius/ayandict/v2/pkg/qsettings"
@@ -52,7 +52,7 @@ type Application struct {
 	historyView     *HistoryView
 	entry           *widgets.QLineEdit
 	queryModeCombo  *widgets.QComboBox
-	favoritesWidget *favorites.FavoritesWidget
+	favoritesWidget *qfavorites.FavoritesWidget
 
 	favoriteButton      *widgets.QPushButton
 	queryFavoriteButton *widgets.QPushButton
@@ -294,7 +294,7 @@ func (app *Application) Run() {
 	}
 	// TODO: save the width of 2 columns
 
-	app.favoritesWidget = favorites.NewFavoritesWidget(conf)
+	app.favoritesWidget = qfavorites.NewFavoritesWidget(conf)
 	{
 		err := app.favoritesWidget.Load()
 		if err != nil {
