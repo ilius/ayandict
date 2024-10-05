@@ -3,6 +3,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 
@@ -13,10 +14,26 @@ import (
 
 func main() {
 	log.SetOutput(os.Stdout)
+
+	createConfigFlag := flag.Bool(
+		"create-config",
+		false,
+		"Create config file (with defaults) if it does not exist",
+	)
+	flag.Parse()
+
 	conf, err := config.Load()
 	if err != nil {
 		panic(err)
 	}
+
+	if *createConfigFlag {
+		err := config.EnsureExists(conf)
+		if err != nil {
+			log.Printf("Failed creating config file: %v", err)
+		}
+	}
+
 	dictmgr.InitDicts(conf)
 	server.StartServer(conf.LocalServerPorts[0])
 }

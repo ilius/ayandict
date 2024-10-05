@@ -1,5 +1,3 @@
-//go:build !nogui
-
 package config
 
 import (
