@@ -2,7 +2,7 @@ package favorites
 
 import (
 	"encoding/json"
-	"log"
+	"log/slog"
 	"os"
 )
 
@@ -60,7 +60,7 @@ func (fav *Favorites) Save(fpath string) error {
 	if err != nil {
 		return err
 	}
-	log.Println("Saving", fpath)
+	slog.Info("Saving", fpath)
 	err = os.WriteFile(fpath, jsonBytes, 0o644)
 	if err != nil {
 		return err

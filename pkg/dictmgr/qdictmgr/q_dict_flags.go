@@ -1,7 +1,7 @@
 package qdictmgr
 
 import (
-	"log"
+	"log/slog"
 	"sync"
 
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
@@ -71,12 +71,12 @@ func (w *DictFlagsCheckboxes) checkConnectClicked(check *widgets.QPushButton, fl
 		}
 		w.flagsMutex.Lock()
 		defer w.flagsMutex.Unlock()
-		log.Printf("(before) flags = %x for %v", ds.Flags, ds.Symbol)
+		slog.Debug("(before) flags", "flags", ds.Flags, "symbol", ds.Symbol)
 		if checked {
 			ds.Flags &= ^flag
 		} else {
 			ds.Flags |= flag
 		}
-		log.Printf("(after)  flags = %x for %v, flag=%x", ds.Flags, ds.Symbol, flag)
+		slog.Debug("(after)  flags", "flags", ds.Flags, "symbol", ds.Symbol, "flag", flag)
 	})
 }

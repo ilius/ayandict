@@ -27,7 +27,7 @@ func jsonCodeValue(x any) string {
 // 	encoder := toml.NewEncoder(buf)
 // 	err := encoder.Encode(x)
 // 	if err != nil {
-// 		log.Printf("failed to encode %#v", x)
+// 		slog.Error("failed to encode", "x", x)
 // 		panic(err)
 // 	}
 // 	return buf.String()

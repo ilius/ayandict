@@ -3,7 +3,7 @@ package application
 import (
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -66,7 +66,7 @@ func (c *AudioCache) download(urlStr string, fpath string) error {
 	if err != nil {
 		return err
 	}
-	log.Printf("Downloaded into %#v", fpath)
+	slog.Debug("Downloaded audio", "fpath", fpath)
 	return nil
 }
 

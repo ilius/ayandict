@@ -1,7 +1,7 @@
 package dictmgr
 
 import (
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -48,7 +48,7 @@ func DictResFile(dictName string, resPath string) (string, bool) {
 	_, err := os.Stat(fpath)
 	if err != nil {
 		if err != os.ErrNotExist {
-			log.Println(err)
+			slog.Error("error", "err", err)
 		}
 		return "", false
 	}
@@ -58,7 +58,7 @@ func DictResFile(dictName string, resPath string) (string, bool) {
 func AudioVolume(dictName string) int {
 	ds := dicts.DictSettingsMap[dictName]
 	if ds == nil {
-		log.Printf("AudioVolume: no Settings value for dictName=%#v", dictName)
+		slog.Error("AudioVolume: no Settings value", "dictName", dictName)
 		return 200
 	}
 	if ds.AudioVolume == 0 {

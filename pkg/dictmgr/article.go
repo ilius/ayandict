@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	std_html "html"
-	"log"
+	"log/slog"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -55,7 +55,7 @@ func (p *DictProcessor) dictResURL(relPath string) string {
 func (p *DictProcessor) fixResURL(quoted string) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
-		log.Println(err)
+		slog.Error("error", "err", err)
 		return false, ""
 	}
 	if urlStr == webPlayImage {
@@ -63,7 +63,7 @@ func (p *DictProcessor) fixResURL(quoted string) (bool, string) {
 	}
 	_url, err := url.Parse(urlStr)
 	if err != nil {
-		log.Println(err)
+		slog.Error("error", "err", err)
 		return false, ""
 	}
 	if _url.Scheme != "" || _url.Host != "" {
@@ -75,7 +75,7 @@ func (p *DictProcessor) fixResURL(quoted string) (bool, string) {
 func (p *DictProcessor) fixSoundURL(quoted string) (bool, string) {
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
-		log.Println(err)
+		slog.Error("error", "err", err)
 		return false, ""
 	}
 	return true, p.dictResURL(urlStr[len("sound://"):])
@@ -90,13 +90,13 @@ func (*DictProcessor) fixEmptySoundLink(defi string, playImg string) string {
 
 func (p *DictProcessor) fixHrefSound(defi string) string {
 	subFunc := func(match string) string {
-		// log.Println("hrefSoundSub: match:", match)
+		// slog.Info("hrefSoundSub: match:", match)
 		ok, _url := p.fixSoundURL(match[6:])
 		if !ok {
 			return match
 		}
 		newStr := " href=" + strconv.Quote(_url)
-		// log.Println("hrefSoundSub:", newStr)
+		// slog.Info("hrefSoundSub:", newStr)
 		return newStr
 	}
 	return hrefSoundRE.ReplaceAllStringFunc(defi, subFunc)
@@ -175,7 +175,7 @@ func (p *DictProcessor) fixFileSrc(defi string) string {
 			return match
 		}
 		newStr := " src=" + strconv.Quote(_url)
-		// log.Println("srcSub:", newStr)
+		// slog.Info("srcSub:", newStr)
 		return newStr
 	}
 	return srcRE.ReplaceAllStringFunc(defi, srcSub)
@@ -211,11 +211,10 @@ func (p *DictProcessor) embedExternalStyle(defi string) string {
 		q_href := match[i+pre:]
 		j := strings.Index(q_href[1:], q_href[:1])
 		if j < 0 {
-			log.Printf("linkSub: did not find quote end in q_href=%#v\n", q_href)
+			slog.Error("linkSub: did not find quote end in q_href", "q_href", q_href)
 			return match
 		}
 		href := q_href[1 : j+1]
-		// log.Printf("linkSub: href=%#v\n", href)
 		if strings.Contains(href, "://") {
 			// TODO: download?
 			return match
@@ -223,7 +222,7 @@ func (p *DictProcessor) embedExternalStyle(defi string) string {
 		data, err := os.ReadFile(filepath.Join(resDir, href))
 		if err != nil {
 			if !os.IsNotExist(err) {
-				log.Println(err)
+				slog.Error("error", "err", err)
 			}
 			return match
 		}
@@ -231,7 +230,6 @@ func (p *DictProcessor) embedExternalStyle(defi string) string {
 	}
 
 	defi = linkRE.ReplaceAllStringFunc(defi, subFunc)
-	// log.Println(defi)
 	return defi
 }
 
@@ -282,7 +280,7 @@ func (p *DictProcessor) getPlayImage() string {
 	}
 	imgPath, err := loadPNGFile("audio-play.png")
 	if err != nil {
-		log.Println(err)
+		slog.Error("error", "err", err)
 	}
 	_url := url.URL{}
 	_url.Scheme = "file"

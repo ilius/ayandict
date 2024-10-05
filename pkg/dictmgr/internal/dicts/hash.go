@@ -2,14 +2,14 @@ package dicts
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 
 	"github.com/ilius/ayandict/v2/pkg/qerr"
 	common "github.com/ilius/go-dict-commons"
 )
 
 func Hash(info common.Dictionary) string {
-	log.Println("Calculating hash for", info.DictName())
+	slog.Info("Calculating hash for", info.DictName())
 	b_hash, err := info.CalcHash()
 	if err != nil {
 		qerr.Error(err)

@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"log"
+	"log/slog"
 	"strconv"
 	"strings"
 
@@ -93,7 +93,7 @@ func (t Token) tagString() string {
 		buf.WriteString(`="`)
 		err := escape(buf, a.Val)
 		if err != nil {
-			log.Println(err)
+			slog.Error("error", "err", err)
 		}
 		buf.WriteByte('"')
 	}

@@ -46,7 +46,7 @@ func loadPNGIcon(filename string) (*gui.QIcon, error) {
 // func loadSVGIcon(filename string) *gui.QIcon {
 // 	data, err := res.ReadFile("res/" + filename)
 // 	if err != nil {
-// 		log.Println(err)
+// 		slog.Error("error", "err", err)
 // 		return nil
 // 	}
 // 	image := gui.QImage_FromData(data, len(data), "SVG")

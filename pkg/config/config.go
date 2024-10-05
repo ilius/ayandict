@@ -1,7 +1,7 @@
 package config
 
 import (
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"sync"
@@ -179,7 +179,7 @@ func Path() string {
 		if err == nil {
 			return absPath
 		} else {
-			log.Printf("bad CONFIG_FILE=%#v, error: %v", _path, err)
+			slog.Error("bad CONFIG_FILE", "CONFIG_FILE", _path, "err", err)
 		}
 	}
 	return filepath.Join(GetConfigDir(), fileName)

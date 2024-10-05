@@ -51,7 +51,7 @@ func LoadConfig() bool {
 		}
 	}
 	{
-		// log.Println("Parsing:", conf.HeaderTemplate)
+		// slog.Info("Parsing:", conf.HeaderTemplate)
 		headerTplNew := template.New("header").Funcs(template.FuncMap{
 			"wrapterms": func(terms []string, limit int) [][]string {
 				return wordwrap.WordWrapByWords(terms, limit, " ", " ")

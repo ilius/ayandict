@@ -2,7 +2,7 @@ package application
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -95,7 +95,7 @@ func (w *ResultListWidget) SetResults(results []common.SearchResultIface) {
 		switch len(terms) {
 		case 0:
 			text = ""
-			log.Printf("empty terms, res=%#v\n", res)
+			slog.Error("empty terms", "res", res)
 		case 1:
 			text = terms[0]
 		case 2:
@@ -124,7 +124,7 @@ type HeaderTemplateInput struct {
 
 func (w *ResultListWidget) OnActivate(row int) {
 	if row >= len(w.results) {
-		log.Printf("ResultListWidget: OnActivate: row index %v out of range\n", row)
+		slog.Error("ResultListWidget: OnActivate: row index out of range", "row", row)
 		return
 	}
 	res := w.results[row]
@@ -157,7 +157,6 @@ func onQuery(
 		}
 		return
 	}
-	// log.Printf("Query: %s\n", query)
 	t := time.Now()
 	mode := dictmgr.QueryModeFuzzy
 	switch queryArgs.ModeCombo.CurrentIndex() {
@@ -169,7 +168,7 @@ func onQuery(
 		mode = dictmgr.QueryModeGlob
 	}
 	results := dictmgr.LookupHTML(query, conf, mode, resultFlags)
-	log.Printf("LookupHTML took %v for %#v", time.Since(t), query)
+	slog.Debug("LookupHTML running time", "dt", time.Since(t), "query", query)
 	queryArgs.ResultList.SetResults(results)
 	if len(results) == 0 {
 		if !isAuto {

@@ -2,7 +2,7 @@ package application
 
 import (
 	"io"
-	"log"
+	"log/slog"
 	"net"
 	"net/http"
 	"net/url"
@@ -29,7 +29,7 @@ func findLocalServer(ports []string) (bool, string) {
 			Path:   serverAppName,
 		}
 		_urlStr := _url.String()
-		log.Println("Trying", _urlStr)
+		slog.Info("Trying", _urlStr)
 		t := time.Now()
 		res, err := client.Get(_urlStr)
 		if err != nil {
@@ -38,7 +38,7 @@ func findLocalServer(ports []string) (bool, string) {
 		if res.Body == nil {
 			continue
 		}
-		log.Printf("%s responded in %v", _urlStr, time.Since(t))
+		slog.Debug("local server responded", "url", _urlStr, "dt", time.Since(t))
 		data, err := io.ReadAll(res.Body)
 		if err != nil {
 			qerr.Error(err)

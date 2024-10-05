@@ -1,7 +1,7 @@
 package application
 
 import (
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -51,7 +51,7 @@ func (app *Application) LoadUserStyle() {
 		qerr.Errorf("Error loading style file %#v: %v\n", stylePath, err)
 		return
 	}
-	log.Println("Loading", stylePath)
+	slog.Info("Loading", stylePath)
 	file := core.NewQFile2(stylePath)
 	file.Open(core.QIODevice__ReadOnly | core.QIODevice__Text)
 	stream := core.NewQTextStream2(file)

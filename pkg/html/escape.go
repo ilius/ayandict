@@ -6,7 +6,7 @@ package html
 
 import (
 	"bytes"
-	"log"
+	"log/slog"
 	"strings"
 	"unicode/utf8"
 )
@@ -273,7 +273,7 @@ func escapeCommentString(s string) string {
 	var buf bytes.Buffer
 	err := escapeComment(&buf, s)
 	if err != nil {
-		log.Println(err)
+		slog.Error("error", "err", err)
 	}
 	return buf.String()
 }
@@ -326,7 +326,7 @@ func EscapeString(s string) string {
 	var buf bytes.Buffer
 	err := escape(&buf, s)
 	if err != nil {
-		log.Println(err)
+		slog.Error("error", "err", err)
 	}
 	return buf.String()
 }

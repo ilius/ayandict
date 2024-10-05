@@ -155,7 +155,6 @@ func (app *Application) postQuery(query string) {
 
 func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 	widget.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
-		// log.Printf("KeyPressEvent: %T", widget)
 		switch event.Text() {
 		case " ":
 			app.entry.SetFocus(core.Qt__ShortcutFocusReason)
@@ -610,7 +609,6 @@ func (app *Application) setupHandlers() {
 		if !conf.SearchOnType {
 			return
 		}
-		// log.Printf("event text=%#v, key=%x, modifiers=%x", event.Text(), event.Key(), event.Modifiers())
 		if event.Key() >= 0x01000000 {
 			return
 		}

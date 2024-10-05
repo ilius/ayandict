@@ -2,7 +2,7 @@ package dicts
 
 import (
 	"encoding/json"
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"sort"
@@ -140,7 +140,7 @@ func InitDicts(conf *config.Config) {
 		DictByName[dic.DictName()] = dic
 	}
 
-	log.Println("Loading dictionaries took", time.Since(t))
+	slog.Info("Loading dictionaries took", time.Since(t))
 
 	nameByHash := getDictNameByHashMap()
 
@@ -149,7 +149,7 @@ func InitDicts(conf *config.Config) {
 		if hash != "" {
 			prevNames := nameByHash[hash]
 			if len(prevNames) > 0 {
-				log.Println("init: found renamed dicts:", prevNames)
+				slog.Info("init: found renamed dicts:", prevNames)
 				prevName := prevNames[0]
 				ds := DictSettingsMap[prevName]
 				delete(DictSettingsMap, prevName)
@@ -168,7 +168,7 @@ func InitDicts(conf *config.Config) {
 		dictName := dic.DictName()
 		ds := DictSettingsMap[dictName]
 		if ds == nil {
-			log.Printf("init: found new dict: %v\n", dictName)
+			slog.Info("init: found new dict", "dictName", dictName)
 			ds = newDictSettings(dic, index)
 			DictSettingsMap[dictName] = ds
 			DictsOrder[dictName] = ds.Order

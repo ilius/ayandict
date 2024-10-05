@@ -4,7 +4,7 @@
 package config
 
 import (
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -30,7 +30,7 @@ func GetCacheDir() string {
 		var err error
 		localAppData, err = filepath.Abs(filepath.Join(appData, "..", "Local"))
 		if err != nil {
-			log.Println(err)
+			slog.Error("error", "err", err)
 			return ""
 		}
 	}

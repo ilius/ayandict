@@ -1,7 +1,7 @@
 package qdictmgr
 
 import (
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -122,7 +122,7 @@ func (dm *DictManager) setItem(
 	table := dm.TableWidget
 	info, ok := dm.infoMap[dictName]
 	if !ok {
-		log.Printf("dictName=%#v not in infoMap\n", dictName)
+		slog.Error("dictName not in infoMap", "dictName", dictName)
 		return
 	}
 	enabledItem := widgets.NewQTableWidgetItem(0)
@@ -286,7 +286,7 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 	extraOptionsVBox.AddLayout(volumeHBox, 0)
 	volumeInput.ConnectValueChanged(func(value int) {
 		if selectedDictSettings == nil {
-			log.Println("ConnectValueChanged: selectedDictSettings == nil")
+			slog.Info("ConnectValueChanged: selectedDictSettings == nil")
 			return
 		}
 		selectedDictSettings.AudioVolume = value
@@ -370,7 +370,7 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 		dictName := dic.DictName()
 		ds := dicts.DictSettingsMap[dictName]
 		if ds == nil {
-			log.Printf("dict manager: found new dict: %v\n", dictName)
+			slog.Info("dict manager: found new dict", "dictName", dictName)
 			ds = dicts.NewDictSettings(dic, index)
 			ds.Hash = dicts.Hash(dic)
 			dicts.DictSettingsMap[dictName] = ds

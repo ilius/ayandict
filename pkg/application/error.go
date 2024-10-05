@@ -1,7 +1,7 @@
 package application
 
 import (
-	"log"
+	"log/slog"
 
 	"github.com/ilius/qt/widgets"
 )
@@ -10,7 +10,7 @@ func showErrorMessage(msg string) {
 	defer func() {
 		r := recover()
 		if r != nil {
-			log.Println(r)
+			slog.Error("Panic", "r", r)
 		}
 	}()
 	d := widgets.NewQErrorMessage(nil)

@@ -1,7 +1,7 @@
 package qsettings
 
 import (
-	"log"
+	"log/slog"
 	"strconv"
 	"strings"
 	"time"
@@ -100,7 +100,7 @@ func restoreIntSetting(
 }
 
 func saveMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
-	// log.Println("Saving main window geometry")
+	// slog.Info("Saving main window geometry")
 	qs.BeginGroup(QS_mainwindow)
 	defer qs.EndGroup()
 
@@ -249,7 +249,7 @@ func RestoreTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, m
 }
 
 func saveSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
-	// log.Println("Saving splitter sizes")
+	// slog.Info("Saving splitter sizes")
 	qs.BeginGroup(mainKey)
 	defer qs.EndGroup()
 	sizes := splitterSizes(splitter)
@@ -265,7 +265,7 @@ func RestoreSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainK
 	sizesStr := qs.Value(QS_sizes, core.NewQVariant1("")).ToString()
 	sizes, err := splitIntList(sizesStr)
 	if err != nil {
-		log.Println(err)
+		slog.Error("error", "err", err)
 		return
 	}
 	splitter.SetSizes(sizes)

@@ -1,7 +1,7 @@
 package application
 
 import (
-	"log"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -68,10 +68,9 @@ var audioUrlRE = regexp.MustCompile(`href="[^<>"]+\.mp3"`)
 func (view *ArticleView) playAudioMPV(urlStr string) bool {
 	path, err := exec.LookPath("mpv")
 	if err != nil {
-		log.Println("error in LookPath:", err)
+		slog.Error("error in LookPath:", err)
 		return false
 	}
-	// log.Println(path, urlStr)
 	args := []string{
 		path,
 		"--no-video",
@@ -82,7 +81,6 @@ func (view *ArticleView) playAudioMPV(urlStr string) bool {
 		volumeStr := strconv.FormatInt(int64(volume), 10)
 		args = append(args, "--volume="+volumeStr)
 	}
-	// log.Printf("%#v", args)
 	cmd := exec.Cmd{
 		Path:   path,
 		Args:   args,
@@ -91,7 +89,7 @@ func (view *ArticleView) playAudioMPV(urlStr string) bool {
 	}
 	err = cmd.Start()
 	if err != nil {
-		log.Println("error in mpv: Start:", err)
+		slog.Error("error in mpv: Start:", err)
 		return false
 	}
 	return true
@@ -99,7 +97,7 @@ func (view *ArticleView) playAudioMPV(urlStr string) bool {
 
 func (view *ArticleView) playAudio(qUrl *core.QUrl) {
 	urlStr := qUrl.ToString(core.QUrl__PreferLocalFile)
-	log.Println("Playing audio", urlStr)
+	slog.Info("Playing audio", urlStr)
 	if conf.AudioMPV && view.playAudioMPV(urlStr) {
 		return
 	}
@@ -119,23 +117,23 @@ func (view *ArticleView) autoPlay(text string, count int) {
 	for index, match := range matches {
 		urlStr, err := strconv.Unquote(match[5:])
 		if err != nil {
-			log.Println(err)
+			slog.Error("error", "err", err)
 			continue
 		}
 		qUrl := core.NewQUrl3(urlStr, core.QUrl__TolerantMode)
-		// log.Println("Playing audio", urlStr)
+		// slog.Info("Playing audio", urlStr)
 		isRemote := qUrl.Scheme() != "file"
 		if isRemote {
 			qUrlLocal, err := audioCache.Get(urlStr)
 			if err != nil {
-				log.Println(err)
+				slog.Error("error", "err", err)
 			} else {
 				qUrl = qUrlLocal
 				isRemote = false
 			}
 		}
 		view.playAudio(qUrl)
-		// log.Println("Duration:", player.Duration())
+		// slog.Info("Duration:", player.Duration())
 		// player.Duration() is always zero
 		if isRemote {
 			time.Sleep(2000 * time.Millisecond)
@@ -145,16 +143,16 @@ func (view *ArticleView) autoPlay(text string, count int) {
 		if fpath == "" {
 			continue
 		}
-		// log.Println("Calculating duration of", fpath)
+		// slog.Info("Calculating duration of", fpath)
 		duration, err := mp3duration.Calculate(fpath)
 		if err != nil {
-			log.Printf("error in mp3duration.Calculate(%#v): %v", fpath, err)
+			slog.Error("error in mp3duration.Calculate", "fpath", fpath, "err", err)
 			continue
 		}
 		if index < lastIndex {
 			duration += conf.AudioAutoPlayWaitBetween
 		}
-		// log.Println("Sleeping", duration)
+		// slog.Info("Sleeping", duration)
 		time.Sleep(duration)
 	}
 }
@@ -267,25 +265,25 @@ func (view *ArticleView) ZoomOut() {
 
 func (view *ArticleView) findLinkOnCursor(cursor *gui.QTextCursor) string {
 	text := cursor.Selection().ToHtml(core.NewQByteArray2("utf-8", 5))
-	// log.Println("findLinkOnCursor:", text)
+	// slog.Info("findLinkOnCursor:", text)
 	start := strings.Index(text, startFrag)
 	if start >= 0 {
 		text = text[start:]
 	}
 	start = strings.Index(text, "href=")
 	if start < 0 {
-		// log.Println("findLinkOnCursor: did not find end href=")
+		// slog.Info("findLinkOnCursor: did not find end href=")
 		return ""
 	}
 	text = text[start+5:]
 	end := strings.Index(text[1:], text[:1])
 	if end < 0 {
-		// log.Println("findLinkOnCursor: did not find end quote")
+		// slog.Info("findLinkOnCursor: did not find end quote")
 		return ""
 	}
 	urlStr, err := strconv.Unquote(text[:end+2])
 	if err != nil {
-		// log.Println("error in Unquote", err)
+		// slog.Error("error in Unquote", err)
 		return ""
 	}
 	return urlStr
@@ -294,40 +292,31 @@ func (view *ArticleView) findLinkOnCursor(cursor *gui.QTextCursor) string {
 func (view *ArticleView) setupAnchorClicked() {
 	view.ConnectAnchorClicked(func(qUrl *core.QUrl) {
 		host := qUrl.Host(core.QUrl__FullyDecoded)
-		// log.Printf(
-		// 	"AnchorClicked: %#v, host=%#v = %#v\n",
-		// 	link.ToString(core.QUrl__None),
-		// 	host,
-		// 	link.Host(core.QUrl__FullyEncoded),
-		// )
 		if qUrl.Scheme() == "bword" {
 			if host != "" {
 				view.doQuery(host)
 			} else {
-				log.Printf("AnchorClicked: %#v\n", qUrl.ToString(core.QUrl__None))
+				slog.Debug("AnchorClicked", "url", qUrl.ToString(core.QUrl__None))
 			}
 			return
 		}
 		path := qUrl.Path(core.QUrl__FullyDecoded)
-		// log.Printf("scheme=%#v, host=%#v, path=%#v", link.Scheme(), host, path)
 		switch qUrl.Scheme() {
 		case "":
 			view.doQuery(path)
 			return
 		case "file":
-			// log.Printf("host=%#v, ext=%#v", host, ext)
 			switch filepath.Ext(path) {
 			case ".mp3", ".wav", ".ogg":
 				view.playAudio(qUrl)
 				return
 			}
 		case "http", "https":
-			// log.Printf("host=%#v, ext=%#v", host, ext)
 			switch filepath.Ext(path) {
 			case ".mp3", ".wav", ".ogg":
 				qUrlLocal, err := audioCache.Get(qUrl.ToString(core.QUrl__None))
 				if err != nil {
-					log.Println(err)
+					slog.Error("error", "err", err)
 				} else {
 					qUrl = qUrlLocal
 				}
@@ -356,13 +345,13 @@ func (view *ArticleView) setupMouseReleaseEvent() {
 
 				urlStr := view.findLinkOnCursor(cursor)
 				if urlStr != "" {
-					// log.Println("right-click on url:", urlStr)
+					// slog.Info("right-click on url:", urlStr)
 					view.rightClickOnUrl = urlStr
 				}
 
 				view.rightClickOnWord = strings.Trim(cursor.SelectedText(), punctuation)
 				if view.rightClickOnWord != "" {
-					log.Printf("Right-clicked on word %#v\n", view.rightClickOnWord)
+					slog.Debug("Right-clicked on word", "word", view.rightClickOnWord)
 				}
 			}
 		}

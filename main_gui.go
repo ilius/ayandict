@@ -4,8 +4,7 @@ package main
 
 import (
 	"flag"
-	"log"
-	"os"
+	"log/slog"
 
 	"github.com/ilius/ayandict/v2/pkg/application"
 	"github.com/ilius/ayandict/v2/pkg/config"
@@ -21,7 +20,7 @@ func runServerOnly(createConfig bool) {
 	if createConfig {
 		err := config.EnsureExists(conf)
 		if err != nil {
-			log.Printf("Failed creating config file: %v", err)
+			slog.Error("Failed creating config file", "err", err)
 		}
 	}
 	dictmgr.InitDicts(conf)
@@ -41,7 +40,7 @@ func main() {
 	)
 	flag.Parse()
 
-	log.SetOutput(os.Stdout)
+	// slog uses stdout
 
 	if *noGuiFlag {
 		runServerOnly(*createConfigFlag)

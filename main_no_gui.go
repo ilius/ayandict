@@ -4,8 +4,7 @@ package main
 
 import (
 	"flag"
-	"log"
-	"os"
+	"log/slog"
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
@@ -13,7 +12,7 @@ import (
 )
 
 func main() {
-	log.SetOutput(os.Stdout)
+	// slog uses stdout
 
 	createConfigFlag := flag.Bool(
 		"create-config",
@@ -30,7 +29,7 @@ func main() {
 	if *createConfigFlag {
 		err := config.EnsureExists(conf)
 		if err != nil {
-			log.Printf("Failed creating config file: %v", err)
+			slog.Error("Failed creating config file", "err", err)
 		}
 	}
 

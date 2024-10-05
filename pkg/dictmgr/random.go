@@ -1,7 +1,7 @@
 package dictmgr
 
 import (
-	"log"
+	"log/slog"
 	"math/rand"
 	"sort"
 
@@ -16,7 +16,7 @@ func entryCount(dic common.Dictionary) int {
 	}
 	n, err := dic.EntryCount()
 	if err != nil {
-		log.Println(err)
+		slog.Error("error", "err", err)
 	}
 	return n
 }
@@ -37,10 +37,10 @@ func RandomEntry(conf *config.Config, resultFlags uint32) *SearchResult {
 	})
 	dic := dicts.DictList[dicIndex]
 	relEntryI := totalEntryI - sums[dicIndex]
-	log.Printf("RandomEntry: %v from %v", relEntryI, dic.DictName())
+	slog.Debug("RandomEntry", "index", relEntryI, "dictName", dic.DictName())
 	entry := dic.EntryByIndex(relEntryI)
 	if entry == nil {
-		log.Printf("ENTRY NOT FOUND: index %v in %v", relEntryI, dic.DictName())
+		slog.Error("ENTRY NOT FOUND", "index", relEntryI, "dictName", dic.DictName())
 		return nil
 	}
 	entry.F_Score = 200

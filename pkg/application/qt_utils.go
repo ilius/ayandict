@@ -1,7 +1,7 @@
 package application
 
 import (
-	"log"
+	"log/slog"
 	"path/filepath"
 	"strings"
 
@@ -38,7 +38,7 @@ func fontPointSize(font *gui.QFont, dpi float64) float64 {
 	}
 	pixels := font.PixelSize()
 	if pixels <= 0 {
-		log.Printf("bad font size: points=%v, pixels=%v", font.PointSizeF(), pixels)
+		slog.Error("bad font size", "points", font.PointSizeF(), "pixels", pixels)
 	}
 	return float64(pixels) * 72.0 / dpi
 }
