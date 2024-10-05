@@ -60,7 +60,7 @@ func (fav *Favorites) Save(fpath string) error {
 	if err != nil {
 		return err
 	}
-	slog.Info("Saving", fpath)
+	slog.Info("Saving favorites", "fpath", fpath)
 	err = os.WriteFile(fpath, jsonBytes, 0o644)
 	if err != nil {
 		return err

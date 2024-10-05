@@ -9,7 +9,7 @@ import (
 )
 
 func Hash(info common.Dictionary) string {
-	slog.Info("Calculating hash for", info.DictName())
+	slog.Info("Calculating dict hash", "dictName", info.DictName())
 	b_hash, err := info.CalcHash()
 	if err != nil {
 		qerr.Error(err)

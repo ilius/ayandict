@@ -140,7 +140,7 @@ func InitDicts(conf *config.Config) {
 		DictByName[dic.DictName()] = dic
 	}
 
-	slog.Info("Loading dictionaries took", time.Since(t))
+	slog.Info("Loaded dictionaries", "dt", time.Since(t))
 
 	nameByHash := getDictNameByHashMap()
 
@@ -149,7 +149,7 @@ func InitDicts(conf *config.Config) {
 		if hash != "" {
 			prevNames := nameByHash[hash]
 			if len(prevNames) > 0 {
-				slog.Info("init: found renamed dicts:", prevNames)
+				slog.Info("init: found renamed dicts:", "prevNames", prevNames)
 				prevName := prevNames[0]
 				ds := DictSettingsMap[prevName]
 				delete(DictSettingsMap, prevName)
