@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/ilius/ayandict/v2/pkg/qerr"
+	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 )
 
 const fileName = "config.toml"

@@ -12,9 +12,9 @@ import (
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/qdictmgr"
-	"github.com/ilius/ayandict/v2/pkg/qerr"
-	"github.com/ilius/ayandict/v2/pkg/qsettings"
-	"github.com/ilius/ayandict/v2/pkg/qutils"
+	"github.com/ilius/ayandict/v2/pkg/qtcommon"
+	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
+	"github.com/ilius/ayandict/v2/pkg/qtcommon/qsettings"
 	"github.com/ilius/ayandict/v2/pkg/server"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
@@ -43,7 +43,7 @@ type Application struct {
 
 	dictManager *qdictmgr.DictManager
 
-	allTextWidgets []qutils.HasSetFont
+	allTextWidgets []qtcommon.HasSetFont
 
 	queryArgs       *QueryArgs
 	headerLabel     *HeaderLabel
@@ -73,7 +73,7 @@ func Run() {
 	app := &Application{
 		QApplication:   widgets.NewQApplication(len(os.Args), os.Args),
 		window:         widgets.NewQMainWindow(nil, 0),
-		allTextWidgets: []qutils.HasSetFont{},
+		allTextWidgets: []qtcommon.HasSetFont{},
 	}
 	qerr.ShowMessage = showErrorMessage
 	app.style = app.Style()
@@ -433,7 +433,7 @@ func (app *Application) Run() {
 
 	app.SetFont(ConfigFont(), "")
 
-	app.allTextWidgets = []qutils.HasSetFont{
+	app.allTextWidgets = []qtcommon.HasSetFont{
 		queryLabel,
 		app.entry,
 		app.queryModeCombo,

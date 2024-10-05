@@ -7,7 +7,7 @@ import (
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/qdictmgr"
-	"github.com/ilius/ayandict/v2/pkg/qerr"
+	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/ayandict/v2/pkg/wordwrap"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"

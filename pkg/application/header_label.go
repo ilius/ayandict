@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
-	"github.com/ilius/ayandict/v2/pkg/qerr"
+	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"

@@ -1,4 +1,4 @@
-package qutils
+package qtcommon
 
 import "github.com/ilius/qt/gui"
 

@@ -3,7 +3,7 @@ package qfavorites
 import (
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/favorites"
-	"github.com/ilius/ayandict/v2/pkg/qerr"
+	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/qt/widgets"
 )
 

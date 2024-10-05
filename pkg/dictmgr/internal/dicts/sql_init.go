@@ -3,7 +3,7 @@
 package dicts
 
 import (
-	"github.com/ilius/ayandict/v2/pkg/qerr"
+	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	sqldict "github.com/ilius/go-dict-sql"
 )
 

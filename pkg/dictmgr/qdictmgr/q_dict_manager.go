@@ -8,9 +8,9 @@ import (
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
-	"github.com/ilius/ayandict/v2/pkg/qerr"
-	"github.com/ilius/ayandict/v2/pkg/qsettings"
-	"github.com/ilius/ayandict/v2/pkg/qutils"
+	"github.com/ilius/ayandict/v2/pkg/qtcommon"
+	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
+	"github.com/ilius/ayandict/v2/pkg/qtcommon/qsettings"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
@@ -38,7 +38,7 @@ type DictManager struct {
 	Dialog      *widgets.QDialog
 	TableWidget *widgets.QTableWidget
 	VolumeInput *widgets.QSpinBox
-	TextWidgets []qutils.HasSetFont
+	TextWidgets []qtcommon.HasSetFont
 
 	infoMap map[string]common.Dictionary
 
@@ -92,7 +92,7 @@ func NewDictManager(
 		Dialog:      window,
 		TableWidget: table,
 		VolumeInput: volumeInput,
-		TextWidgets: []qutils.HasSetFont{
+		TextWidgets: []qtcommon.HasSetFont{
 			table,
 			toolbar,
 			okButton,
