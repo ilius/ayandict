@@ -1,7 +1,7 @@
 package application
 
 import (
-	"github.com/ilius/ayandict/v2/pkg/frequency"
+	"github.com/ilius/ayandict/v2/pkg/application/frequency"
 	"github.com/ilius/qt/widgets"
 )
 

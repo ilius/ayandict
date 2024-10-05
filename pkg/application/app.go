@@ -7,11 +7,11 @@ import (
 	// "github.com/ilius/qt/webengine"
 
 	"github.com/ilius/ayandict/v2/pkg/appinfo"
+	"github.com/ilius/ayandict/v2/pkg/application/frequency"
 	"github.com/ilius/ayandict/v2/pkg/application/qfavorites"
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/qdictmgr"
-	"github.com/ilius/ayandict/v2/pkg/frequency"
 	"github.com/ilius/ayandict/v2/pkg/qerr"
 	"github.com/ilius/ayandict/v2/pkg/qsettings"
 	"github.com/ilius/ayandict/v2/pkg/qutils"
