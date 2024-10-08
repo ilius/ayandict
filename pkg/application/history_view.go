@@ -1,63 +1,88 @@
 package application
 
 import (
+	"log/slog"
+
+	"github.com/ilius/ayandict/v2/pkg/activity"
+	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/qt/gui"
 	"github.com/ilius/qt/widgets"
 )
 
 type HistoryView struct {
+	storage *activity.ActivityStorage
+	maxSize int
+
 	*widgets.QListWidget
 
 	doQuery func(string)
 }
 
-func NewHistoryView() *HistoryView {
+func NewHistoryView(
+	storage *activity.ActivityStorage,
+	maxSize int,
+) *HistoryView {
 	widget := widgets.NewQListWidget(nil)
 	return &HistoryView{
+		storage:     storage,
+		maxSize:     maxSize,
 		QListWidget: widget,
 	}
 }
 
-func (view *HistoryView) AddHistory(query string) {
-	if len(history) > 0 && query == history[len(history)-1] {
+func (h *HistoryView) Load() error {
+	history, err := h.storage.LoadHistory()
+	if err != nil {
+		return err
+	}
+	h.AddHistoryList(history)
+	return nil
+}
+
+func (h *HistoryView) Save() {
+	err := h.storage.SaveHistory()
+	if err != nil {
+		qerr.Errorf("Error saving history: %v", err)
+	}
+}
+
+func (h *HistoryView) Add(query string) {
+	slog.Debug("HistoryView: Add", "query", query)
+	if !h.storage.AddHistory(query) {
 		return
 	}
-	addHistoryLow(query)
-	view.InsertItem2(0, query)
-	view.TrimHistory(historyMaxSize)
+
+	h.InsertItem2(0, query)
+	h.TrimHistory(h.maxSize)
 	if conf.HistoryAutoSave {
-		SaveHistory()
+		h.Save()
 	}
 }
 
-func (view *HistoryView) AddHistoryList(list []string) {
+func (h *HistoryView) AddHistoryList(list []string) {
 	for _, query := range list {
-		view.InsertItem2(0, query)
+		h.InsertItem2(0, query)
 	}
 }
 
-func (view *HistoryView) TrimHistory(maxSize int) {
-	count := view.Count()
+func (h *HistoryView) TrimHistory(maxSize int) {
+	count := h.Count()
 	if count <= maxSize {
 		return
 	}
 	for i := maxSize; i < count; i++ {
-		view.TakeItem(maxSize)
+		h.TakeItem(maxSize)
 	}
 }
 
-func (view *HistoryView) ClearHistory() {
-	historyMutex.Lock()
-	history = []string{}
-	historyMutex.Unlock()
-
-	view.Clear()
-
-	SaveHistory()
+func (h *HistoryView) ClearHistory() {
+	h.storage.ClearHistory()
+	h.Clear()
+	h.Save()
 }
 
-func (view *HistoryView) SetupCustomHandlers() {
-	doQuery := view.doQuery
+func (h *HistoryView) SetupCustomHandlers() {
+	doQuery := h.doQuery
 	if doQuery == nil {
 		panic("doQuery is not set")
 	}
@@ -65,16 +90,16 @@ func (view *HistoryView) SetupCustomHandlers() {
 	// view.SelectedItems() panics
 	// and even after fixing panic, doesn't return anything
 	// you have to use view.CurrentIndex()
-	view.ConnectMousePressEvent(func(event *gui.QMouseEvent) {
-		view.MousePressEventDefault(event)
-		index := view.CurrentIndex()
+	h.ConnectMousePressEvent(func(event *gui.QMouseEvent) {
+		h.MousePressEventDefault(event)
+		index := h.CurrentIndex()
 		if index == nil {
 			return
 		}
-		view.Activated(index)
+		h.Activated(index)
 	})
 
-	view.ConnectItemActivated(func(item *widgets.QListWidgetItem) {
+	h.ConnectItemActivated(func(item *widgets.QListWidgetItem) {
 		doQuery(item.Text())
 	})
 

@@ -6,6 +6,7 @@ import (
 
 	// "github.com/ilius/qt/webengine"
 
+	"github.com/ilius/ayandict/v2/pkg/activity"
 	"github.com/ilius/ayandict/v2/pkg/appinfo"
 	"github.com/ilius/ayandict/v2/pkg/application/frequency"
 	"github.com/ilius/ayandict/v2/pkg/application/qfavorites"
@@ -202,8 +203,10 @@ func (app *Application) Run() {
 	basePxI := int(basePx)
 	basePxHalf := int(basePx / 2)
 
+	activityStorage := activity.NewActivityStorage(conf, config.GetCacheDir())
+
 	frequencyTable = frequency.NewFrequencyView(
-		frequencyFilePath(),
+		activityStorage,
 		conf.MostFrequentMaxSize,
 	)
 
@@ -276,7 +279,13 @@ func (app *Application) Run() {
 
 	app.articleView = NewArticleView(app)
 
-	app.historyView = NewHistoryView()
+	app.historyView = NewHistoryView(activityStorage, conf.HistoryMaxSize)
+	if !conf.HistoryDisable {
+		err := app.historyView.Load()
+		if err != nil {
+			qerr.Error(err)
+		}
+	}
 
 	frequencyTable.SetHorizontalHeaderItem(
 		0,
@@ -287,7 +296,7 @@ func (app *Application) Run() {
 		widgets.NewQTableWidgetItem2("Count", 0),
 	)
 	if !conf.MostFrequentDisable {
-		err := frequencyTable.LoadFromFile(frequencyFilePath())
+		err := frequencyTable.Load()
 		if err != nil {
 			qerr.Error(err)
 		}
@@ -477,15 +486,6 @@ func (app *Application) Run() {
 	// setting up handlers
 	app.setupHandlers()
 
-	if !conf.HistoryDisable {
-		err := LoadHistory()
-		if err != nil {
-			qerr.Error(err)
-		} else {
-			app.historyView.AddHistoryList(history)
-		}
-	}
-
 	qs := qsettings.GetQSettings(window)
 	app.setupSettings(qs, mainSplitter)
 
@@ -571,7 +571,7 @@ func (app *Application) setupHandlers() {
 		onQuery(entry.Text(), queryArgs, false)
 	})
 	app.saveHistoryButton.ConnectClicked(func(checked bool) {
-		SaveHistory()
+		app.historyView.Save()
 		frequencyTable.SaveNoError()
 	})
 	app.randomEntryButton.ConnectClicked(func(checked bool) {

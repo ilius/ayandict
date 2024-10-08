@@ -1,20 +1,16 @@
 package frequency
 
 import (
-	"encoding/json"
-	"fmt"
-	"os"
-	"sort"
 	"strconv"
-	"sync"
 
+	"github.com/ilius/ayandict/v2/pkg/activity"
 	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/widgets"
 )
 
 func NewFrequencyView(
-	filePath string,
+	storage *activity.ActivityStorage,
 	maxSize int,
 ) *FrequencyTable {
 	widget := widgets.NewQTableWidget(nil)
@@ -26,7 +22,7 @@ func NewFrequencyView(
 
 	return &FrequencyTable{
 		QTableWidget: widget,
-		filePath:     filePath,
+		storage:      storage,
 		maxSize:      maxSize,
 		KeyMap:       map[string]int{},
 		Counts:       map[string]int{},
@@ -36,18 +32,17 @@ func NewFrequencyView(
 type FrequencyTable struct {
 	*widgets.QTableWidget
 
-	filePath string
+	storage *activity.ActivityStorage
 
 	maxSize int
 
 	Counts map[string]int
 	Keys   []string
 	KeyMap map[string]int
-
-	saveMutex sync.Mutex
 }
 
 func (view *FrequencyTable) Clear() {
+	view.storage.ClearFrequency()
 	view.Counts = map[string]int{}
 	view.Keys = []string{}
 	view.KeyMap = map[string]int{}
@@ -95,6 +90,7 @@ func (view *FrequencyTable) setItemForKey(index int, key string) {
 }
 
 func (view *FrequencyTable) Add(key string, plus int) {
+	view.storage.AddFrequency(key, plus)
 	index, ok := view.KeyMap[key]
 	if !ok {
 		view.addNew(key, plus)
@@ -113,28 +109,13 @@ func (view *FrequencyTable) Add(key string, plus int) {
 	view.setItemForKey(index, key)
 }
 
-func (view *FrequencyTable) LoadFromFile(pathStr string) error {
-	jsonBytes, err := os.ReadFile(pathStr)
+func (view *FrequencyTable) Load() error {
+	countList, err := view.storage.LoadFrequency()
 	if err != nil {
-		if !os.IsNotExist(err) {
-			return fmt.Errorf("error loading frequency: %w", err)
-		}
-		return nil
+		return err
 	}
-	countMap := map[string]int{}
-	err = json.Unmarshal(jsonBytes, &countMap)
-	if err != nil {
-		return fmt.Errorf("bad frequency file %#v: %w", pathStr, err)
-	}
-	countList := [][2]any{}
-	for key, count := range countMap {
-		countList = append(countList, [2]any{key, count})
-	}
-	sort.Slice(countList, func(i, j int) bool {
-		return countList[i][1].(int) > countList[j][1].(int)
-	})
 	for _, item := range countList {
-		view.addNew(item[0].(string), item[1].(int))
+		view.addNew(item.Word, item.Count)
 	}
 	return nil
 }
@@ -164,20 +145,7 @@ func (view *FrequencyTable) Trim() {
 }
 
 func (view *FrequencyTable) Save() error {
-	if view.filePath == "" {
-		return fmt.Errorf("FrequencyTable: filePath is empty")
-	}
-	view.saveMutex.Lock()
-	defer view.saveMutex.Unlock()
-	jsonBytes, err := json.MarshalIndent(view.Counts, "", "\t")
-	if err != nil {
-		panic(err)
-	}
-	err = os.WriteFile(view.filePath, jsonBytes, 0o644)
-	if err != nil {
-		return err
-	}
-	return nil
+	return view.storage.SaveFrequency()
 }
 
 func (view *FrequencyTable) SaveNoError() {

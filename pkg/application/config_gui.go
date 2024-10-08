@@ -41,9 +41,6 @@ func LoadConfig() bool {
 	}
 	conf = newConf
 
-	if conf.HistoryMaxSize > 0 {
-		historyMaxSize = conf.HistoryMaxSize
-	}
 	{
 		err := readArticleStyle(conf.ArticleStyle)
 		if err != nil {
