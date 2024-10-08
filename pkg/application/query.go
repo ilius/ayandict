@@ -29,7 +29,7 @@ type QueryArgs struct {
 
 func (w *QueryArgs) AddHistoryAndFrequency(query string) {
 	if !conf.HistoryDisable {
-		w.HistoryView.AddHistory(query)
+		w.HistoryView.Add(query)
 	}
 	if !conf.MostFrequentDisable {
 		frequencyTable.Add(query, 1)

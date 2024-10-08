@@ -3,7 +3,9 @@ package main
 import (
 	"os"
 
+	"github.com/ilius/ayandict/v2/pkg/activity"
 	"github.com/ilius/ayandict/v2/pkg/application/frequency"
+	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/qt/widgets"
 )
 
@@ -17,7 +19,9 @@ func main() {
 	entry.SetPlaceholderText("")
 	entry.SetFixedHeight(25)
 
-	view := frequency.NewFrequencyView("", 6)
+	activityStorage := activity.NewActivityStorage(config.GetCacheDir())
+
+	view := frequency.NewFrequencyView(activityStorage, 6)
 	view.SetHorizontalHeaderItem(0, widgets.NewQTableWidgetItem2("Key", 0))
 	view.SetHorizontalHeaderItem(1, widgets.NewQTableWidgetItem2("Count", 0))
 
