@@ -79,7 +79,21 @@ func query(w http.ResponseWriter, r *http.Request) {
 	// mode = dictmgr.QueryModeRegex
 	// mode = dictmgr.QueryModeGlob
 
-	raw_results := dictmgr.LookupHTML(query, conf, mode, resultFlags)
+	flags := resultFlags
+	switch r.FormValue("qt") {
+	case "":
+	case "5", "6":
+		flags = flags | common.ResultFlag_FixWordLink | common.ResultFlag_ColorMapping
+	default:
+		err := jsonEncoder.Encode(ErrorResponse{Error: "invalid qt version, must be 5 or 6"})
+		if err != nil {
+			slog.Error("error in jsonEncoder.Encode", "err", err)
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	raw_results := dictmgr.LookupHTML(query, conf, mode, flags)
 	// pass resultFlags to LookupHTML
 	results := make([]Result, len(raw_results))
 	for i, entry := range raw_results {
