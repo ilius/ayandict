@@ -30,11 +30,9 @@ var (
 	homeTpl *template.Template
 )
 
-const resultFlags = common.ResultFlag_Web |
-	common.ResultFlag_FixAudio |
-	common.ResultFlag_FixFileSrc
-
-// 	common.ResultFlag_ColorMapping)
+const resultFlags = uint32(common.ResultFlag_FixAudio |
+	common.ResultFlag_FixFileSrc |
+	common.ResultFlag_Web)
 
 type ErrorResponse struct {
 	Error string `json:"error"`
