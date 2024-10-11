@@ -131,14 +131,6 @@ def on_query_result(res):
 	resultListElem <= ul
 
 
-def ajax_query(query, mode):
-	ajax.post(
-		"/query?query=" + query + "&mode=" + mode,
-		cache=False,
-		oncomplete=on_query_result,
-	)
-
-
 def clear_results():
 	resultListElem.clear()
 	headerLabel.clear()
@@ -151,7 +143,11 @@ def on_lookup_input_keypress(event):
 	if not input.value:
 		clear_results()
 		return
-	ajax_query(input.value, modeInput.value)
+	ajax.post(
+		"/query?query=" + input.value + "&mode=" +  modeInput.value,
+		cache=False,
+		oncomplete=on_query_result,
+	)
 
 
 def on_word_link_click(event):
@@ -163,7 +159,11 @@ def on_word_link_click(event):
 	if target.startswith("bword://"):
 		target = target[8:]
 	input.value = target
-	ajax_query(target, modeInput.value)
+	ajax.post(
+		"/query?query=" + target + "&mode=" +  modeInput.value + "&limit=1",
+		cache=False,
+		oncomplete=on_query_result,
+	)
 
 
 def on_random_result(res):

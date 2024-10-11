@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
 	"text/template"
 	"time"
 
@@ -106,7 +107,22 @@ func query(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	raw_results := dictmgr.LookupHTML(query, conf, mode, flags)
+	limit := 0
+	limitStr := r.FormValue("limit")
+	if limitStr != "" {
+		limitI64, err := strconv.ParseUint(limitStr, 10, 0)
+		if err != nil {
+			err := jsonEncoder.Encode(ErrorResponse{Error: "invalid limit"})
+			if err != nil {
+				slog.Error("error in jsonEncoder.Encode", "err", err)
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		limit = int(limitI64)
+	}
+
+	raw_results := dictmgr.LookupHTML(query, conf, mode, flags, limit)
 	// pass resultFlags to LookupHTML
 	results := make([]Result, len(raw_results))
 	for i, entry := range raw_results {

@@ -167,7 +167,7 @@ func onQuery(
 	case 3:
 		mode = dictmgr.QueryModeGlob
 	}
-	results := dictmgr.LookupHTML(query, conf, mode, resultFlags)
+	results := dictmgr.LookupHTML(query, conf, mode, resultFlags, 0)
 	slog.Debug("LookupHTML running time", "dt", time.Since(t), "query", query)
 	queryArgs.ResultList.SetResults(results)
 	if len(results) == 0 {

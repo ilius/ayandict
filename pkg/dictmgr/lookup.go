@@ -69,6 +69,7 @@ func LookupHTML(
 	conf *config.Config,
 	mode QueryMode,
 	resultFlags uint32,
+	limit int,
 ) []common.SearchResultIface {
 	results := []common.SearchResultIface{}
 	for _, dic := range dicts.DictList {
@@ -104,9 +105,11 @@ func LookupHTML(
 		// }
 		return res1.EntryIndex() < res2.EntryIndex()
 	})
-	cutoff := conf.MaxResultsTotal
-	if cutoff > 0 && len(results) > cutoff {
-		results = results[:cutoff]
+	if limit == 0 {
+		limit = conf.MaxResultsTotal
+	}
+	if limit > 0 && len(results) > limit {
+		results = results[:limit]
 	}
 	return results
 }
