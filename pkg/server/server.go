@@ -75,9 +75,22 @@ func query(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// mode = dictmgr.QueryModeStartWith
-	// mode = dictmgr.QueryModeRegex
-	// mode = dictmgr.QueryModeGlob
+	switch r.FormValue("mode") {
+	case "":
+	case "startWith":
+		mode = dictmgr.QueryModeStartWith
+	case "regex":
+		mode = dictmgr.QueryModeRegex
+	case "glob":
+		mode = dictmgr.QueryModeGlob
+	default:
+		err := jsonEncoder.Encode(ErrorResponse{Error: "invalid mode"})
+		if err != nil {
+			slog.Error("error in jsonEncoder.Encode", "err", err)
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	flags := resultFlags
 	switch r.FormValue("qt") {
