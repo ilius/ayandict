@@ -19,7 +19,7 @@ func main() {
 	entry.SetPlaceholderText("")
 	entry.SetFixedHeight(25)
 
-	activityStorage := activity.NewActivityStorage(config.GetCacheDir())
+	activityStorage := activity.NewActivityStorage(config.Default(), config.GetCacheDir())
 
 	view := frequency.NewFrequencyView(activityStorage, 6)
 	view.SetHorizontalHeaderItem(0, widgets.NewQTableWidgetItem2("Key", 0))
