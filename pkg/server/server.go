@@ -60,7 +60,6 @@ func getAppName(w http.ResponseWriter, r *http.Request) {
 
 func query(w http.ResponseWriter, r *http.Request) {
 	t := time.Now()
-	mode := dictmgr.QueryModeFuzzy
 
 	jsonEncoder := json.NewEncoder(w)
 	w.Header().Set("Content-Type", "application/json")
@@ -75,8 +74,9 @@ func query(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	mode := dictmgr.QueryModeFuzzy
 	switch r.FormValue("mode") {
-	case "":
+	case "", "fuzzy":
 	case "startWith":
 		mode = dictmgr.QueryModeStartWith
 	case "regex":
