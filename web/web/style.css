@@ -43,7 +43,7 @@ body {
 }
 
 #lookup-container {
-	width: 20em;
+	width: 22em;
 	height: 100%;
 	overflow: hidden;
 	border-right: thin solid gray;
@@ -58,6 +58,14 @@ body {
 	font-size: medium;
 	margin: 0.4rem;
 	padding: 0.4rem;
+}
+
+
+#mode-input {
+	flex-shrink: 1;
+	flex-grow: 1;
+	font-size: medium;
+	margin: 0.4rem;
 }
 
 #input-container {

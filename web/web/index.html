@@ -17,6 +17,12 @@
 			<input id="lookup-input" name="lookup-input"
 				placeholder="Lookup..." type="search" autocomplete="off" autofocus />
 			<a id="random-link" href="#">⚅</a>
+			<select name="mode-input" id="mode-input">
+				<option value="fuzzy">Fuzzy</option>
+				<option value="startWith">Prefix</option>
+				<option value="regex">Regex</option>
+				<option value="glob">Glob</option>
+			</select>
 		</div>
 		<div id="result-list"
 			style="overflow: auto; height: 100vh;">
@@ -50,6 +56,7 @@ from browser import document, html, ajax
 
 
 input = document["lookup-input"]
+modeInput = document["mode-input"]
 resultListElem = document["result-list"]
 content = document["content"]
 headerLabel = document["header-label"]
@@ -124,9 +131,9 @@ def on_query_result(res):
 	resultListElem <= ul
 
 
-def ajax_query(query):
+def ajax_query(query, mode):
 	ajax.post(
-		"/query?query=" + query,
+		"/query?query=" + query + "&mode=" + mode,
 		cache=False,
 		oncomplete=on_query_result,
 	)
@@ -144,7 +151,7 @@ def on_lookup_input_keypress(event):
 	if not input.value:
 		clear_results()
 		return
-	ajax_query(input.value)
+	ajax_query(input.value, modeInput.value)
 
 
 def on_word_link_click(event):
@@ -156,7 +163,7 @@ def on_word_link_click(event):
 	if target.startswith("bword://"):
 		target = target[8:]
 	input.value = target
-	ajax_query(target)
+	ajax_query(target, modeInput.value)
 
 
 def on_random_result(res):
