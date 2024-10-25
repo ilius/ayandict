@@ -5,6 +5,7 @@ package main
 import (
 	"flag"
 	"log/slog"
+	"os"
 
 	"github.com/ilius/ayandict/v2/pkg/application"
 	"github.com/ilius/ayandict/v2/pkg/config"
@@ -41,6 +42,8 @@ func main() {
 	flag.Parse()
 
 	// slog uses stdout
+	noColor := os.Getenv("NO_COLOLR") != ""
+	setupLogger(noColor, defaultLevel)
 
 	if *noGuiFlag {
 		runServerOnly(*createConfigFlag)

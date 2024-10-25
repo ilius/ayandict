@@ -5,6 +5,7 @@ package main
 import (
 	"flag"
 	"log/slog"
+	"os"
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
@@ -25,6 +26,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	noColor := os.Getenv("NO_COLOLR") != ""
+	setupLogger(noColor, defaultLevel)
 
 	if *createConfigFlag {
 		err := config.EnsureExists(conf)
