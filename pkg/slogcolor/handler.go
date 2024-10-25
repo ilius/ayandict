@@ -62,9 +62,9 @@ func (h *Handler) Handle(_ context.Context, r slog.Record) error {
 	case slog.LevelDebug:
 		fmt.Fprint(bf, color.New(color.BgCyan, color.FgHiWhite).Sprint("DEBUG"))
 	case slog.LevelInfo:
-		fmt.Fprint(bf, color.New(color.BgGreen, color.FgHiWhite).Sprint("INFO "))
+		fmt.Fprint(bf, color.New(color.BgGreen, color.FgHiWhite).Sprint("INFO"))
 	case slog.LevelWarn:
-		fmt.Fprint(bf, color.New(color.BgYellow, color.FgHiWhite).Sprint("WARN "))
+		fmt.Fprint(bf, color.New(color.BgYellow, color.FgHiWhite).Sprint("WARN"))
 	case slog.LevelError:
 		fmt.Fprint(bf, color.New(color.BgRed, color.FgHiWhite).Sprint("ERROR"))
 	}
