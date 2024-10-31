@@ -6,7 +6,7 @@ import (
 )
 
 // ShowMessage: set in GUI application
-var ShowMessage = func(msg string) {}
+var ShowMessage = func(_ string) {}
 
 func Error(args ...any) {
 	msg := fmt.Sprint(args...)

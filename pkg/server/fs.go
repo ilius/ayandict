@@ -15,6 +15,6 @@ type httpFile struct {
 	localFile
 }
 
-func (f *httpFile) Readdir(count int) ([]fs.FileInfo, error) {
+func (f *httpFile) Readdir(_ int) ([]fs.FileInfo, error) {
 	return nil, errors.New("not a directory")
 }

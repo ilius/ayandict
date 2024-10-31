@@ -13,8 +13,8 @@ import (
 
 func NewActivityStorage(conf *config.Config, configDir string) *ActivityStorage {
 	return &ActivityStorage{
-		frequencyFilePath: filepath.Join(config.GetConfigDir(), "frequent.json"),
-		historyFilePath:   filepath.Join(config.GetConfigDir(), "history.json"),
+		frequencyFilePath: filepath.Join(configDir, "frequent.json"),
+		historyFilePath:   filepath.Join(configDir, "history.json"),
 		frequencyMap:      map[string]int{},
 		saveMutex:         &sync.Mutex{},
 		historyMutex:      &sync.Mutex{},

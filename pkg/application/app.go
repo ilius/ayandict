@@ -203,7 +203,7 @@ func (app *Application) Run() {
 	basePxI := int(basePx)
 	basePxHalf := int(basePx / 2)
 
-	activityStorage := activity.NewActivityStorage(conf, config.GetCacheDir())
+	activityStorage := activity.NewActivityStorage(conf, config.GetConfigDir())
 
 	frequencyTable = frequency.NewFrequencyView(
 		activityStorage,

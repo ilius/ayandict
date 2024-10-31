@@ -55,7 +55,7 @@ func writeMsg(w http.ResponseWriter, msg string) {
 	}
 }
 
-func getAppName(w http.ResponseWriter, r *http.Request) {
+func getAppName(w http.ResponseWriter, _ *http.Request) {
 	writeMsg(w, appinfo.APP_NAME)
 }
 
@@ -148,7 +148,7 @@ func query(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func random(w http.ResponseWriter, r *http.Request) {
+func random(w http.ResponseWriter, _ *http.Request) {
 	jsonEncoder := json.NewEncoder(w)
 	w.Header().Set("Content-Type", "application/json")
 
@@ -175,7 +175,7 @@ type homeTemplateParams struct {
 	Config *config.Config
 }
 
-func home(w http.ResponseWriter, r *http.Request) {
+func home(w http.ResponseWriter, _ *http.Request) {
 	err := homeTpl.Execute(w, homeTemplateParams{
 		Config: conf,
 	})
