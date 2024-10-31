@@ -13,6 +13,7 @@ import (
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/qdictmgr"
+	"github.com/ilius/ayandict/v2/pkg/logging"
 	"github.com/ilius/ayandict/v2/pkg/qtcommon"
 	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/ayandict/v2/pkg/qtcommon/qsettings"
@@ -101,6 +102,8 @@ func (app *Application) init() {
 		panic("config local_server_ports is empty")
 	}
 	client.Timeout = conf.LocalClientTimeout
+
+	logging.SetupLoggerAfterConfigLoad(false, conf)
 
 	if ok, _ := findLocalServer(conf.LocalServerPorts); ok {
 		qerr.Error("Another instance is running")

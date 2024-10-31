@@ -10,6 +10,7 @@ import (
 	"github.com/ilius/ayandict/v2/pkg/application"
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
+	"github.com/ilius/ayandict/v2/pkg/logging"
 	"github.com/ilius/ayandict/v2/pkg/server"
 )
 
@@ -43,7 +44,7 @@ func main() {
 
 	// slog uses stdout
 	noColor := os.Getenv("NO_COLOLR") != ""
-	setupLogger(noColor, defaultLevel)
+	logging.SetupLogger(noColor, logging.DefaultLevel)
 
 	if *noGuiFlag {
 		runServerOnly(*createConfigFlag)

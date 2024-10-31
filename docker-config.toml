@@ -6,3 +6,7 @@ directory_list = ["/root/.stardict/dic"]
 
 search_worker_count = 8
 search_timeout = "5s"
+
+[logging]
+no_color = false
+level = "info" # error, warning, info, debug

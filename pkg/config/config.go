@@ -24,6 +24,11 @@ func init() {
 }
 
 type Config struct {
+	Logging struct {
+		NoColor bool   `toml:"no_color"`
+		Level   string `toml:"level"`
+	} `toml:"logging"`
+
 	DirectoryList []string `toml:"directory_list"`
 
 	SqlDictList []string `toml:"sql_dict_list"`
