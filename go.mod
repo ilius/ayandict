@@ -1,4 +1,4 @@
-module github.com/ilius/ayandict/v2
+module github.com/ilius/ayandict/v3
 
 go 1.22
 
@@ -8,7 +8,7 @@ require (
 	github.com/ilius/go-dict-sql v0.4.0
 	github.com/ilius/go-stardict/v2 v2.3.1-0.20241127071536-9c2bdedb338b
 	github.com/ilius/is/v2 v2.3.2
-	github.com/ilius/qt v0.0.0-20230422004322-c855bcf0151b
+	github.com/mappu/miqt v0.7.1-0.20241208013906-02fd3dae07a1
 	golang.org/x/sys v0.17.0
 )
 
@@ -16,7 +16,6 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect

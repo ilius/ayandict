@@ -8,12 +8,14 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
+	"github.com/ilius/ayandict/v3/pkg/qtcommon/qerr"
 )
 
 const fileName = "config.toml"
 
 var mutex sync.Mutex
+
+var PrivateMode = false
 
 func init() {
 	dir := GetConfigDir()

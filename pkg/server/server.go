@@ -10,11 +10,11 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/ilius/ayandict/v2/pkg/appinfo"
-	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/dictmgr"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
-	"github.com/ilius/ayandict/v2/web"
+	"github.com/ilius/ayandict/v3/pkg/appinfo"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr"
+	"github.com/ilius/ayandict/v3/pkg/qtcommon/qerr"
+	"github.com/ilius/ayandict/v3/web"
 	common "github.com/ilius/go-dict-commons"
 )
 

@@ -17,7 +17,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ilius/ayandict/v2/pkg/html/atom"
+	"github.com/ilius/ayandict/v3/pkg/html/atom"
 )
 
 type testAttrs struct {
