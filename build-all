@@ -60,8 +60,8 @@ bzip2 -f $(build_for_os32 linux)
 build_for_win64
 build_for_win32 -tags nosql
 
-bzip2 -f $(build_for_os64 freebsd)
-bzip2 -f $(build_for_os32 freebsd)
+#bzip2 -f $(build_for_os64 freebsd)
+#bzip2 -f $(build_for_os32 freebsd)
 
 build_for_mac
 
