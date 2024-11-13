@@ -8,7 +8,7 @@ const (
 
 const ABOUT = `AyanDict is simple dictionary application based on Qt and written in Go.
 
-Copyleft © 2023 Saeed Rasooli
+Copyleft © 2024 Saeed Rasooli
 AyanDict is licensed by the GNU Affero General Public License version 3 (or later)
 `
 
@@ -16,7 +16,7 @@ const AUTHORS = `Saeed Rasooli <saeed.gnu@gmail.com> (ilius)`
 
 const LICENSE = `AyanDict - A simple dictionary application
 
-Copyright © 2023 Saeed Rasooli
+Copyright © 2024 Saeed Rasooli
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
