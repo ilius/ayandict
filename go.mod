@@ -6,9 +6,10 @@ require (
 	github.com/BurntSushi/toml v1.3.2
 	github.com/ilius/go-dict-commons v0.4.2
 	github.com/ilius/go-dict-sql v0.4.0
-	github.com/ilius/go-stardict/v2 v2.3.0
+	github.com/ilius/go-stardict/v2 v2.3.1-0.20241127071536-9c2bdedb338b
 	github.com/ilius/is/v2 v2.3.2
 	github.com/ilius/qt v0.0.0-20230422004322-c855bcf0151b
+	golang.org/x/sys v0.17.0
 )
 
 require (
@@ -21,7 +22,6 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	golang.org/x/mod v0.15.0 // indirect
-	golang.org/x/sys v0.17.0 // indirect
 	modernc.org/gc/v3 v3.0.0-20240107210532-573471604cb6 // indirect
 	modernc.org/libc v1.41.0 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
