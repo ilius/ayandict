@@ -30,7 +30,8 @@ type Options struct {
 	// SrcFileMode is the source file mode.
 	SrcFileMode SourceFileMode
 
-	// SrcFileLength to show fixed length filename to line up the log output, default 0 shows complete filename.
+	// SrcFileLength to show fixed length filename to line up the log output,
+	// default 0 shows complete filename.
 	SrcFileLength int
 
 	// MsgPrefix to show prefix before message, default: white colored "| ".
@@ -39,7 +40,8 @@ type Options struct {
 	// MsgColor is the color of the message, default to empty.
 	MsgColor *color.Color
 
-	// MsgLength to show fixed length message to line up the log output, default 0 shows complete message.
+	// MsgLength to show fixed length message to line up the log output, default 0
+	// shows complete message.
 	MsgLength int
 
 	// NoColor disables color, default: false.

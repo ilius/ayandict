@@ -97,7 +97,8 @@ func (h *Handler) Handle(_ context.Context, r slog.Record) error {
 		}
 	}
 
-	// we need the attributes here, as we can print a longer string if there are no attributes
+	// we need the attributes here, as we can print a longer string if there are no
+	// attributes
 	var attrs []slog.Attr
 	attrs = append(attrs, h.attrs...)
 	r.Attrs(func(a slog.Attr) bool {
