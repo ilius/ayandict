@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"log/slog"
 	"os"
 	"runtime"
 	"time"
@@ -44,5 +45,10 @@ func EnsureExists(conf *Config) error {
 	if !os.IsNotExist(err) {
 		return err
 	}
-	return Save(conf)
+	err = Save(conf)
+	if err != nil {
+		return err
+	}
+	slog.Info("Created config file: " + Path())
+	return nil
 }

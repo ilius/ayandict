@@ -38,7 +38,7 @@ func main() {
 		}
 	}
 	if !conf.WebEnable {
-		slog.Warn("Web is not enabled, set web_enable = true in config.toml file")
+		slog.Warn("Web is not enabled, set web_enable = true in " + config.Path())
 	}
 
 	dictmgr.InitDicts(conf)
