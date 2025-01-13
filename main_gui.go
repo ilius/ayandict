@@ -25,6 +25,9 @@ func runServerOnly(createConfig bool) {
 			slog.Error("Failed creating config file", "err", err)
 		}
 	}
+	if !conf.WebEnable {
+		slog.Warn("Web is not enabled, set web_enable = true in config.toml file")
+	}
 	dictmgr.InitDicts(conf)
 	server.StartServer(conf.LocalServerPorts[0])
 }
