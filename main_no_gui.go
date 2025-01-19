@@ -4,9 +4,11 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log/slog"
 	"os"
 
+	"github.com/ilius/ayandict/v2/pkg/appinfo"
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	"github.com/ilius/ayandict/v2/pkg/logging"
@@ -16,12 +18,22 @@ import (
 func main() {
 	// slog uses stdout
 
+	versionFlag := flag.Bool(
+		"version",
+		false,
+		"Show version and exit",
+	)
 	createConfigFlag := flag.Bool(
 		"create-config",
 		false,
 		"Create config file (with defaults) if it does not exist",
 	)
 	flag.Parse()
+
+	if *versionFlag {
+		fmt.Printf("%v %v (non-GUI build)\n", appinfo.APP_DESC, appinfo.VERSION)
+		os.Exit(0)
+	}
 
 	conf, err := config.Load()
 	if err != nil {

@@ -4,9 +4,11 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log/slog"
 	"os"
 
+	"github.com/ilius/ayandict/v2/pkg/appinfo"
 	"github.com/ilius/ayandict/v2/pkg/application"
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
@@ -33,6 +35,11 @@ func runServerOnly(createConfig bool) {
 }
 
 func main() {
+	versionFlag := flag.Bool(
+		"version",
+		false,
+		"Show version and exit",
+	)
 	noGuiFlag := flag.Bool(
 		"no-gui",
 		false,
@@ -44,6 +51,11 @@ func main() {
 		"With --no-gui: create config file (with defaults) if it does not exist",
 	)
 	flag.Parse()
+
+	if *versionFlag {
+		fmt.Printf("%v %v\n", appinfo.APP_DESC, appinfo.VERSION)
+		os.Exit(0)
+	}
 
 	// slog uses stdout
 	noColor := os.Getenv("NO_COLOLR") != ""
