@@ -3,7 +3,7 @@ package appinfo
 const (
 	APP_NAME = "ayandict"
 	APP_DESC = "AyanDict"
-	VERSION  = "v2.1.0"
+	VERSION  = "v2.1.1"
 )
 
 const ABOUT = `AyanDict is simple dictionary application based on Qt and written in Go.
@@ -16,7 +16,7 @@ const AUTHORS = `Saeed Rasooli <saeed.gnu@gmail.com> (ilius)`
 
 const LICENSE = `AyanDict - A simple dictionary application
 
-Copyright © 2024 Saeed Rasooli
+Copyright © 2025 Saeed Rasooli
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
