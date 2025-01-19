@@ -8,7 +8,7 @@ const (
 
 const ABOUT = `AyanDict is simple dictionary application based on Qt and written in Go.
 
-Copyleft © 2024 Saeed Rasooli
+Copyleft © 2025 Saeed Rasooli
 AyanDict is licensed by the GNU Affero General Public License version 3 (or later)
 `
 
