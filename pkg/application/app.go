@@ -244,14 +244,14 @@ func (app *Application) Run() {
 	// favoriteButtonVBox.AddWidget(favoriteButton, 0, qt.AlignBottom)
 
 	// FIXME: causes panic
-	// okButton.OnResizeEvent(func(_ func(*qt.QResizeEvent), event *qt.QResizeEvent) {
-	// 	h := event.Size().Height()
-	// 	if h > 100 {
-	// 		return
-	// 	}
-	// 	app.queryFavoriteButton.SetFixedSize2(h, h)
-	// 	app.favoriteButton.SetFixedSize2(h, h)
-	// })
+	okButton.OnResizeEvent(func(_ func(*qt.QResizeEvent), event *qt.QResizeEvent) {
+		h := event.Size().Height()
+		if h > 100 {
+			return
+		}
+		app.queryFavoriteButton.SetFixedSize2(h, h)
+		app.favoriteButton.SetFixedSize2(h, h)
+	})
 
 	queryLabel := qt.NewQLabel3("Query:")
 	queryBox := qt.NewQFrame(nil)
@@ -477,9 +477,9 @@ func (app *Application) Run() {
 	})
 
 	for _, widget := range []KeyPressIface{
-		// app.resultList.QListWidget, // FIXME: causes panic
+		app.resultList.QListWidget, // FIXME: causes panic
 		app.articleView,
-		// app.historyView.QListWidget, // FIXME: causes panic
+		app.historyView.QListWidget, // FIXME: causes panic
 	} {
 		app.setupKeyPressEvent(widget)
 	}

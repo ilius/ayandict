@@ -8,7 +8,7 @@ require (
 	github.com/ilius/go-dict-sql v0.4.0
 	github.com/ilius/go-stardict/v2 v2.3.1-0.20241127071536-9c2bdedb338b
 	github.com/ilius/is/v2 v2.3.2
-	github.com/mappu/miqt v0.7.1-0.20241208013906-02fd3dae07a1
+	github.com/mappu/miqt v0.8.1-0.20250118232148-28fd54f6a371
 	golang.org/x/sys v0.17.0
 )
 

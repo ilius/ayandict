@@ -97,14 +97,14 @@ func (h *HistoryView) SetupCustomHandlers() {
 	// and even after fixing panic, doesn't return anything
 	// you have to use view.CurrentIndex()
 	// FIXME: OnMousePressEvent causes panic
-	// h.OnMousePressEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
-	// 	super(event)
-	// 	index := h.CurrentIndex()
-	// 	if index == nil {
-	// 		return
-	// 	}
-	// 	h.Activated(index)
-	// })
+	h.OnMousePressEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+		super(event)
+		index := h.CurrentIndex()
+		if index == nil {
+			return
+		}
+		h.Activated(index)
+	})
 
 	h.OnItemActivated(func(item *qt.QListWidgetItem) {
 		doQuery(item.Text())
