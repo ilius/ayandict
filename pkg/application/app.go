@@ -290,14 +290,16 @@ func (app *Application) Run() {
 		}
 	}
 
-	frequencyTable.SetHorizontalHeaderItem(
-		0,
-		widgets.NewQTableWidgetItem2("Query", 0),
-	)
-	frequencyTable.SetHorizontalHeaderItem(
-		1,
-		widgets.NewQTableWidgetItem2("Count", 0),
-	)
+	{
+		item := widgets.NewQTableWidgetItem2("Query", 0)
+		item.SetTextAlignment(0)
+		frequencyTable.SetHorizontalHeaderItem(0, item)
+	}
+	{
+		item := widgets.NewQTableWidgetItem2("#", 0)
+		item.SetTextAlignment(0)
+		frequencyTable.SetHorizontalHeaderItem(1, item)
+	}
 	if !conf.MostFrequentDisable {
 		err := frequencyTable.Load()
 		if err != nil {
