@@ -23,7 +23,7 @@ loop:
 	for {
 		c1, err := er.ReadByte()
 		if err != nil {
-			plaintext.WriteTo(w.out)
+			_, _ = plaintext.WriteTo(w.out)
 			break loop
 		}
 		if c1 != 0x1b {

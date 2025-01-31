@@ -3,7 +3,7 @@ package slogcolor
 import (
 	"strings"
 
-	"github.com/ilius/ayandict/v2/pkg/go-color"
+	"github.com/ilius/ayandict/v3/pkg/go-color"
 )
 
 // Prefix prepends a colored prefix to msg.
