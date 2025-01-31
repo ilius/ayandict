@@ -11,7 +11,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ilius/ayandict/v2/pkg/go-color"
+	"github.com/ilius/ayandict/v3/pkg/go-color"
 )
 
 type Handler struct {

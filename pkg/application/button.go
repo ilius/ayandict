@@ -3,16 +3,16 @@ package application
 import (
 	"fmt"
 
-	"github.com/ilius/qt/widgets"
+	qt "github.com/mappu/miqt/qt6"
 )
 
-func NewPNGIconTextButton(label string, imageName string) *widgets.QPushButton {
+func NewPNGIconTextButton(label string, imageName string) *qt.QPushButton {
 	icon, err := loadPNGIcon(imageName)
 	if err != nil {
 		fmt.Println(err)
 	}
 	if icon == nil {
-		return widgets.NewQPushButton2(label, nil)
+		return qt.NewQPushButton3(label)
 	}
-	return widgets.NewQPushButton3(icon, label, nil)
+	return qt.NewQPushButton4(icon, label)
 }

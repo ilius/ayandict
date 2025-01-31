@@ -13,10 +13,8 @@ jobs:
     build:
         strategy:
             fail-fast: false
-            matrix:
-                os: [ubuntu-latest, macos-latest, windows-latest]
 
-        runs-on: ${{ matrix.os }}
+        runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
 
@@ -25,14 +23,6 @@ jobs:
               with:
                   go-version: 1.22
 
-            - name: Build
-              run: go build -v
-
-            - name: Build sub-packages
-              run: go build -v ./...
-
-            - name: Build nogui
+            - name: Build (no GUI)
               run: go build -v -tags nogui
 
-            - name: Install
-              run: go install github.com/ilius/ayandict@main
