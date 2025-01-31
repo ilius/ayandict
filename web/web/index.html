@@ -1,193 +1,201 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<meta charset="utf-8" />
+	<meta charset="utf-8" />
 
-<head>
-	<title>AyanDict Web</title>
-	<link rel="stylesheet" type="text/css" href="web/style.css" />
-	<script type="text/javascript" src="web/brython@3.11.0/brython.min.js">
-	</script>
-	<script type="text/javascript" src="web/brython@3.11.0/brython_stdlib.js">
-	</script>
-</head>
+	<head>
+		<title>AyanDict Web</title>
+		<link rel="stylesheet" type="text/css" href="web/style.css" />
+		<script
+			type="text/javascript"
+			src="web/brython@3.11.0/brython.min.js"
+		></script>
+		<script
+			type="text/javascript"
+			src="web/brython@3.11.0/brython_stdlib.js"
+		></script>
+	</head>
 
-<body class="horizontal" onload="brython()">
-	<div id="lookup-container" class="vertical">
-		<div id="input-container" class="horizontal">
-			<input id="lookup-input" name="lookup-input"
-				placeholder="Lookup..." type="search" autocomplete="off" autofocus />
-			<a id="random-link" href="#">⚅</a>
-			<select name="mode-input" id="mode-input">
-				<option value="fuzzy">Fuzzy</option>
-				<option value="startWith">Prefix</option>
-				<option value="regex">Regex</option>
-				<option value="glob">Glob</option>
-			</select>
+	<body class="horizontal" onload="brython()">
+		<div id="lookup-container" class="vertical">
+			<div id="input-container" class="horizontal">
+				<input
+					id="lookup-input"
+					name="lookup-input"
+					placeholder="Lookup..."
+					type="search"
+					autocomplete="off"
+					autofocus
+				/>
+				<a id="random-link" href="#">⚅</a>
+				<select name="mode-input" id="mode-input">
+					<option value="fuzzy">Fuzzy</option>
+					<option value="startWith">Prefix</option>
+					<option value="regex">Regex</option>
+					<option value="glob">Glob</option>
+				</select>
+			</div>
+			<div id="result-list" style="overflow: auto; height: 100vh"></div>
 		</div>
-		<div id="result-list"
-			style="overflow: auto; height: 100vh;">
+		<div id="content-container" class="vertical">
+			<div id="content-header" class="horizontal">
+				<span id="header-label"></span>
+			</div>
+			<div
+				id="content"
+				name="content"
+				class="vertical"
+				style="overflow: auto; height: 100vh"
+			></div>
+			{{if .Config.WebShowPoweredBy}}
+			<div id="powered-by">
+				Powered by
+				<a href="https://github.com/ilius/ayandict">AyanDict</a>,
+				<a href="https://go.dev/">Go</a>
+				and <a href="https://brython.info/">Brython</a>
+			</div>
+			{{end}}
 		</div>
-	</div>
-	<div id="content-container" class="vertical">
-		<div id="content-header" class="horizontal">
-			<span id="header-label"></span>
-		</div>
-		<div id="content" name="content" class="vertical" 
-			style="overflow: auto; height: 100vh;">
-		</div>
-		{{if .Config.WebShowPoweredBy}}
-		<div id="powered-by">
-			Powered by <a href="https://github.com/ilius/ayandict">AyanDict</a>,
-			<a href="https://go.dev/">Go</a> 
-			and <a href="https://brython.info/">Brython</a>
-		</div>
-		{{end}}
-	</div>
-	<script type="text/javascript">
-
-function playAudioA(a) {
-	var audio = new Audio(a.href)
-	audio.play();
-}
-
-	</script>
-	<script type="text/python">
-from browser import document, html, ajax
+		<script type="text/javascript">
+			function playAudioA(a) {
+				var audio = new Audio(a.href);
+				audio.play();
+			}
+		</script>
+		<script type="text/python">
+			from browser import document, html, ajax
 
 
-input = document["lookup-input"]
-modeInput = document["mode-input"]
-resultListElem = document["result-list"]
-content = document["content"]
-headerLabel = document["header-label"]
+			input = document["lookup-input"]
+			modeInput = document["mode-input"]
+			resultListElem = document["result-list"]
+			content = document["content"]
+			headerLabel = document["header-label"]
 
 
-def is_word_link(target):
-	if "://" not in target:
-		return True
-	if target.startswith("bword://"):
-		return True
-	return False
+			def is_word_link(target):
+				if "://" not in target:
+					return True
+				if target.startswith("bword://"):
+					return True
+				return False
 
 
-def fix_content_links():
-	for a in content.select('a'):
-		target = a.attrs.get("href")
-		if not target:
-			continue
-		if target.endswith((".mp3", ".wav", ".ogg")):
-			a.attrs["onclick"] = "playAudioA(this); return false"
-			continue
-		if not is_word_link(target):
-			continue
-		a.attrs["dict_target"] = target
-		a.attrs["href"] = "#"
-		a.bind("click", on_word_link_click)
+			def fix_content_links():
+				for a in content.select('a'):
+					target = a.attrs.get("href")
+					if not target:
+						continue
+					if target.endswith((".mp3", ".wav", ".ogg")):
+						a.attrs["onclick"] = "playAudioA(this); return false"
+						continue
+					if not is_word_link(target):
+						continue
+					a.attrs["dict_target"] = target
+					a.attrs["href"] = "#"
+					a.bind("click", on_word_link_click)
 
 
-def show_result_content(result):
-	content.html = "<br/>".join(result["definitionsHTML"])
+			def show_result_content(result):
+				content.html = "<br/>".join(result["definitionsHTML"])
 
-	fix_content_links()
+				fix_content_links()
 
-	headerLabel.clear()
-	headerLabel <= html.B(html.FONT(
-		result["dictName"],
-		color="#55f",
-	))
-	terms = result["terms"]
-	headerLabel <= html.DIV(
-		terms[0],
-		**{"class": "header-term-first"},
-	)
-	for term in terms[1:]:
-		bar = html.SPAN(
-			" │ ",
-			**{"class": "header-sep-bar"}
-		)
-		headerLabel <= html.SPAN(
-			bar + term,
-			**{"class": "header-term"},
-		)
-
-
-def add_result_list_item(result, ul):
-	a = html.A(href="#", **{"class": "result-list-item"})
-	a.bind("click", lambda event, result=result: show_result_content(result))
-	a <= html.DIV(html.STRONG(" | ".join(result["terms"])))
-	a <= html.SMALL(result["dictName"])
-	ul <= html.LI(a)
+				headerLabel.clear()
+				headerLabel <= html.B(html.FONT(
+					result["dictName"],
+					color="#55f",
+				))
+				terms = result["terms"]
+				headerLabel <= html.DIV(
+					terms[0],
+					**{"class": "header-term-first"},
+				)
+				for term in terms[1:]:
+					bar = html.SPAN(
+						" │ ",
+						**{"class": "header-sep-bar"}
+					)
+					headerLabel <= html.SPAN(
+						bar + term,
+						**{"class": "header-term"},
+					)
 
 
-def on_query_result(res):
-	# res is an Ajax object
-	results = res.json
-	resultListElem.clear()
-	ul = html.UL()
-	for index, result in enumerate(results):
-		add_result_list_item(result, ul)
-		if index == 0:
-			show_result_content(result)
-	resultListElem <= ul
+			def add_result_list_item(result, ul):
+				a = html.A(href="#", **{"class": "result-list-item"})
+				a.bind("click", lambda event, result=result: show_result_content(result))
+				a <= html.DIV(html.STRONG(" | ".join(result["terms"])))
+				a <= html.SMALL(result["dictName"])
+				ul <= html.LI(a)
 
 
-def clear_results():
-	resultListElem.clear()
-	headerLabel.clear()
-	content.clear()
+			def on_query_result(res):
+				# res is an Ajax object
+				results = res.json
+				resultListElem.clear()
+				ul = html.UL()
+				for index, result in enumerate(results):
+					add_result_list_item(result, ul)
+					if index == 0:
+						show_result_content(result)
+				resultListElem <= ul
 
 
-def on_lookup_input_keypress(event):
-	if event.key != "Enter":
-		return
-	if not input.value:
-		clear_results()
-		return
-	ajax.post(
-		"/query?query=" + input.value + "&mode=" +  modeInput.value,
-		cache=False,
-		oncomplete=on_query_result,
-	)
+			def clear_results():
+				resultListElem.clear()
+				headerLabel.clear()
+				content.clear()
 
 
-def on_word_link_click(event):
-	event.preventDefault()
-	a = event.target
-	target = a.attrs.get("dict_target")
-	if not target:
-		return
-	if target.startswith("bword://"):
-		target = target[8:]
-	input.value = target
-	ajax.post(
-		"/query?query=" + target + "&mode=" +  modeInput.value + "&limit=1",
-		cache=False,
-		oncomplete=on_query_result,
-	)
+			def on_lookup_input_keypress(event):
+				if event.key != "Enter":
+					return
+				if not input.value:
+					clear_results()
+					return
+				ajax.post(
+					"/query?query=" + input.value + "&mode=" +  modeInput.value,
+					cache=False,
+					oncomplete=on_query_result,
+				)
 
 
-def on_random_result(res):
-	result = res.json
-	input.value = result["terms"][0]
-	resultListElem.clear()
-	ul = html.UL()
-	add_result_list_item(result, ul)
-	resultListElem <= ul
-	show_result_content(result)
+			def on_word_link_click(event):
+				event.preventDefault()
+				a = event.target
+				target = a.attrs.get("dict_target")
+				if not target:
+					return
+				if target.startswith("bword://"):
+					target = target[8:]
+				input.value = target
+				ajax.post(
+					"/query?query=" + target + "&mode=" +  modeInput.value + "&limit=1",
+					cache=False,
+					oncomplete=on_query_result,
+				)
 
 
-def on_random_click(event):
-	ajax.post(
-		"/random",
-		cache=False,
-		oncomplete=on_random_result,
-	)
+			def on_random_result(res):
+				result = res.json
+				input.value = result["terms"][0]
+				resultListElem.clear()
+				ul = html.UL()
+				add_result_list_item(result, ul)
+				resultListElem <= ul
+				show_result_content(result)
 
 
-input.bind("keypress", on_lookup_input_keypress)
-document["random-link"].bind("click", on_random_click)
+			def on_random_click(event):
+				ajax.post(
+					"/random",
+					cache=False,
+					oncomplete=on_random_result,
+				)
 
-	</script>
-</body>
 
+			input.bind("keypress", on_lookup_input_keypress)
+			document["random-link"].bind("click", on_random_click)
+		</script>
+	</body>
 </html>
