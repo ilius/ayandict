@@ -87,6 +87,9 @@ type Config struct {
 	WebEnable bool `toml:"web_enable"`
 	WebExpose bool `toml:"web_expose"`
 
+	WebSearchOnType          bool `toml:"web_search_on_type"`
+	WebSearchOnTypeMinLength int  `toml:"web_search_on_type_min_length"`
+
 	WebShowPoweredBy bool `toml:"web_show_powered_by"`
 
 	SearchWorkerCount int `toml:"search_worker_count"`
@@ -167,8 +170,12 @@ func Default() *Config {
 
 		LocalClientTimeout: 100 * time.Millisecond,
 
-		WebEnable:        false,
-		WebExpose:        false,
+		WebEnable: false,
+		WebExpose: false,
+
+		WebSearchOnType:          false,
+		WebSearchOnTypeMinLength: 3,
+
 		WebShowPoweredBy: true,
 
 		SearchWorkerCount: 8,

@@ -1,3 +1,9 @@
+``logging``
+-----------
+Logging config
+
+Default value: ``{"NoColor":false,"Level":""}``
+
 ``directory_list``
 ------------------
 List of dictionary directory paths (absolute or relative to home)
@@ -195,6 +201,18 @@ Default value: ``false``
 Expose web service & web app to outside (otherwise only available to 127.0.0.1)
 
 Default value: ``false``
+
+``web_search_on_type``
+----------------------
+Web: Enable/disable search-on-type
+
+Default value: ``false``
+
+``web_search_on_type_min_length``
+---------------------------------
+Web: Minimum query length for search-on-type
+
+Default value: ``3``
 
 ``web_show_powered_by``
 -----------------------

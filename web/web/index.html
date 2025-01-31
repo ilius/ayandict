@@ -150,15 +150,28 @@
 			def on_lookup_input_keypress(event):
 				if event.key != "Enter":
 					return
-				if not input.value:
+				query = input.value
+				if not query:
 					clear_results()
 					return
 				ajax.post(
-					"/query?query=" + input.value + "&mode=" +  modeInput.value,
+					"/query?query=" + query + "&mode=" +  modeInput.value,
 					cache=False,
 					oncomplete=on_query_result,
 				)
 
+			def on_lookup_input_input(event):
+				query = input.value
+				if not query:
+					clear_results()
+					return
+				if len(query) < {{.Config.WebSearchOnTypeMinLength}}:
+					return
+				ajax.post(
+					"/query?query=" + query + "&mode=" +  modeInput.value,
+					cache=False,
+					oncomplete=on_query_result,
+				)
 
 			def on_word_link_click(event):
 				event.preventDefault()
@@ -195,6 +208,9 @@
 
 
 			input.bind("keypress", on_lookup_input_keypress)
+			{{if .Config.WebSearchOnType}}
+			input.bind("input", on_lookup_input_input)
+			{{end}}
 			document["random-link"].bind("click", on_random_click)
 		</script>
 	</body>

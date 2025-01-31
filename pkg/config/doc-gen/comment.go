@@ -1,6 +1,7 @@
 package main
 
 var commentMap = map[string]string{
+	"logging":        "Logging config",
 	"directory_list": "List of dictionary directory paths (absolute or relative to home)",
 
 	"sql_dict_list": "List of SQL databases, only SQLite is currently supported",
@@ -56,6 +57,9 @@ var commentMap = map[string]string{
 
 	"web_enable": "Set true/false and restart to enable/disable web service & web app",
 	"web_expose": "Expose web service & web app to outside (otherwise only available to 127.0.0.1)",
+
+	"web_search_on_type":            "Web: Enable/disable search-on-type",
+	"web_search_on_type_min_length": "Web: Minimum query length for search-on-type",
 
 	"web_show_powered_by": "Show 'Powered By ...' footer in web.",
 
