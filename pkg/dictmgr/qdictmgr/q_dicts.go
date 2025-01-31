@@ -1,33 +1,32 @@
 package qdictmgr
 
 import (
-	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
-	"github.com/ilius/qt/core"
-	"github.com/ilius/qt/widgets"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr/internal/dicts"
+	qt "github.com/mappu/miqt/qt6"
 )
 
-func loadingDictsPopup(conf *config.Config) *widgets.QLabel {
-	popup := widgets.NewQLabel2(
+func loadingDictsPopup(conf *config.Config) *qt.QLabel {
+	popup := qt.NewQLabel6(
 		`<span style="font-size:xx-large;">Loading dictionaries</span>`,
 		nil,
-		core.Qt__SplashScreen,
+		qt.SplashScreen,
 	)
 	// Qt__SplashScreen makes it centered on screen
-	popup.SetFrameStyle(int(widgets.QFrame__Raised | widgets.QFrame__Shadow(widgets.QFrame__Panel)))
-	popup.SetAlignment(core.Qt__AlignCenter)
+	popup.SetFrameStyle(int(qt.QFrame__Raised | qt.QFrame__Shadow(qt.QFrame__Panel)))
+	popup.SetAlignment(qt.AlignCenter)
 	popup.SetFixedSize2(300, 100)
-	popup.SetWindowModality(core.Qt__WindowModal)
+	popup.SetWindowModality(qt.WindowModal)
 	popup.SetStyleSheet(conf.PopupStyleStr)
 	popup.Show()
-	core.QCoreApplication_ProcessEvents(core.QEventLoop__AllEvents)
+	qt.QCoreApplication_ProcessEvents1(qt.QEventLoop__AllEvents)
 	return popup
 }
 
 func InitDicts(conf *config.Config, popup bool) {
 	if popup {
 		popupLabel := loadingDictsPopup(conf)
-		defer popupLabel.Destroy(true, true)
+		defer popupLabel.Delete()
 	}
 	dicts.InitDicts(conf)
 }

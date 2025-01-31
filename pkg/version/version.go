@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/ilius/ayandict/v2/pkg/appinfo"
+	"github.com/ilius/ayandict/v3/pkg/appinfo"
 )
 
 func main() {

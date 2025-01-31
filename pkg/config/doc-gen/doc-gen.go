@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ilius/ayandict/v2/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/config"
 )
 
 func getTomlTag(s string) string {
