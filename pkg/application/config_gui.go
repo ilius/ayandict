@@ -8,7 +8,6 @@ import (
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/qdictmgr"
 	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
-	"github.com/ilius/ayandict/v2/pkg/wordwrap"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
 )
@@ -48,17 +47,11 @@ func LoadConfig() bool {
 		}
 	}
 	{
-		// slog.Info("Parsing:", conf.HeaderTemplate)
-		headerTplNew := template.New("header").Funcs(template.FuncMap{
-			"wrapterms": func(terms []string, limit int) [][]string {
-				return wordwrap.WordWrapByWords(terms, limit, " ", " ")
-			},
-		})
-		headerTplNew, err := headerTplNew.Parse(conf.HeaderTemplate)
+		tpl, err := config.LoadHeaderTemplate(conf)
 		if err != nil {
 			qerr.Error(err)
 		} else {
-			headerTpl = headerTplNew
+			headerTpl = tpl
 		}
 	}
 	return true

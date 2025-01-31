@@ -114,14 +114,6 @@ func (w *ResultListWidget) SetResults(results []common.SearchResultIface) {
 	}
 }
 
-type HeaderTemplateInput struct {
-	Terms     []string
-	Term      string
-	DictName  string
-	Score     uint8
-	ShowTerms bool
-}
-
 func (w *ResultListWidget) OnActivate(row int) {
 	if row >= len(w.results) {
 		slog.Error("ResultListWidget: OnActivate: row index out of range", "row", row)
