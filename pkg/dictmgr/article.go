@@ -13,9 +13,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/html"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/html"
+	"github.com/ilius/ayandict/v3/pkg/qtcommon/qerr"
 	common "github.com/ilius/go-dict-commons"
 )
 
@@ -193,8 +193,8 @@ func (p *DictProcessor) fixFileSrc(defi string) string {
 // problem 1: href value has space
 // for example: <a href="bword://abscisic acid">
 // clicking on these link do not work
-// ConnectAnchorClicked will get an empty url
-// link.ToString(core.QUrl__None) == ""
+// .OnAnchorClicked will get an empty url
+// link.ToString(qt.QUrl__None) == ""
 // unless I remove `bword://` prefix
 // also tried replacing space with %20
 // problem 2: href value has quoted unicode characters, using &#...;

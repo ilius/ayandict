@@ -3,7 +3,7 @@ package runewidth
 import (
 	"os"
 
-	"github.com/ilius/ayandict/v2/pkg/runewidth/uniseg"
+	"github.com/ilius/ayandict/v3/pkg/runewidth/uniseg"
 )
 
 //go:generate go run script/generate.go

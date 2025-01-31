@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
-	"github.com/ilius/qt/core"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/qtcommon/qerr"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 var (
@@ -28,7 +28,7 @@ func NewAudioCache() *AudioCache {
 	}
 
 	return &AudioCache{
-		m:   map[string]*core.QUrl{},
+		m:   map[string]*qt.QUrl{},
 		dir: dir,
 
 		downloader: &http.Client{
@@ -38,7 +38,7 @@ func NewAudioCache() *AudioCache {
 }
 
 type AudioCache struct {
-	m     map[string]*core.QUrl
+	m     map[string]*qt.QUrl
 	mlock sync.RWMutex
 	dir   string
 
@@ -70,15 +70,15 @@ func (c *AudioCache) download(urlStr string, fpath string) error {
 	return nil
 }
 
-func (c *AudioCache) Get(urlStr string) (*core.QUrl, error) {
+func (c *AudioCache) Get(urlStr string) (*qt.QUrl, error) {
 	c.mlock.RLock()
 	qUrl := c.m[urlStr]
 	c.mlock.RUnlock()
 	if qUrl != nil {
 		return qUrl, nil
 	}
-	qUrl = core.NewQUrl3(urlStr, core.QUrl__TolerantMode)
-	host := qUrl.Host(core.QUrl__FullyEncoded)
+	qUrl = qt.NewQUrl4(urlStr, qt.QUrl__TolerantMode)
+	host := qUrl.Host1(qt.QUrl__FullyEncoded)
 	// also add possible port?
 	if c.dir == "" {
 		return nil, fmt.Errorf("audio cache dir is empty")
@@ -86,11 +86,11 @@ func (c *AudioCache) Get(urlStr string) (*core.QUrl, error) {
 	fpath := filepath.Join(
 		c.dir,
 		host,
-		qUrl.Path(core.QUrl__FullyEncoded),
+		qUrl.Path1(qt.QUrl__FullyEncoded),
 	)
 	qUrl.SetScheme("file")
-	qUrl.SetHost("", core.QUrl__DecodedMode)
-	qUrl.SetPath(fpath, core.QUrl__DecodedMode)
+	qUrl.SetHost("")
+	qUrl.SetPath2(fpath, qt.QUrl__DecodedMode)
 	if _, err := os.Stat(fpath); err != nil {
 		if !os.IsNotExist(err) {
 			qerr.Error(err)
