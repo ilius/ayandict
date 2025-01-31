@@ -109,7 +109,7 @@ parsed content, the input must be re-serialized (for instance by using Render or
 Token.String) in order for those trust decisions to hold, as the process of
 tokenization or parsing may alter the content.
 */
-package html // import "github.com/ilius/ayandict/v2/pkg/html"
+package html // import "github.com/ilius/ayandict/v3/pkg/html"
 
 // The tokenization algorithm implemented by this package is not a line-by-line
 // transliteration of the relatively verbose state-machine in the WHATWG
