@@ -4,14 +4,14 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
-	"github.com/ilius/qt/widgets"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr/internal/dicts"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 func NewDictFlagsCheckboxes(hide func()) *DictFlagsCheckboxes {
-	widget := widgets.NewQWidget(nil, 0)
-	hbox := widgets.NewQHBoxLayout2(nil)
-	widget.SetLayout(hbox)
+	widget := qt.NewQWidget2()
+	hbox := qt.NewQHBoxLayout2()
+	widget.SetLayout(hbox.Layout())
 	hbox.SetSpacing(10) // TODO: parameterize
 
 	w := &DictFlagsCheckboxes{
@@ -25,21 +25,21 @@ func NewDictFlagsCheckboxes(hide func()) *DictFlagsCheckboxes {
 	w.addCheckBox("Glob", dicts.FlagNoGlob)
 
 	hbox.AddSpacing(30) // TODO: parameterize
-	hideButton := widgets.NewQPushButton2("Hide", nil)
-	hideButton.ConnectClicked(func(bool) {
+	hideButton := qt.NewQPushButton3("Hide")
+	hideButton.OnClicked(func() {
 		hide()
 	})
-	hbox.AddWidget(hideButton, 0, 0)
+	hbox.AddWidget(hideButton.QWidget)
 
 	return w
 }
 
 type DictFlagsCheckboxes struct {
-	*widgets.QWidget
+	*qt.QWidget
 
-	hbox *widgets.QHBoxLayout
+	hbox *qt.QHBoxLayout
 
-	checkList []*widgets.QPushButton
+	checkList []*qt.QPushButton
 
 	ds *dicts.DictionarySettings
 
@@ -55,16 +55,16 @@ func (w *DictFlagsCheckboxes) SetActiveDictSetting(ds *dicts.DictionarySettings)
 }
 
 func (w *DictFlagsCheckboxes) addCheckBox(label string, flag uint16) {
-	check := widgets.NewQPushButton2(label, nil)
+	check := qt.NewQPushButton3(label)
 	check.SetCheckable(true)
 	check.SetChecked(true)
-	w.hbox.AddWidget(check, 1, 0)
+	w.hbox.AddWidget3(check.QWidget, 1, 0)
 	w.checkList = append(w.checkList, check)
 	w.checkConnectClicked(check, flag)
 }
 
-func (w *DictFlagsCheckboxes) checkConnectClicked(check *widgets.QPushButton, flag uint16) {
-	check.ConnectClicked(func(checked bool) {
+func (w *DictFlagsCheckboxes) checkConnectClicked(check *qt.QPushButton, flag uint16) {
+	check.OnClicked(func() {
 		ds := w.ds
 		if ds == nil {
 			return
@@ -72,7 +72,7 @@ func (w *DictFlagsCheckboxes) checkConnectClicked(check *widgets.QPushButton, fl
 		w.flagsMutex.Lock()
 		defer w.flagsMutex.Unlock()
 		slog.Debug("(before) flags", "flags", ds.Flags, "symbol", ds.Symbol)
-		if checked {
+		if check.IsChecked() {
 			ds.Flags &= ^flag
 		} else {
 			ds.Flags |= flag
