@@ -1,12 +1,9 @@
 package application
 
 import (
-	"bytes"
-	"html"
 	"strings"
 
-	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/dictmgr"
+	"github.com/ilius/ayandict/v2/pkg/headerlib"
 	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
@@ -63,22 +60,12 @@ func (label *HeaderLabel) SetText(text string) {
 
 func (label *HeaderLabel) SetResult(res common.SearchResultIface) {
 	label.result = res
-	terms := res.Terms()
-	termsJoined := html.EscapeString(strings.Join(terms, " | "))
-	headerBuf := bytes.NewBuffer(nil)
-	dictName := res.DictName()
-	err := headerTpl.Execute(headerBuf, config.HeaderTemplateInput{
-		Terms:     terms,
-		Term:      termsJoined,
-		DictName:  dictName,
-		Score:     res.Score() >> 1,
-		ShowTerms: dictmgr.DictShowTerms(dictName),
-	})
+	header, err := headerlib.GetHeader(headerTpl, res)
 	if err != nil {
 		qerr.Errorf("Error formatting header label: %v", err)
 		return
 	}
-	label.SetText(headerBuf.String())
+	label.SetText(header)
 }
 
 func (label *HeaderLabel) addQueryAction(menu *widgets.QMenu, term string) {

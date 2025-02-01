@@ -7,6 +7,7 @@ import (
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/qdictmgr"
+	"github.com/ilius/ayandict/v2/pkg/headerlib"
 	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
@@ -47,7 +48,7 @@ func LoadConfig() bool {
 		}
 	}
 	{
-		tpl, err := config.LoadHeaderTemplate(conf)
+		tpl, err := headerlib.LoadHeaderTemplate(conf)
 		if err != nil {
 			qerr.Error(err)
 		} else {
