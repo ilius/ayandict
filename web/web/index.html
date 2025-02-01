@@ -96,29 +96,9 @@
 
 
 			def show_result_content(result):
+				headerLabel.html = result["header_html"]
 				content.html = "<br/>".join(result["definitionsHTML"])
-
 				fix_content_links()
-
-				headerLabel.clear()
-				headerLabel <= html.B(html.FONT(
-					result["dictName"],
-					color="#55f",
-				))
-				terms = result["terms"]
-				headerLabel <= html.DIV(
-					terms[0],
-					**{"class": "header-term-first"},
-				)
-				for term in terms[1:]:
-					bar = html.SPAN(
-						" │ ",
-						**{"class": "header-sep-bar"}
-					)
-					headerLabel <= html.SPAN(
-						bar + term,
-						**{"class": "header-term"},
-					)
 
 
 			def add_result_list_item(result, ul):

@@ -2,17 +2,19 @@ package server
 
 import (
 	"encoding/json"
+	html_template "html/template"
 	"io"
 	"log/slog"
 	"net/http"
 	"os"
 	"strconv"
-	"text/template"
+	text_template "text/template"
 	"time"
 
 	"github.com/ilius/ayandict/v2/pkg/appinfo"
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
+	"github.com/ilius/ayandict/v2/pkg/headerlib"
 	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/ayandict/v2/web"
 	common "github.com/ilius/go-dict-commons"
@@ -28,7 +30,8 @@ const (
 var (
 	conf = config.MustLoad()
 
-	homeTpl *template.Template
+	homeTpl   *text_template.Template
+	headerTpl *html_template.Template
 )
 
 const resultFlags = uint32(common.ResultFlag_FixAudio |
@@ -45,6 +48,7 @@ type Result struct {
 	DefinitionsHTML []string `json:"definitionsHTML"`
 	EntryIndex      uint64   `json:"entryIndex"`
 	Score           uint8    `json:"score"`
+	HeaderHTML      string   `json:"header_html"`
 	// ResourceDir string
 }
 
@@ -125,13 +129,20 @@ func query(w http.ResponseWriter, r *http.Request) {
 	raw_results := dictmgr.LookupHTML(query, conf, mode, flags, limit)
 	// pass resultFlags to LookupHTML
 	results := make([]Result, len(raw_results))
-	for i, entry := range raw_results {
+	for i, res := range raw_results {
+		header, err := headerlib.GetHeader(headerTpl, res)
+		if err != nil {
+			slog.Error("Error formatting header label: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		results[i] = Result{
-			DictName:        entry.DictName(),
-			Terms:           entry.Terms(),
-			DefinitionsHTML: entry.DefinitionsHTML(),
-			EntryIndex:      entry.EntryIndex(),
-			Score:           entry.Score(),
+			DictName:        res.DictName(),
+			Terms:           res.Terms(),
+			DefinitionsHTML: res.DefinitionsHTML(),
+			EntryIndex:      res.EntryIndex(),
+			Score:           res.Score(),
+			HeaderHTML:      header,
 		}
 		// entry.ResourceDir()
 	}
@@ -225,7 +236,7 @@ func addWebHandlers() {
 	}))
 }
 
-func loadWebTemplates() error {
+func loadIndexTemplate() error {
 	file, err := web.FS.Open("web/index.html")
 	if err != nil {
 		return err
@@ -234,11 +245,32 @@ func loadWebTemplates() error {
 	if err != nil {
 		return err
 	}
-	tpl, err := template.New("index").Parse(string(data))
+	tpl, err := text_template.New("index").Parse(string(data))
 	if err != nil {
 		return err
 	}
 	homeTpl = tpl
+	return nil
+}
+
+func loadHeaderTemplate() error {
+	tpl, err := headerlib.LoadHeaderTemplate(conf)
+	if err != nil {
+		return err
+	}
+	headerTpl = tpl
+	return nil
+}
+
+func loadWebTemplates() error {
+	err := loadIndexTemplate()
+	if err != nil {
+		return err
+	}
+	err = loadHeaderTemplate()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
