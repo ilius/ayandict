@@ -3,7 +3,7 @@ package appinfo
 const (
 	APP_NAME = "ayandict"
 	APP_DESC = "AyanDict"
-	VERSION  = "v2.1.1"
+	VERSION  = "v2.1.2"
 )
 
 const ABOUT = `AyanDict is simple dictionary application based on Qt and written in Go.
