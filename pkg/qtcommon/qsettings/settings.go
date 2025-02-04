@@ -25,8 +25,9 @@ const (
 
 	QS_sizes = "sizes"
 
-	QS_search     = "search"
-	QS_searchMode = "mode"
+	QS_search   = "search"
+	QS_activity = "activity"
+	QS_mode     = "mode"
 )
 
 func joinIntList(nums []int) string {
@@ -340,7 +341,7 @@ func SaveSearchSettings(qs *core.QSettings, combo *widgets.QComboBox) {
 	qs.BeginGroup(QS_search)
 	defer qs.EndGroup()
 
-	qs.SetValue(QS_searchMode, core.NewQVariant1(
+	qs.SetValue(QS_mode, core.NewQVariant1(
 		strconv.FormatInt(int64(combo.CurrentIndex()), 10),
 	))
 }
@@ -349,5 +350,21 @@ func RestoreSearchSettings(qs *core.QSettings, combo *widgets.QComboBox) {
 	qs.BeginGroup(QS_search)
 	defer qs.EndGroup()
 
-	restoreIntSetting(qs, QS_searchMode, combo.SetCurrentIndex)
+	restoreIntSetting(qs, QS_mode, combo.SetCurrentIndex)
+}
+
+func SaveActivityMode(qs *core.QSettings, combo *widgets.QComboBox) {
+	qs.BeginGroup(QS_activity)
+	defer qs.EndGroup()
+
+	qs.SetValue(QS_mode, core.NewQVariant1(
+		strconv.FormatInt(int64(combo.CurrentIndex()), 10),
+	))
+}
+
+func RestoreActivityMode(qs *core.QSettings, combo *widgets.QComboBox) {
+	qs.BeginGroup(QS_activity)
+	defer qs.EndGroup()
+
+	restoreIntSetting(qs, QS_mode, combo.SetCurrentIndex)
 }

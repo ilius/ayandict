@@ -41,6 +41,8 @@ type Application struct {
 
 	style *widgets.QStyle
 
+	qs *core.QSettings
+
 	bottomBoxStyleOpt *widgets.QStyleOptionButton
 
 	dictManager *qdictmgr.DictManager
@@ -69,6 +71,7 @@ type Application struct {
 	saveFavoritesButton *widgets.QPushButton
 	clearButton         *widgets.QPushButton
 	dictsButton         *widgets.QPushButton
+	activityTypeCombo   *widgets.QComboBox
 }
 
 func Run() {
@@ -192,6 +195,7 @@ func (app *Application) activityComboChanged(index int) {
 		frequencyTable.Hide()
 		app.favoritesWidget.Show()
 	}
+	qsettings.SaveActivityMode(app.qs, app.activityTypeCombo)
 }
 
 // TODO: break down
@@ -382,6 +386,7 @@ func (app *Application) Run() {
 	leftMainLayout.AddLayout(buttonBox, 0)
 
 	activityTypeCombo := widgets.NewQComboBox(nil)
+	app.activityTypeCombo = activityTypeCombo
 	activityTypeCombo.AddItems([]string{
 		"Recent",
 		"Most Frequent",
@@ -492,7 +497,9 @@ func (app *Application) Run() {
 	app.setupHandlers()
 
 	qs := qsettings.GetQSettings(window)
+	app.qs = qs
 	app.setupSettings(qs, mainSplitter)
+	qsettings.RestoreActivityMode(qs, activityTypeCombo)
 
 	window.Show()
 	app.Exec()
