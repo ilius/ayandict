@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.3.2
 	github.com/ilius/go-dict-commons v0.4.2
 	github.com/ilius/go-dict-sql v0.4.0
-	github.com/ilius/go-stardict/v2 v2.3.1-0.20250125193125-d306e15eb662
+	github.com/ilius/go-stardict/v2 v2.3.1
 	github.com/ilius/is/v2 v2.3.2
 	github.com/ilius/qt v0.0.0-20230422004322-c855bcf0151b
 	golang.org/x/sys v0.17.0
