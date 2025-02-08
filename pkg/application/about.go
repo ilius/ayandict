@@ -67,8 +67,10 @@ func aboutClicked(
 	addTabWithIcon(tabWidget, licenseWidget, "License", "license-22.png")
 
 	buttonBox := widgets.NewQDialogButtonBox(nil)
-	okButton := buttonBox.AddButton2("OK", widgets.QDialogButtonBox__AcceptRole)
-	okButton.ConnectClicked(func(checked bool) {
+	buttonBox.AddButton2(
+		"Close",
+		widgets.QDialogButtonBox__AcceptRole,
+	).ConnectClicked(func(checked bool) {
 		window.Accept()
 	})
 
