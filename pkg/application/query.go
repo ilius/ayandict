@@ -167,7 +167,13 @@ func onQuery(
 			queryArgs.SetNoResult(query)
 		}
 	}
-	if !isAuto {
+	if isAuto {
+		if len(results) > 0 {
+			if results[0].Score() == 200 {
+				queryArgs.AddHistoryAndFrequency(query)
+			}
+		}
+	} else {
 		queryArgs.AddHistoryAndFrequency(query)
 	}
 	queryArgs.PostQuery(query)
