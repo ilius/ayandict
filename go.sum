@@ -1,13 +1,13 @@
 github.com/BurntSushi/toml v1.3.2 h1:o7IhLm0Msx3BaB+n3Ag7L8EVlByGnpq14C4YWiu/gL8=
 github.com/BurntSushi/toml v1.3.2/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
-github.com/gobwas/glob v0.2.3 h1:A4xDbljILXROh+kObIiy5kIaPYD8e96x1tgBhUI5J+Y=
-github.com/gobwas/glob v0.2.3/go.mod h1:d3Ez4x06l9bZtSvzIay5+Yzi0fmZzPgnTbPcKjJAkT8=
 github.com/gopherjs/gopherjs v1.17.2 h1:fQnZVsXk8uxXIStYb0N4bGk7jeyTalG/wsZjQ25dO0g=
 github.com/gopherjs/gopherjs v1.17.2/go.mod h1:pRRIvn/QzFLrKfvEz3qUuEhtE/zLCWfreZ6J5gM2i+k=
+github.com/ilius/glob v0.0.0-20250212111036-4c41f838a304 h1:hrjENbAZEBbffGaAhD6Wd4t1pKUp54wXtKQ4FsMXh/4=
+github.com/ilius/glob v0.0.0-20250212111036-4c41f838a304/go.mod h1:hp4bF1pIJfwcFirp8JaYh3xPs6DPQ/yP1BsTkpVNAg8=
 github.com/ilius/go-dict-commons v0.4.2 h1:Twfn0BPUHyqXmhPK8lytpRY5/47wYjgyCdO0/KaDBFI=
 github.com/ilius/go-dict-commons v0.4.2/go.mod h1:z5IgcnlVQqE76GU603UjjnzoQBP04dmR6qUE5GJQRzY=
-github.com/ilius/go-stardict/v2 v2.3.1 h1:ZVHgnbKsuYcgJ3+5PrLa34tU94oPIXHm5UIU3YCvCAc=
-github.com/ilius/go-stardict/v2 v2.3.1/go.mod h1:SMYH/gv1pRqVYB+6VnqBKsgvgEEjExZk+ItX2vVeyOo=
+github.com/ilius/go-stardict/v2 v2.3.2 h1:oxfrYr5Xxxe3WuwxhQDc9XsmUAuSH+sHq6rBgd5H3Ws=
+github.com/ilius/go-stardict/v2 v2.3.2/go.mod h1:onnvJtMbwF4nvFyx36OUPu/u6NAsQ6FKQ0G5dfNTyvY=
 github.com/ilius/is/v2 v2.3.2 h1:14u2j/UTKeIHKlcp/48dabf7+7QJ9JJaaoeHVvfyAOk=
 github.com/ilius/is/v2 v2.3.2/go.mod h1:OMGTmQDDc3Svaj3EoQHeNnXHP0R1HCb5u/Hfm7kuYIM=
 github.com/ilius/qt v0.0.0-20230422004322-c855bcf0151b h1:so6ndDlj5MkK/IWNMDhGLGyHjP+HJIMk7PkkAtbXZl8=
