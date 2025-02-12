@@ -128,6 +128,9 @@ func InitDicts(conf *config.Config) {
 	if err != nil {
 		panic(err)
 	}
+	if len(conf.SqlDictList) > 0 {
+		DictList = append(DictList, sqldictOpen(conf.SqlDictList, DictsOrder)...)
+	}
 
 	// to support another format, you can call pkg.Open just like stardict
 	// and append them new dicList to this dicList. since we are sorting them
