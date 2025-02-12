@@ -4,6 +4,12 @@ List of dictionary directory paths (absolute or relative to home)
 
 Default value: ``[".stardict/dic"]``
 
+``sql_dict_list``
+-----------------
+List of SQL databases, only SQLite is currently supported
+
+Default value: ``null``
+
 ``style``
 ---------
 Path to application stylesheet file (.qss)
