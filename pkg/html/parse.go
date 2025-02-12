@@ -5,8 +5,6 @@
 package html
 
 import (
-	"errors"
-	"fmt"
 	"io"
 	"strings"
 
@@ -2348,27 +2346,8 @@ func Parse(r io.Reader) (*Node, error) {
 	return ParseWithOptions(r)
 }
 
-// ParseFragment parses a fragment of HTML and returns the nodes that were
-// found. If the fragment is the InnerHTML for an existing element, pass that
-// element in context.
-//
-// It has the same intricacies as Parse.
-func ParseFragment(r io.Reader, context *Node) ([]*Node, error) {
-	return ParseFragmentWithOptions(r, context)
-}
-
 // ParseOption configures a parser.
 type ParseOption func(p *parser)
-
-// ParseOptionEnableScripting configures the scripting flag.
-// https://html.spec.whatwg.org/multipage/webappapis.html#enabling-and-disabling-scripting
-//
-// By default, scripting is enabled.
-func ParseOptionEnableScripting(enable bool) ParseOption {
-	return func(p *parser) {
-		p.scripting = enable
-	}
-}
 
 // ParseWithOptions is like Parse, with options.
 func ParseWithOptions(r io.Reader, opts ...ParseOption) (*Node, error) {
@@ -2390,75 +2369,4 @@ func ParseWithOptions(r io.Reader, opts ...ParseOption) (*Node, error) {
 		return nil, err
 	}
 	return p.doc, nil
-}
-
-// ParseFragmentWithOptions is like ParseFragment, with options.
-func ParseFragmentWithOptions(r io.Reader, context *Node, opts ...ParseOption) ([]*Node, error) {
-	contextTag := ""
-	if context != nil {
-		if context.Type != ElementNode {
-			return nil, errors.New("html: ParseFragment of non-element Node")
-		}
-		// The next check isn't just context.DataAtom.String() == context.Data because
-		// it is valid to pass an element whose tag isn't a known atom. For example,
-		// DataAtom == 0 and Data = "tagfromthefuture" is perfectly consistent.
-		if context.DataAtom != a.Lookup([]byte(context.Data)) {
-			return nil, fmt.Errorf("html: inconsistent Node: DataAtom=%q, Data=%q", context.DataAtom, context.Data)
-		}
-		contextTag = context.DataAtom.String()
-	}
-	p := &parser{
-		doc: &Node{
-			Type: DocumentNode,
-		},
-		scripting: true,
-		fragment:  true,
-		context:   context,
-	}
-	if context != nil && context.Namespace != "" {
-		p.tokenizer = NewTokenizer(r)
-	} else {
-		p.tokenizer = NewTokenizerFragment(r, contextTag)
-	}
-
-	for _, f := range opts {
-		f(p)
-	}
-
-	root := &Node{
-		Type:     ElementNode,
-		DataAtom: a.Html,
-		Data:     a.Html.String(),
-	}
-	p.doc.AppendChild(root)
-	p.oe = nodeStack{root}
-	if context != nil && context.DataAtom == a.Template {
-		p.templateStack = append(p.templateStack, inTemplateIM)
-	}
-	p.resetInsertionMode()
-
-	for n := context; n != nil; n = n.Parent {
-		if n.Type == ElementNode && n.DataAtom == a.Form {
-			p.form = n
-			break
-		}
-	}
-
-	if err := p.parse(); err != nil {
-		return nil, err
-	}
-
-	parent := p.doc
-	if context != nil {
-		parent = root
-	}
-
-	var result []*Node
-	for c := parent.FirstChild; c != nil; {
-		next := c.NextSibling
-		parent.RemoveChild(c)
-		result = append(result, c)
-		c = next
-	}
-	return result, nil
 }

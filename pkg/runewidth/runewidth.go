@@ -108,14 +108,6 @@ type Condition struct {
 	StrictEmojiNeutral bool
 }
 
-// NewCondition return new instance of Condition which is current locale.
-func NewCondition() *Condition {
-	return &Condition{
-		EastAsianWidth:     EastAsianWidth,
-		StrictEmojiNeutral: StrictEmojiNeutral,
-	}
-}
-
 // RuneWidth returns the number of cells in r.
 // See http://www.unicode.org/reports/tr11/
 func (c *Condition) RuneWidth(r rune) int {

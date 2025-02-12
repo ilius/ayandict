@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"strconv"
 	"strings"
 
 	"github.com/ilius/ayandict/v2/pkg/html/atom"
@@ -37,27 +36,6 @@ const (
 // ErrBufferExceeded means that the buffering limit was exceeded.
 var ErrBufferExceeded = errors.New("max buffer exceeded")
 
-// String returns a string representation of the TokenType.
-func (t TokenType) String() string {
-	switch t {
-	case ErrorToken:
-		return "Error"
-	case TextToken:
-		return "Text"
-	case StartTagToken:
-		return "StartTag"
-	case EndTagToken:
-		return "EndTag"
-	case SelfClosingTagToken:
-		return "SelfClosingTag"
-	case CommentToken:
-		return "Comment"
-	case DoctypeToken:
-		return "Doctype"
-	}
-	return "Invalid(" + strconv.Itoa(int(t)) + ")"
-}
-
 // An Attribute is an attribute namespace-key-value triple. Namespace is
 // non-empty for foreign attributes like xlink, Key is alphabetic (and hence
 // does not contain escapable characters like '&', '<' or '>'), and Val is
@@ -78,43 +56,6 @@ type Token struct {
 	DataAtom atom.Atom
 	Data     string
 	Attr     []Attribute
-}
-
-// tagString returns a string representation of a tag Token's Data and Attr.
-func (t Token) tagString() string {
-	if len(t.Attr) == 0 {
-		return t.Data
-	}
-	buf := bytes.NewBufferString(t.Data)
-	for _, a := range t.Attr {
-		buf.WriteByte(' ')
-		buf.WriteString(a.Key)
-		buf.WriteString(`="`)
-		escape(buf, a.Val)
-		buf.WriteByte('"')
-	}
-	return buf.String()
-}
-
-// String returns a string representation of the Token.
-func (t Token) String() string {
-	switch t.Type {
-	case ErrorToken:
-		return ""
-	case TextToken:
-		return EscapeString(t.Data)
-	case StartTagToken:
-		return "<" + t.tagString() + ">"
-	case EndTagToken:
-		return "</" + t.tagString() + ">"
-	case SelfClosingTagToken:
-		return "<" + t.tagString() + "/>"
-	case CommentToken:
-		return "<!--" + escapeCommentString(t.Data) + "-->"
-	case DoctypeToken:
-		return "<!DOCTYPE " + EscapeString(t.Data) + ">"
-	}
-	return "Invalid(" + strconv.Itoa(int(t.Type)) + ")"
 }
 
 // span is a range of bytes in a Tokenizer's buffer. The start is inclusive,
@@ -284,11 +225,6 @@ func (z *Tokenizer) readByte() byte {
 		return 0
 	}
 	return x
-}
-
-// Buffered returns a slice containing data buffered but not yet tokenized.
-func (z *Tokenizer) Buffered() []byte {
-	return z.buf[z.raw.end:]
 }
 
 // readAtLeastOneByte wraps an io.Reader so that reading cannot return (0, nil).
@@ -1235,12 +1171,6 @@ func (z *Tokenizer) Token() Token {
 		}
 	}
 	return t
-}
-
-// SetMaxBuf sets a limit on the amount of data buffered during tokenization.
-// A value of 0 means unlimited.
-func (z *Tokenizer) SetMaxBuf(n int) {
-	z.maxBuf = n
 }
 
 // NewTokenizer returns a new HTML Tokenizer for the given Reader.
