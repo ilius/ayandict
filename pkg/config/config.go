@@ -32,6 +32,8 @@ type Config struct {
 
 	DirectoryList []string `toml:"directory_list" doc:"List of dictionary directory paths (absolute or relative to home)"`
 
+	SqlDictList []string `toml:"sql_dict_list" doc:"List of SQL databases, only SQLite is currently supported"`
+
 	Style string `toml:"style" doc:"Path to application stylesheet file (.qss)"`
 
 	ArticleStyle string `toml:"article_style" doc:"Path to article stylesheet file (.css)"`
