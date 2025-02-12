@@ -6,7 +6,6 @@ package html
 
 import (
 	"bytes"
-	"log/slog"
 	"strings"
 	"unicode/utf8"
 )
@@ -267,14 +266,11 @@ func escapeComment(w writer, s string) error {
 
 // escapeCommentString is to EscapeString as escapeComment is to escape.
 func escapeCommentString(s string) string {
-	if !strings.ContainsAny(s, "&>") {
+	if strings.IndexAny(s, "&>") == -1 {
 		return s
 	}
 	var buf bytes.Buffer
-	err := escapeComment(&buf, s)
-	if err != nil {
-		slog.Error("error", "err", err)
-	}
+	escapeComment(&buf, s)
 	return buf.String()
 }
 
@@ -320,14 +316,11 @@ func escape(w writer, s string) error {
 // UnescapeString(EscapeString(s)) == s always holds, but the converse isn't
 // always true.
 func EscapeString(s string) string {
-	if !strings.ContainsAny(s, escapedChars) {
+	if strings.IndexAny(s, escapedChars) == -1 {
 		return s
 	}
 	var buf bytes.Buffer
-	err := escape(&buf, s)
-	if err != nil {
-		slog.Error("error", "err", err)
-	}
+	escape(&buf, s)
 	return buf.String()
 }
 

@@ -777,7 +777,10 @@ func inHeadNoscriptIM(p *parser) bool {
 		panic("html: the new current node will be a head element.")
 	}
 	p.im = inHeadIM
-	return p.tok.DataAtom == a.Noscript
+	if p.tok.DataAtom == a.Noscript {
+		return true
+	}
+	return false
 }
 
 // Section 12.2.6.4.6.
@@ -837,6 +840,10 @@ func afterHeadIM(p *parser) bool {
 
 	p.parseImpliedToken(StartTagToken, a.Body, a.Body.String())
 	p.framesetOK = true
+	if p.tok.Type == ErrorToken {
+		// Stop parsing.
+		return true
+	}
 	return false
 }
 
@@ -1028,7 +1035,7 @@ func inBodyIM(p *parser) bool {
 			if p.tok.DataAtom == a.Input {
 				for _, t := range p.tok.Attr {
 					if t.Key == "type" {
-						if strings.ToLower(t.Val) == "hidden" {
+						if strings.EqualFold(t.Val, "hidden") {
 							// Skip setting framesetOK = false
 							return true
 						}
@@ -1456,7 +1463,7 @@ func inTableIM(p *parser) bool {
 			return inHeadIM(p)
 		case a.Input:
 			for _, t := range p.tok.Attr {
-				if t.Key == "type" && strings.ToLower(t.Val) == "hidden" {
+				if t.Key == "type" && strings.EqualFold(t.Val, "hidden") {
 					p.addElement()
 					p.oe.pop()
 					return true
