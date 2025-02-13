@@ -8,7 +8,6 @@ require (
 	github.com/ilius/go-stardict/v2 v2.3.2
 	github.com/ilius/is/v2 v2.3.2
 	github.com/ilius/qt v0.0.0-20230422004322-c855bcf0151b
-	golang.org/x/sys v0.17.0
 )
 
 require (

@@ -12,5 +12,3 @@ github.com/ilius/is/v2 v2.3.2 h1:14u2j/UTKeIHKlcp/48dabf7+7QJ9JJaaoeHVvfyAOk=
 github.com/ilius/is/v2 v2.3.2/go.mod h1:OMGTmQDDc3Svaj3EoQHeNnXHP0R1HCb5u/Hfm7kuYIM=
 github.com/ilius/qt v0.0.0-20230422004322-c855bcf0151b h1:so6ndDlj5MkK/IWNMDhGLGyHjP+HJIMk7PkkAtbXZl8=
 github.com/ilius/qt v0.0.0-20230422004322-c855bcf0151b/go.mod h1:BkQcF3GtkapAqQ6Z6/Of2PZaAy1QEEApLBjw+PXUFM0=
-golang.org/x/sys v0.17.0 h1:25cE3gD+tdBA7lp7QfhuV+rJiE9YXTcS3VG1SqssI/Y=
-golang.org/x/sys v0.17.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
