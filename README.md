@@ -28,9 +28,9 @@ It's good to know that the binary / executable file is completely portable, so y
 
 By setting `web_enable = true` in [config file](#configuration) and running the program, you can use the web interface. The port is set with `local_server_ports` value (first available port in that list), and the URL is printed in stdout.
 
-If you do not want to use GUI at all and run in web-only mode, you can pass
+If you do not want to use GUI at all and run in web-only mode, you can pass `-no-gui` flag in command line.
 
-You can also compile 
+You can also compile in web-only / non-GUI mode with `go build -v -tags nogui` command. This is specially useful for unsupported platforms if you could not compile with Qt GUI.
 
 # Screenshots
 
