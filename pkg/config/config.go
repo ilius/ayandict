@@ -31,8 +31,6 @@ type Config struct {
 
 	DirectoryList []string `toml:"directory_list"`
 
-	SqlDictList []string `toml:"sql_dict_list"`
-
 	Style string `toml:"style"`
 
 	ArticleStyle string `toml:"article_style"`
