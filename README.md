@@ -2,7 +2,11 @@
 
 A simple cross-platform desktop dictionary application based on Qt framework and written in Go that uses StarDict dictionary format.
 
-It is designed for desktop and it should run on every desktop operating system that Qt supports. It is tested on Linux and Windows, and it should run perfectly on Mac, FreeBSD and other modern Unix-like systems. I will upload binaries for Linux, Windows and Mac (and maybe FreeBSD).
+It is designed for desktop and it should run on every desktop operating system that Qt supports. It is tested on Linux, Windows and Mac OS. I generally upload binaries for Linux, Windows and Mac OS on releases.
+
+BSD family and other Unix-like systems are not currently supported (due to `qtbox` dependency) until release of version 3.x.
+
+If you use an unsupported operating system or platform, you can try compiling on `v3` branch with `CGO_ENABLED=1 go build` command.
 
 StarDict is the only supported format for now, and by default, it reads all StarDict dictionaries in `~/.stardict/dic` folder. But you can change the folder or add more folders through [configuration](#configuration).
 
@@ -19,6 +23,14 @@ go install github.com/ilius/ayandict/v2@latest
 Or clone the repository, `cd` to it and run `go build`, which will create the binary (`ayandict.exe` or `ayandict`) in this directory.
 
 It's good to know that the binary / executable file is completely portable, so you can copy it anywhere you want and run it from there (although on Unix the storage must support executable files).
+
+# Web Interface
+
+By setting `web_enable = true` in [config file](#configuration) and running the program, you can use the web interface. The port is set with `local_server_ports` value (first available port in that list), and the URL is printed in stdout.
+
+If you do not want to use GUI at all and run in web-only mode, you can pass
+
+You can also compile 
 
 # Screenshots
 
