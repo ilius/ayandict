@@ -30,7 +30,7 @@ func aboutClicked(
 ) {
 	window := widgets.NewQDialog(parent, core.Qt__Dialog)
 	window.SetWindowTitle("About AyanDict")
-	window.Resize2(600, 500)
+	window.Resize2(700, 500)
 
 	topHBox := widgets.NewQHBoxLayout()
 	topLabel := widgets.NewQLabel2(fmt.Sprintf(
@@ -54,6 +54,7 @@ func aboutClicked(
 	aboutLabel := widgets.NewQLabel2(appinfo.ABOUT, nil, 0)
 	aboutLabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
 	aboutLabel.SetAlignment(core.Qt__AlignTop)
+	aboutLabel.SetWordWrap(true)
 	addTabWithIcon(tabWidget, aboutLabel, "About", "dialog-information-22.png")
 
 	authorsLabel := widgets.NewQLabel2(appinfo.AUTHORS, nil, 0)
