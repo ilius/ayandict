@@ -25,74 +25,74 @@ func init() {
 
 type Config struct {
 	Logging struct {
-		NoColor bool   `toml:"no_color"`
-		Level   string `toml:"level"`
-	} `toml:"logging"`
+		NoColor bool   `toml:"no_color" doc:"Disable log colors"`
+		Level   string `toml:"level" doc:"Log level"`
+	} `toml:"logging" doc:"Logging config"`
 
-	DirectoryList []string `toml:"directory_list"`
+	DirectoryList []string `toml:"directory_list" doc:"List of dictionary directory paths (absolute or relative to home)"`
 
-	Style string `toml:"style"`
+	Style string `toml:"style" doc:"Path to application stylesheet file (.qss)"`
 
-	ArticleStyle string `toml:"article_style"`
+	ArticleStyle string `toml:"article_style" doc:"Path to article stylesheet file (.css)"`
 
-	FontFamily string `toml:"font_family"`
-	FontSize   int    `toml:"font_size"`
+	FontFamily string `toml:"font_family" doc:"Application font family"`
+	FontSize   int    `toml:"font_size" doc:"Application font size"`
 
-	SearchOnType          bool `toml:"search_on_type"`
-	SearchOnTypeMinLength int  `toml:"search_on_type_min_length"`
+	SearchOnType          bool `toml:"search_on_type" doc:"Enable/disable search-on-type"`
+	SearchOnTypeMinLength int  `toml:"search_on_type_min_length" doc:"Minimum query length for search-on-type"`
 
-	HeaderTemplate string `toml:"header_template"`
-	HeaderWordWrap bool   `toml:"header_word_wrap"`
+	HeaderTemplate string `toml:"header_template" doc:"HTML template for header (dict name + entry terms)"`
+	HeaderWordWrap bool   `toml:"header_word_wrap" doc:"Enable word-wrapping for header (dict name + entry terms)"`
 
-	HistoryDisable  bool `toml:"history_disable"`
-	HistoryAutoSave bool `toml:"history_auto_save"`
-	HistoryMaxSize  int  `toml:"history_max_size"`
+	HistoryDisable  bool `toml:"history_disable" doc:"Disable history"`
+	HistoryAutoSave bool `toml:"history_auto_save" doc:"Auto-save history on every new record"`
+	HistoryMaxSize  int  `toml:"history_max_size" doc:"Maximum size for history"`
 
-	MostFrequentDisable  bool `toml:"most_frequent_disable"`
-	MostFrequentAutoSave bool `toml:"most_frequent_auto_save"`
-	MostFrequentMaxSize  int  `toml:"most_frequent_max_size"`
+	MostFrequentDisable  bool `toml:"most_frequent_disable" doc:"Disable keeping Most Frequent queries"`
+	MostFrequentAutoSave bool `toml:"most_frequent_auto_save" doc:"Auto-save Most Frequent queries"`
+	MostFrequentMaxSize  int  `toml:"most_frequent_max_size" doc:"Maximum size for Most Frequent queries"`
 
-	FavoritesAutoSave bool `toml:"favorites_auto_save"`
+	FavoritesAutoSave bool `toml:"favorites_auto_save" doc:"Auto-save Favorites on every new record"`
 
-	MaxResultsTotal int `toml:"max_results_total"`
+	MaxResultsTotal int `toml:"max_results_total" doc:"Maximum number of search results"`
 
-	Audio bool `toml:"audio"`
+	Audio bool `toml:"audio" doc:"Enable audio in article"`
 
-	AudioMPV bool `toml:"audio_mpv"`
+	AudioMPV bool `toml:"audio_mpv" doc:"Use ‘mpv‘ command for playing audio"`
 
-	AudioDownloadTimeout time.Duration `toml:"audio_download_timeout"`
+	AudioDownloadTimeout time.Duration `toml:"audio_download_timeout" doc:"Timeout for downloading audio files"`
 
-	AudioAutoPlay int `toml:"audio_auto_play"`
+	AudioAutoPlay int `toml:"audio_auto_play" doc:"Number of audio file to auto-play, set ‘0‘ to disable."`
 
-	AudioAutoPlayWaitBetween time.Duration `toml:"audio_auto_play_wait_between"`
+	AudioAutoPlayWaitBetween time.Duration `toml:"audio_auto_play_wait_between" doc:"Wait time between multiple audio files on auto-play"`
 
-	EmbedExternalStylesheet bool `toml:"embed_external_stylesheet"`
+	EmbedExternalStylesheet bool `toml:"embed_external_stylesheet" doc:"Embed external stylesheet/css in article"`
 
-	ColorMapping map[string]string `toml:"color_mapping"`
+	ColorMapping map[string]string `toml:"color_mapping" doc:"Mapping for colors used in article"`
 
-	PopupStyleStr string `toml:"popup_style_str"`
+	PopupStyleStr string `toml:"popup_style_str" doc:"Stylesheet (text) for 'Loading' popup"`
 
-	ArticleZoomFactor float64 `toml:"article_zoom_factor"`
+	ArticleZoomFactor float64 `toml:"article_zoom_factor" doc:"Zoom factor for article with mouse wheel or keyboard"`
 
-	ArticleArrowKeys bool `toml:"article_arrow_keys"`
+	ArticleArrowKeys bool `toml:"article_arrow_keys" doc:"Use arrow keys to scroll through article (when focused)"`
 
-	ReduceMinimumWindowWidth bool `toml:"reduce_minimum_window_width"`
+	ReduceMinimumWindowWidth bool `toml:"reduce_minimum_window_width" doc:"Use smaller buttons to reduce minimum width of window"`
 
-	LocalServerPorts []string `toml:"local_server_ports"`
+	LocalServerPorts []string `toml:"local_server_ports" doc:"Ports for local server. Server runs on first port; Client tries all"`
 
-	LocalClientTimeout time.Duration `toml:"local_client_timeout"`
+	LocalClientTimeout time.Duration `toml:"local_client_timeout" doc:"Timeout for local web client"`
 
-	WebEnable bool `toml:"web_enable"`
-	WebExpose bool `toml:"web_expose"`
+	WebEnable bool `toml:"web_enable" doc:"Set true/false and restart to enable/disable web service & web app"`
+	WebExpose bool `toml:"web_expose" doc:"Expose web service & web app to outside (otherwise only available to 127.0.0.1)"`
 
-	WebSearchOnType          bool `toml:"web_search_on_type"`
-	WebSearchOnTypeMinLength int  `toml:"web_search_on_type_min_length"`
+	WebSearchOnType          bool `toml:"web_search_on_type" doc:"Web: Enable/disable search-on-type"`
+	WebSearchOnTypeMinLength int  `toml:"web_search_on_type_min_length" doc:"Web: Minimum query length for search-on-type"`
 
-	WebShowPoweredBy bool `toml:"web_show_powered_by"`
+	WebShowPoweredBy bool `toml:"web_show_powered_by" doc:"Show 'Powered By ...' footer in web."`
 
-	SearchWorkerCount int `toml:"search_worker_count"`
+	SearchWorkerCount int `toml:"search_worker_count" doc:"The number of workers / goroutines used for search"`
 
-	SearchTimeout time.Duration `toml:"search_timeout"`
+	SearchTimeout time.Duration `toml:"search_timeout" doc:"Timeout for search on each dictionary. Only works if ‘search_worker_count > 1‘"`
 }
 
 const defaultHeaderTemplate = `<b><font color='#55f'>{{.DictName}}</font></b>

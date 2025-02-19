@@ -10,17 +10,25 @@ import (
 	"github.com/ilius/ayandict/v2/pkg/config"
 )
 
-func getTomlTag(s string) string {
-	i := strings.Index(s, `toml:"`)
+func getFieldTag(s string, tag string) string {
+	i := strings.Index(s, tag+`:"`)
 	if i < 0 {
 		return ""
 	}
-	start := i + 6
+	start := i + len(tag) + 2
 	len := strings.Index(s[start:], `"`)
 	if len < 0 {
 		return ""
 	}
 	return s[start : start+len]
+}
+
+func getTomlTag(s string) string {
+	return getFieldTag(s, "toml")
+}
+
+func getDocTag(s string) string {
+	return strings.ReplaceAll(getFieldTag(s, "doc"), "‘", "`")
 }
 
 func printCommentTemplate() {
@@ -40,7 +48,7 @@ func printStruct(typ reflect.Type, val reflect.Value, keyPrefix string) {
 		key := keyPrefix + getTomlTag(string(field.Tag))
 		fieldVal := val.Field(i)
 		fieldValIn := fieldVal.Interface()
-		comment := commentMap[key]
+		comment := getDocTag(string(field.Tag))
 		if comment == "" {
 			log.Fatalln("No comment for", key)
 		}
@@ -89,10 +97,9 @@ func printMarkdownStruct(spec ConfigStructSpec) {
 			continue
 		}
 
-		commentKey := strings.Join(keyPath, ".")
-		comment := commentMap[commentKey]
+		comment := getDocTag(string(field.Tag))
 		if comment == "" {
-			log.Fatalln("No comment for", commentKey)
+			log.Fatalln("No comment for", field)
 		}
 		comment = strings.ReplaceAll(comment, "`", "``")
 
