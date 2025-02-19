@@ -1,46 +1,17 @@
 package application
 
 import (
-	"os"
-	"sync"
-
 	qt "github.com/mappu/miqt/qt6"
 )
 
-var (
-	iconMap      = map[string]*qt.QIcon{}
-	iconMapMutex sync.RWMutex
-)
-
 func loadPNGIcon(filename string) (*qt.QIcon, error) {
-	iconMapMutex.RLock()
-	icon, ok := iconMap[filename]
-	iconMapMutex.RUnlock()
-	if ok {
-		return icon, nil
-	}
 	data, err := res.ReadFile("res/" + filename)
 	if err != nil {
 		return nil, err
 	}
-	file, err := os.CreateTemp("", filename)
-	if err != nil {
-		return nil, err
-	}
-	_, err = file.Write(data)
-	if err != nil {
-		return nil, err
-	}
-	err = file.Close()
-	if err != nil {
-		return nil, err
-	}
-	pixmap := qt.NewQPixmap6(file.Name(), "PNG")
-	icon = qt.NewQIcon2(pixmap)
-	iconMapMutex.Lock()
-	iconMap[filename] = icon
-	iconMapMutex.Unlock()
-	return icon, nil
+	pixmap := qt.NewQPixmap()
+	pixmap.LoadFromData2(data, "PNG")
+	return qt.NewQIcon2(pixmap), nil
 }
 
 // func loadSVGIcon(filename string) *qt.QIcon {
