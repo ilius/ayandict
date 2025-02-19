@@ -132,7 +132,7 @@ func query(w http.ResponseWriter, r *http.Request) {
 	for i, res := range raw_results {
 		header, err := headerlib.GetHeader(headerTpl, res)
 		if err != nil {
-			slog.Error("Error formatting header label: %v", err)
+			slog.Error("Error formatting header label", "err", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
