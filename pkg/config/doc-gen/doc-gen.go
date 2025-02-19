@@ -33,14 +33,11 @@ func printCommentTemplate() {
 	}
 }
 
-func printAll() {
-	conf := config.Default()
-	typ := reflect.TypeOf(conf).Elem()
-	val := reflect.ValueOf(conf).Elem()
+func printStruct(typ reflect.Type, val reflect.Value, keyPrefix string) {
 	for i := 0; i < typ.NumField(); i++ {
-		fieldType := typ.Field(i)
-		name := fieldType.Name
-		key := getTomlTag(string(fieldType.Tag))
+		field := typ.Field(i)
+		name := field.Name
+		key := keyPrefix + getTomlTag(string(field.Tag))
 		fieldVal := val.Field(i)
 		fieldValIn := fieldVal.Interface()
 		comment := commentMap[key]
@@ -54,30 +51,69 @@ func printAll() {
 			fieldValIn,
 			comment,
 		)
+		fieldType := field.Type
+		if fieldType.Kind() == reflect.Struct {
+			printStruct(fieldType, fieldVal, key+".")
+		}
+	}
+}
+
+func printAll() {
+	conf := config.Default()
+	typ := reflect.TypeOf(conf).Elem()
+	val := reflect.ValueOf(conf).Elem()
+	printStruct(typ, val, "")
+}
+
+type ConfigStructSpec struct {
+	Type    reflect.Type
+	Value   reflect.Value
+	KeyPath []string
+}
+
+func printMarkdownStruct(spec ConfigStructSpec) {
+	subStructs := []ConfigStructSpec{}
+	for i := 0; i < spec.Type.NumField(); i++ {
+		field := spec.Type.Field(i)
+		keyPath := append(spec.KeyPath, getTomlTag(string(field.Tag)))
+
+		fieldType := field.Type
+		fieldValue := spec.Value.Field(i)
+
+		if fieldType.Kind() == reflect.Struct {
+			subStructs = append(subStructs, ConfigStructSpec{
+				Type:    fieldType,
+				Value:   fieldValue,
+				KeyPath: keyPath,
+			})
+			continue
+		}
+
+		commentKey := strings.Join(keyPath, ".")
+		comment := commentMap[commentKey]
+		if comment == "" {
+			log.Fatalln("No comment for", commentKey)
+		}
+		comment = strings.ReplaceAll(comment, "`", "``")
+
+		keyCode := codeValue(strings.Join(keyPath, ": "))
+		fmt.Println(keyCode)
+		fmt.Println(strings.Repeat("-", len(keyCode)))
+		fmt.Println(comment + "\n")
+		fmt.Println("Default value: " + jsonCodeValue(fieldValue.Interface()) + "\n")
+
+	}
+	for _, sub := range subStructs {
+		printMarkdownStruct(sub)
 	}
 }
 
 func printMarkdown() {
 	conf := config.Default()
-	typ := reflect.TypeOf(conf).Elem()
-	val := reflect.ValueOf(conf).Elem()
-	for i := 0; i < typ.NumField(); i++ {
-		fieldType := typ.Field(i)
-		key := getTomlTag(string(fieldType.Tag))
-		fieldVal := val.Field(i)
-		fieldValIn := fieldVal.Interface()
-		comment := commentMap[key]
-		if comment == "" {
-			log.Fatalln("No comment for", key)
-		}
-		comment = strings.ReplaceAll(comment, "`", "``")
-
-		keyCode := codeValue(key)
-		fmt.Println(keyCode)
-		fmt.Println(strings.Repeat("-", len(keyCode)))
-		fmt.Println(comment + "\n")
-		fmt.Println("Default value: " + jsonCodeValue(fieldValIn) + "\n")
-	}
+	printMarkdownStruct(ConfigStructSpec{
+		Type:  reflect.TypeOf(conf).Elem(),
+		Value: reflect.ValueOf(conf).Elem(),
+	})
 }
 
 func main() {

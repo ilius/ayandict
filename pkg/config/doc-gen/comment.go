@@ -1,8 +1,10 @@
 package main
 
 var commentMap = map[string]string{
-	"logging":        "Logging config",
-	"directory_list": "List of dictionary directory paths (absolute or relative to home)",
+	"logging":          "Logging config",
+	"logging.no_color": "Disable log colors",
+	"logging.level":    "Log level",
+	"directory_list":   "List of dictionary directory paths (absolute or relative to home)",
 
 	"sql_dict_list": "List of SQL databases, only SQLite is currently supported",
 

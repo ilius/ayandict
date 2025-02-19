@@ -1,9 +1,3 @@
-``logging``
------------
-Logging config
-
-Default value: ``{"NoColor":false,"Level":""}``
-
 ``directory_list``
 ------------------
 List of dictionary directory paths (absolute or relative to home)
@@ -225,4 +219,16 @@ Default value: ``8``
 Timeout for search on each dictionary. Only works if ``search_worker_count > 1``
 
 Default value: ``"5s"``
+
+``logging: no_color``
+---------------------
+Disable log colors
+
+Default value: ``false``
+
+``logging: level``
+------------------
+Log level
+
+Default value: ``""``
 
