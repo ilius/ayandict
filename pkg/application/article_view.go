@@ -1,6 +1,7 @@
 package application
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 	"os/exec"
@@ -38,9 +39,6 @@ type ArticleView struct {
 	doQuery func(string)
 
 	mediaPlayer *multimedia.QMediaPlayer
-
-	rightClickOnWord string
-	rightClickOnUrl  string
 
 	autoPlayMutex sync.Mutex
 
@@ -172,35 +170,59 @@ func (view *ArticleView) SetResult(res common.SearchResultIface) {
 	}
 }
 
-func (view *ArticleView) createContextMenu() *qt.QMenu {
-	menu := qt.NewQMenu(view.QTextBrowser.QWidget)
-	menu.AddActionWithText("Query").OnTriggered(func() {
-		text := view.TextCursor().SelectedText()
-		if text != "" {
-			view.doQuery(strings.Trim(text, queryForceTrimChars))
-			return
-		}
-		if view.rightClickOnWord != "" {
-			view.doQuery(view.rightClickOnWord)
-		}
+func (view *ArticleView) onContextMenuEvent(_ func(event *qt.QContextMenuEvent), event *qt.QContextMenuEvent) {
+	event.Ignore()
+	menu := view.createContextMenu(event.Pos())
+	menu.Popup(event.GlobalPos())
+}
+
+func (view *ArticleView) createContextMenuWithSelection(menu *qt.QMenu, selected string) {
+	label := "Query Selection"
+	if len(selected) < 20 {
+		label = "Query: " + selected
+	}
+	menu.AddActionWithText(label).OnTriggered(func() {
+		view.doQuery(strings.Trim(selected, queryForceTrimChars))
 	})
-	if view.rightClickOnUrl != "" {
+	menu.AddActionWithText("Copy Selection").OnTriggered(func() {
+		qt.QGuiApplication_Clipboard().SetText2(strings.TrimSpace(selected), qt.QClipboard__Clipboard)
+	})
+	menu.AddActionWithText("Copy Selection HTML").OnTriggered(func() {
+		qt.QGuiApplication_Clipboard().SetText2(view.selectedHTML(), qt.QClipboard__Clipboard)
+	})
+}
+
+func (view *ArticleView) createContextMenuNoSelection(menu *qt.QMenu, pos *qt.QPoint) {
+	cursor := view.CursorForPosition(pos)
+	cursor.Select(qt.QTextCursor__WordUnderCursor) // it doesn't actually select the word in GUI
+
+	cursorUrl := view.findLinkOnCursor(cursor)
+	if cursorUrl != "" {
 		menu.AddActionWithText("Copy Link Target").OnTriggered(func() {
-			qt.QGuiApplication_Clipboard().SetText2(view.rightClickOnUrl, qt.QClipboard__Clipboard)
+			qt.QGuiApplication_Clipboard().SetText2(cursorUrl, qt.QClipboard__Clipboard)
 		})
 	}
-	menu.AddActionWithText("Copy").OnTriggered(func() {
-		text := view.TextCursor().SelectedText()
-		if text == "" {
-			return
-		}
-		text = strings.TrimSpace(text)
-		qt.QGuiApplication_Clipboard().SetText2(text, qt.QClipboard__Clipboard)
-	})
-	menu.AddActionWithText("Copy HTML").OnTriggered(func() {
-		text := view.selectedHTML()
-		qt.QGuiApplication_Clipboard().SetText2(text, qt.QClipboard__Clipboard)
-	})
+
+	cursorWord := strings.Trim(cursor.SelectedText(), punctuation)
+	if cursorWord != "" {
+		slog.Debug("Right-clicked on word", "word", fmt.Sprintf("%#v", cursorWord))
+		menu.AddActionWithText("Query: " + cursorWord).OnTriggered(func() {
+			view.doQuery(cursorWord)
+		})
+	}
+}
+
+func (view *ArticleView) createContextMenu(pos *qt.QPoint) *qt.QMenu {
+	menu := qt.NewQMenu(view.QTextBrowser.QWidget)
+
+	selected := view.TextCursor().SelectedText()
+
+	if selected == "" {
+		view.createContextMenuNoSelection(menu, pos)
+	} else {
+		view.createContextMenuWithSelection(menu, selected)
+	}
+
 	menu.AddActionWithText("Copy All (HTML)").OnTriggered(func() {
 		qt.QGuiApplication_Clipboard().SetText2(
 			view.ToHtml(),
@@ -329,30 +351,13 @@ func (view *ArticleView) setupAnchorClicked() {
 
 func (view *ArticleView) setupMouseReleaseEvent() {
 	view.OnMouseReleaseEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
-		text := view.TextCursor().SelectedText()
 		switch event.Button() {
 		case qt.MiddleButton:
-			if text != "" {
-				view.doQuery(strings.Trim(text, queryForceTrimChars))
+			selected := view.TextCursor().SelectedText()
+			if selected != "" {
+				view.doQuery(strings.Trim(selected, queryForceTrimChars))
 			}
 			return
-		case qt.RightButton:
-			if text == "" {
-				cursor := view.CursorForPosition(event.Pos())
-				cursor.Select(qt.QTextCursor__WordUnderCursor)
-				// it doesn't actually select the word in GUI
-
-				urlStr := view.findLinkOnCursor(cursor)
-				if urlStr != "" {
-					// slog.Info("right-click on url:", urlStr)
-					view.rightClickOnUrl = urlStr
-				}
-
-				view.rightClickOnWord = strings.Trim(cursor.SelectedText(), punctuation)
-				if view.rightClickOnWord != "" {
-					slog.Debug("Right-clicked on word", "word", view.rightClickOnWord)
-				}
-			}
 		}
 		super(event)
 	})
@@ -408,11 +413,7 @@ func (view *ArticleView) SetupCustomHandlers() {
 	// and read it when Query is selected from context menu
 	// may not be pretty or concurrent-safe! but seems to work!
 
-	view.OnContextMenuEvent(func(_ func(event *qt.QContextMenuEvent), event *qt.QContextMenuEvent) {
-		event.Ignore()
-		menu := view.createContextMenu()
-		menu.Popup(event.GlobalPos())
-	})
+	view.OnContextMenuEvent(view.onContextMenuEvent)
 	view.setupMouseReleaseEvent()
 	view.setupWheelEvent()
 }
