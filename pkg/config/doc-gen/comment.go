@@ -6,8 +6,6 @@ var commentMap = map[string]string{
 	"logging.level":    "Log level",
 	"directory_list":   "List of dictionary directory paths (absolute or relative to home)",
 
-	"sql_dict_list": "List of SQL databases, only SQLite is currently supported",
-
 	"style":         "Path to application stylesheet file (.qss)",
 	"article_style": "Path to article stylesheet file (.css)",
 	"font_family":   "Application font family",
