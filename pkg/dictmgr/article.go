@@ -11,9 +11,11 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/html"
+	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	common "github.com/ilius/go-dict-commons"
 )
 
@@ -33,13 +35,18 @@ var (
 )
 
 const (
-	webPlayImage = "/web/audio-play.png"
+	webPlayImage  = "/web/audio-play.png"
+	playImageName = "audio-play.png"
 )
+
+var playImagePath = filepath.Join(config.GetCacheDir(), playImageName)
 
 type DictProcessor struct {
 	common.Dictionary
 	conf  *config.Config
 	flags uint32
+
+	playImageMutex sync.Mutex
 }
 
 func (p *DictProcessor) dictResURL(relPath string) string {
@@ -272,19 +279,41 @@ func (p *DictProcessor) applyColorMapping(defi string) string {
 	return defi
 }
 
+func (p *DictProcessor) createPlayImage() bool {
+	_, statErr := os.Stat(playImagePath)
+	if statErr == nil {
+		return true
+	}
+
+	p.playImageMutex.Lock()
+	defer p.playImageMutex.Unlock()
+
+	data, err := res.ReadFile("res/" + playImageName)
+	if err != nil {
+		qerr.Error(err)
+		return false
+	}
+	err = os.WriteFile(playImagePath, data, 0o644)
+	if err != nil {
+		qerr.Error(err)
+		return false
+	}
+	return true
+}
+
 func (p *DictProcessor) getPlayImage() string {
 	if p.flags&common.ResultFlag_Web > 0 {
 		return fmt.Sprintf(
 			`<img src="%s" />`, webPlayImage,
 		)
 	}
-	imgPath, err := loadPNGFile("audio-play.png")
-	if err != nil {
-		slog.Error("error", "err", err)
+	if !p.createPlayImage() {
+		return ""
 	}
+
 	_url := url.URL{}
 	_url.Scheme = "file"
-	_url.Path = imgPath
+	_url.Path = playImagePath
 	_urlStr := _url.String()
 	return fmt.Sprintf(
 		`<img src=%s />`,
