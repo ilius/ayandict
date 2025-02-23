@@ -4,35 +4,35 @@
 name: Go Build
 
 on:
-    push:
-        branches: ["main", "v3"]
-    pull_request:
-        branches: ["main"]
+  push:
+    branches: ["main", "v3"]
+  pull_request:
+    branches: ["main"]
 
 jobs:
-    build:
-        strategy:
-            fail-fast: false
-            matrix:
-                os: [ubuntu-latest, macos-latest, windows-latest]
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
-        runs-on: ${{ matrix.os }}
-        steps:
-            - uses: actions/checkout@v3
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
 
-            - name: Set up Go
-              uses: actions/setup-go@v3
-              with:
-                  go-version: 1.22
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.22
 
-            - name: Build
-              run: go build -v
+      - name: Build
+        run: go build -v
 
-            - name: Build sub-packages
-              run: go build -v ./...
+      - name: Build sub-packages
+        run: go build -v ./...
 
-            - name: Build nogui
-              run: go build -v -tags nogui
+      - name: Build nogui
+        run: go build -v -tags nogui
 
-            - name: Install
-              run: go install github.com/ilius/ayandict@main
+      - name: Install
+        run: go install github.com/ilius/ayandict@main
