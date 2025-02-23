@@ -59,10 +59,10 @@ func AudioVolume(dictName string) int {
 	ds := dicts.DictSettingsMap[dictName]
 	if ds == nil {
 		slog.Error("AudioVolume: no Settings value", "dictName", dictName)
-		return 200
+		return 100
 	}
 	if ds.AudioVolume == 0 {
-		return 200
+		return 100
 	}
 	return ds.AudioVolume
 }

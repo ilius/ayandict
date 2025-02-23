@@ -66,6 +66,8 @@ type Config struct {
 
 	AudioAutoPlayWaitBetween time.Duration `toml:"audio_auto_play_wait_between" doc:"Wait time between multiple audio files on auto-play"`
 
+	AudioVolume int `toml:"audio_volume" doc:"Volume for playing audio, 0 to 100 (% multiplied by dict-specofic volume)"`
+
 	EmbedExternalStylesheet bool `toml:"embed_external_stylesheet" doc:"Embed external stylesheet/css in article"`
 
 	ColorMapping map[string]string `toml:"color_mapping" doc:"Mapping for colors used in article"`
@@ -149,6 +151,8 @@ func Default() *Config {
 		AudioAutoPlay: 1,
 
 		AudioAutoPlayWaitBetween: 500 * time.Millisecond,
+
+		AudioVolume: 70,
 
 		EmbedExternalStylesheet: false,
 

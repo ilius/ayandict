@@ -130,6 +130,12 @@ Wait time between multiple audio files on auto-play
 
 Default value: ``"500ms"``
 
+``audio_volume``
+----------------
+Volume for playing audio, 0 to 100 (% multiplied by dict-specofic volume)
+
+Default value: ``70``
+
 ``embed_external_stylesheet``
 -----------------------------
 Embed external stylesheet/css in article

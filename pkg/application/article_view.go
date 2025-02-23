@@ -76,11 +76,8 @@ func (view *ArticleView) playAudioMPV(urlStr string) bool {
 		"--no-video",
 		urlStr,
 	}
-	volume := dictmgr.AudioVolume(view.dictName)
-	if volume > 0 {
-		volumeStr := strconv.FormatInt(int64(volume), 10)
-		args = append(args, "--volume="+volumeStr)
-	}
+	volume := dictmgr.AudioVolume(view.dictName) * conf.AudioVolume / 100
+	args = append(args, "--volume="+strconv.FormatInt(int64(volume), 10))
 	cmd := exec.Cmd{
 		Path:   path,
 		Args:   args,
