@@ -15,10 +15,6 @@ func NewFavoriteButton() *FavoriteButton {
 		qerr.Error(err)
 		panic(err)
 	}
-	if icon == nil {
-		qerr.Error("error loading favorite.png icon: icon is nil")
-		panic("error loading favorite.png icon: icon is nil")
-	}
 	button := widgets.NewQPushButton3(icon, "", nil)
 	button.SetCheckable(true)
 	return &FavoriteButton{
