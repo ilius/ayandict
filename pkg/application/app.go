@@ -58,8 +58,8 @@ type Application struct {
 	queryModeCombo  *widgets.QComboBox
 	favoritesWidget *qfavorites.FavoritesWidget
 
-	favoriteButton      *widgets.QPushButton
-	queryFavoriteButton *widgets.QPushButton
+	favoriteButton      *FavoriteButton
+	queryFavoriteButton *FavoriteButton
 	reloadDictsButton   *widgets.QPushButton
 	closeDictsButton    *widgets.QPushButton
 	openConfigButton    *widgets.QPushButton
@@ -238,13 +238,11 @@ func (app *Application) Run() {
 
 	okButton := widgets.NewQPushButton2(" OK ", nil)
 
-	app.queryFavoriteButton = NewPNGIconTextButton("", "favorite.png")
-	app.queryFavoriteButton.SetCheckable(true)
+	app.queryFavoriteButton = NewFavoriteButton()
 	app.queryFavoriteButton.SetToolTip("Add this query to favorites")
 
 	// favoriteButtonVBox := widgets.NewQVBoxLayout()
-	app.favoriteButton = NewPNGIconTextButton("", "favorite.png")
-	app.favoriteButton.SetCheckable(true)
+	app.favoriteButton = NewFavoriteButton()
 	app.favoriteButton.SetToolTip("Add this term to favorites")
 	app.favoriteButton.Hide()
 	// favoriteButtonVBox.AddWidget(favoriteButton, 0, core.Qt__AlignBottom)
