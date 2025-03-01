@@ -238,11 +238,31 @@ func (app *Application) Run() {
 
 	okButton := widgets.NewQPushButton2(" OK ", nil)
 
-	app.queryFavoriteButton = NewFavoriteButton()
+	app.queryFavoriteButton = NewFavoriteButton(func(checked bool) {
+		term := app.entry.Text()
+		if term == "" {
+			app.queryFavoriteButton.SetChecked(false)
+			return
+		}
+		app.favoritesWidget.SetFavorite(term, checked)
+		if app.resultList.Active != nil && term == app.resultList.Active.Terms()[0] {
+			app.favoriteButton.SetChecked(checked)
+		}
+	})
 	app.queryFavoriteButton.SetToolTip("Add this query to favorites")
 
 	// favoriteButtonVBox := widgets.NewQVBoxLayout()
-	app.favoriteButton = NewFavoriteButton()
+	app.favoriteButton = NewFavoriteButton(func(checked bool) {
+		if app.resultList.Active == nil {
+			app.favoriteButton.SetChecked(false)
+			return
+		}
+		term := app.resultList.Active.Terms()[0]
+		app.favoritesWidget.SetFavorite(term, checked)
+		if term == app.entry.Text() {
+			app.queryFavoriteButton.SetChecked(checked)
+		}
+	})
 	app.favoriteButton.SetToolTip("Add this term to favorites")
 	app.favoriteButton.Hide()
 	// favoriteButtonVBox.AddWidget(favoriteButton, 0, core.Qt__AlignBottom)
@@ -632,28 +652,6 @@ func (app *Application) setupHandlers() {
 		onQuery(text, app.queryArgs, true)
 	})
 
-	app.favoriteButton.ConnectClicked(func(checked bool) {
-		if app.resultList.Active == nil {
-			app.favoriteButton.SetChecked(false)
-			return
-		}
-		term := app.resultList.Active.Terms()[0]
-		app.favoritesWidget.SetFavorite(term, checked)
-		if term == entry.Text() {
-			app.queryFavoriteButton.SetChecked(checked)
-		}
-	})
-	app.queryFavoriteButton.ConnectClicked(func(checked bool) {
-		term := entry.Text()
-		if term == "" {
-			app.queryFavoriteButton.SetChecked(false)
-			return
-		}
-		app.favoritesWidget.SetFavorite(term, checked)
-		if app.resultList.Active != nil && term == app.resultList.Active.Terms()[0] {
-			app.favoriteButton.SetChecked(checked)
-		}
-	})
 	app.entry.ConnectReturnPressed(func() {
 		onQuery(entry.Text(), app.queryArgs, false)
 	})
