@@ -83,6 +83,7 @@ func Run() {
 	qerr.ShowMessage = showErrorMessage
 	app.style = app.Style()
 	app.bottomBoxStyleOpt = widgets.NewQStyleOptionButton()
+	core.QCoreApplication_SetApplicationName(appinfo.APP_DESC)
 
 	if cacheDir == "" {
 		qerr.Error(cacheDir)
