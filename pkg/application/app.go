@@ -249,7 +249,10 @@ func (app *Application) Run() {
 			app.favoriteButton.SetChecked(checked)
 		}
 	})
-	app.queryFavoriteButton.SetToolTip("Add this query to favorites")
+	app.queryFavoriteButton.SetToolTips(
+		"Add this query to favorites",
+		"Remove this query from favorites",
+	)
 
 	// favoriteButtonVBox := widgets.NewQVBoxLayout()
 	app.favoriteButton = NewFavoriteButton(func(checked bool) {
@@ -263,7 +266,11 @@ func (app *Application) Run() {
 			app.queryFavoriteButton.SetChecked(checked)
 		}
 	})
-	app.favoriteButton.SetToolTip("Add this term to favorites")
+
+	app.favoriteButton.SetToolTips(
+		"Add this term to favorites",
+		"Remove this term from favorites",
+	)
 	app.favoriteButton.Hide()
 	// favoriteButtonVBox.AddWidget(favoriteButton, 0, core.Qt__AlignBottom)
 

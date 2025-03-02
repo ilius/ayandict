@@ -11,19 +11,30 @@ type FavoriteButton struct {
 	checked      bool
 	activeIcon   *gui.QIcon
 	inactiveIcon *gui.QIcon
+
+	inactiveTooltip string
+	activeTooltip   string
 }
 
 func (b *FavoriteButton) SetChecked(checked bool) {
 	b.checked = checked
 	if checked {
 		b.SetIcon(b.activeIcon)
+		b.SetToolTip(b.activeTooltip)
 	} else {
 		b.SetIcon(b.inactiveIcon)
+		b.SetToolTip(b.inactiveTooltip)
 	}
 }
 
 func (b *FavoriteButton) ToggleChecked() {
 	b.SetChecked(!b.checked)
+}
+
+func (b *FavoriteButton) SetToolTips(inactive string, active string) {
+	b.inactiveTooltip = inactive
+	b.activeTooltip = active
+	b.SetToolTip(inactive)
 }
 
 func NewFavoriteButton(onClick func(bool)) *FavoriteButton {
