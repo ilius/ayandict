@@ -63,6 +63,19 @@ func getAppName(w http.ResponseWriter, _ *http.Request) {
 	writeMsg(w, appinfo.APP_NAME)
 }
 
+func queryModeParam(r *http.Request) (dictmgr.QueryMode, bool) {
+	switch r.FormValue("mode") {
+	case "", "fuzzy":
+	case "startWith":
+		return dictmgr.QueryModeStartWith, true
+	case "regex":
+		return dictmgr.QueryModeRegex, true
+	case "glob":
+		return dictmgr.QueryModeGlob, true
+	}
+	return dictmgr.QueryMode(0), false
+}
+
 func query(w http.ResponseWriter, r *http.Request) {
 	t := time.Now()
 
@@ -79,16 +92,8 @@ func query(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mode := dictmgr.QueryModeFuzzy
-	switch r.FormValue("mode") {
-	case "", "fuzzy":
-	case "startWith":
-		mode = dictmgr.QueryModeStartWith
-	case "regex":
-		mode = dictmgr.QueryModeRegex
-	case "glob":
-		mode = dictmgr.QueryModeGlob
-	default:
+	mode, ok := queryModeParam(r)
+	if !ok {
 		err := jsonEncoder.Encode(ErrorResponse{Error: "invalid mode"})
 		if err != nil {
 			slog.Error("error in jsonEncoder.Encode", "err", err)
