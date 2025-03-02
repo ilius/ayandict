@@ -2,6 +2,7 @@ package application
 
 import (
 	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
+	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
 	"github.com/ilius/qt/widgets"
 )
@@ -49,7 +50,10 @@ func NewFavoriteButton(onClick func(bool)) *FavoriteButton {
 		panic(err)
 	}
 	qButton := widgets.NewQPushButton3(inactiveIcon, "", nil)
-	// FIXME: reduce internal padding / border width
+	qButton.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		iconSize := event.Size().Height() * 4 / 5
+		qButton.SetIconSize(core.NewQSize2(iconSize, iconSize))
+	})
 	button := &FavoriteButton{
 		QPushButton:  qButton,
 		activeIcon:   activeIcon,
