@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/ilius/ayandict/v2/pkg/appinfo"
 	"github.com/ilius/qt/core"
@@ -34,8 +35,10 @@ func aboutClicked(
 
 	topHBox := widgets.NewQHBoxLayout()
 	topLabel := widgets.NewQLabel2(fmt.Sprintf(
-		"AyanDict\nVersion %s",
+		"AyanDict version %s\nUsing Qt %v and Go %v",
 		appinfo.VERSION,
+		core.QLibraryInfo_Version().ToString(),
+		runtime.Version()[2:],
 	), nil, 0)
 	topHBox.AddWidget(topLabel, 0, 0)
 
