@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+	<meta charset="utf-8" />
+
+	<head>
+		<title>AyanDict Web</title>
+		<link rel="stylesheet" type="text/css" href="web/style.css" />
+		<script
+			type="text/javascript"
+			src="web/brython@3.11.0/brython.min.js"
+		></script>
+		<script
+			type="text/javascript"
+			src="web/brython@3.11.0/brython_stdlib.js"
+		></script>
+	</head>
+
+	<body class="horizontal" onload="brython()">
+		<div id="content-container" class="vertical">
+			<div id="content-header" class="horizontal">
+				<span id="header-label"></span>
+			</div>
+			<div
+				id="content"
+				name="content"
+				class="vertical"
+				style="overflow: auto; height: 100vh"
+			></div>
+			{{if .Config.WebShowPoweredBy}}
+			<div id="powered-by">
+				Powered by
+				<a href="https://github.com/ilius/ayandict">AyanDict</a>,
+				<a href="https://go.dev/">Go</a>
+				and <a href="https://brython.info/">Brython</a>
+			</div>
+			{{end}}
+		</div>
+		<script type="text/javascript">
+			function playAudioA(a) {
+				var audio = new Audio(a.href);
+				audio.play();
+			}
+		</script>
+		<script type="text/python">
+			from browser import document, html, ajax, alert
+
+			entryId = document.query["id"]
+			dictName = document.query["dict"]
+			content = document["content"]
+			headerLabel = document["header-label"]
+
+			ajax.post(
+				"/api/entry?id=" + entryId + "&dict=" +  dictName,
+				cache=False,
+				oncomplete=on_entry_result,
+			)
+
+			def is_word_link(target):
+				if "://" not in target:
+					return True
+				if target.startswith("bword://"):
+					return True
+				return False
+
+
+			def fix_content_links():
+				for a in content.select('a'):
+					target = a.attrs.get("href")
+					if not target:
+						continue
+					if target.endswith((".mp3", ".wav", ".ogg")):
+						a.attrs["onclick"] = "playAudioA(this); return false"
+						continue
+					if not is_word_link(target):
+						continue
+					# TODO
+					# a.attrs["dict_target"] = target
+					# a.attrs["href"] = "#"
+
+
+			def show_result_content(result):
+				headerLabel.html = result["header_html"]
+				content.html = "<br/>".join(result["definitionsHTML"])
+				fix_content_links()
+
+
+			def on_entry_result(res):
+				# res is an Ajax object
+				result = res.json
+				error = result.get("error")
+				if error:
+					alert(error)
+					return
+				ul = html.UL()
+				show_result_content(result)
+		</script>
+	</body>
+</html>
