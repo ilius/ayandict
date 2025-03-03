@@ -51,7 +51,7 @@ func NewFavoriteButton(onClick func(bool)) *FavoriteButton {
 	}
 	qButton := widgets.NewQPushButton3(inactiveIcon, "", nil)
 	qButton.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		iconSize := event.Size().Height() * 4 / 5
+		iconSize := event.Size().Height() * 2 / 3
 		qButton.SetIconSize(core.NewQSize2(iconSize, iconSize))
 	})
 	button := &FavoriteButton{
