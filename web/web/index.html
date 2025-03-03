@@ -62,7 +62,7 @@
 			}
 		</script>
 		<script type="text/python">
-			from browser import document, html, ajax
+			from browser import document, html, ajax, alert
 
 
 			input = document["lookup-input"]
@@ -112,6 +112,9 @@
 			def on_query_result(res):
 				# res is an Ajax object
 				results = res.json
+				if isinstance(results, dict):
+					alert(results.get("error") or "bad results = " + str(results))
+					return
 				resultListElem.clear()
 				ul = html.UL()
 				for index, result in enumerate(results):
