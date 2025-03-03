@@ -66,6 +66,7 @@ func getAppName(w http.ResponseWriter, _ *http.Request) {
 func queryModeParam(r *http.Request) (dictmgr.QueryMode, bool) {
 	switch r.FormValue("mode") {
 	case "", "fuzzy":
+		return dictmgr.QueryModeFuzzy, true
 	case "startWith":
 		return dictmgr.QueryModeStartWith, true
 	case "regex":
