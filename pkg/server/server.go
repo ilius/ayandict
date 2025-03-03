@@ -21,10 +21,10 @@ import (
 )
 
 const (
-	localhost    = "127.0.0.1"
-	path_appName = "app-name"
-	path_query   = "query"
-	path_random  = "random"
+	localhost       = "127.0.0.1"
+	path_appName    = "app-name"
+	path_api_query  = "api/query"
+	path_api_random = "api/random"
 )
 
 var (
@@ -77,7 +77,7 @@ func queryModeParam(r *http.Request) (dictmgr.QueryMode, bool) {
 	return dictmgr.QueryMode(0), false
 }
 
-func query(w http.ResponseWriter, r *http.Request) {
+func api_query(w http.ResponseWriter, r *http.Request) {
 	t := time.Now()
 
 	jsonEncoder := json.NewEncoder(w)
@@ -165,7 +165,7 @@ func query(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func random(w http.ResponseWriter, _ *http.Request) {
+func api_random(w http.ResponseWriter, _ *http.Request) {
 	jsonEncoder := json.NewEncoder(w)
 	w.Header().Set("Content-Type", "application/json")
 
@@ -231,8 +231,8 @@ func dictRes(w http.ResponseWriter, r *http.Request) {
 }
 
 func addWebHandlers() {
-	http.HandleFunc("/"+path_query, query)
-	http.HandleFunc("/"+path_random, random)
+	http.HandleFunc("/"+path_api_query, api_query)
+	http.HandleFunc("/"+path_api_random, api_random)
 	http.HandleFunc("/", home)
 	http.HandleFunc(dictmgr.DictResPathBase, dictRes)
 

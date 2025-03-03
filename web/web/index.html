@@ -135,7 +135,7 @@
 					clear_results()
 					return
 				ajax.post(
-					"/query?query=" + query + "&mode=" +  modeInput.value,
+					"/api/query?query=" + query + "&mode=" +  modeInput.value,
 					cache=False,
 					oncomplete=on_query_result,
 				)
@@ -148,7 +148,7 @@
 				if len(query) < {{.Config.WebSearchOnTypeMinLength}}:
 					return
 				ajax.post(
-					"/query?query=" + query + "&mode=" +  modeInput.value,
+					"/api/query?query=" + query + "&mode=" +  modeInput.value,
 					cache=False,
 					oncomplete=on_query_result,
 				)
@@ -163,7 +163,7 @@
 					target = target[8:]
 				input.value = target
 				ajax.post(
-					"/query?query=" + target + "&mode=" +  modeInput.value + "&limit=1",
+					"/api/query?query=" + target + "&mode=" +  modeInput.value + "&limit=1",
 					cache=False,
 					oncomplete=on_query_result,
 				)
@@ -181,7 +181,7 @@
 
 			def on_random_click(event):
 				ajax.post(
-					"/random",
+					"/api/random",
 					cache=False,
 					oncomplete=on_random_result,
 				)
