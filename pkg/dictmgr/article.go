@@ -2,9 +2,13 @@ package dictmgr
 
 import (
 	"bytes"
+	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 	std_html "html"
+	"io"
 	"log/slog"
+	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -12,6 +16,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/html"
@@ -20,7 +25,8 @@ import (
 )
 
 var (
-	srcRE = regexp.MustCompile(` src="[^<>"]*?"`)
+	srcRE  = regexp.MustCompile(` src="[^<>"]*?"`)
+	srcRE2 = regexp.MustCompile(` src='[^<>']*?'`)
 
 	emptySoundRE = regexp.MustCompile(`<a [^<>]*href="sound://[^<>"]*?"></a>`)
 	hrefSoundRE  = regexp.MustCompile(` href="sound://[^<>"]*?"`)
@@ -35,6 +41,7 @@ var (
 )
 
 const (
+	singleQuote   = byte(39)
 	webPlayImage  = "/web/audio-play.png"
 	playImageName = "audio-play.png"
 )
@@ -47,9 +54,24 @@ type DictProcessor struct {
 	flags uint32
 
 	playImageMutex sync.Mutex
+
+	httpClient *http.Client
 }
 
-func (p *DictProcessor) dictResURL(relPath string) string {
+func NewDictProcessor(dic common.Dictionary, conf *config.Config, flags uint32) *DictProcessor {
+	return &DictProcessor{
+		Dictionary: dic,
+		conf:       conf,
+		flags:      flags,
+
+		httpClient: &http.Client{
+			Timeout: 2 * time.Second, // TODO: add config
+		},
+	}
+}
+
+func (p *DictProcessor) dictResLocalURL(relPath string) string {
+	// should we fix paths that start with "res/" or "/res/" ?
 	if p.flags&common.ResultFlag_Web > 0 {
 		values := url.Values{}
 		values.Add("dictName", p.DictName())
@@ -59,10 +81,66 @@ func (p *DictProcessor) dictResURL(relPath string) string {
 	return p.ResourceURL() + "/" + relPath
 }
 
-func (p *DictProcessor) fixResURL(quoted string) (bool, string) {
+func (p *DictProcessor) unquoteValue(quoted string) (bool, string) {
+	// FIXME: fails to unquote single-quoted string
+	if quoted[0] == singleQuote {
+		return true, quoted[1 : len(quoted)-1]
+	}
 	urlStr, err := strconv.Unquote(quoted)
 	if err != nil {
-		slog.Error("error", "err", err)
+		slog.Error("error in unquoting url", "err", err, "quoted", quoted)
+		return false, ""
+	}
+	return true, urlStr
+}
+
+func sha1sumStr(s string) string {
+	_hash := sha1.New()
+	_hash.Write([]byte(s))
+	return hex.EncodeToString(_hash.Sum(nil))
+}
+
+func (p *DictProcessor) fixResHttpURL(_url *url.URL) (bool, string) {
+	urlStr := _url.String()
+	fname := sha1sumStr(urlStr)
+	// slog.Info("fixResURL: http(s)", "url", _url, "fname", fname)
+	dpath := filepath.Join(config.GetCacheDir(), "res")
+	fpath := filepath.Join(dpath, fname)
+	_, err := os.Stat(fpath)
+	if err == nil {
+		return true, fpath
+	}
+	if !os.IsNotExist(err) {
+		slog.Error("unexpected error in stat", "err", err)
+		return false, ""
+	}
+	err = os.MkdirAll(dpath, 0o755)
+	if err != nil {
+		slog.Error("error creating directory", "err", err, "dpath", dpath)
+		return false, ""
+	}
+	slog.Info("downloading res file", "url", urlStr, "fpath", fpath)
+	resp, err := p.httpClient.Get(urlStr)
+	if err != nil {
+		slog.Error("error downloading res file", "err", err, "url", urlStr)
+		return false, ""
+	}
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		slog.Error("error downloading res file", "err", err, "url", urlStr)
+		return false, ""
+	}
+	err = os.WriteFile(fpath, data, 0o644)
+	if err != nil {
+		slog.Error("error writing res file", "err", err, "fpath", fpath, "url", urlStr)
+		return false, ""
+	}
+	return true, fpath
+}
+
+func (p *DictProcessor) fixResURL(quoted string) (bool, string) {
+	ok, urlStr := p.unquoteValue(quoted)
+	if !ok {
 		return false, ""
 	}
 	if urlStr == webPlayImage {
@@ -70,22 +148,35 @@ func (p *DictProcessor) fixResURL(quoted string) (bool, string) {
 	}
 	_url, err := url.Parse(urlStr)
 	if err != nil {
-		slog.Error("error", "err", err)
+		slog.Error("error in parsing url", "err", err, "urlStr", urlStr)
 		return false, ""
 	}
-	if _url.Scheme != "" || _url.Host != "" {
-		return false, ""
+	// slog.Info("fixResURL", "scheme", _url.Scheme)
+	switch _url.Scheme {
+	case "":
+		return true, p.dictResLocalURL(_url.Path)
+	case "file":
+		pathStr := _url.Host
+		if _url.Path != "" {
+			pathStr += "/" + _url.Path
+		}
+		return true, p.dictResLocalURL(pathStr)
+	case "http", "https":
+		return p.fixResHttpURL(_url)
+	case "data": // TODO
+
+	default:
+		slog.Warn("fixResURL: unknown schema", "scheme", _url.Scheme)
 	}
-	return true, p.dictResURL(_url.Path)
+	return false, ""
 }
 
 func (p *DictProcessor) fixSoundURL(quoted string) (bool, string) {
-	urlStr, err := strconv.Unquote(quoted)
-	if err != nil {
-		slog.Error("error", "err", err)
+	ok, urlStr := p.unquoteValue(quoted)
+	if !ok {
 		return false, ""
 	}
-	return true, p.dictResURL(urlStr[len("sound://"):])
+	return true, p.dictResLocalURL(urlStr[len("sound://"):])
 }
 
 func (*DictProcessor) fixEmptySoundLink(defi string, playImg string) string {
@@ -177,15 +268,15 @@ func (p *DictProcessor) fixAudioTag(
 
 func (p *DictProcessor) fixFileSrc(defi string) string {
 	srcSub := func(match string) string {
-		ok, _url := p.fixResURL(match[5:])
+		ok, urlStr := p.fixResURL(match[5:])
 		if !ok {
 			return match
 		}
-		newStr := " src=" + strconv.Quote(_url)
-		// slog.Info("srcSub:", newStr)
+		newStr := " src=" + strconv.Quote(urlStr)
 		return newStr
 	}
-	return srcRE.ReplaceAllStringFunc(defi, srcSub)
+	defi = srcRE.ReplaceAllStringFunc(defi, srcSub)
+	return srcRE2.ReplaceAllStringFunc(defi, srcSub)
 }
 
 // hrefBwordSub fixes several problems, working around qt bugs
@@ -229,7 +320,7 @@ func (p *DictProcessor) embedExternalStyle(defi string) string {
 		data, err := os.ReadFile(filepath.Join(resDir, href))
 		if err != nil {
 			if !os.IsNotExist(err) {
-				slog.Error("error", "err", err)
+				slog.Error("external style file not found", "err", err)
 			}
 			return match
 		}

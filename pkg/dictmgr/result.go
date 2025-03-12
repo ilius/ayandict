@@ -17,11 +17,7 @@ func NewSearchResult(
 	return &SearchResult{
 		SearchResultLow: res,
 
-		proc: &DictProcessor{
-			Dictionary: dic,
-			conf:       conf,
-			flags:      flags,
-		},
+		proc: NewDictProcessor(dic, conf, flags),
 	}
 }
 
