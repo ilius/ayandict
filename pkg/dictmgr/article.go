@@ -71,7 +71,8 @@ func NewDictProcessor(dic common.Dictionary, conf *config.Config, flags uint32) 
 }
 
 func (p *DictProcessor) dictResLocalURL(relPath string) string {
-	// should we fix paths that start with "res/" or "/res/" ?
+	relPath = strings.TrimLeft(relPath, "/")
+	// TODO: add a config to remove "res/" prefix
 	if p.flags&common.ResultFlag_Web > 0 {
 		values := url.Values{}
 		values.Add("dictName", p.DictName())
