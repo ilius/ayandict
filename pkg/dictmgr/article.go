@@ -3,6 +3,7 @@ package dictmgr
 import (
 	"bytes"
 	"crypto/sha1"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	std_html "html"
@@ -138,6 +139,71 @@ func (p *DictProcessor) fixResHttpURL(_url *url.URL) (bool, string) {
 	return true, fpath
 }
 
+func (p *DictProcessor) parseInlineData(s string) ([]byte, string) {
+	s = s[5:] // remove data:
+	pos := strings.Index(s, ";")
+	if pos < 0 {
+		slog.Error("parseInlineData: invalid inline data: no semi-colon", "s", s)
+		return nil, ""
+	}
+	s, mimeType := s[pos+1:], s[:pos]
+	pos = strings.Index(s, ",")
+	if pos < 0 {
+		slog.Error("parseInlineData: invalid inline data: comma and encoding", "s", s)
+		return nil, ""
+	}
+	s, encoding := s[pos+1:], s[:pos]
+	switch encoding {
+	case "base64":
+		data, err := base64.StdEncoding.DecodeString(s)
+		if err != nil {
+			slog.Error("parseInlineData: bad base64 string", "err", err, "s", s)
+			return nil, ""
+		}
+		return data, mimeType
+	}
+	return nil, ""
+}
+
+func (p *DictProcessor) extFromMimeType(mimeType string) string {
+	ext := extByMimeTypeMap[mimeType]
+	if ext != "" {
+		return "." + ext
+	}
+	return ""
+}
+
+func (p *DictProcessor) fixResDataURL(s string) (bool, string) {
+	data, mimeType := p.parseInlineData(s)
+	if data == nil {
+		return false, ""
+	}
+	_hash := sha1.New()
+	_hash.Write(data)
+	fname := hex.EncodeToString(_hash.Sum(nil)) + p.extFromMimeType(mimeType)
+	dpath := filepath.Join(config.GetCacheDir(), "res")
+	fpath := filepath.Join(dpath, fname)
+	_, err := os.Stat(fpath)
+	if err == nil {
+		return true, fpath
+	}
+	if !os.IsNotExist(err) {
+		slog.Error("unexpected error in stat", "err", err)
+		return false, ""
+	}
+	err = os.MkdirAll(dpath, 0o755)
+	if err != nil {
+		slog.Error("error creating directory", "err", err, "dpath", dpath)
+		return false, ""
+	}
+	err = os.WriteFile(fpath, data, 0o644)
+	if err != nil {
+		slog.Error("error writing res file", "err", err, "fpath", fpath)
+		return false, ""
+	}
+	return true, fpath
+}
+
 func (p *DictProcessor) fixResURL(quoted string) (bool, string) {
 	ok, urlStr := p.unquoteValue(quoted)
 	if !ok {
@@ -145,6 +211,9 @@ func (p *DictProcessor) fixResURL(quoted string) (bool, string) {
 	}
 	if urlStr == webPlayImage {
 		return false, ""
+	}
+	if strings.HasPrefix(urlStr, "data:") {
+		return p.fixResDataURL(urlStr)
 	}
 	_url, err := url.Parse(urlStr)
 	if err != nil {
@@ -163,8 +232,6 @@ func (p *DictProcessor) fixResURL(quoted string) (bool, string) {
 		return true, p.dictResLocalURL(pathStr)
 	case "http", "https":
 		return p.fixResHttpURL(_url)
-	case "data": // TODO
-
 	default:
 		slog.Warn("fixResURL: unknown schema", "scheme", _url.Scheme)
 	}
