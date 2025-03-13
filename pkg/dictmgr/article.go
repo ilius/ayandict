@@ -102,6 +102,9 @@ func sha1sumStr(s string) string {
 }
 
 func (p *DictProcessor) fixResHttpURL(_url *url.URL) (bool, string) {
+	if p.flags&common.ResultFlag_Web > 0 {
+		return false, ""
+	}
 	urlStr := _url.String()
 	fname := sha1sumStr(urlStr)
 	// slog.Info("fixResURL: http(s)", "url", _url, "fname", fname)
@@ -140,6 +143,9 @@ func (p *DictProcessor) fixResHttpURL(_url *url.URL) (bool, string) {
 }
 
 func (p *DictProcessor) parseInlineData(s string) ([]byte, string) {
+	if p.flags&common.ResultFlag_Web > 0 {
+		return nil, ""
+	}
 	s = s[5:] // remove data:
 	pos := strings.Index(s, ";")
 	if pos < 0 {
