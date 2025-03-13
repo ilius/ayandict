@@ -17,7 +17,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/html"
@@ -66,7 +65,7 @@ func NewDictProcessor(dic common.Dictionary, conf *config.Config, flags uint32) 
 		flags:      flags,
 
 		httpClient: &http.Client{
-			Timeout: 2 * time.Second, // TODO: add config
+			Timeout: conf.ResourceHttpDownloadTimeout,
 		},
 	}
 }

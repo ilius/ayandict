@@ -70,6 +70,8 @@ type Config struct {
 
 	EmbedExternalStylesheet bool `toml:"embed_external_stylesheet" doc:"Embed external stylesheet/css in article"`
 
+	ResourceHttpDownloadTimeout time.Duration `toml:"resource_http_download_timeout" doc:"Timeout for downloading http/https resources in article"`
+
 	ColorMapping map[string]string `toml:"color_mapping" doc:"Mapping for colors used in article"`
 
 	PopupStyleStr string `toml:"popup_style_str" doc:"Stylesheet (text) for 'Loading' popup"`
@@ -155,6 +157,8 @@ func Default() *Config {
 		AudioVolume: 70,
 
 		EmbedExternalStylesheet: false,
+
+		ResourceHttpDownloadTimeout: 2 * time.Second,
 
 		ColorMapping: map[string]string{},
 

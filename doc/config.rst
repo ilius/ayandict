@@ -142,6 +142,12 @@ Embed external stylesheet/css in article
 
 Default value: ``false``
 
+``resource_http_download_timeout``
+----------------------------------
+Timeout for downloading http/https resources in article
+
+Default value: ``"2s"``
+
 ``color_mapping``
 -----------------
 Mapping for colors used in article
