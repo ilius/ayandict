@@ -19,5 +19,9 @@ func platformConfigDir() string {
 }
 
 func GetCacheDir() string {
+	parent := os.Getenv("XDG_CACHE_HOME")
+	if parent != "" {
+		return filepath.Join(parent, appinfo.APP_NAME)
+	}
 	return filepath.Join(os.Getenv(S_HOME), ".cache", appinfo.APP_NAME)
 }
