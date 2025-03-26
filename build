@@ -5,4 +5,4 @@ set -x
 FLAGS=(-ldflags '-s -w' -trimpath)
 VERSION=$(go run pkg/version/version.go)
 
-GOOS=$OS GOARCH=amd64 go build -o ayandict-$VERSION "${FLAGS[@]}" "$@"
+go build -o ayandict-$VERSION "${FLAGS[@]}" "$@"
