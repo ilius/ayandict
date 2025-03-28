@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	// "github.com/ilius/qt/webengine"
@@ -86,12 +87,12 @@ func Run() {
 	core.QCoreApplication_SetApplicationName(appinfo.APP_DESC)
 
 	if cacheDir == "" {
-		qerr.Error(cacheDir)
+		slog.Error("cacheDir is empty")
 	}
 	{
 		err := os.MkdirAll(cacheDir, 0o755)
 		if err != nil {
-			qerr.Error(err)
+			slog.Error("error in MkdirAll: " + err.Error())
 		}
 	}
 
@@ -110,7 +111,7 @@ func (app *Application) init() {
 	logging.SetupLoggerAfterConfigLoad(false, conf)
 
 	if ok, _ := findLocalServer(conf.LocalServerPorts); ok {
-		qerr.Error("Another instance is running")
+		slog.Error("another instance is running")
 		return
 	}
 	go server.StartServer(conf.LocalServerPorts[0])
@@ -316,7 +317,7 @@ func (app *Application) Run() {
 	if !conf.HistoryDisable {
 		err := app.historyView.Load()
 		if err != nil {
-			qerr.Error(err)
+			slog.Error("error in loading history: " + err.Error())
 		}
 	}
 
@@ -333,7 +334,7 @@ func (app *Application) Run() {
 	if !conf.MostFrequentDisable {
 		err := frequencyTable.Load()
 		if err != nil {
-			qerr.Error(err)
+			slog.Error("error in loading frequency table: " + err.Error())
 		}
 	}
 	// TODO: save the width of 2 columns
@@ -631,7 +632,7 @@ func (app *Application) setupHandlers() {
 	app.saveFavoritesButton.ConnectClicked(func(checked bool) {
 		err := app.favoritesWidget.Save()
 		if err != nil {
-			qerr.Error(err)
+			slog.Error("error saving favorites: " + err.Error())
 		}
 	})
 	app.clearButton.ConnectClicked(func(checked bool) {
@@ -663,4 +664,5 @@ func (app *Application) setupHandlers() {
 	app.entry.ConnectReturnPressed(func() {
 		onQuery(entry.Text(), app.queryArgs, false)
 	})
+	// slog.Error("test error", "s", "hello", "n", 2, "b", true)
 }

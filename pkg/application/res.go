@@ -1,10 +1,10 @@
 package application
 
 import (
+	"log/slog"
 	"os"
 	"sync"
 
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/qt/gui"
 )
 
@@ -39,7 +39,7 @@ func loadPNGIcon(filename string) (*gui.QIcon, error) {
 	pixmap := gui.NewQPixmap3(file.Name(), "PNG", 0)
 	icon = gui.NewQIcon2(pixmap)
 	if icon == nil {
-		qerr.Errorf("error loading png icon %v: icon is nil", filename)
+		slog.Error("error loading png icon: icon is nil: " + filename)
 		panic("error loading png icon: icon is nil")
 	}
 	iconMapMutex.Lock()

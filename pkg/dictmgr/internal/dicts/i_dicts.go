@@ -120,7 +120,7 @@ func InitDicts(conf *config.Config) {
 	var err error
 	DictSettingsMap, DictsOrder, err = loadDictsSettings()
 	if err != nil {
-		qerr.Errorf("Error reading dicts.json: %v", err)
+		slog.Error("error reading dicts.json: " + err.Error())
 	}
 
 	t := time.Now()
@@ -183,7 +183,7 @@ func InitDicts(conf *config.Config) {
 	if modified {
 		err := SaveDictsSettings(DictSettingsMap)
 		if err != nil {
-			qerr.Error(err)
+			slog.Error("error saving dicts settings: " + err.Error())
 		}
 	}
 

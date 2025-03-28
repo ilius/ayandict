@@ -4,7 +4,6 @@ import (
 	"log/slog"
 
 	"github.com/ilius/ayandict/v2/pkg/activity"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/qt/gui"
 	"github.com/ilius/qt/widgets"
 )
@@ -42,7 +41,7 @@ func (h *HistoryView) Load() error {
 func (h *HistoryView) Save() {
 	err := h.storage.SaveHistory()
 	if err != nil {
-		qerr.Errorf("Error saving history: %v", err)
+		slog.Error("error saving history: " + err.Error())
 	}
 }
 

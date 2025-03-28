@@ -59,7 +59,7 @@ func main() {
 
 	// slog uses stdout
 	noColor := os.Getenv("NO_COLOLR") != ""
-	logging.SetupLogger(noColor, logging.DefaultLevel)
+	logging.SetupGUILogger(noColor, logging.DefaultLevel)
 
 	if *noGuiFlag {
 		runServerOnly(*createConfigFlag)

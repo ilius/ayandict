@@ -9,7 +9,6 @@ import (
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
 	"github.com/ilius/ayandict/v2/pkg/qtcommon"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/ayandict/v2/pkg/qtcommon/qsettings"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
@@ -149,7 +148,7 @@ func (dm *DictManager) setItem(
 
 	entries, err := info.EntryCount()
 	if err != nil {
-		qerr.Error(err)
+		slog.Error("error from info.EntryCount: " + err.Error())
 		return
 	}
 	table.SetItem(
@@ -202,7 +201,7 @@ func (dm *DictManager) openInfoFile() {
 	dictName := table.Item(row, dm_col_dictName).Text()
 	dic := dicts.DictByName[dictName]
 	if dic == nil {
-		qerr.Errorf("No dictionary %#v found", dictName)
+		slog.Error("no dictionary was found with this name: " + dictName)
 		return
 	}
 	path := dic.InfoPath()
@@ -218,7 +217,7 @@ func (dm *DictManager) openInfoFile() {
 func (dm *DictManager) openFolder(conf *config.Config) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		qerr.Error(err)
+		slog.Error("error in os.UserHomeDir: " + err.Error())
 		return
 	}
 	for _, p := range conf.DirectoryList {
@@ -436,14 +435,14 @@ func (dm *DictManager) Run() bool {
 		if disabled && !dic.Disabled() {
 			err := dic.Load()
 			if err != nil {
-				qerr.Error(err)
+				slog.Error("error in dic.Load: " + err.Error())
 			}
 		}
 	}
 
 	err := dicts.SaveDictsSettings(dicts.DictSettingsMap)
 	if err != nil {
-		qerr.Error(err)
+		slog.Error("error in saving dicts settings: " + err.Error())
 	}
 	return true
 }

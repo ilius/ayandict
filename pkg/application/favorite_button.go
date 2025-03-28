@@ -1,7 +1,8 @@
 package application
 
 import (
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
+	"log/slog"
+
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
 	"github.com/ilius/qt/widgets"
@@ -41,12 +42,12 @@ func (b *FavoriteButton) SetToolTips(inactive string, active string) {
 func NewFavoriteButton(onClick func(bool)) *FavoriteButton {
 	activeIcon, err := loadPNGIcon("favorite-active-64.png")
 	if err != nil {
-		qerr.Error(err)
+		slog.Error("error loading icon favorite-active-64.png: " + err.Error())
 		panic(err)
 	}
 	inactiveIcon, err := loadPNGIcon("favorite-64.png")
 	if err != nil {
-		qerr.Error(err)
+		slog.Error("error loading icon favorite-64.png: " + err.Error())
 		panic(err)
 	}
 	qButton := widgets.NewQPushButton3(inactiveIcon, "", nil)

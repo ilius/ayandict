@@ -1,6 +1,8 @@
 package logging
 
 import (
+	"context"
+	"fmt"
 	"log/slog"
 	"os"
 	"strings"
@@ -8,13 +10,21 @@ import (
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/go-color"
+	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/ayandict/v2/pkg/slogcolor"
 )
 
 const DefaultLevel = slog.LevelInfo
 
-func SetupLogger(noColor bool, level slog.Level) {
-	handler := slogcolor.NewHandler(os.Stdout, &slogcolor.Options{
+func SetupGUILogger(noColor bool, level slog.Level) {
+	handler := NewColoredHandler(noColor, level)
+	slog.SetDefault(slog.New(&CustomHandler{
+		Handler: handler,
+	}))
+}
+
+func NewColoredHandler(noColor bool, level slog.Level) slog.Handler {
+	return slogcolor.NewHandler(os.Stdout, &slogcolor.Options{
 		Level:         level,
 		TimeFormat:    time.DateTime,
 		SrcFileMode:   slogcolor.ShortFile,
@@ -24,7 +34,35 @@ func SetupLogger(noColor bool, level slog.Level) {
 		MsgColor:  color.New(),
 		NoColor:   noColor,
 	})
-	slog.SetDefault(slog.New(handler))
+}
+
+type CustomHandler struct {
+	slog.Handler
+}
+
+func (h *CustomHandler) showRecordInGUI(record slog.Record) {
+	msg := record.Message
+	if msg != "" {
+		msg = strings.ToUpper(msg[:1]) + msg[1:] // capitalize first character
+	}
+	// TODO: check how it looks
+	attrs := []string{}
+	record.Attrs(func(attr slog.Attr) bool {
+		attrs = append(attrs, fmt.Sprintf("%s: %v", attr.Key, attr.Value))
+		return true
+	})
+	// \n does not work, <br> and <br/> does
+	// <pre> does not work
+	msg += "<br>" + strings.Join(attrs, "<br>")
+	qerr.Error(msg)
+}
+
+func (h *CustomHandler) Handle(ctx context.Context, record slog.Record) error {
+	err := h.Handler.Handle(ctx, record)
+	if record.Level == slog.LevelError {
+		h.showRecordInGUI(record)
+	}
+	return err
 }
 
 func parseLevel(levelStr string) (slog.Level, bool) {
@@ -61,6 +99,6 @@ func SetupLoggerAfterConfigLoad(noColor bool, conf *config.Config) {
 	}
 	if recreateLogger {
 		slog.Info("Re-creating logger after loading config")
-		SetupLogger(noColor, level)
+		SetupGUILogger(noColor, level)
 	}
 }

@@ -2,13 +2,13 @@ package application
 
 import (
 	"html/template"
+	"log/slog"
 	"reflect"
 	"sync"
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/qdictmgr"
 	"github.com/ilius/ayandict/v2/pkg/headerlib"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
 )
@@ -36,7 +36,7 @@ func LoadConfig() bool {
 	defer confMutex.Unlock()
 	newConf, err := config.Load()
 	if err != nil {
-		qerr.Errorf("Failed to load config: %v", err)
+		slog.Error("failed to load config: " + err.Error())
 		return false
 	}
 	conf = newConf
@@ -44,13 +44,13 @@ func LoadConfig() bool {
 	{
 		err := readArticleStyle(conf.ArticleStyle)
 		if err != nil {
-			qerr.Error(err)
+			slog.Error("error reading srticle style: " + err.Error())
 		}
 	}
 	{
 		tpl, err := headerlib.LoadHeaderTemplate(conf)
 		if err != nil {
-			qerr.Error(err)
+			slog.Error("error loading header template: " + err.Error())
 		} else {
 			headerTpl = tpl
 		}
@@ -107,7 +107,7 @@ func (app *Application) ReloadConfig() {
 func OpenConfig() {
 	err := config.EnsureExists(conf)
 	if err != nil {
-		qerr.Error(err)
+		slog.Error("error checking/creating config file: " + err.Error())
 	}
 	url := core.NewQUrl()
 	url.SetScheme("file")

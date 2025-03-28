@@ -20,7 +20,6 @@ import (
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/html"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	common "github.com/ilius/go-dict-commons"
 )
 
@@ -454,12 +453,12 @@ func (p *DictProcessor) createPlayImage() bool {
 
 	data, err := res.ReadFile("res/" + playImageName)
 	if err != nil {
-		qerr.Error(err)
+		slog.Error("error reading play image file from memory: " + err.Error())
 		return false
 	}
 	err = os.WriteFile(playImagePath, data, 0o644)
 	if err != nil {
-		qerr.Error(err)
+		slog.Error("error writing play image file: "+err.Error(), "playImagePath", playImagePath)
 		return false
 	}
 	return true

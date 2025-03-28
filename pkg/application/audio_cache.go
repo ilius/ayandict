@@ -10,7 +10,6 @@ import (
 	"sync"
 
 	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/qt/core"
 )
 
@@ -22,7 +21,7 @@ var (
 func NewAudioCache() *AudioCache {
 	dir := ""
 	if cacheDir == "" {
-		qerr.Error("cacheDir is empty")
+		slog.Error("cacheDir is empty")
 	} else {
 		dir = filepath.Join(cacheDir, "audio")
 	}
@@ -93,7 +92,7 @@ func (c *AudioCache) Get(urlStr string) (*core.QUrl, error) {
 	qUrl.SetPath(fpath, core.QUrl__DecodedMode)
 	if _, err := os.Stat(fpath); err != nil {
 		if !os.IsNotExist(err) {
-			qerr.Error(err)
+			slog.Error("error in Stat: "+err.Error(), "fpath", fpath)
 		}
 		err := c.download(urlStr, fpath)
 		if err != nil {

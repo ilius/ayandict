@@ -1,10 +1,10 @@
 package frequency
 
 import (
+	"log/slog"
 	"strconv"
 
 	"github.com/ilius/ayandict/v2/pkg/activity"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/widgets"
 )
@@ -151,6 +151,6 @@ func (view *FrequencyTable) Save() error {
 func (view *FrequencyTable) SaveNoError() {
 	err := view.Save()
 	if err != nil {
-		qerr.Errorf("Error saving frequency: %v", err)
+		slog.Error("Error saving frequency: " + err.Error())
 	}
 }
