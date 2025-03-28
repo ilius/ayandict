@@ -41,7 +41,8 @@ func main() {
 	}
 
 	noColor := os.Getenv("NO_COLOLR") != ""
-	logging.SetupLogger(noColor, logging.DefaultLevel)
+	handler := logging.NewColoredHandler(noColor, logging.DefaultLevel)
+	slog.SetDefault(slog.New(handler))
 
 	if *createConfigFlag {
 		err := config.EnsureExists(conf)
