@@ -96,6 +96,9 @@ func (h *HistoryView) SetupCustomHandlers() {
 		if index == nil {
 			return
 		}
+		if index.Row() < 0 {
+			return
+		}
 		h.Activated(index)
 	})
 
