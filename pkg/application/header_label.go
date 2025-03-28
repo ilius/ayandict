@@ -4,15 +4,13 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/ilius/ayandict/v2/pkg/headerlib"
+	"github.com/ilius/ayandict/v3/pkg/headerlib"
 	common "github.com/ilius/go-dict-commons"
-	"github.com/ilius/qt/core"
-	"github.com/ilius/qt/gui"
-	"github.com/ilius/qt/widgets"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 type HeaderLabel struct {
-	*widgets.QLabel
+	*qt.QLabel
 
 	app *Application
 
@@ -24,21 +22,21 @@ type HeaderLabel struct {
 }
 
 func CreateHeaderLabel(app *Application) *HeaderLabel {
-	qLabel := widgets.NewQLabel(nil, 0)
-	qLabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
-	// | core.Qt__TextSelectableByKeyboard
+	qLabel := qt.NewQLabel2()
+	qLabel.SetTextInteractionFlags(qt.TextSelectableByMouse)
+	// | qt.TextSelectableByKeyboard
 	qLabel.SetContentsMargins(0, 0, 0, 0)
-	qLabel.SetTextFormat(core.Qt__RichText)
+	qLabel.SetTextFormat(qt.RichText)
 	qLabel.SetWordWrap(conf.HeaderWordWrap)
-	qLabel.SetSizePolicy2(expanding, widgets.QSizePolicy__Minimum)
+	qLabel.SetSizePolicy2(expanding, qt.QSizePolicy__Minimum)
 	label := &HeaderLabel{
 		QLabel: qLabel,
 		app:    app,
 	}
-	qLabel.ConnectContextMenuEvent(func(event *gui.QContextMenuEvent) {
+	qLabel.OnContextMenuEvent(func(super func(*qt.QContextMenuEvent), event *qt.QContextMenuEvent) {
 		event.Ignore()
 		menu := label.createContextMenu(qLabel.SelectedText() != "")
-		menu.Popup(event.GlobalPos(), nil)
+		menu.Popup(event.GlobalPos())
 	})
 	return label
 }
@@ -68,8 +66,8 @@ func (label *HeaderLabel) SetResult(res common.SearchResultIface) {
 	label.SetText(header)
 }
 
-func (label *HeaderLabel) addQueryAction(menu *widgets.QMenu, term string) {
-	menu.AddAction("Query: " + term).ConnectTriggered(func(checked bool) {
+func (label *HeaderLabel) addQueryAction(menu *qt.QMenu, term string) {
+	menu.AddActionWithText("Query: " + term).OnTriggered(func() {
 		res := label.result
 		if res == nil {
 			return
@@ -78,21 +76,21 @@ func (label *HeaderLabel) addQueryAction(menu *widgets.QMenu, term string) {
 	})
 }
 
-func (label *HeaderLabel) createContextMenu(selection bool) *widgets.QMenu {
-	menu := widgets.NewQMenu(label.QLabel)
+func (label *HeaderLabel) createContextMenu(selection bool) *qt.QMenu {
+	menu := qt.NewQMenu(label.QLabel.QWidget)
 	if selection {
-		menu.AddAction("Query Selected").ConnectTriggered(func(checked bool) {
+		menu.AddActionWithText("Query Selected").OnTriggered(func() {
 			text := label.SelectedText()
 			if text != "" {
 				label.doQuery(strings.Trim(text, queryForceTrimChars))
 			}
 		})
-		menu.AddAction("Copy Selected").ConnectTriggered(func(checked bool) {
+		menu.AddActionWithText("Copy Selected").OnTriggered(func() {
 			text := label.SelectedText()
 			if text == "" {
 				return
 			}
-			label.app.Clipboard().SetText(strings.TrimSpace(text), gui.QClipboard__Clipboard)
+			qt.QGuiApplication_Clipboard().SetText2(strings.TrimSpace(text), qt.QClipboard__Clipboard)
 		})
 	}
 	terms := label.result.Terms()
@@ -103,16 +101,16 @@ func (label *HeaderLabel) createContextMenu(selection bool) *widgets.QMenu {
 		label.addQueryAction(menu, term)
 	}
 
-	menu.AddAction("Copy All (Plaintext)").ConnectTriggered(func(checked bool) {
-		label.app.Clipboard().SetText(
+	menu.AddActionWithText("Copy All (Plaintext)").OnTriggered(func() {
+		qt.QGuiApplication_Clipboard().SetText2(
 			plaintextFromHTML(label.Text()),
-			gui.QClipboard__Clipboard,
+			qt.QClipboard__Clipboard,
 		)
 	})
-	menu.AddAction("Copy All (HTML)").ConnectTriggered(func(checked bool) {
-		label.app.Clipboard().SetText(
+	menu.AddActionWithText("Copy All (HTML)").OnTriggered(func() {
+		qt.QGuiApplication_Clipboard().SetText2(
 			label.Text(),
-			gui.QClipboard__Clipboard,
+			qt.QClipboard__Clipboard,
 		)
 	})
 

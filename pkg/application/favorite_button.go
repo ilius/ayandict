@@ -3,16 +3,14 @@ package application
 import (
 	"log/slog"
 
-	"github.com/ilius/qt/core"
-	"github.com/ilius/qt/gui"
-	"github.com/ilius/qt/widgets"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 type FavoriteButton struct {
-	*widgets.QPushButton
+	*qt.QPushButton
 	checked      bool
-	activeIcon   *gui.QIcon
-	inactiveIcon *gui.QIcon
+	activeIcon   *qt.QIcon
+	inactiveIcon *qt.QIcon
 
 	inactiveTooltip string
 	activeTooltip   string
@@ -50,17 +48,17 @@ func NewFavoriteButton(onClick func(bool)) *FavoriteButton {
 		slog.Error("error loading icon favorite-64.png: " + err.Error())
 		panic(err)
 	}
-	qButton := widgets.NewQPushButton3(inactiveIcon, "", nil)
-	qButton.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+	qButton := qt.NewQPushButton4(inactiveIcon, "")
+	qButton.OnResizeEvent(func(super func(event *qt.QResizeEvent), event *qt.QResizeEvent) {
 		iconSize := event.Size().Height() * 2 / 3
-		qButton.SetIconSize(core.NewQSize2(iconSize, iconSize))
+		qButton.SetIconSize(qt.NewQSize2(iconSize, iconSize))
 	})
 	button := &FavoriteButton{
 		QPushButton:  qButton,
 		activeIcon:   activeIcon,
 		inactiveIcon: inactiveIcon,
 	}
-	button.ConnectClicked(func(checked bool) {
+	button.OnClicked(func() {
 		button.ToggleChecked()
 		onClick(button.checked)
 	})

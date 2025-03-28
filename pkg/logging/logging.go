@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/go-color"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
-	"github.com/ilius/ayandict/v2/pkg/slogcolor"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/go-color"
+	"github.com/ilius/ayandict/v3/pkg/qtcommon/qerr"
+	"github.com/ilius/ayandict/v3/pkg/slogcolor"
 )
 
 const DefaultLevel = slog.LevelInfo

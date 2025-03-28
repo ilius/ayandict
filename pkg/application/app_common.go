@@ -1,12 +1,12 @@
 package application
 
 import (
-	"github.com/ilius/ayandict/v2/pkg/application/frequency"
-	"github.com/ilius/qt/widgets"
+	"github.com/ilius/ayandict/v3/pkg/application/frequency"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 const (
-	expanding = widgets.QSizePolicy__Expanding
+	expanding = qt.QSizePolicy__Expanding
 )
 
 // we trim these characters when user right-clicks on a word without selecting it

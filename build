@@ -2,7 +2,9 @@
 set -e
 set -x
 
+export CGO_ENABLED=1
+
 FLAGS=(-ldflags '-s -w' -trimpath)
 VERSION=$(go run pkg/version/version.go)
 
-go build -o ayandict-$VERSION "${FLAGS[@]}" "$@"
+time go build -o ayandict-$VERSION "${FLAGS[@]}" "$@"

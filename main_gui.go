@@ -7,13 +7,14 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"runtime"
 
-	"github.com/ilius/ayandict/v2/pkg/appinfo"
-	"github.com/ilius/ayandict/v2/pkg/application"
-	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/dictmgr"
-	"github.com/ilius/ayandict/v2/pkg/logging"
-	"github.com/ilius/ayandict/v2/pkg/server"
+	"github.com/ilius/ayandict/v3/pkg/appinfo"
+	"github.com/ilius/ayandict/v3/pkg/application"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr"
+	"github.com/ilius/ayandict/v3/pkg/logging"
+	"github.com/ilius/ayandict/v3/pkg/server"
 )
 
 func runServerOnly(createConfig bool) {
@@ -50,6 +51,11 @@ func main() {
 		false,
 		"With --no-gui: create config file (with defaults) if it does not exist",
 	)
+	privateFlag := flag.Bool(
+		"private",
+		false,
+		"Enable private mode: do not save activity (history, most frequest, favorites)",
+	)
 	flag.Parse()
 
 	if *versionFlag {
@@ -65,6 +71,10 @@ func main() {
 		runServerOnly(*createConfigFlag)
 		return
 	}
+	if *privateFlag {
+		config.PrivateMode = true
+	}
 
+	runtime.LockOSThread()
 	application.Run()
 }

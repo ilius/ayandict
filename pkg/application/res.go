@@ -5,15 +5,15 @@ import (
 	"os"
 	"sync"
 
-	"github.com/ilius/qt/gui"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 var (
-	iconMap      = map[string]*gui.QIcon{}
+	iconMap      = map[string]*qt.QIcon{}
 	iconMapMutex sync.RWMutex
 )
 
-func loadPNGIcon(filename string) (*gui.QIcon, error) {
+func loadPNGIcon(filename string) (*qt.QIcon, error) {
 	iconMapMutex.RLock()
 	icon, ok := iconMap[filename]
 	iconMapMutex.RUnlock()
@@ -36,8 +36,8 @@ func loadPNGIcon(filename string) (*gui.QIcon, error) {
 	if err != nil {
 		return nil, err
 	}
-	pixmap := gui.NewQPixmap3(file.Name(), "PNG", 0)
-	icon = gui.NewQIcon2(pixmap)
+	pixmap := qt.NewQPixmap6(file.Name(), "PNG")
+	icon = qt.NewQIcon2(pixmap)
 	if icon == nil {
 		slog.Error("error loading png icon: icon is nil: " + filename)
 		panic("error loading png icon: icon is nil")
@@ -48,14 +48,14 @@ func loadPNGIcon(filename string) (*gui.QIcon, error) {
 	return icon, nil
 }
 
-// func loadSVGIcon(filename string) *gui.QIcon {
+// func loadSVGIcon(filename string) *qt.QIcon {
 // 	data, err := res.ReadFile("res/" + filename)
 // 	if err != nil {
 // 		slog.Error("error", "err", err)
 // 		return nil
 // 	}
-// 	image := gui.QImage_FromData(data, len(data), "SVG")
-// 	image.Rect().SetSize(core.NewQSize2(36, 36))
-// 	pixmap := gui.QPixmap_FromImage(image, core.Qt__AutoColor)
-// 	return gui.NewQIcon2(pixmap)
+// 	image := qt.QImage_FromData(data, len(data), "SVG")
+// 	image.Rect().SetSize(qt.NewQSize2(36, 36))
+// 	pixmap := qt.QPixmap_FromImage(image, qt.AutoColor)
+// 	return qt.NewQIcon2(pixmap)
 // }

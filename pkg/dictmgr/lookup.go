@@ -4,8 +4,8 @@ import (
 	"log/slog"
 	"sort"
 
-	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr/internal/dicts"
 	common "github.com/ilius/go-dict-commons"
 )
 
