@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 )
 
 const fileName = "config.toml"
@@ -19,7 +18,7 @@ func init() {
 	dir := GetConfigDir()
 	err := os.MkdirAll(dir, 0o755)
 	if err != nil {
-		qerr.Error(err)
+		slog.Error("error in MkdirAll: " + err.Error())
 	}
 }
 

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/ilius/ayandict/v2/pkg/appinfo"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
 	"github.com/ilius/qt/widgets"
@@ -94,7 +93,7 @@ func restoreIntSetting(
 	value := qs.Value(key, core.NewQVariant1(nil))
 	valueInt, err := strconv.ParseInt(value.ToString(), 10, 64)
 	if err != nil {
-		qerr.Error(err)
+		slog.Error("error in restoreIntSetting: bad int value: "+err.Error(), "value", value.ToString())
 		return
 	}
 	apply(int(valueInt))
@@ -242,7 +241,7 @@ func RestoreTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, m
 	for index, widthStr := range widthList {
 		width, err := strconv.ParseInt(widthStr, 10, 64)
 		if err != nil {
-			qerr.Errorf("invalid column width=%#v\n", widthStr)
+			slog.Error("invalid column width=" + widthStr)
 			continue
 		}
 		header.ResizeSection(index, int(width))

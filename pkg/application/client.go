@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/ilius/ayandict/v2/pkg/appinfo"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 )
 
 const (
@@ -41,7 +40,7 @@ func findLocalServer(ports []string) (bool, string) {
 		slog.Debug("local server responded", "url", _urlStr, "dt", time.Since(t))
 		data, err := io.ReadAll(res.Body)
 		if err != nil {
-			qerr.Error(err)
+			slog.Error("error in findLocalServer while reading response body: " + err.Error())
 			continue
 		}
 		res.Body.Close()

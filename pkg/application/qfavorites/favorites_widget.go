@@ -1,9 +1,10 @@
 package qfavorites
 
 import (
+	"log/slog"
+
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/favorites"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	"github.com/ilius/qt/widgets"
 )
 
@@ -53,7 +54,7 @@ func (w *FavoritesWidget) AddFavorite(item string) {
 	if w.conf.FavoritesAutoSave {
 		err := w.Save()
 		if err != nil {
-			qerr.Error(err)
+			slog.Error("error saving favorites: " + err.Error())
 		}
 	}
 }
@@ -69,7 +70,7 @@ func (w *FavoritesWidget) RemoveFavorite(item string) {
 	if w.conf.FavoritesAutoSave {
 		err := w.Save()
 		if err != nil {
-			qerr.Error(err)
+			slog.Error("error saving favorites: " + err.Error())
 		}
 	}
 }

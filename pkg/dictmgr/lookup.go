@@ -1,11 +1,11 @@
 package dictmgr
 
 import (
+	"log/slog"
 	"sort"
 
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	common "github.com/ilius/go-dict-commons"
 )
 
@@ -43,7 +43,7 @@ func search(
 		}
 		results, err := dic.SearchRegex(query, workerCount, timeout)
 		if err != nil {
-			qerr.Error(err)
+			slog.Error("error in SearchRegex: " + err.Error())
 			return nil
 		}
 		return results
@@ -53,7 +53,7 @@ func search(
 		}
 		results, err := dic.SearchGlob(query, workerCount, timeout)
 		if err != nil {
-			qerr.Error(err)
+			slog.Error("error in SearchGlob: " + err.Error())
 			return nil
 		}
 		return results

@@ -1,10 +1,10 @@
 package application
 
 import (
+	"log/slog"
 	"strings"
 
 	"github.com/ilius/ayandict/v2/pkg/headerlib"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
@@ -62,7 +62,7 @@ func (label *HeaderLabel) SetResult(res common.SearchResultIface) {
 	label.result = res
 	header, err := headerlib.GetHeader(headerTpl, res)
 	if err != nil {
-		qerr.Errorf("Error formatting header label: %v", err)
+		slog.Error("error formatting header label: " + err.Error())
 		return
 	}
 	label.SetText(header)

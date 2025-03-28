@@ -2,6 +2,7 @@ package application
 
 import (
 	"html/template"
+	"log/slog"
 	"reflect"
 	"sync"
 
@@ -36,7 +37,7 @@ func LoadConfig() bool {
 	defer confMutex.Unlock()
 	newConf, err := config.Load()
 	if err != nil {
-		qerr.Errorf("Failed to load config: %v", err)
+		slog.Error("failed to load config: " + err.Error())
 		return false
 	}
 	conf = newConf
@@ -44,13 +45,13 @@ func LoadConfig() bool {
 	{
 		err := readArticleStyle(conf.ArticleStyle)
 		if err != nil {
-			qerr.Error(err)
+			slog.Error("error reading srticle style: " + err.Error())
 		}
 	}
 	{
 		tpl, err := headerlib.LoadHeaderTemplate(conf)
 		if err != nil {
-			qerr.Error(err)
+			slog.Error("error loading header template: " + err.Error())
 		} else {
 			headerTpl = tpl
 		}

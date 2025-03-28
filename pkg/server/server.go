@@ -15,7 +15,7 @@ import (
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	"github.com/ilius/ayandict/v2/pkg/headerlib"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
+	"github.com/ilius/ayandict/v2/pkg/logging"
 	"github.com/ilius/ayandict/v2/web"
 	common "github.com/ilius/go-dict-commons"
 )
@@ -33,6 +33,13 @@ var (
 	homeTpl   *text_template.Template
 	headerTpl *html_template.Template
 )
+
+// using a different logger here, so that it does not show errors in GUI
+// because there is a little risk in showing web-user-input values in GUI
+var logger = slog.New(logging.NewColoredHandler(
+	os.Getenv("NO_COLOLR") != "",
+	logging.DefaultLevel,
+))
 
 const resultFlags = uint32(common.ResultFlag_FixAudio |
 	common.ResultFlag_FixFileSrc |
@@ -55,7 +62,7 @@ type Result struct {
 func writeMsg(w http.ResponseWriter, msg string) {
 	_, err := w.Write([]byte(msg))
 	if err != nil {
-		slog.Error("error in Write", "err", err)
+		logger.Error("error in Write", "err", err)
 	}
 }
 
@@ -87,7 +94,7 @@ func api_query(w http.ResponseWriter, r *http.Request) {
 	if query == "" {
 		err := jsonEncoder.Encode(ErrorResponse{Error: "missing query"})
 		if err != nil {
-			slog.Error("error in jsonEncoder.Encode", "err", err)
+			logger.Error("error in jsonEncoder.Encode", "err", err)
 		}
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -97,7 +104,7 @@ func api_query(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		err := jsonEncoder.Encode(ErrorResponse{Error: "invalid mode"})
 		if err != nil {
-			slog.Error("error in jsonEncoder.Encode", "err", err)
+			logger.Error("error in jsonEncoder.Encode", "err", err)
 		}
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -111,7 +118,7 @@ func api_query(w http.ResponseWriter, r *http.Request) {
 	default:
 		err := jsonEncoder.Encode(ErrorResponse{Error: "invalid qt version, must be 5 or 6"})
 		if err != nil {
-			slog.Error("error in jsonEncoder.Encode", "err", err)
+			logger.Error("error in jsonEncoder.Encode", "err", err)
 		}
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -124,7 +131,7 @@ func api_query(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			err := jsonEncoder.Encode(ErrorResponse{Error: "invalid limit"})
 			if err != nil {
-				slog.Error("error in jsonEncoder.Encode", "err", err)
+				logger.Error("error in jsonEncoder.Encode", "err", err)
 			}
 			w.WriteHeader(http.StatusBadRequest)
 			return
@@ -138,7 +145,7 @@ func api_query(w http.ResponseWriter, r *http.Request) {
 	for i, res := range raw_results {
 		header, err := headerlib.GetHeader(headerTpl, res)
 		if err != nil {
-			slog.Error("Error formatting header label", "err", err)
+			logger.Error("Error formatting header label", "err", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -152,13 +159,13 @@ func api_query(w http.ResponseWriter, r *http.Request) {
 		}
 		// entry.ResourceDir()
 	}
-	slog.Info("LookupHTML running time", "dt", time.Since(t), "query", query)
+	logger.Info("LookupHTML running time", "dt", time.Since(t), "query", query)
 	err := jsonEncoder.Encode(results)
 	if err != nil {
-		slog.Error("error in jsonEncoder.Encode", "err", err)
+		logger.Error("error in jsonEncoder.Encode", "err", err)
 		err2 := jsonEncoder.Encode(ErrorResponse{Error: err.Error()})
 		if err2 != nil {
-			slog.Error("error in jsonEncoder.Encode", "err2", err2)
+			logger.Error("error in jsonEncoder.Encode", "err2", err2)
 		}
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -178,10 +185,10 @@ func api_random(w http.ResponseWriter, _ *http.Request) {
 		Score:           entry.Score(),
 	})
 	if err != nil {
-		slog.Error("error in jsonEncoder.Encode", "err", err)
+		logger.Error("error in jsonEncoder.Encode", "err", err)
 		err2 := jsonEncoder.Encode(ErrorResponse{Error: err.Error()})
 		if err2 != nil {
-			slog.Error("error in jsonEncoder.Encode", "err2", err2)
+			logger.Error("error in jsonEncoder.Encode", "err2", err2)
 		}
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -291,13 +298,13 @@ func StartServer(port string) {
 		addWebHandlers()
 	}
 
-	slog.Info("Starting local server", "port", port)
+	logger.Info("Starting local server", "port", port)
 	addr := "127.0.0.1:" + port
 	if conf.WebExpose {
 		addr = ":" + port
 	}
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
-		qerr.Error(err)
+		logger.Error("error in ListenAndServe: " + err.Error())
 	}
 }
