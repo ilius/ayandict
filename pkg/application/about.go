@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/ilius/ayandict/v2/pkg/appinfo"
-	"github.com/ilius/qt/core"
-	"github.com/ilius/qt/widgets"
+	"github.com/ilius/ayandict/v3/pkg/appinfo"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 func addTabWithIcon(
-	tabWidget *widgets.QTabWidget,
-	widget widgets.QWidget_ITF,
+	tabWidget *qt.QTabWidget,
+	widget *qt.QWidget,
 	label string,
 	filename string,
 ) {
@@ -20,33 +19,33 @@ func addTabWithIcon(
 		fmt.Println(err)
 	}
 	if icon == nil {
-		tabWidget.AddTab(widget, label)
+		_ = tabWidget.AddTab2(widget, nil, label)
 		return
 	}
-	tabWidget.AddTab2(widget, icon, label)
+	_ = tabWidget.AddTab2(widget, icon, label)
 }
 
 func aboutClicked(
-	parent widgets.QWidget_ITF,
+	parent *qt.QWidget,
 ) {
-	window := widgets.NewQDialog(parent, core.Qt__Dialog)
+	window := qt.NewQDialog(parent)
 	window.SetWindowTitle("About AyanDict")
-	window.Resize2(700, 500)
+	window.Resize(700, 500)
 
-	topHBox := widgets.NewQHBoxLayout()
-	topLabel := widgets.NewQLabel2(fmt.Sprintf(
+	topHBox := qt.NewQHBoxLayout2()
+	topLabel := qt.NewQLabel3(fmt.Sprintf(
 		"AyanDict version %s\nUsing Qt %v and Go %v",
 		appinfo.VERSION,
-		core.QLibraryInfo_Version().ToString(),
+		qt.QLibraryInfo_Version().ToString(),
 		runtime.Version()[2:],
-	), nil, 0)
-	topHBox.AddWidget(topLabel, 0, 0)
+	))
+	topHBox.AddWidget(topLabel.QWidget)
 
-	tabWidget := widgets.NewQTabWidget(nil)
+	tabWidget := qt.NewQTabWidget2()
 	tabWidget.SetSizePolicy2(expanding, expanding)
-	tabWidget.SetIconSize(core.NewQSize2(22, 22))
+	tabWidget.SetIconSize(qt.NewQSize2(22, 22))
 
-	// tabWidget.SetTabPosition(widgets.QTabWidget__West)
+	// tabWidget.SetTabPosition(qt.QTabWidget__West)
 	// tabBar := tabWidget.TabBar()
 	// tabWidget.SetStyleSheet(`
 	// QTabBar::tab {
@@ -54,34 +53,34 @@ func aboutClicked(
 	// 	padding: 15px;
 	// }`)
 
-	aboutLabel := widgets.NewQLabel2(appinfo.ABOUT, nil, 0)
-	aboutLabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
-	aboutLabel.SetAlignment(core.Qt__AlignTop)
+	aboutLabel := qt.NewQLabel3(appinfo.ABOUT)
+	aboutLabel.SetTextInteractionFlags(qt.TextSelectableByMouse)
+	aboutLabel.SetAlignment(qt.AlignTop)
 	aboutLabel.SetWordWrap(true)
-	addTabWithIcon(tabWidget, aboutLabel, "About", "dialog-information-22.png")
+	addTabWithIcon(tabWidget, aboutLabel.QWidget, "About", "dialog-information-22.png")
 
-	authorsLabel := widgets.NewQLabel2(appinfo.AUTHORS, nil, 0)
-	authorsLabel.SetTextInteractionFlags(core.Qt__TextSelectableByMouse)
-	authorsLabel.SetAlignment(core.Qt__AlignTop)
-	addTabWithIcon(tabWidget, authorsLabel, "Authors", "author-22.png")
+	authorsLabel := qt.NewQLabel3(appinfo.AUTHORS)
+	authorsLabel.SetTextInteractionFlags(qt.TextSelectableByMouse)
+	authorsLabel.SetAlignment(qt.AlignTop)
+	addTabWithIcon(tabWidget, authorsLabel.QWidget, "Authors", "author-22.png")
 
-	licenseWidget := widgets.NewQTextEdit(nil)
+	licenseWidget := qt.NewQTextEdit2()
 	licenseWidget.SetReadOnly(true)
 	licenseWidget.SetPlainText(appinfo.LICENSE)
-	addTabWithIcon(tabWidget, licenseWidget, "License", "license-22.png")
+	addTabWithIcon(tabWidget, licenseWidget.QWidget, "License", "license-22.png")
 
-	buttonBox := widgets.NewQDialogButtonBox(nil)
+	buttonBox := qt.NewQDialogButtonBox2()
 	buttonBox.AddButton2(
 		"Close",
-		widgets.QDialogButtonBox__AcceptRole,
-	).ConnectClicked(func(checked bool) {
+		qt.QDialogButtonBox__AcceptRole,
+	).OnClicked(func() {
 		window.Accept()
 	})
 
-	mainBox := widgets.NewQVBoxLayout2(window)
-	mainBox.AddLayout(topHBox, 0)
-	mainBox.AddWidget(tabWidget, 0, 0)
-	mainBox.AddWidget(buttonBox, 0, 0)
+	mainBox := qt.NewQVBoxLayout(window.QWidget)
+	mainBox.AddLayout(topHBox.Layout())
+	mainBox.AddWidget(tabWidget.QWidget)
+	mainBox.AddWidget(buttonBox.QWidget)
 
-	window.Exec()
+	_ = window.Exec()
 }

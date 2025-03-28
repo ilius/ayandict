@@ -3,18 +3,18 @@ package application
 import (
 	"log/slog"
 
-	"github.com/ilius/qt/widgets"
+	qt "github.com/mappu/miqt/qt6"
 )
 
-func NewPNGIconTextButton(label string, imageName string) *widgets.QPushButton {
+func NewPNGIconTextButton(label string, imageName string) *qt.QPushButton {
 	icon, err := loadPNGIcon(imageName)
 	if err != nil {
 		slog.Error("error loading png icon", "imageName", imageName, "err", err)
-		return widgets.NewQPushButton2(label, nil)
+		return qt.NewQPushButton3(label)
 	}
 	if icon == nil {
 		slog.Error("error loading png icon: icon is nil", "imageName", imageName)
-		return widgets.NewQPushButton2(label, nil)
+		return qt.NewQPushButton3(label)
 	}
-	return widgets.NewQPushButton3(icon, label, nil)
+	return qt.NewQPushButton4(icon, label)
 }

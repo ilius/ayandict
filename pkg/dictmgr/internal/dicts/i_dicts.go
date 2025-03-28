@@ -8,8 +8,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qerr"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/qtcommon/qerr"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/go-stardict/v2"
 )

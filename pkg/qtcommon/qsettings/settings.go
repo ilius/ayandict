@@ -6,10 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ilius/ayandict/v2/pkg/appinfo"
-	"github.com/ilius/qt/core"
-	"github.com/ilius/qt/gui"
-	"github.com/ilius/qt/widgets"
+	"github.com/ilius/ayandict/v3/pkg/appinfo"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 const (
@@ -27,6 +25,31 @@ const (
 	QS_search   = "search"
 	QS_activity = "activity"
 	QS_mode     = "mode"
+)
+
+var (
+	qs_mainwindow = *qt.NewQAnyStringView3(QS_mainwindow)
+	qs_geometry   = *qt.NewQAnyStringView3(QS_geometry)
+	qs_savestate  = *qt.NewQAnyStringView3(QS_savestate)
+	qs_maximized  = *qt.NewQAnyStringView3(QS_maximized)
+	qs_pos        = *qt.NewQAnyStringView3(QS_pos)
+	qs_size       = *qt.NewQAnyStringView3(QS_size)
+
+	qs_columnwidth = *qt.NewQAnyStringView3(QS_columnwidth)
+
+	qs_sizes = *qt.NewQAnyStringView3(QS_sizes)
+
+	qs_search   = *qt.NewQAnyStringView3(QS_search)
+	qs_activity = *qt.NewQAnyStringView3(QS_activity)
+	qs_mode     = *qt.NewQAnyStringView3(QS_mode)
+)
+
+var (
+	newQVarBool  = qt.NewQVariant8
+	newQVarBytes = qt.NewQVariant12
+	newQVarStr   = qt.NewQVariant14
+	newQVarSize  = qt.NewQVariant22
+	newQVarPoint = qt.NewQVariant24
 )
 
 func joinIntList(nums []int) string {
@@ -50,7 +73,7 @@ func splitIntList(st string) ([]int, error) {
 	return nums, nil
 }
 
-func splitterSizes(splitter *widgets.QSplitter) []int {
+func splitterSizes(splitter *qt.QSplitter) []int {
 	itemCount := splitter.Count()
 	widthList := make([]int, itemCount)
 	for i := range itemCount {
@@ -59,38 +82,39 @@ func splitterSizes(splitter *widgets.QSplitter) []int {
 	return widthList
 }
 
-func GetQSettings(parent core.QObject_ITF) *core.QSettings {
-	return core.NewQSettings("ilius", appinfo.APP_NAME, parent)
+func GetQSettings(parent *qt.QObject) *qt.QSettings {
+	return qt.NewQSettings8("ilius", appinfo.APP_NAME, parent)
 }
 
-func restoreSetting(qs *core.QSettings, key string, apply func(*core.QVariant)) {
-	if !qs.Contains(key) {
+func restoreSetting(qs *qt.QSettings, qKey qt.QAnyStringView, apply func(*qt.QVariant)) {
+	if !qs.Contains(qKey) {
 		return
 	}
-	apply(qs.Value(key, core.NewQVariant1(nil)))
+	apply(qs.ValueWithKey(qKey))
 }
 
 func restoreBoolSetting(
-	qs *core.QSettings,
-	key string, _default bool,
+	qs *qt.QSettings,
+	qKey qt.QAnyStringView,
+	_default bool,
 	apply func(bool),
 ) {
-	if !qs.Contains(key) {
+	if !qs.Contains(qKey) {
 		apply(_default)
 		return
 	}
-	apply(qs.Value(key, core.NewQVariant1(nil)).ToBool())
+	apply(qs.ValueWithKey(qKey).ToBool())
 }
 
 func restoreIntSetting(
-	qs *core.QSettings,
-	key string,
+	qs *qt.QSettings,
+	qKey qt.QAnyStringView,
 	apply func(int),
 ) {
-	if !qs.Contains(key) {
+	if !qs.Contains(qKey) {
 		return
 	}
-	value := qs.Value(key, core.NewQVariant1(nil))
+	value := qs.ValueWithKey(qKey)
 	valueInt, err := strconv.ParseInt(value.ToString(), 10, 64)
 	if err != nil {
 		slog.Error("error in restoreIntSetting: bad int value: "+err.Error(), "value", value.ToString())
@@ -99,38 +123,37 @@ func restoreIntSetting(
 	apply(int(valueInt))
 }
 
-func saveMainWinGeometry(qs *core.QSettings, window *widgets.QMainWindow) {
+func saveMainWinGeometry(qs *qt.QSettings, window *qt.QMainWindow) {
 	// slog.Info("Saving main window geometry")
-	qs.BeginGroup(QS_mainwindow)
+	qs.BeginGroup(qs_mainwindow)
 	defer qs.EndGroup()
 
-	qs.SetValue(QS_geometry, core.NewQVariant13(window.SaveGeometry()))
-	qs.SetValue(QS_savestate, core.NewQVariant13(window.SaveState(0)))
-	qs.SetValue(QS_maximized, core.NewQVariant9(window.IsMaximized()))
+	qs.SetValue(qs_geometry, newQVarBytes(window.SaveGeometry()))
+	qs.SetValue(qs_savestate, newQVarBytes(window.SaveState()))
+	qs.SetValue(qs_maximized, newQVarBool(window.IsMaximized()))
 	if !window.IsMaximized() {
-		qs.SetValue(QS_pos, core.NewQVariant27(window.Pos()))
-		qs.SetValue(QS_size, core.NewQVariant25(window.Size()))
+		qs.SetValue(qs_pos, newQVarPoint(window.Pos()))
+		qs.SetValue(qs_size, newQVarSize(window.Size()))
 	}
 }
 
-func SaveWinGeometry(qs *core.QSettings, window *widgets.QWidget, mainKey string) {
-	qs.BeginGroup(mainKey)
+func SaveDialogGeometry(qs *qt.QSettings, dialog *qt.QDialog, mainKey string) {
+	qs.BeginGroup(*qt.NewQAnyStringView3(mainKey))
 	defer qs.EndGroup()
 
-	qs.SetValue(QS_geometry, core.NewQVariant13(window.SaveGeometry()))
-	qs.SetValue(QS_maximized, core.NewQVariant9(window.IsMaximized()))
-	if !window.IsMaximized() {
-		qs.SetValue(QS_pos, core.NewQVariant27(window.Pos()))
-		qs.SetValue(QS_size, core.NewQVariant25(window.Size()))
+	qs.SetValue(qs_geometry, newQVarBytes(dialog.SaveGeometry()))
+	qs.SetValue(qs_maximized, newQVarBool(dialog.IsMaximized()))
+	if !dialog.IsMaximized() {
+		qs.SetValue(qs_pos, newQVarPoint(dialog.Pos()))
+		qs.SetValue(qs_size, newQVarSize(dialog.Size()))
 	}
 }
 
 func setWinPosition(
-	app *widgets.QApplication,
-	window *widgets.QWidget,
-	pos *core.QPoint,
+	window *qt.QWidget,
+	pos *qt.QPoint,
 ) {
-	screenSize := app.Desktop().AvailableGeometry(0)
+	screenSize := qt.QGuiApplication_PrimaryScreen().AvailableGeometry()
 	x := pos.X()
 	y := pos.Y()
 	switch {
@@ -145,98 +168,95 @@ func setWinPosition(
 	case y > screenSize.Height():
 		pos.SetY(screenSize.Height() >> 1)
 	}
-	window.Move(pos)
+	window.MoveWithQPoint(pos)
 }
 
 func setWinSize(
-	app *widgets.QApplication,
-	window *widgets.QWidget,
-	size *core.QSize,
+	window *qt.QWidget,
+	size *qt.QSize,
 ) {
-	screenSize := app.Desktop().AvailableGeometry(0)
+	screenSize := qt.QGuiApplication_PrimaryScreen().AvailableGeometry()
 	if size.Width() > screenSize.Width() {
 		size.SetWidth(screenSize.Width())
 	}
 	if size.Height() > screenSize.Height() {
 		size.SetHeight(screenSize.Height())
 	}
-	window.Resize(size)
+	window.ResizeWithQSize(size)
 }
 
 func RestoreMainWinGeometry(
-	app *widgets.QApplication,
-	qs *core.QSettings,
-	window *widgets.QMainWindow,
+	qs *qt.QSettings,
+	window *qt.QMainWindow,
 ) {
-	qs.BeginGroup(QS_mainwindow)
+	qs.BeginGroup(qs_mainwindow)
 	defer qs.EndGroup()
 
-	restoreSetting(qs, QS_geometry, func(value *core.QVariant) {
+	restoreSetting(qs, qs_geometry, func(value *qt.QVariant) {
 		window.RestoreGeometry(value.ToByteArray())
 	})
-	restoreSetting(qs, QS_savestate, func(value *core.QVariant) {
-		window.RestoreState(value.ToByteArray(), 0)
+	restoreSetting(qs, qs_savestate, func(value *qt.QVariant) {
+		window.RestoreState(value.ToByteArray())
 	})
-	restoreBoolSetting(qs, QS_maximized, false, func(maximized bool) {
+	restoreBoolSetting(qs, qs_maximized, false, func(maximized bool) {
 		if maximized {
 			window.ShowMaximized()
 			return
 		}
-		restoreSetting(qs, QS_pos, func(value *core.QVariant) {
-			setWinPosition(app, &window.QWidget, value.ToPoint())
+		restoreSetting(qs, qs_pos, func(value *qt.QVariant) {
+			setWinPosition(window.QWidget, value.ToPoint())
 		})
-		restoreSetting(qs, QS_size, func(value *core.QVariant) {
-			setWinSize(app, &window.QWidget, value.ToSize())
+		restoreSetting(qs, qs_size, func(value *qt.QVariant) {
+			setWinSize(window.QWidget, value.ToSize())
 		})
 	})
 }
 
 func RestoreWinGeometry(
-	app *widgets.QApplication,
-	qs *core.QSettings,
-	window *widgets.QWidget,
+	qs *qt.QSettings,
+	window *qt.QWidget,
 	mainKey string,
 ) {
-	qs.BeginGroup(mainKey)
+	qs.BeginGroup(*qt.NewQAnyStringView3(mainKey))
 	defer qs.EndGroup()
 
-	restoreSetting(qs, QS_geometry, func(value *core.QVariant) {
+	restoreSetting(qs, qs_geometry, func(value *qt.QVariant) {
 		window.RestoreGeometry(value.ToByteArray())
 	})
-	restoreBoolSetting(qs, QS_maximized, false, func(maximized bool) {
+	restoreBoolSetting(qs, qs_maximized, false, func(maximized bool) {
 		if maximized {
 			window.ShowMaximized()
 			return
 		}
-		restoreSetting(qs, QS_pos, func(value *core.QVariant) {
-			setWinPosition(app, window, value.ToPoint())
+		restoreSetting(qs, qs_pos, func(value *qt.QVariant) {
+			setWinPosition(window, value.ToPoint())
 		})
-		restoreSetting(qs, QS_size, func(value *core.QVariant) {
-			setWinSize(app, window, value.ToSize())
+		restoreSetting(qs, qs_size, func(value *qt.QVariant) {
+			setWinSize(window, value.ToSize())
 		})
 	})
 }
 
-func SaveTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, mainKey string) {
-	qs.BeginGroup(mainKey)
+func SaveTableColumnsWidth(qs *qt.QSettings, table *qt.QTableWidget, mainKey string) {
+	qs.BeginGroup(*qt.NewQAnyStringView3(mainKey))
 	defer qs.EndGroup()
 	count := table.ColumnCount()
 	widths := make([]int, count)
 	for i := range count {
 		widths[i] = table.ColumnWidth(i)
 	}
-	qs.SetValue(QS_columnwidth, core.NewQVariant1(joinIntList(widths)))
+	qs.SetValue(qs_columnwidth, newQVarStr(joinIntList(widths)))
 }
 
-func RestoreTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, mainKey string) {
-	qs.BeginGroup(mainKey)
+func RestoreTableColumnsWidth(qs *qt.QSettings, table *qt.QTableWidget, mainKey string) {
+	qs.BeginGroup(*qt.NewQAnyStringView3(mainKey))
 	defer qs.EndGroup()
-	if !qs.Contains(QS_columnwidth) {
+	if !qs.Contains(qs_columnwidth) {
 		return
 	}
 	header := table.HorizontalHeader()
 	// even []string does not work, let alone []int
-	widthListStr := qs.Value(QS_columnwidth, core.NewQVariant1("")).ToString()
+	widthListStr := qs.ValueWithKey(qs_columnwidth).ToString()
 	widthList := strings.Split(widthListStr, ",")
 	for index, widthStr := range widthList {
 		width, err := strconv.ParseInt(widthStr, 10, 64)
@@ -248,21 +268,21 @@ func RestoreTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, m
 	}
 }
 
-func saveSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
+func saveSplitterSizes(qs *qt.QSettings, splitter *qt.QSplitter, mainKey string) {
 	// slog.Info("Saving splitter sizes")
-	qs.BeginGroup(mainKey)
+	qs.BeginGroup(*qt.NewQAnyStringView3(mainKey))
 	defer qs.EndGroup()
 	sizes := splitterSizes(splitter)
-	qs.SetValue(QS_sizes, core.NewQVariant1(joinIntList(sizes)))
+	qs.SetValue(qs_sizes, newQVarStr(joinIntList(sizes)))
 }
 
-func RestoreSplitterSizes(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
-	qs.BeginGroup(mainKey)
+func RestoreSplitterSizes(qs *qt.QSettings, splitter *qt.QSplitter, mainKey string) {
+	qs.BeginGroup(*qt.NewQAnyStringView3(mainKey))
 	defer qs.EndGroup()
-	if !qs.Contains(QS_sizes) {
+	if !qs.Contains(qs_sizes) {
 		return
 	}
-	sizesStr := qs.Value(QS_sizes, core.NewQVariant1("")).ToString()
+	sizesStr := qs.ValueWithKey(qs_sizes).ToString()
 	sizes, err := splitIntList(sizesStr)
 	if err != nil {
 		slog.Error("error", "err", err)
@@ -294,9 +314,9 @@ func actionSaveLoop(ch <-chan time.Time, callable func()) {
 	}
 }
 
-func SetupSplitterSizesSave(qs *core.QSettings, splitter *widgets.QSplitter, mainKey string) {
+func SetupSplitterSizesSave(qs *qt.QSettings, splitter *qt.QSplitter, mainKey string) {
 	ch := make(chan time.Time, 100)
-	splitter.ConnectSplitterMoved(func(pos int, index int) {
+	splitter.OnSplitterMoved(func(pos int, index int) {
 		ch <- time.Now()
 	})
 	go actionSaveLoop(ch, func() {
@@ -304,31 +324,31 @@ func SetupSplitterSizesSave(qs *core.QSettings, splitter *widgets.QSplitter, mai
 	})
 }
 
-func SetupWinGeometrySave(
-	qs *core.QSettings,
-	window *widgets.QWidget,
+func SetupDialogGeometrySave(
+	qs *qt.QSettings,
+	dialog *qt.QDialog,
 	mainKey string,
 ) {
 	ch := make(chan time.Time, 100)
 
-	window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
+	dialog.OnMoveEvent(func(super func(*qt.QMoveEvent), event *qt.QMoveEvent) {
 		ch <- time.Now()
 	})
-	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+	dialog.OnResizeEvent(func(super func(*qt.QResizeEvent), event *qt.QResizeEvent) {
 		ch <- time.Now()
 	})
 	go actionSaveLoop(ch, func() {
-		SaveWinGeometry(qs, window, mainKey)
+		SaveDialogGeometry(qs, dialog, mainKey)
 	})
 }
 
-func SetupMainWinGeometrySave(qs *core.QSettings, window *widgets.QMainWindow) {
+func SetupMainWinGeometrySave(qs *qt.QSettings, window *qt.QMainWindow) {
 	ch := make(chan time.Time, 100)
 
-	window.ConnectMoveEvent(func(event *gui.QMoveEvent) {
+	window.OnMoveEvent(func(super func(*qt.QMoveEvent), event *qt.QMoveEvent) {
 		ch <- time.Now()
 	})
-	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+	window.OnResizeEvent(func(super func(*qt.QResizeEvent), event *qt.QResizeEvent) {
 		ch <- time.Now()
 	})
 	go actionSaveLoop(ch, func() {
@@ -336,34 +356,34 @@ func SetupMainWinGeometrySave(qs *core.QSettings, window *widgets.QMainWindow) {
 	})
 }
 
-func SaveSearchSettings(qs *core.QSettings, combo *widgets.QComboBox) {
-	qs.BeginGroup(QS_search)
+func SaveSearchSettings(qs *qt.QSettings, combo *qt.QComboBox) {
+	qs.BeginGroup(qs_search)
 	defer qs.EndGroup()
 
-	qs.SetValue(QS_mode, core.NewQVariant1(
+	qs.SetValue(qs_mode, newQVarStr(
 		strconv.FormatInt(int64(combo.CurrentIndex()), 10),
 	))
 }
 
-func RestoreSearchSettings(qs *core.QSettings, combo *widgets.QComboBox) {
-	qs.BeginGroup(QS_search)
+func RestoreSearchSettings(qs *qt.QSettings, combo *qt.QComboBox) {
+	qs.BeginGroup(qs_search)
 	defer qs.EndGroup()
 
-	restoreIntSetting(qs, QS_mode, combo.SetCurrentIndex)
+	restoreIntSetting(qs, qs_mode, combo.SetCurrentIndex)
 }
 
-func SaveActivityMode(qs *core.QSettings, combo *widgets.QComboBox) {
-	qs.BeginGroup(QS_activity)
+func SaveActivityMode(qs *qt.QSettings, combo *qt.QComboBox) {
+	qs.BeginGroup(qs_activity)
 	defer qs.EndGroup()
 
-	qs.SetValue(QS_mode, core.NewQVariant1(
+	qs.SetValue(qs_mode, newQVarStr(
 		strconv.FormatInt(int64(combo.CurrentIndex()), 10),
 	))
 }
 
-func RestoreActivityMode(qs *core.QSettings, combo *widgets.QComboBox) {
-	qs.BeginGroup(QS_activity)
+func RestoreActivityMode(qs *qt.QSettings, combo *qt.QComboBox) {
+	qs.BeginGroup(qs_activity)
 	defer qs.EndGroup()
 
-	restoreIntSetting(qs, QS_mode, combo.SetCurrentIndex)
+	restoreIntSetting(qs, qs_mode, combo.SetCurrentIndex)
 }

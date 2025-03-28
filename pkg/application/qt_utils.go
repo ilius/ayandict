@@ -5,17 +5,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ilius/qt/core"
-	"github.com/ilius/qt/gui"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 type KeyPressIface interface {
-	ConnectKeyPressEvent(func(event *gui.QKeyEvent))
-	KeyPressEventDefault(event gui.QKeyEvent_ITF)
+	OnKeyPressEvent(func(func(event *qt.QKeyEvent), *qt.QKeyEvent))
 }
 
-func filePathFromQUrl(qUrl *core.QUrl) string {
-	fpath := qUrl.Path(core.QUrl__FullyDecoded)
+func filePathFromQUrl(qUrl *qt.QUrl) string {
+	fpath := qUrl.Path1(qt.QUrl__FullyDecoded)
 	if fpath == "" {
 		return ""
 	}
@@ -26,12 +24,12 @@ func filePathFromQUrl(qUrl *core.QUrl) string {
 }
 
 func plaintextFromHTML(htext string) string {
-	doc := gui.NewQTextDocument(nil)
+	doc := qt.NewQTextDocument()
 	doc.SetHtml(htext)
 	return doc.ToPlainText()
 }
 
-func fontPointSize(font *gui.QFont, dpi float64) float64 {
+func fontPointSize(font *qt.QFont, dpi float64) float64 {
 	points := font.PointSizeF()
 	if points > 0 {
 		return points
@@ -43,7 +41,7 @@ func fontPointSize(font *gui.QFont, dpi float64) float64 {
 	return float64(pixels) * 72.0 / dpi
 }
 
-func fontPixelSize(font *gui.QFont, dpi float64) float64 {
+func fontPixelSize(font *qt.QFont, dpi float64) float64 {
 	pixels := font.PixelSize()
 	if pixels > 0 {
 		return float64(pixels)
@@ -53,14 +51,14 @@ func fontPixelSize(font *gui.QFont, dpi float64) float64 {
 	return points * dpi / 72.0
 }
 
-// func posStr(pos *core.QPoint) string {
+// func posStr(pos *qt.QPoint) string {
 // 	if pos == nil {
 // 		return "nil"
 // 	}
 // 	return fmt.Sprintf("(%v, %v)", pos.X(), pos.Y())
 // }
 
-// func sizeStr(size *core.QSize) string {
+// func sizeStr(size *qt.QSize) string {
 // 	if size == nil {
 // 		return "nil"
 // 	}

@@ -1,0 +1,88 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Linux Build
+
+on:
+  push:
+    branches: ["main", "v3"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # - name: Download artifact
+      #   id: download-artifact
+      #   uses: dawidd6/action-download-artifact@v8
+      #   with:
+      #     # Optional, workflow file name or ID
+      #     # If not specified, will be inferred from run_id (if run_id is specified), or will be the current workflow
+      #     workflow: ${{ github.workflow }}
+      #     # If no workflow is set and workflow_search set to true, then the most recent workflow matching
+      #     # all other criteria will be looked up instead of using the current workflow
+      #     workflow_search: false
+      #     workflow_conclusion: success
+      #     # branch: master
+      #     event: push
+
+      #     # Optional, uploaded artifact name,
+      #     # will download all artifacts if not specified
+      #     # and extract them into respective subdirectories
+      #     # https://github.com/actions/download-artifact#download-all-artifacts
+      #     # is treated as a regular expression if input name_is_regexp is true
+      #     # will download only those artifacts with a name that matches this regular expression
+      #     # https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions
+      #     name: go-build-cache
+      #     # Optional, a directory where to extract artifact(s), defaults to the current directory
+      #     path: /home/runner/.cache/go-build
+      #     # Optional, defaults to current repo
+      #     repo: ${{ github.repository }}
+      #     # Optional, check the workflow run to whether it has an artifact
+      #     # then will get the last available artifact from the previous workflow
+      #     # default false, just try to download from the last one
+      #     check_artifacts: false
+      #     # Optional, search for the last workflow run whose stored an artifact named as in `name` input
+      #     # default false
+      #     search_artifacts: false
+
+      #     # Optional, choose how to exit the action if no artifact is found
+      #     # can be one of:
+      #     #  "fail", "warn", "ignore"
+      #     # default fail
+      #     if_no_artifact_found: ignore
+
+      #     use_unzip: true
+
+      - name: Check Go build cache
+        run: ls -l /home/runner/.cache/go-build || true
+
+      - uses: actions/checkout@v3
+
+      - name: Install Qt6
+        run: sudo apt-get install qt6-base-dev qt6-multimedia-dev
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.22
+
+      - name: Build
+        run: CGO_ENABLED=1 go build -ldflags '-s -w' -trimpath
+
+      - name: CLICK HERE TO DOWNLOAD BINARY
+        uses: actions/upload-artifact@v4
+        with:
+          name: ayandict-linux-amd64-${{ github.sha }}
+          if-no-files-found: error
+          retention-days: 7
+          path: ayandict
+
+      - name: Upload Go build cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-build-cache
+          if-no-files-found: error
+          retention-days: 7
+          path: ~/.cache/go-build

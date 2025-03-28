@@ -11,13 +11,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ilius/ayandict/v2/pkg/dictmgr"
-	"github.com/ilius/ayandict/v2/pkg/mp3duration"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr"
+	"github.com/ilius/ayandict/v3/pkg/mp3duration"
 	common "github.com/ilius/go-dict-commons"
-	"github.com/ilius/qt/core"
-	"github.com/ilius/qt/gui"
-	"github.com/ilius/qt/multimedia"
-	"github.com/ilius/qt/widgets"
+	qt "github.com/mappu/miqt/qt6"
+	"github.com/mappu/miqt/qt6/multimedia" // not in latest tag
 )
 
 // Source code of QTextEdit says:
@@ -33,7 +31,7 @@ const (
 var dummyParagRE = regexp.MustCompile(`<p [^<>]*><br />(</p>|$)`)
 
 type ArticleView struct {
-	*widgets.QTextBrowser
+	*qt.QTextBrowser
 
 	app     *Application
 	dpi     float64
@@ -50,17 +48,22 @@ type ArticleView struct {
 }
 
 func NewArticleView(app *Application) *ArticleView {
-	widget := widgets.NewQTextBrowser(nil)
+	widget := qt.NewQTextBrowser(nil)
 	// widget := webengine.NewQWebEngineView(nil)
 	widget.SetReadOnly(true)
 	widget.SetOpenExternalLinks(true)
 	widget.SetOpenLinks(false)
-	dpi := app.PrimaryScreen().PhysicalDotsPerInch()
-	return &ArticleView{
+	dpi := qt.QGuiApplication_PrimaryScreen().PhysicalDotsPerInch()
+	view := &ArticleView{
 		QTextBrowser: widget,
 		app:          app,
 		dpi:          dpi,
 	}
+	widget.OnKeyPressEvent(func(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
+		view.onKeyPressEvent(event)
+		super(event)
+	})
+	return view
 }
 
 var audioUrlRE = regexp.MustCompile(`href="[^<>"]+\.mp3"`)
@@ -92,15 +95,14 @@ func (view *ArticleView) playAudioMPV(urlStr string) bool {
 	return true
 }
 
-func (view *ArticleView) playAudio(qUrl *core.QUrl) {
-	urlStr := qUrl.ToString(core.QUrl__PreferLocalFile)
+func (view *ArticleView) playAudio(qUrl *qt.QUrl) {
+	urlStr := qUrl.ToLocalFile()
 	slog.Info("Playing audio", "url", urlStr)
 	if conf.AudioMPV && view.playAudioMPV(urlStr) {
 		return
 	}
 	player := view.mediaPlayer
-	content := multimedia.NewQMediaContent2(qUrl)
-	player.SetMedia(content, nil)
+	player.SetSource(qUrl)
 	player.Play()
 }
 
@@ -117,7 +119,7 @@ func (view *ArticleView) autoPlay(text string, count int) {
 			slog.Error("error", "err", err)
 			continue
 		}
-		qUrl := core.NewQUrl3(urlStr, core.QUrl__TolerantMode)
+		qUrl := qt.NewQUrl4(urlStr, qt.QUrl__TolerantMode)
 		// slog.Info("Playing audio", urlStr)
 		isRemote := qUrl.Scheme() != "file"
 		if isRemote {
@@ -170,9 +172,9 @@ func (view *ArticleView) SetResult(res common.SearchResultIface) {
 	}
 }
 
-func (view *ArticleView) createContextMenu() *widgets.QMenu {
-	menu := widgets.NewQMenu(view.QTextBrowser)
-	menu.AddAction("Query").ConnectTriggered(func(checked bool) {
+func (view *ArticleView) createContextMenu() *qt.QMenu {
+	menu := qt.NewQMenu(view.QTextBrowser.QWidget)
+	menu.AddActionWithText("Query").OnTriggered(func() {
 		text := view.TextCursor().SelectedText()
 		if text != "" {
 			view.doQuery(strings.Trim(text, queryForceTrimChars))
@@ -183,32 +185,32 @@ func (view *ArticleView) createContextMenu() *widgets.QMenu {
 		}
 	})
 	if view.rightClickOnUrl != "" {
-		menu.AddAction("Copy Link Target").ConnectTriggered(func(checked bool) {
-			view.app.Clipboard().SetText(view.rightClickOnUrl, gui.QClipboard__Clipboard)
+		menu.AddActionWithText("Copy Link Target").OnTriggered(func() {
+			qt.QGuiApplication_Clipboard().SetText2(view.rightClickOnUrl, qt.QClipboard__Clipboard)
 		})
 	}
-	menu.AddAction("Copy").ConnectTriggered(func(checked bool) {
+	menu.AddActionWithText("Copy").OnTriggered(func() {
 		text := view.TextCursor().SelectedText()
 		if text == "" {
 			return
 		}
 		text = strings.TrimSpace(text)
-		view.app.Clipboard().SetText(text, gui.QClipboard__Clipboard)
+		qt.QGuiApplication_Clipboard().SetText2(text, qt.QClipboard__Clipboard)
 	})
-	menu.AddAction("Copy HTML").ConnectTriggered(func(checked bool) {
+	menu.AddActionWithText("Copy HTML").OnTriggered(func() {
 		text := view.selectedHTML()
-		view.app.Clipboard().SetText(text, gui.QClipboard__Clipboard)
+		qt.QGuiApplication_Clipboard().SetText2(text, qt.QClipboard__Clipboard)
 	})
-	menu.AddAction("Copy All (HTML)").ConnectTriggered(func(checked bool) {
-		view.app.Clipboard().SetText(
+	menu.AddActionWithText("Copy All (HTML)").OnTriggered(func() {
+		qt.QGuiApplication_Clipboard().SetText2(
 			view.ToHtml(),
-			gui.QClipboard__Clipboard,
+			qt.QClipboard__Clipboard,
 		)
 	})
-	menu.AddAction("Copy All (Plaintext)").ConnectTriggered(func(checked bool) {
-		view.app.Clipboard().SetText(
+	menu.AddActionWithText("Copy All (Plaintext)").OnTriggered(func() {
+		qt.QGuiApplication_Clipboard().SetText2(
 			view.ToPlainText(),
-			gui.QClipboard__Clipboard,
+			qt.QClipboard__Clipboard,
 		)
 	})
 
@@ -216,7 +218,7 @@ func (view *ArticleView) createContextMenu() *widgets.QMenu {
 }
 
 func (view *ArticleView) selectedHTML() string {
-	text := view.TextCursor().Selection().ToHtml(core.NewQByteArray2("utf-8", 5))
+	text := view.TextCursor().Selection().ToHtml()
 	body := strings.Index(text, "<body>")
 	if body >= 0 {
 		text = text[body+6:]
@@ -260,8 +262,8 @@ func (view *ArticleView) ZoomOut() {
 	doc.SetDefaultFont(font)
 }
 
-func (view *ArticleView) findLinkOnCursor(cursor *gui.QTextCursor) string {
-	text := cursor.Selection().ToHtml(core.NewQByteArray2("utf-8", 5))
+func (view *ArticleView) findLinkOnCursor(cursor *qt.QTextCursor) string {
+	text := cursor.Selection().ToHtml()
 	// slog.Info("findLinkOnCursor:", text)
 	start := strings.Index(text, startFrag)
 	if start >= 0 {
@@ -287,17 +289,17 @@ func (view *ArticleView) findLinkOnCursor(cursor *gui.QTextCursor) string {
 }
 
 func (view *ArticleView) setupAnchorClicked() {
-	view.ConnectAnchorClicked(func(qUrl *core.QUrl) {
-		host := qUrl.Host(core.QUrl__FullyDecoded)
+	view.OnAnchorClicked(func(qUrl *qt.QUrl) {
+		host := qUrl.Host1(qt.QUrl__FullyDecoded)
 		if qUrl.Scheme() == "bword" {
 			if host != "" {
 				view.doQuery(host)
 			} else {
-				slog.Debug("AnchorClicked", "url", qUrl.ToString(core.QUrl__None))
+				slog.Debug("AnchorClicked", "url", qUrl.ToString())
 			}
 			return
 		}
-		path := qUrl.Path(core.QUrl__FullyDecoded)
+		path := qUrl.Path1(qt.QUrl__FullyDecoded)
 		switch qUrl.Scheme() {
 		case "":
 			view.doQuery(path)
@@ -311,7 +313,7 @@ func (view *ArticleView) setupAnchorClicked() {
 		case "http", "https":
 			switch filepath.Ext(path) {
 			case ".mp3", ".wav", ".ogg":
-				qUrlLocal, err := audioCache.Get(qUrl.ToString(core.QUrl__None))
+				qUrlLocal, err := audioCache.Get(qUrl.ToString()) // qt.QUrl__None
 				if err != nil {
 					slog.Error("error", "err", err)
 				} else {
@@ -321,23 +323,23 @@ func (view *ArticleView) setupAnchorClicked() {
 				return
 			}
 		}
-		gui.QDesktopServices_OpenUrl(qUrl)
+		qt.QDesktopServices_OpenUrl(qUrl)
 	})
 }
 
 func (view *ArticleView) setupMouseReleaseEvent() {
-	view.ConnectMouseReleaseEvent(func(event *gui.QMouseEvent) {
+	view.OnMouseReleaseEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 		text := view.TextCursor().SelectedText()
 		switch event.Button() {
-		case core.Qt__MiddleButton:
+		case qt.MiddleButton:
 			if text != "" {
 				view.doQuery(strings.Trim(text, queryForceTrimChars))
 			}
 			return
-		case core.Qt__RightButton:
+		case qt.RightButton:
 			if text == "" {
 				cursor := view.CursorForPosition(event.Pos())
-				cursor.Select(gui.QTextCursor__WordUnderCursor)
+				cursor.Select(qt.QTextCursor__WordUnderCursor)
 				// it doesn't actually select the word in GUI
 
 				urlStr := view.findLinkOnCursor(cursor)
@@ -352,14 +354,14 @@ func (view *ArticleView) setupMouseReleaseEvent() {
 				}
 			}
 		}
-		view.MouseReleaseEventDefault(event)
+		super(event)
 	})
 }
 
 func (view *ArticleView) setupWheelEvent() {
-	view.ConnectWheelEvent(func(event *gui.QWheelEvent) {
-		if event.Modifiers()&core.Qt__ControlModifier == 0 {
-			view.WheelEventDefault(event)
+	view.OnWheelEvent(func(super func(*qt.QWheelEvent), event *qt.QWheelEvent) {
+		if event.Modifiers()&qt.ControlModifier == 0 {
+			super(event)
 			return
 		}
 		delta := event.AngleDelta().Y()
@@ -380,52 +382,52 @@ func (view *ArticleView) SetupCustomHandlers() {
 	if doQuery == nil {
 		panic("doQuery is not set")
 	}
-	mediaPlayer := multimedia.NewQMediaPlayer(nil, 0)
+
+	mediaPlayer := multimedia.NewQMediaPlayer()
 	view.mediaPlayer = mediaPlayer
 
-	copyAction := widgets.NewQAction2("Copy", view)
+	copyAction := qt.NewQAction5("Copy", view.QObject)
 	view.AddAction(copyAction)
-	copyAction.SetShortcut(gui.NewQKeySequence2("Ctrl+C", gui.QKeySequence__PortableText))
-	copyAction.ConnectTriggered(func(checked bool) {
+	copyAction.SetShortcut(qt.NewQKeySequence7("Ctrl+C", qt.QKeySequence__PortableText))
+	copyAction.OnTriggered(func() {
 		text := view.TextCursor().SelectedText()
 		if text == "" {
 			return
 		}
 		text = strings.TrimSpace(text)
-		view.app.Clipboard().SetText(text, gui.QClipboard__Clipboard)
+		qt.QGuiApplication_Clipboard().SetText2(text, qt.QClipboard__Clipboard)
 	})
 
 	view.setupAnchorClicked()
 
-	// menuStyleOpt := widgets.NewQStyleOptionMenuItem()
+	// menuStyleOpt := qt.NewQStyleOptionMenuItem()
 	// style := app.Style()
-	// queryMenuIcon := style.StandardIcon(widgets.QStyle__SP_ArrowUp, menuStyleOpt, nil)
+	// queryMenuIcon := style.StandardIcon(qt.QStyle__SP_ArrowUp, menuStyleOpt, nil)
 
 	// we set this on right-button MouseRelease when no text is selected
 	// and read it when Query is selected from context menu
 	// may not be pretty or concurrent-safe! but seems to work!
 
-	view.ConnectContextMenuEvent(func(event *gui.QContextMenuEvent) {
+	view.OnContextMenuEvent(func(_ func(event *qt.QContextMenuEvent), event *qt.QContextMenuEvent) {
 		event.Ignore()
 		menu := view.createContextMenu()
-		menu.Popup(event.GlobalPos(), nil)
+		menu.Popup(event.GlobalPos())
 	})
 	view.setupMouseReleaseEvent()
 	view.setupWheelEvent()
 }
 
-func (view *ArticleView) KeyPressEventDefault(event gui.QKeyEvent_ITF) {
-	switch event.QKeyEvent_PTR().Key() {
-	case int(core.Qt__Key_Up):
+func (view *ArticleView) onKeyPressEvent(event *qt.QKeyEvent) {
+	switch event.Key() {
+	case int(qt.Key_Up):
 		if conf.ArticleArrowKeys {
-			view.VerticalScrollBar().TriggerAction(widgets.QAbstractSlider__SliderSingleStepSub)
+			view.VerticalScrollBar().TriggerAction(qt.QAbstractSlider__SliderSingleStepSub)
 			return
 		}
-	case int(core.Qt__Key_Down):
+	case int(qt.Key_Down):
 		if conf.ArticleArrowKeys {
-			view.VerticalScrollBar().TriggerAction(widgets.QAbstractSlider__SliderSingleStepAdd)
+			view.VerticalScrollBar().TriggerAction(qt.QAbstractSlider__SliderSingleStepAdd)
 			return
 		}
 	}
-	view.QTextBrowser.KeyPressEventDefault(event)
 }

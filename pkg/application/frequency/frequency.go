@@ -4,19 +4,19 @@ import (
 	"log/slog"
 	"strconv"
 
-	"github.com/ilius/ayandict/v2/pkg/activity"
-	"github.com/ilius/qt/core"
-	"github.com/ilius/qt/widgets"
+	"github.com/ilius/ayandict/v3/pkg/activity"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 func NewFrequencyView(
 	storage *activity.ActivityStorage,
 	maxSize int,
 ) *FrequencyTable {
-	widget := widgets.NewQTableWidget(nil)
+	widget := qt.NewQTableWidget2()
 	widget.SetColumnCount(2)
 
-	widget.ConnectItemClicked(func(item *widgets.QTableWidgetItem) {
+	widget.OnItemClicked(func(item *qt.QTableWidgetItem) {
 		widget.ItemActivated(item)
 	})
 
@@ -30,7 +30,7 @@ func NewFrequencyView(
 }
 
 type FrequencyTable struct {
-	*widgets.QTableWidget
+	*qt.QTableWidget
 
 	storage *activity.ActivityStorage
 
@@ -49,9 +49,9 @@ func (view *FrequencyTable) Clear() {
 	view.QTableWidget.SetRowCount(0)
 }
 
-func (view *FrequencyTable) newItem(text string) *widgets.QTableWidgetItem {
-	item := widgets.NewQTableWidgetItem2(text, 0)
-	item.SetFlags(core.Qt__ItemIsSelectable | core.Qt__ItemIsEnabled)
+func (view *FrequencyTable) newItem(text string) *qt.QTableWidgetItem {
+	item := qt.NewQTableWidgetItem2(text)
+	item.SetFlags(qt.ItemIsSelectable | qt.ItemIsEnabled)
 	return item
 }
 
@@ -90,6 +90,9 @@ func (view *FrequencyTable) setItemForKey(index int, key string) {
 }
 
 func (view *FrequencyTable) Add(key string, plus int) {
+	if config.PrivateMode {
+		return
+	}
 	view.storage.AddFrequency(key, plus)
 	index, ok := view.KeyMap[key]
 	if !ok {
@@ -145,6 +148,9 @@ func (view *FrequencyTable) Trim() {
 }
 
 func (view *FrequencyTable) Save() error {
+	if config.PrivateMode {
+		return nil
+	}
 	return view.storage.SaveFrequency()
 }
 

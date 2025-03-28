@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/ilius/ayandict/v2/pkg/go-color"
+	"github.com/ilius/ayandict/v3/pkg/go-color"
 )
 
 var DefaultOptions *Options = &Options{

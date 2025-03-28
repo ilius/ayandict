@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ilius/ayandict/v2/pkg/dictmgr"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	common "github.com/ilius/go-dict-commons"
-	"github.com/ilius/qt/widgets"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 const resultFlags = uint32(
@@ -23,8 +23,8 @@ type QueryArgs struct {
 	HeaderLabel *HeaderLabel
 	HistoryView *HistoryView
 	PostQuery   func(string)
-	Entry       *widgets.QLineEdit
-	ModeCombo   *widgets.QComboBox
+	Entry       *qt.QLineEdit
+	ModeCombo   *qt.QComboBox
 }
 
 func (w *QueryArgs) AddHistoryAndFrequency(query string) {
@@ -50,20 +50,20 @@ func NewResultListWidget(
 	headerLabel *HeaderLabel,
 	onResultDisplay func(terms []string),
 ) *ResultListWidget {
-	widget := widgets.NewQListWidget(nil)
+	widget := qt.NewQListWidget(nil)
 	resultList := &ResultListWidget{
 		QListWidget:     widget,
 		HeaderLabel:     headerLabel,
 		ArticleView:     articleView,
 		onResultDisplay: onResultDisplay,
 	}
-	widget.ConnectCurrentRowChanged(func(row int) {
+	widget.OnCurrentRowChanged(func(row int) {
 		if row < 0 {
 			return
 		}
 		resultList.OnActivate(row)
 	})
-	widget.ConnectItemActivated(func(item *widgets.QListWidgetItem) {
+	widget.OnItemActivated(func(item *qt.QListWidgetItem) {
 		row := widget.Row(item)
 		if row < 0 {
 			return
@@ -74,7 +74,7 @@ func NewResultListWidget(
 }
 
 type ResultListWidget struct {
-	*widgets.QListWidget
+	*qt.QListWidget
 
 	results []common.SearchResultIface
 

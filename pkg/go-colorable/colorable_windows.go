@@ -487,7 +487,7 @@ loop:
 			}
 			w.rest.Reset()
 			continue
-		// https://github.com/ilius/ayandict/v2/pkg/go-colorable/issues/27
+		// https://github.com/ilius/ayandict/v3/pkg/go-colorable/issues/27
 		case '7':
 			procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
 			w.oldpos = csbi.cursorPosition

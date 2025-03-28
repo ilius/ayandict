@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ilius/ayandict/v2/pkg/go-colorable"
+	"github.com/ilius/ayandict/v3/pkg/go-colorable"
 )
 
 var (

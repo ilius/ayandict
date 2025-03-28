@@ -6,11 +6,10 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/dictmgr/qdictmgr"
-	"github.com/ilius/ayandict/v2/pkg/headerlib"
-	"github.com/ilius/qt/core"
-	"github.com/ilius/qt/gui"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr/qdictmgr"
+	"github.com/ilius/ayandict/v3/pkg/headerlib"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 var (
@@ -20,8 +19,8 @@ var (
 	headerTpl *template.Template
 )
 
-func ConfigFont() *gui.QFont {
-	font := gui.NewQFont()
+func ConfigFont() *qt.QFont {
+	font := qt.NewQFont()
 	if conf.FontFamily != "" {
 		font.SetFamily(conf.FontFamily)
 	}
@@ -71,8 +70,8 @@ func shouldReloadDicts(currentList []string, newList []string) bool {
 func (app *Application) ReloadFont() {
 	font := ConfigFont()
 	// app.SetFont only applies to future widgets (DictManager for example)
-	app.SetFont(font, "")
-	// widgets.QApplication_AllWidgets panics
+	qt.QApplication_SetFont2(font, "")
+	// qt.QApplication_AllWidgets panics
 	// app.AllWidgets() panics
 	// window.Children() panics
 	for _, w := range app.allTextWidgets {
@@ -109,8 +108,8 @@ func OpenConfig() {
 	if err != nil {
 		slog.Error("error checking/creating config file: " + err.Error())
 	}
-	url := core.NewQUrl()
+	url := qt.NewQUrl()
 	url.SetScheme("file")
-	url.SetPath(config.Path(), core.QUrl__TolerantMode)
-	gui.QDesktopServices_OpenUrl(url)
+	url.SetPath2(config.Path(), qt.QUrl__TolerantMode)
+	_ = qt.QDesktopServices_OpenUrl(url)
 }

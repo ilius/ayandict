@@ -6,9 +6,9 @@ import (
 	"html/template"
 	"strings"
 
-	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/dictmgr"
-	"github.com/ilius/ayandict/v2/pkg/wordwrap"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr"
+	"github.com/ilius/ayandict/v3/pkg/wordwrap"
 	commons "github.com/ilius/go-dict-commons"
 )
 

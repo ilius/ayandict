@@ -8,7 +8,7 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/ilius/ayandict/v2/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/config"
 )
 
 func NewActivityStorage(conf *config.Config, configDir string) *ActivityStorage {

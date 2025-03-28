@@ -6,14 +6,12 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon"
-	"github.com/ilius/ayandict/v2/pkg/qtcommon/qsettings"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr/internal/dicts"
+	"github.com/ilius/ayandict/v3/pkg/qtcommon"
+	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
 	common "github.com/ilius/go-dict-commons"
-	"github.com/ilius/qt/core"
-	"github.com/ilius/qt/gui"
-	"github.com/ilius/qt/widgets"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 const (
@@ -34,19 +32,19 @@ const (
 )
 
 type DictManager struct {
-	Dialog      *widgets.QDialog
-	TableWidget *widgets.QTableWidget
-	VolumeInput *widgets.QSpinBox
+	Dialog      *qt.QDialog
+	TableWidget *qt.QTableWidget
+	VolumeInput *qt.QSpinBox
 	TextWidgets []qtcommon.HasSetFont
 
 	infoMap map[string]common.Dictionary
 
-	app *widgets.QApplication
+	app *qt.QApplication
 
-	toolbar   *widgets.QToolBar
-	buttonBox *widgets.QDialogButtonBox
+	toolbar   *qt.QToolBar
+	buttonBox *qt.QDialogButtonBox
 
-	settings *core.QSettings
+	settings *qt.QSettings
 }
 
 func makeDictInfoMap(infos []common.Dictionary) map[string]common.Dictionary {
@@ -59,31 +57,31 @@ func makeDictInfoMap(infos []common.Dictionary) map[string]common.Dictionary {
 
 // TODO: break down
 func NewDictManager(
-	app *widgets.QApplication,
-	parent widgets.QWidget_ITF,
+	app *qt.QApplication,
+	parent *qt.QWidget,
 	conf *config.Config,
 ) *DictManager {
-	window := widgets.NewQDialog(parent, core.Qt__Dialog)
+	window := qt.NewQDialog(parent)
 	window.SetWindowTitle("Dictionaries")
-	window.Resize2(900, 800)
+	window.Resize(900, 800)
 
 	infoMap := makeDictInfoMap(dicts.DictList)
 
-	qs := qsettings.GetQSettings(window)
-	qsettings.RestoreWinGeometry(app, qs, &window.QWidget, QS_dictManager)
+	qs := qsettings.GetQSettings(window.QObject)
+	qsettings.RestoreWinGeometry(qs, window.QWidget, QS_dictManager)
 
-	table := widgets.NewQTableWidget(nil)
-	volumeInput := widgets.NewQSpinBox(nil)
-	toolbar := widgets.NewQToolBar2(nil)
+	table := qt.NewQTableWidget2()
+	volumeInput := qt.NewQSpinBox2()
+	toolbar := qt.NewQToolBar3()
 
-	buttonBox := widgets.NewQDialogButtonBox(nil)
-	okButton := buttonBox.AddButton2("OK", widgets.QDialogButtonBox__AcceptRole)
-	cancelButton := buttonBox.AddButton2("Cancel", widgets.QDialogButtonBox__RejectRole)
+	buttonBox := qt.NewQDialogButtonBox2()
+	okButton := buttonBox.AddButton2("OK", qt.QDialogButtonBox__AcceptRole)
+	cancelButton := buttonBox.AddButton2("Cancel", qt.QDialogButtonBox__RejectRole)
 
-	okButton.ConnectClicked(func(checked bool) {
+	okButton.OnClicked(func() {
 		window.Accept()
 	})
-	cancelButton.ConnectClicked(func(checked bool) {
+	cancelButton.OnClicked(func() {
 		window.Reject()
 	})
 
@@ -107,9 +105,9 @@ func NewDictManager(
 	return dictMgr
 }
 
-func (dm *DictManager) newItem(text string) *widgets.QTableWidgetItem {
-	item := widgets.NewQTableWidgetItem2(text, 0)
-	item.SetFlags(core.Qt__ItemIsSelectable | core.Qt__ItemIsEnabled)
+func (dm *DictManager) newItem(text string) *qt.QTableWidgetItem {
+	item := qt.NewQTableWidgetItem2(text)
+	item.SetFlags(qt.ItemIsSelectable | qt.ItemIsEnabled)
 	return item
 }
 
@@ -124,26 +122,26 @@ func (dm *DictManager) setItem(
 		slog.Error("dictName not in infoMap", "dictName", dictName)
 		return
 	}
-	enabledItem := widgets.NewQTableWidgetItem(0)
+	enabledItem := qt.NewQTableWidgetItem()
 	if ds.Order < 0 {
-		enabledItem.SetCheckState(core.Qt__Unchecked)
+		enabledItem.SetCheckState(qt.Unchecked)
 	} else {
-		enabledItem.SetCheckState(core.Qt__Checked)
+		enabledItem.SetCheckState(qt.Checked)
 	}
 	table.SetItem(index, dm_col_enable, enabledItem)
 
-	headerItem := widgets.NewQTableWidgetItem(1)
+	headerItem := qt.NewQTableWidgetItem()
 	if ds.HideTermsHeader {
-		headerItem.SetCheckState(core.Qt__Unchecked)
+		headerItem.SetCheckState(qt.Unchecked)
 	} else {
-		headerItem.SetCheckState(core.Qt__Checked)
+		headerItem.SetCheckState(qt.Checked)
 	}
 	table.SetItem(index, dm_col_header, headerItem)
 
 	symbolItem := dm.newItem(ds.Symbol)
-	symbolItem.SetFlags(core.Qt__ItemIsEnabled |
-		core.Qt__ItemIsSelectable |
-		core.Qt__ItemIsEditable)
+	symbolItem.SetFlags(qt.ItemIsEnabled |
+		qt.ItemIsSelectable |
+		qt.ItemIsEditable)
 	table.SetItem(index, dm_col_symbol, symbolItem)
 
 	entries, err := info.EntryCount()
@@ -208,10 +206,10 @@ func (dm *DictManager) openInfoFile() {
 	if path == "" {
 		return
 	}
-	url := core.NewQUrl()
+	url := qt.NewQUrl()
 	url.SetScheme("file")
-	url.SetPath(path, core.QUrl__TolerantMode)
-	gui.QDesktopServices_OpenUrl(url)
+	url.SetPath2(path, qt.QUrl__TolerantMode)
+	_ = qt.QDesktopServices_OpenUrl(url)
 }
 
 func (dm *DictManager) openFolder(conf *config.Config) {
@@ -224,10 +222,10 @@ func (dm *DictManager) openFolder(conf *config.Config) {
 		if !filepath.IsAbs(p) {
 			p = filepath.Join(homeDir, p)
 		}
-		url := core.NewQUrl()
+		url := qt.NewQUrl()
 		url.SetScheme("file")
-		url.SetPath(p, core.QUrl__TolerantMode)
-		gui.QDesktopServices_OpenUrl(url)
+		url.SetPath2(p, qt.QUrl__TolerantMode)
+		_ = qt.QDesktopServices_OpenUrl(url)
 	}
 }
 
@@ -247,43 +245,43 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 
 	table.SetHorizontalHeaderItem(
 		dm_col_enable,
-		widgets.NewQTableWidgetItem2("", 0),
+		qt.NewQTableWidgetItem2(""),
 	)
 	table.SetHorizontalHeaderItem(
 		dm_col_header,
-		widgets.NewQTableWidgetItem2("Terms\nHeader", 0),
+		qt.NewQTableWidgetItem2("Terms\nHeader"),
 	)
 	table.SetHorizontalHeaderItem(
 		dm_col_symbol,
-		widgets.NewQTableWidgetItem2("Sym", 0),
+		qt.NewQTableWidgetItem2("Sym"),
 	)
 	table.SetHorizontalHeaderItem(
 		dm_col_entries,
-		widgets.NewQTableWidgetItem2("Entries", 0),
+		qt.NewQTableWidgetItem2("Entries"),
 	)
 	table.SetHorizontalHeaderItem(
 		dm_col_dictName,
-		widgets.NewQTableWidgetItem2("Name", 0),
+		qt.NewQTableWidgetItem2("Name"),
 	)
 
-	extraOptionsWidget := widgets.NewQWidget(nil, 0)
-	extraOptionsVBox := widgets.NewQVBoxLayout2(nil)
-	extraOptionsWidget.SetLayout(extraOptionsVBox)
+	extraOptionsWidget := qt.NewQWidget2()
+	extraOptionsVBox := qt.NewQVBoxLayout2()
+	extraOptionsWidget.SetLayout(extraOptionsVBox.Layout())
 	extraOptionsWidget.Hide()
 
 	flagsCBWidget := NewDictFlagsCheckboxes(func() {
 		extraOptionsWidget.Hide()
 	})
-	extraOptionsVBox.AddWidget(flagsCBWidget, 0, 0)
+	extraOptionsVBox.AddWidget(flagsCBWidget.QWidget)
 
-	volumeHBox := widgets.NewQHBoxLayout2(nil)
-	volumeHBox.AddWidget(widgets.NewQLabel2("Audio Volume:", nil, 0), 0, 0)
+	volumeHBox := qt.NewQHBoxLayout2()
+	volumeHBox.AddWidget(qt.NewQLabel3("Audio Volume:").QWidget)
 	volumeInput.SetMinimum(0)
 	volumeInput.SetMaximum(999)
-	volumeHBox.AddWidget(volumeInput, 0, 0)
-	volumeHBox.AddWidget(widgets.NewQLabel2("", nil, 0), 1, 0)
-	extraOptionsVBox.AddLayout(volumeHBox, 0)
-	volumeInput.ConnectValueChanged(func(value int) {
+	volumeHBox.AddWidget(volumeInput.QWidget)
+	volumeHBox.AddWidget(qt.NewQLabel3("").QWidget)
+	extraOptionsVBox.AddLayout(volumeHBox.Layout())
+	volumeInput.OnValueChanged(func(value int) {
 		if selectedDictSettings == nil {
 			slog.Info("ConnectValueChanged: selectedDictSettings == nil")
 			return
@@ -291,46 +289,46 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 		selectedDictSettings.AudioVolume = value
 	})
 
-	mainVBox := widgets.NewQVBoxLayout2(nil)
-	mainVBox.AddWidget(table, 3, 0)
-	mainVBox.AddWidget(extraOptionsWidget, 1, 0)
+	mainVBox := qt.NewQVBoxLayout2()
+	mainVBox.AddWidget3(table.QWidget, 3, 0)
+	mainVBox.AddWidget3(extraOptionsWidget, 1, 0)
 
-	mainHBox := widgets.NewQHBoxLayout2(nil)
-	mainHBox.AddLayout(mainVBox, 1)
+	mainHBox := qt.NewQHBoxLayout2()
+	mainHBox.AddLayout2(mainVBox.Layout(), 1)
 
 	toolbar := dm.toolbar
-	toolbarVBox := widgets.NewQVBoxLayout2(nil)
+	toolbarVBox := qt.NewQVBoxLayout2()
 	toolbarVBox.AddSpacing(80)
-	toolbarVBox.AddWidget(toolbar, 0, 0)
+	toolbarVBox.AddWidget(toolbar.QWidget)
 	toolbarVBox.SetContentsMargins(0, 0, 0, 0)
 
-	mainHBox.AddLayout(toolbarVBox, 0)
-	toolbar.SetOrientation(core.Qt__Vertical)
+	mainHBox.AddLayout(toolbarVBox.Layout())
+	toolbar.SetOrientation(qt.Vertical)
 
-	style := dm.app.Style()
-	tbOpt := widgets.NewQStyleOptionToolBar()
-	toolbar.SetIconSize(core.NewQSize2(48, 48))
+	style := qt.QApplication_Style()
+	tbOpt := qt.NewQStyleOptionToolBar()
+	toolbar.SetIconSize(qt.NewQSize2(48, 48))
 	{
-		icon := style.StandardIcon(widgets.QStyle__SP_ArrowUp, tbOpt, nil)
-		toolbar.AddAction2(icon, dictManager_up)
+		icon := style.StandardIcon(qt.QStyle__SP_ArrowUp, tbOpt.QStyleOption, nil)
+		_ = toolbar.AddAction2(icon, dictManager_up)
 	}
-	toolbar.AddSeparator()
+	_ = toolbar.AddSeparator()
 	{
-		icon := style.StandardIcon(widgets.QStyle__SP_ArrowDown, tbOpt, nil)
-		toolbar.AddAction2(icon, dictManager_down)
+		icon := style.StandardIcon(qt.QStyle__SP_ArrowDown, tbOpt.QStyleOption, nil)
+		_ = toolbar.AddAction2(icon, dictManager_down)
 	}
-	toolbar.AddSeparator()
+	_ = toolbar.AddSeparator()
 	{
-		icon := style.StandardIcon(widgets.QStyle__SP_FileIcon, tbOpt, nil)
-		toolbar.AddAction2(icon, dictManager_openInfo)
+		icon := style.StandardIcon(qt.QStyle__SP_FileIcon, tbOpt.QStyleOption, nil)
+		_ = toolbar.AddAction2(icon, dictManager_openInfo)
 	}
-	toolbar.AddSeparator()
+	_ = toolbar.AddSeparator()
 	{
-		icon := style.StandardIcon(widgets.QStyle__SP_DirOpenIcon, tbOpt, nil)
-		toolbar.AddAction2(icon, dictManager_openDirs)
+		icon := style.StandardIcon(qt.QStyle__SP_DirOpenIcon, tbOpt.QStyleOption, nil)
+		_ = toolbar.AddAction2(icon, dictManager_openDirs)
 	}
 
-	toolbar.ConnectActionTriggered(func(action *widgets.QAction) {
+	toolbar.OnActionTriggered(func(action *qt.QAction) {
 		switch action.Text() {
 		case dictManager_up:
 			dm.toolbarUp()
@@ -343,7 +341,7 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 		}
 	})
 
-	table.ConnectCellClicked(func(row int, column int) {
+	table.OnCellClicked(func(row int, column int) {
 		if column < 3 {
 			extraOptionsWidget.Hide()
 			return
@@ -360,9 +358,9 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 		extraOptionsWidget.Show()
 	})
 
-	mainBox := widgets.NewQVBoxLayout2(dm.Dialog)
-	mainBox.AddLayout(mainHBox, 1)
-	mainBox.AddWidget(dm.buttonBox, 0, 0)
+	mainBox := qt.NewQVBoxLayout(dm.Dialog.QWidget)
+	mainBox.AddLayout2(mainHBox.Layout(), 1)
+	mainBox.AddWidget(dm.buttonBox.QWidget)
 
 	table.SetRowCount(len(dicts.DictList))
 	for index, dic := range dicts.DictList {
@@ -383,11 +381,11 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 		table,
 		QS_dictManager,
 	)
-	table.HorizontalHeader().ConnectSectionResized(func(logicalIndex int, oldSize int, newSize int) {
+	table.HorizontalHeader().OnSectionResized(func(logicalIndex int, oldSize int, newSize int) {
 		qsettings.SaveTableColumnsWidth(qs, table, QS_dictManager)
 	})
 
-	qsettings.SetupWinGeometrySave(qs, &dm.Dialog.QWidget, QS_dictManager)
+	qsettings.SetupDialogGeometrySave(qs, dm.Dialog, QS_dictManager)
 }
 
 // updates global var dictSettingsMap
@@ -397,8 +395,8 @@ func (dm *DictManager) updateMap() map[string]int {
 	order := map[string]int{}
 	count := table.RowCount()
 	for index := range count {
-		disable := table.Item(index, dm_col_enable).CheckState() != core.Qt__Checked
-		hideHeader := table.Item(index, dm_col_header).CheckState() != core.Qt__Checked
+		disable := table.Item(index, dm_col_enable).CheckState() != qt.Checked
+		hideHeader := table.Item(index, dm_col_header).CheckState() != qt.Checked
 		symbol := table.Item(index, dm_col_symbol).Text()
 		dictName := table.Item(index, dm_col_dictName).Text()
 		value := index + 1
@@ -422,7 +420,7 @@ func (dm *DictManager) updateMap() map[string]int {
 // if OK was clicked, then applies and saves changes
 // and returs true
 func (dm *DictManager) Run() bool {
-	if dm.Dialog.Exec() != int(widgets.QDialog__Accepted) {
+	if dm.Dialog.Exec() != int(qt.QDialog__Accepted) {
 		return false
 	}
 	dicts.DictsOrder = dm.updateMap()

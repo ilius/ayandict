@@ -11,12 +11,12 @@ import (
 	text_template "text/template"
 	"time"
 
-	"github.com/ilius/ayandict/v2/pkg/appinfo"
-	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/dictmgr"
-	"github.com/ilius/ayandict/v2/pkg/headerlib"
-	"github.com/ilius/ayandict/v2/pkg/logging"
-	"github.com/ilius/ayandict/v2/web"
+	"github.com/ilius/ayandict/v3/pkg/appinfo"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr"
+	"github.com/ilius/ayandict/v3/pkg/headerlib"
+	"github.com/ilius/ayandict/v3/pkg/logging"
+	"github.com/ilius/ayandict/v3/web"
 	common "github.com/ilius/go-dict-commons"
 )
 

@@ -3,7 +3,7 @@ package wordwrap
 import (
 	"strings"
 
-	"github.com/ilius/ayandict/v2/pkg/runewidth"
+	"github.com/ilius/ayandict/v3/pkg/runewidth"
 )
 
 func WordWrapByWords(

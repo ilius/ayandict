@@ -14,6 +14,8 @@ const fileName = "config.toml"
 
 var mutex sync.Mutex
 
+var PrivateMode = false
+
 func init() {
 	dir := GetConfigDir()
 	err := os.MkdirAll(dir, 0o755)

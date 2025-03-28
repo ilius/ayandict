@@ -10,7 +10,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/ilius/ayandict/v2/pkg/html/atom"
+	"github.com/ilius/ayandict/v3/pkg/html/atom"
 )
 
 // A TokenType is the type of a Token.

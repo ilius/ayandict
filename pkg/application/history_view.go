@@ -3,16 +3,16 @@ package application
 import (
 	"log/slog"
 
-	"github.com/ilius/ayandict/v2/pkg/activity"
-	"github.com/ilius/qt/gui"
-	"github.com/ilius/qt/widgets"
+	"github.com/ilius/ayandict/v3/pkg/activity"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 type HistoryView struct {
 	storage *activity.ActivityStorage
 	maxSize int
 
-	*widgets.QListWidget
+	*qt.QListWidget
 
 	doQuery func(string)
 }
@@ -21,7 +21,7 @@ func NewHistoryView(
 	storage *activity.ActivityStorage,
 	maxSize int,
 ) *HistoryView {
-	widget := widgets.NewQListWidget(nil)
+	widget := qt.NewQListWidget(nil)
 	return &HistoryView{
 		storage:     storage,
 		maxSize:     maxSize,
@@ -39,6 +39,9 @@ func (h *HistoryView) Load() error {
 }
 
 func (h *HistoryView) Save() {
+	if config.PrivateMode {
+		return
+	}
 	err := h.storage.SaveHistory()
 	if err != nil {
 		slog.Error("error saving history: " + err.Error())
@@ -46,6 +49,9 @@ func (h *HistoryView) Save() {
 }
 
 func (h *HistoryView) Add(query string) {
+	if config.PrivateMode {
+		return
+	}
 	slog.Debug("HistoryView: Add", "query", query)
 	if !h.storage.AddHistory(query) {
 		return
@@ -70,7 +76,7 @@ func (h *HistoryView) TrimHistory(maxSize int) {
 		return
 	}
 	for i := maxSize; i < count; i++ {
-		h.TakeItem(maxSize)
+		_ = h.TakeItem(maxSize)
 	}
 }
 
@@ -86,11 +92,11 @@ func (h *HistoryView) SetupCustomHandlers() {
 		panic("doQuery is not set")
 	}
 
-	// view.SelectedItems() panics
+	// on old (qt5) binding: view.SelectedItems() panics
 	// and even after fixing panic, doesn't return anything
 	// you have to use view.CurrentIndex()
-	h.ConnectMousePressEvent(func(event *gui.QMouseEvent) {
-		h.MousePressEventDefault(event)
+	h.OnMousePressEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+		super(event)
 		index := h.CurrentIndex()
 		if index == nil {
 			return
@@ -101,14 +107,14 @@ func (h *HistoryView) SetupCustomHandlers() {
 		h.Activated(index)
 	})
 
-	h.ConnectItemActivated(func(item *widgets.QListWidgetItem) {
+	h.OnItemActivated(func(item *qt.QListWidgetItem) {
 		doQuery(item.Text())
 	})
 
 	// we are doing query on MousePressEvent (before release, with any button)
-	// so we don't need ConnectItemClicked
+	// so we don't need.OnItemClicked
 	// unless we decide to have right-click do something else
-	// view.ConnectItemClicked(func(item *widgets.QListWidgetItem) {
+	// view.OnItemClicked(func(item *qt.QListWidgetItem) {
 	// 	doQuery(item.Text())
 	// })
 }

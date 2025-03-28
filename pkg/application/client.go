@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/ilius/ayandict/v2/pkg/appinfo"
+	"github.com/ilius/ayandict/v3/pkg/appinfo"
 )
 
 const (

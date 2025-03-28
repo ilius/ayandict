@@ -3,7 +3,7 @@ package application
 import (
 	"log/slog"
 
-	"github.com/ilius/qt/widgets"
+	qt "github.com/mappu/miqt/qt6"
 )
 
 func showErrorMessage(msg string) {
@@ -13,6 +13,6 @@ func showErrorMessage(msg string) {
 			slog.Error("Panic", "r", r)
 		}
 	}()
-	d := widgets.NewQErrorMessage(nil)
+	d := qt.NewQErrorMessage(nil)
 	d.ShowMessage(msg)
 }

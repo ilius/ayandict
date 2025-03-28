@@ -8,7 +8,7 @@ import (
 	"io"
 	"strings"
 
-	a "github.com/ilius/ayandict/v2/pkg/html/atom"
+	a "github.com/ilius/ayandict/v3/pkg/html/atom"
 )
 
 // A parser implements the HTML5 parsing algorithm:

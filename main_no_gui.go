@@ -8,11 +8,11 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/ilius/ayandict/v2/pkg/appinfo"
-	"github.com/ilius/ayandict/v2/pkg/config"
-	"github.com/ilius/ayandict/v2/pkg/dictmgr"
-	"github.com/ilius/ayandict/v2/pkg/logging"
-	"github.com/ilius/ayandict/v2/pkg/server"
+	"github.com/ilius/ayandict/v3/pkg/appinfo"
+	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr"
+	"github.com/ilius/ayandict/v3/pkg/logging"
+	"github.com/ilius/ayandict/v3/pkg/server"
 )
 
 func main() {

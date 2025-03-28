@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr/internal/dicts"
 )
 
 const DictResPathBase = "/dict-res/"
