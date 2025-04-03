@@ -397,7 +397,7 @@ func (app *Application) Run() {
 
 	buttonBox.AddStretch(1)
 
-	app.clearButton = widgets.NewQPushButton2("Clear", nil)
+	app.clearButton = widgets.NewQPushButton2(" Clear ", nil)
 	buttonBox.AddWidget(app.clearButton, 0, core.Qt__AlignRight)
 
 	leftMainWidget := widgets.NewQWidget(nil, 0)
