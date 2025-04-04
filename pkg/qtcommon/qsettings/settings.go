@@ -53,7 +53,7 @@ func splitIntList(st string) ([]int, error) {
 func splitterSizes(splitter *widgets.QSplitter) []int {
 	itemCount := splitter.Count()
 	widthList := make([]int, itemCount)
-	for i := 0; i < itemCount; i++ {
+	for i := range itemCount {
 		widthList[i] = splitter.Widget(i).Geometry().Width()
 	}
 	return widthList
@@ -222,7 +222,7 @@ func SaveTableColumnsWidth(qs *core.QSettings, table *widgets.QTableWidget, main
 	defer qs.EndGroup()
 	count := table.ColumnCount()
 	widths := make([]int, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		widths[i] = table.ColumnWidth(i)
 	}
 	qs.SetValue(QS_columnwidth, core.NewQVariant1(joinIntList(widths)))

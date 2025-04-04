@@ -168,7 +168,7 @@ func (dm *DictManager) toolbarUp() {
 	if row < 1 {
 		return
 	}
-	for col := 0; col < columns; col++ {
+	for col := range columns {
 		item1 := table.TakeItem(row, col)
 		item2 := table.TakeItem(row-1, col)
 		table.SetItem(row-1, col, item1)
@@ -183,7 +183,7 @@ func (dm *DictManager) toolbarDown() {
 	if row > table.RowCount()-2 {
 		return
 	}
-	for col := 0; col < columns; col++ {
+	for col := range columns {
 		item1 := table.TakeItem(row, col)
 		item2 := table.TakeItem(row+1, col)
 		table.SetItem(row+1, col, item1)
@@ -396,7 +396,7 @@ func (dm *DictManager) updateMap() map[string]int {
 	table := dm.TableWidget
 	order := map[string]int{}
 	count := table.RowCount()
-	for index := 0; index < count; index++ {
+	for index := range count {
 		disable := table.Item(index, dm_col_enable).CheckState() != core.Qt__Checked
 		hideHeader := table.Item(index, dm_col_header).CheckState() != core.Qt__Checked
 		symbol := table.Item(index, dm_col_symbol).Text()

@@ -34,7 +34,7 @@ func getDocTag(s string) string {
 func printCommentTemplate() {
 	conf := config.Default()
 	typ := reflect.TypeOf(conf).Elem()
-	for i := 0; i < typ.NumField(); i++ {
+	for i := range typ.NumField() {
 		fieldType := typ.Field(i)
 		tomlTag := getTomlTag(string(fieldType.Tag))
 		fmt.Printf("%#v: \"\",\n", tomlTag)
@@ -42,7 +42,7 @@ func printCommentTemplate() {
 }
 
 func printStruct(typ reflect.Type, val reflect.Value, keyPrefix string) {
-	for i := 0; i < typ.NumField(); i++ {
+	for i := range typ.NumField() {
 		field := typ.Field(i)
 		name := field.Name
 		key := keyPrefix + getTomlTag(string(field.Tag))
@@ -81,7 +81,7 @@ type ConfigStructSpec struct {
 
 func printMarkdownStruct(spec ConfigStructSpec) {
 	subStructs := []ConfigStructSpec{}
-	for i := 0; i < spec.Type.NumField(); i++ {
+	for i := range spec.Type.NumField() {
 		field := spec.Type.Field(i)
 		keyPath := append(spec.KeyPath, getTomlTag(string(field.Tag)))
 
