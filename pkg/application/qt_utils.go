@@ -13,7 +13,7 @@ type KeyPressIface interface {
 }
 
 func filePathFromQUrl(qUrl *qt.QUrl) string {
-	fpath := qUrl.Path1(qt.QUrl__FullyDecoded)
+	fpath := qUrl.Path()
 	if fpath == "" {
 		return ""
 	}

@@ -12,7 +12,7 @@ func loadPNGIcon(filename string) (*qt.QIcon, error) {
 		return nil, err
 	}
 	pixmap := qt.NewQPixmap()
-	pixmap.LoadFromData2(data, "PNG")
+	pixmap.LoadFromDataWithData(data)
 	icon := qt.NewQIcon2(pixmap)
 	if icon == nil {
 		slog.Error("error loading png icon: icon is nil: " + filename)

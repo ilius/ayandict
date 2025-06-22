@@ -312,7 +312,7 @@ func (view *ArticleView) findLinkOnCursor(cursor *qt.QTextCursor) string {
 
 func (view *ArticleView) setupAnchorClicked() {
 	view.OnAnchorClicked(func(qUrl *qt.QUrl) {
-		host := qUrl.Host1(qt.QUrl__FullyDecoded)
+		host := qUrl.Host()
 		if qUrl.Scheme() == "bword" {
 			if host != "" {
 				view.doQuery(host)
@@ -321,7 +321,7 @@ func (view *ArticleView) setupAnchorClicked() {
 			}
 			return
 		}
-		path := qUrl.Path1(qt.QUrl__FullyDecoded)
+		path := qUrl.Path()
 		switch qUrl.Scheme() {
 		case "":
 			view.doQuery(path)

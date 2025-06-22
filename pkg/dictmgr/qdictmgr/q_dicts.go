@@ -19,7 +19,7 @@ func loadingDictsPopup(conf *config.Config) *qt.QLabel {
 	popup.SetWindowModality(qt.WindowModal)
 	popup.SetStyleSheet(conf.PopupStyleStr)
 	popup.Show()
-	qt.QCoreApplication_ProcessEvents1(qt.QEventLoop__AllEvents)
+	qt.QCoreApplication_ProcessEvents()
 	return popup
 }
 

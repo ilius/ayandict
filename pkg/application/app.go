@@ -385,7 +385,7 @@ func (app *Application) Run() {
 	aboutButton := app.makeAboutButton(conf)
 	buttonBox.AddWidget3(aboutButton.QWidget, 0, qt.AlignLeft)
 
-	buttonBox.AddStretch1(1)
+	buttonBox.AddStretch()
 
 	app.openConfigButton = NewPNGIconTextButton("Config", "preferences-system-22.png")
 	buttonBox.AddWidget3(app.openConfigButton.QWidget, 0, 0)
@@ -393,7 +393,7 @@ func (app *Application) Run() {
 	app.reloadConfigButton = app.newIconTextButton("Reload", qt.QStyle__SP_BrowserReload)
 	buttonBox.AddWidget3(app.reloadConfigButton.QWidget, 0, 0)
 
-	buttonBox.AddStretch1(1)
+	buttonBox.AddStretch()
 
 	app.clearButton = qt.NewQPushButton3("Clear")
 	buttonBox.AddWidget3(app.clearButton.QWidget, 0, qt.AlignRight)

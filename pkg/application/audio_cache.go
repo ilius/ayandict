@@ -77,7 +77,7 @@ func (c *AudioCache) Get(urlStr string) (*qt.QUrl, error) {
 		return qUrl, nil
 	}
 	qUrl = qt.NewQUrl4(urlStr, qt.QUrl__TolerantMode)
-	host := qUrl.Host1(qt.QUrl__FullyEncoded)
+	host := qUrl.Host()
 	// also add possible port?
 	if c.dir == "" {
 		return nil, fmt.Errorf("audio cache dir is empty")
@@ -85,7 +85,7 @@ func (c *AudioCache) Get(urlStr string) (*qt.QUrl, error) {
 	fpath := filepath.Join(
 		c.dir,
 		host,
-		qUrl.Path1(qt.QUrl__FullyEncoded),
+		qUrl.Path(),
 	)
 	qUrl.SetScheme("file")
 	qUrl.SetHost("")
