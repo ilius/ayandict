@@ -59,20 +59,21 @@ type Application struct {
 	queryModeCombo  *widgets.QComboBox
 	favoritesWidget *qfavorites.FavoritesWidget
 
-	favoriteButton      *FavoriteButton
-	queryFavoriteButton *FavoriteButton
-	reloadDictsButton   *widgets.QPushButton
-	closeDictsButton    *widgets.QPushButton
-	openConfigButton    *widgets.QPushButton
-	reloadConfigButton  *widgets.QPushButton
-	reloadStyleButton   *widgets.QPushButton
-	saveHistoryButton   *widgets.QPushButton
-	randomEntryButton   *widgets.QPushButton
-	clearHistoryButton  *widgets.QPushButton
-	saveFavoritesButton *widgets.QPushButton
-	clearButton         *widgets.QPushButton
-	dictsButton         *widgets.QPushButton
-	activityTypeCombo   *widgets.QComboBox
+	favoriteButton       *FavoriteButton
+	queryFavoriteButton  *FavoriteButton
+	reloadDictsButton    *widgets.QPushButton
+	closeDictsButton     *widgets.QPushButton
+	openConfigButton     *widgets.QPushButton
+	reloadConfigButton   *widgets.QPushButton
+	reloadStyleButton    *widgets.QPushButton
+	saveHistoryButton    *widgets.QPushButton
+	randomEntryButton    *widgets.QPushButton
+	randomFavoriteButton *widgets.QPushButton
+	clearHistoryButton   *widgets.QPushButton
+	saveFavoritesButton  *widgets.QPushButton
+	clearButton          *widgets.QPushButton
+	dictsButton          *widgets.QPushButton
+	activityTypeCombo    *widgets.QComboBox
 }
 
 func Run() {
@@ -373,6 +374,9 @@ func (app *Application) Run() {
 	app.randomEntryButton = widgets.NewQPushButton2("Random Entry", nil)
 	miscLayout.AddWidget(app.randomEntryButton, 0, 0)
 
+	app.randomFavoriteButton = widgets.NewQPushButton2("Random Favorite", nil)
+	miscLayout.AddWidget(app.randomFavoriteButton, 0, 0)
+
 	buttonBox := widgets.NewQHBoxLayout()
 	buttonBox.SetContentsMargins(0, 0, 0, 0)
 	buttonBox.SetSpacing(basePxHalf)
@@ -496,6 +500,7 @@ func (app *Application) Run() {
 		app.closeDictsButton,
 		app.reloadStyleButton,
 		app.randomEntryButton,
+		app.randomFavoriteButton,
 		app.dictsButton,
 		aboutButton,
 		app.openConfigButton,
@@ -623,6 +628,14 @@ func (app *Application) setupHandlers() {
 		queryArgs.ResultList.SetResults([]common.SearchResultIface{res})
 		queryArgs.AddHistoryAndFrequency(query)
 		app.postQuery(query)
+	})
+	app.randomFavoriteButton.ConnectClicked(func(checked bool) {
+		term := app.favoritesWidget.Data.Random()
+		if term == "" {
+			// show "No Favorites" error?
+			return
+		}
+		onQuery(term, queryArgs, false)
 	})
 	app.clearHistoryButton.ConnectClicked(func(checked bool) {
 		app.historyView.ClearHistory()
