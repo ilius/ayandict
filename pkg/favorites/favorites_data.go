@@ -3,6 +3,7 @@ package favorites
 import (
 	"encoding/json"
 	"log/slog"
+	"math/rand"
 	"os"
 )
 
@@ -66,4 +67,12 @@ func (fav *Favorites) Save(fpath string) error {
 		return err
 	}
 	return nil
+}
+
+func (fav *Favorites) Random() string {
+	if len(fav.List) == 0 {
+		return ""
+	}
+	index := rand.Intn(len(fav.List))
+	return fav.List[index]
 }

@@ -55,20 +55,21 @@ type Application struct {
 	queryModeCombo  *qt.QComboBox
 	favoritesWidget *qfavorites.FavoritesWidget
 
-	favoriteButton      *FavoriteButton
-	queryFavoriteButton *FavoriteButton
-	reloadDictsButton   *qt.QPushButton
-	closeDictsButton    *qt.QPushButton
-	openConfigButton    *qt.QPushButton
-	reloadConfigButton  *qt.QPushButton
-	reloadStyleButton   *qt.QPushButton
-	saveHistoryButton   *qt.QPushButton
-	randomEntryButton   *qt.QPushButton
-	clearHistoryButton  *qt.QPushButton
-	saveFavoritesButton *qt.QPushButton
-	clearButton         *qt.QPushButton
-	dictsButton         *qt.QPushButton
-	activityTypeCombo   *qt.QComboBox
+	favoriteButton       *FavoriteButton
+	queryFavoriteButton  *FavoriteButton
+	reloadDictsButton    *qt.QPushButton
+	closeDictsButton     *qt.QPushButton
+	openConfigButton     *qt.QPushButton
+	reloadConfigButton   *qt.QPushButton
+	reloadStyleButton    *qt.QPushButton
+	saveHistoryButton    *qt.QPushButton
+	randomEntryButton    *qt.QPushButton
+	randomFavoriteButton *qt.QPushButton
+	clearHistoryButton   *qt.QPushButton
+	saveFavoritesButton  *qt.QPushButton
+	clearButton          *qt.QPushButton
+	dictsButton          *qt.QPushButton
+	activityTypeCombo    *qt.QComboBox
 }
 
 func Run() {
@@ -371,6 +372,9 @@ func (app *Application) Run() {
 	app.randomEntryButton = qt.NewQPushButton3("Random Entry")
 	miscLayout.AddWidget(app.randomEntryButton.QWidget)
 
+	app.randomFavoriteButton = qt.NewQPushButton3("Random Favorite")
+	miscLayout.AddWidget(app.randomFavoriteButton.QWidget)
+
 	buttonBox := qt.NewQHBoxLayout2()
 	buttonBox.SetContentsMargins(0, 0, 0, 0)
 	buttonBox.SetSpacing(basePxHalf)
@@ -494,6 +498,7 @@ func (app *Application) Run() {
 		app.closeDictsButton,
 		app.reloadStyleButton,
 		app.randomEntryButton,
+		app.randomFavoriteButton,
 		app.dictsButton,
 		aboutButton,
 		app.openConfigButton,
@@ -621,6 +626,14 @@ func (app *Application) setupHandlers() {
 		queryArgs.ResultList.SetResults([]common.SearchResultIface{res})
 		queryArgs.AddHistoryAndFrequency(query)
 		app.postQuery(query)
+	})
+	app.randomFavoriteButton.OnClicked(func() {
+		term := app.favoritesWidget.Data.Random()
+		if term == "" {
+			// show "No Favorites" error?
+			return
+		}
+		onQuery(term, queryArgs, false)
 	})
 	app.clearHistoryButton.OnClicked(func() {
 		app.historyView.ClearHistory()
