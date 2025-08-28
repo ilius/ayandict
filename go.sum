@@ -8,5 +8,5 @@ github.com/ilius/go-stardict/v2 v2.3.2 h1:oxfrYr5Xxxe3WuwxhQDc9XsmUAuSH+sHq6rBgd
 github.com/ilius/go-stardict/v2 v2.3.2/go.mod h1:onnvJtMbwF4nvFyx36OUPu/u6NAsQ6FKQ0G5dfNTyvY=
 github.com/ilius/is/v2 v2.3.2 h1:14u2j/UTKeIHKlcp/48dabf7+7QJ9JJaaoeHVvfyAOk=
 github.com/ilius/is/v2 v2.3.2/go.mod h1:OMGTmQDDc3Svaj3EoQHeNnXHP0R1HCb5u/Hfm7kuYIM=
-github.com/mappu/miqt v0.11.0 h1:zn0m52wt0PrI4QDlwc9VXfDduJdG0RVdJpdfOWM1vI8=
-github.com/mappu/miqt v0.11.0/go.mod h1:xFg7ADaO1QSkmXPsPODoKe/bydJpRG9fgCYyIDl/h1U=
+github.com/mappu/miqt v0.11.2 h1:erXnheYNbWh9a7QGNzfVDENlkuwiSw0VJH7Rw6uXBLs=
+github.com/mappu/miqt v0.11.2/go.mod h1:xFg7ADaO1QSkmXPsPODoKe/bydJpRG9fgCYyIDl/h1U=
