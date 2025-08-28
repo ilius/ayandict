@@ -7,4 +7,7 @@ export CGO_ENABLED=1
 FLAGS=(-ldflags '-s -w' -trimpath)
 VERSION=$(go run pkg/version/version.go)
 
+export GOMAXPROCS=4
+# also can use: go build -p 4
+
 time go build -o ayandict-$VERSION "${FLAGS[@]}" "$@"
