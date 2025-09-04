@@ -116,7 +116,7 @@ func transitionGraphemeState(state int, r rune) (newState, prop int, boundary bo
 		if transAnyProp[2] < transAnyState[2] {
 			boundary = transAnyProp[1] == grBoundary
 		}
-		return
+		return newState, prop, boundary
 	}
 
 	if okAnyProp {

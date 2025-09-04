@@ -238,7 +238,7 @@ func parseProperty(line string) (from, to, property, comment string, err error) 
 	fields := propertyPattern.FindStringSubmatch(line)
 	if fields == nil {
 		err = errors.New("no property found")
-		return
+		return from, to, property, comment, err
 	}
 	from = fields[1]
 	to = fields[3]
@@ -247,7 +247,7 @@ func parseProperty(line string) (from, to, property, comment string, err error) 
 	}
 	property = fields[4]
 	comment = fields[5]
-	return
+	return from, to, property, comment, err
 }
 
 // translateProperty translates a property name as used in the Unicode data file

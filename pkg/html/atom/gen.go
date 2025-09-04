@@ -245,7 +245,7 @@ func (t *table) hash(s string) (h1, h2 uint32) {
 	h := fnv(t.h0, s)
 	h1 = h & t.mask
 	h2 = (h >> 16) & t.mask
-	return
+	return h1, h2
 }
 
 // init initializes the table with the given parameters.
