@@ -63,7 +63,7 @@ func stepString(str string, state int) (cluster, rest string, boundaries int, ne
 	r, length := utf8.DecodeRuneInString(str)
 	if r == utf8.RuneError {
 		log.Printf("RuneError from DecodeRuneInString for %#v", str)
-		return
+		return cluster, rest, boundaries, newState
 	}
 	if len(str) <= length { // If we're already past the end, there is nothing else to parse.
 		prop := property(graphemeCodePoints, r)

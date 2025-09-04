@@ -883,7 +883,7 @@ func (c consoleColor) foregroundAttr() (attr word) {
 	if c.intensity {
 		attr |= foregroundIntensity
 	}
-	return
+	return attr
 }
 
 func (c consoleColor) backgroundAttr() (attr word) {
@@ -899,7 +899,7 @@ func (c consoleColor) backgroundAttr() (attr word) {
 	if c.intensity {
 		attr |= backgroundIntensity
 	}
-	return
+	return attr
 }
 
 var color16 = []consoleColor{

@@ -115,7 +115,7 @@ func propertySearch[E interface{ [3]int | [4]int }](dictionary []E, r rune) (res
 		}
 		return cpRange
 	}
-	return
+	return result
 }
 
 // property returns the Unicode property value (see constants above) of the
