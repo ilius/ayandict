@@ -139,7 +139,7 @@ There are tons of web pages that let you download various usable dictionaries, b
 
 The default search is fuzzy, and it is based on similarity scores that are calculated from [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance). We also split entry terms into words, for example if you type "language" (or with with a few misspelled letters, like "languge"), it first shows "language", and then terms like "language learning", but may also show terms like "sign language".
 
-If you specifically want terms with "language" as the second word, you can type "\* language". We do not support pattern matching (yet), and you can only use `*` alone (not as part of a pattern).
+If you specifically want terms with "language" as the second word, you can type "\* language". Pattern matching is not supported in Fuzzy mode, and you can only use `*` alone (not as part of a pattern).
 
 Anything with at least %70 similarity score is listed (for example "languge" is %87 similar to "language"). But we have a limit of how many results are displayed, and by default it's 40 results. You can change this with config parameter [`max_results_total`](./doc/config.rst#max_results_total).
 
