@@ -515,6 +515,7 @@ func (app *Application) Run() {
 	})
 
 	for _, widget := range []KeyPressIface{
+		app.window,
 		app.resultList.QListWidget,
 		app.articleView,
 		app.historyView.QListWidget,
@@ -676,8 +677,21 @@ func (app *Application) setupHandlers() {
 		app.favoriteButton.SetDisabled(true)
 		app.queryFavoriteButton.SetDisabled(true)
 	}
-	app.entry.OnReturnPressed(func() {
-		onQuery(entry.Text(), app.queryArgs, false)
+	app.entry.OnKeyPressEvent(func(super func(event *qt.QKeyEvent), event *qt.QKeyEvent) {
+		// slog.Info(
+		// 	"entry: KeyPressEvent",
+		// 	"text", fmt.Sprintf("%#v", event.Text()),
+		// 	"key", event.Key(),
+		// )
+		switch event.Key() {
+		case int(qt.Key_Escape): // event.Text()="\x1b"
+			app.window.SetFocus()
+			return
+		case int(qt.Key_Return): // event.Text()="\r"
+			onQuery(entry.Text(), app.queryArgs, false)
+			return
+		}
+		super(event)
 	})
 	// slog.Error("test error", "s", "hello", "n", 2, "b", true)
 }
