@@ -517,6 +517,7 @@ func (app *Application) Run() {
 	})
 
 	for _, widget := range []KeyPressIface{
+		app.window,
 		app.resultList,
 		app.articleView,
 		app.historyView,
@@ -657,6 +658,19 @@ func (app *Application) setupHandlers() {
 		}
 	})
 	entry.ConnectKeyPressEvent(func(event *gui.QKeyEvent) {
+		// slog.Info(
+		// 	"entry: KeyPressEvent",
+		// 	"text", fmt.Sprintf("%#v", event.Text()),
+		// 	"key", event.Key(),
+		// )
+		switch event.Key() {
+		case int(core.Qt__Key_Escape): // event.Text()="\x1b"
+			app.window.SetFocus(core.Qt__ShortcutFocusReason)
+			return
+		case int(core.Qt__Key_Return): // event.Text()="\r"
+			onQuery(entry.Text(), app.queryArgs, false)
+			return
+		}
 		entry.KeyPressEventDefault(event)
 		if !conf.SearchOnType {
 			return
@@ -672,10 +686,6 @@ func (app *Application) setupHandlers() {
 			return
 		}
 		onQuery(text, app.queryArgs, true)
-	})
-
-	app.entry.ConnectReturnPressed(func() {
-		onQuery(entry.Text(), app.queryArgs, false)
 	})
 	// slog.Error("test error", "s", "hello", "n", 2, "b", true)
 }
