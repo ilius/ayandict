@@ -667,7 +667,7 @@ func (app *Application) setupHandlers() {
 		case int(core.Qt__Key_Escape): // event.Text()="\x1b"
 			app.window.SetFocus(core.Qt__ShortcutFocusReason)
 			return
-		case int(core.Qt__Key_Return): // event.Text()="\r"
+		case int(core.Qt__Key_Return), int(core.Qt__Key_Enter): // event.Text()="\r"
 			onQuery(entry.Text(), app.queryArgs, false)
 			return
 		}
