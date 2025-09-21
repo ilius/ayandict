@@ -24,6 +24,9 @@ import (
 const (
 	QS_mainSplitter   = "main_splitter"
 	QS_frequencyTable = "frequencytable"
+
+	escape               = int(qt.Key_Escape)
+	shortcutModifierMask = int(qt.ControlModifier) | int(qt.AltModifier) | int(qt.MetaModifier)
 )
 
 // basePx is %66 of the font size in pixels,
@@ -663,7 +666,7 @@ func (app *Application) setupHandlers() {
 		// )
 		key := event.Key()
 		switch key {
-		case int(qt.Key_Escape): // event.Text()="\x1b"
+		case escape: // event.Text()="\x1b"
 			app.window.SetFocus()
 			return
 		case int(qt.Key_Return), int(qt.Key_Enter): // event.Text()="\r"
@@ -673,12 +676,16 @@ func (app *Application) setupHandlers() {
 
 		super(event)
 
-		if conf.SearchOnType && key < 0x01000000 && event.Modifiers() == qt.NoModifier {
-			text := entry.Text()
-			if len(text) >= conf.SearchOnTypeMinLength {
-				onQuery(text, app.queryArgs, true)
+		// event.Modifiers(): qt.NoModifier, qt.ShiftModifier, KeypadModifier
+		if conf.SearchOnType && key < escape {
+			if int(event.Modifiers())&shortcutModifierMask == 0 {
+				text := entry.Text()
+				// slog.Debug("checking SearchOnType") // FIXME: panics
+				if len(text) >= conf.SearchOnTypeMinLength {
+					onQuery(text, app.queryArgs, true)
+				}
+				return
 			}
-			return
 		}
 	})
 
