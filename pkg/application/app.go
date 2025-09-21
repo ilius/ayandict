@@ -677,7 +677,7 @@ func (app *Application) setupHandlers() {
 
 		// event.Modifiers(): qt.NoModifier, qt.ShiftModifier, KeypadModifier
 		if conf.SearchOnType && event.Key() < int(core.Qt__Key_Escape) {
-			if event.Key()&shortcutModifierMask == 0 {
+			if int(event.Modifiers())&shortcutModifierMask == 0 {
 				text := entry.Text()
 				if len(text) >= conf.SearchOnTypeMinLength {
 					onQuery(text, app.queryArgs, true)
