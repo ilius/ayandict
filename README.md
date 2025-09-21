@@ -130,8 +130,10 @@ There are tons of web pages that let you download various usable dictionaries, b
 
 # Keyboard bindings/shortcuts
 
-- **Escape**: clear the input query and results
 - **Space**: (while query entry is not focused) change keyboard focus to query entry
+- **Escape**:
+  - While query entry is focused: focus leaves the entry
+  - While query entry is not focused: clears the query and results
 - **`+`** or **`=`**: Zoom in (article/definition/translation)
 - **`-`**: Zoom out (article/definition/translation)
 
