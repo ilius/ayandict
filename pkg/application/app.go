@@ -656,34 +656,13 @@ func (app *Application) setupHandlers() {
 		}
 	})
 	entry.OnKeyPressEvent(func(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
-		super(event)
-		if !conf.SearchOnType {
-			return
-		}
-		if event.Key() >= 0x01000000 {
-			return
-		}
-		if event.Modifiers() > qt.ShiftModifier {
-			return
-		}
-		text := entry.Text()
-		if len(text) < conf.SearchOnTypeMinLength {
-			return
-		}
-		onQuery(text, app.queryArgs, true)
-	})
-
-	if config.PrivateMode {
-		app.favoriteButton.SetDisabled(true)
-		app.queryFavoriteButton.SetDisabled(true)
-	}
-	app.entry.OnKeyPressEvent(func(super func(event *qt.QKeyEvent), event *qt.QKeyEvent) {
 		// slog.Info(
 		// 	"entry: KeyPressEvent",
 		// 	"text", fmt.Sprintf("%#v", event.Text()),
 		// 	"key", event.Key(),
 		// )
-		switch event.Key() {
+		key := event.Key()
+		switch key {
 		case int(qt.Key_Escape): // event.Text()="\x1b"
 			app.window.SetFocus()
 			return
@@ -691,7 +670,21 @@ func (app *Application) setupHandlers() {
 			onQuery(entry.Text(), app.queryArgs, false)
 			return
 		}
+
 		super(event)
+
+		if conf.SearchOnType && key < 0x01000000 && event.Modifiers() == qt.NoModifier {
+			text := entry.Text()
+			if len(text) >= conf.SearchOnTypeMinLength {
+				onQuery(text, app.queryArgs, true)
+			}
+			return
+		}
 	})
+
+	if config.PrivateMode {
+		app.favoriteButton.SetDisabled(true)
+		app.queryFavoriteButton.SetDisabled(true)
+	}
 	// slog.Error("test error", "s", "hello", "n", 2, "b", true)
 }
