@@ -666,7 +666,7 @@ func (app *Application) setupHandlers() {
 		case int(qt.Key_Escape): // event.Text()="\x1b"
 			app.window.SetFocus()
 			return
-		case int(qt.Key_Return): // event.Text()="\r"
+		case int(qt.Key_Return), int(qt.Key_Enter): // event.Text()="\r"
 			onQuery(entry.Text(), app.queryArgs, false)
 			return
 		}
