@@ -28,6 +28,8 @@ import (
 const (
 	QS_mainSplitter   = "main_splitter"
 	QS_frequencyTable = "frequencytable"
+
+	shortcutModifierMask = int(core.Qt__ControlModifier) | int(core.Qt__AltModifier) | int(core.Qt__MetaModifier)
 )
 
 // basePx is %66 of the font size in pixels,
@@ -672,20 +674,17 @@ func (app *Application) setupHandlers() {
 			return
 		}
 		entry.KeyPressEventDefault(event)
-		if !conf.SearchOnType {
-			return
+
+		// event.Modifiers(): qt.NoModifier, qt.ShiftModifier, KeypadModifier
+		if conf.SearchOnType && event.Key() < int(core.Qt__Key_Escape) {
+			if event.Key()&shortcutModifierMask == 0 {
+				text := entry.Text()
+				if len(text) >= conf.SearchOnTypeMinLength {
+					onQuery(text, app.queryArgs, true)
+				}
+				return
+			}
 		}
-		if event.Key() >= 0x01000000 {
-			return
-		}
-		if event.Modifiers() > core.Qt__ShiftModifier {
-			return
-		}
-		text := entry.Text()
-		if len(text) < conf.SearchOnTypeMinLength {
-			return
-		}
-		onQuery(text, app.queryArgs, true)
 	})
 	// slog.Error("test error", "s", "hello", "n", 2, "b", true)
 }
