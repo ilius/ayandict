@@ -117,6 +117,10 @@ There are tons of web pages that let you download various usable dictionaries, b
 - [kaikki.org](https://kaikki.org/dictionary/index.html)
 - [library.kiwix.org](https://library.kiwix.org/)
 - [freedict.org](https://freedict.org/downloads/) and [@freedict/fd-dictionaries](https://github.com/freedict/fd-dictionaries)
+- [wikdict.com](https://download.wikdict.com/dictionaries/tei/recommended/): More FreeDict (TEI) dictionaries
+- [@reader-dict/monolingual](https://github.com/reader-dict/monolingual): E-book-friendly StarDict dictionaries
+- [@Vuizur/Wiktionary-Dictionaries](https://github.com/Vuizur/Wiktionary-Dictionaries)
+- [@xxyzz/wiktionary_stardict](https://github.com/xxyzz/wiktionary_stardict/releases): generated monthly (15th) from [kaikki.org](https://kaikki.org)
 - [@itkach/slob/wiki/Dictionaries](https://github.com/itkach/slob/wiki/Dictionaries)
 - [goldendict.org](http://goldendict.org/dictionaries.php)
 - [huzheng.org](http://www.huzheng.org/stardict/)
