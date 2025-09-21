@@ -41,6 +41,7 @@ type Config struct {
 
 	SearchOnType          bool `toml:"search_on_type" doc:"Enable/disable search-on-type"`
 	SearchOnTypeMinLength int  `toml:"search_on_type_min_length" doc:"Minimum query length for search-on-type"`
+	SearchOnTypeOnRegex   bool `toml:"search_on_type_on_regex" doc:"Enable/disable search-on-type in Regex mode"`
 
 	HeaderTemplate string `toml:"header_template" doc:"HTML template for header (dict name + entry terms)"`
 	HeaderWordWrap bool   `toml:"header_word_wrap" doc:"Enable word-wrapping for header (dict name + entry terms)"`
@@ -129,6 +130,7 @@ func Default() *Config {
 
 		SearchOnType:          false,
 		SearchOnTypeMinLength: 3,
+		SearchOnTypeOnRegex:   false,
 
 		HeaderTemplate: defaultHeaderTemplate,
 		HeaderWordWrap: true,

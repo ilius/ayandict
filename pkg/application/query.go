@@ -152,11 +152,14 @@ func onQuery(
 	t := time.Now()
 	mode := dictmgr.QueryModeFuzzy
 	switch queryArgs.ModeCombo.CurrentIndex() {
-	case 1:
+	case 1: // StartWith
 		mode = dictmgr.QueryModeStartWith
-	case 2:
+	case 2: // Regex
+		if isAuto && !conf.SearchOnTypeOnRegex {
+			return
+		}
 		mode = dictmgr.QueryModeRegex
-	case 3:
+	case 3: // Glob
 		mode = dictmgr.QueryModeGlob
 	}
 	results := dictmgr.LookupHTML(query, conf, mode, resultFlags, 0)

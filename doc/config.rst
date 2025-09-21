@@ -40,6 +40,12 @@ Minimum query length for search-on-type
 
 Default value: ``3``
 
+``search_on_type_on_regex``
+---------------------------
+Enable/disable search-on-type in Regex mode
+
+Default value: ``false``
+
 ``header_template``
 -------------------
 HTML template for header (dict name + entry terms)
