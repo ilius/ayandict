@@ -218,7 +218,7 @@ func (app *Application) baseFontPixelSize() float32 {
 	) * 0.66)
 }
 
-func (app *Application) favoriteButtonClicked(checked bool) {
+func (app *Application) queryFavoriteButtonClicked(checked bool) {
 	term := app.entry.Text()
 	if term == "" {
 		app.queryFavoriteButton.SetChecked(false)
@@ -230,9 +230,54 @@ func (app *Application) favoriteButtonClicked(checked bool) {
 	}
 }
 
+func (app *Application) favoriteButtonClicked(checked bool) {
+	if app.resultList.Active == nil {
+		app.favoriteButton.SetChecked(false)
+		return
+	}
+	term := app.resultList.Active.Terms()[0]
+	app.favoritesWidget.SetFavorite(term, checked)
+	if term == app.entry.Text() {
+		app.queryFavoriteButton.SetChecked(checked)
+	}
+}
+
+func (app *Application) okButtonResized(
+	_ func(*qt.QResizeEvent),
+	event *qt.QResizeEvent,
+) {
+	h := event.Size().Height()
+	if h > 100 {
+		return
+	}
+	app.queryFavoriteButton.SetFixedSize2(h, h)
+	app.favoriteButton.SetFixedSize2(h, h)
+}
+
+// func (app *Application) tableWidgetItem(text string) *qt.QTableWidgetItem {
+// 	item := qt.NewQTableWidgetItem2(text)
+// 	item.SetTextAlignment(0)
+// 	return item
+// }
+
+func (app *Application) onResultDisplay(terms []string) {
+	app.favoriteButton.Show()
+	app.favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(terms[0]))
+}
+
 // TODO: break down
 func (app *Application) Run() {
 	app.init()
+
+	app.queryArgs = &QueryArgs{
+		ArticleView: app.articleView,
+		ResultList:  app.resultList,
+		HeaderLabel: app.headerLabel,
+		HistoryView: app.historyView,
+		PostQuery:   app.postQuery,
+		Entry:       app.entry,
+		ModeCombo:   app.queryModeCombo,
+	}
 
 	basePx := app.baseFontPixelSize()
 
@@ -261,24 +306,14 @@ func (app *Application) Run() {
 
 	okButton := qt.NewQPushButton3(" OK ")
 
-	app.queryFavoriteButton = NewFavoriteButton(app.favoriteButtonClicked)
+	app.queryFavoriteButton = NewFavoriteButton(app.queryFavoriteButtonClicked)
 	app.queryFavoriteButton.SetToolTips(
 		"Add this query to favorites",
 		"Remove this query from favorites",
 	)
 
 	// favoriteButtonVBox := qt.NewQVBoxLayout()
-	app.favoriteButton = NewFavoriteButton(func(checked bool) {
-		if app.resultList.Active == nil {
-			app.favoriteButton.SetChecked(false)
-			return
-		}
-		term := app.resultList.Active.Terms()[0]
-		app.favoritesWidget.SetFavorite(term, checked)
-		if term == app.entry.Text() {
-			app.queryFavoriteButton.SetChecked(checked)
-		}
-	})
+	app.favoriteButton = NewFavoriteButton(app.favoriteButtonClicked)
 
 	app.favoriteButton.SetToolTips(
 		"Add this term to favorites",
@@ -287,14 +322,7 @@ func (app *Application) Run() {
 	app.favoriteButton.Hide()
 	// favoriteButtonVBox.AddWidget(favoriteButton, 0, qt.AlignBottom)
 
-	okButton.OnResizeEvent(func(_ func(*qt.QResizeEvent), event *qt.QResizeEvent) {
-		h := event.Size().Height()
-		if h > 100 {
-			return
-		}
-		app.queryFavoriteButton.SetFixedSize2(h, h)
-		app.favoriteButton.SetFixedSize2(h, h)
-	})
+	okButton.OnResizeEvent(app.okButtonResized)
 
 	queryLabel := qt.NewQLabel3("Query:")
 	queryBox := qt.NewQFrame(nil)
@@ -447,30 +475,15 @@ func (app *Application) Run() {
 
 	activityTypeCombo.OnCurrentIndexChanged(app.activityComboChanged)
 
-	onResultDisplay := func(terms []string) {
-		app.favoriteButton.Show()
-		app.favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(terms[0]))
-	}
-
 	leftPanel := qt.NewQWidget(nil)
 	leftPanelLayout := qt.NewQVBoxLayout(leftPanel)
 	leftPanelLayout.AddWidget(qt.NewQLabel3("Results").QWidget)
 	app.resultList = NewResultListWidget(
 		app.articleView,
 		app.headerLabel,
-		onResultDisplay,
+		app.onResultDisplay,
 	)
 	leftPanelLayout.AddWidget(app.resultList.QWidget)
-
-	app.queryArgs = &QueryArgs{
-		ArticleView: app.articleView,
-		ResultList:  app.resultList,
-		HeaderLabel: app.headerLabel,
-		HistoryView: app.historyView,
-		PostQuery:   app.postQuery,
-		Entry:       app.entry,
-		ModeCombo:   app.queryModeCombo,
-	}
 
 	app.headerLabel.doQuery = app.doQuery
 	app.articleView.doQuery = app.doQuery
@@ -494,14 +507,20 @@ func (app *Application) Run() {
 	qt.QApplication_SetFont(ConfigFont())
 
 	app.allTextWidgets = []qtcommon.HasSetFont{
+		// local:
 		queryLabel,
+		okButton,
+		aboutButton,
+		rightPanel,
+		// global:
+		frequencyTable,
+		// fields:
+		app.activityTypeCombo,
 		app.entry,
 		app.queryModeCombo,
-		okButton,
 		app.headerLabel,
 		app.articleView,
 		app.historyView,
-		frequencyTable,
 		app.favoritesWidget,
 		app.saveHistoryButton,
 		app.clearHistoryButton,
@@ -512,13 +531,10 @@ func (app *Application) Run() {
 		app.randomEntryButton,
 		app.randomFavoriteButton,
 		app.dictsButton,
-		aboutButton,
 		app.openConfigButton,
 		app.reloadConfigButton,
 		app.clearButton,
-		activityTypeCombo,
 		app.resultList,
-		rightPanel,
 	}
 	app.ReloadFont()
 
@@ -526,14 +542,10 @@ func (app *Application) Run() {
 		onQuery(app.entry.Text(), app.queryArgs, false)
 	})
 
-	for _, widget := range []KeyPressIface{
-		app.window,
-		app.resultList.QListWidget,
-		app.articleView,
-		app.historyView.QListWidget,
-	} {
-		app.setupKeyPressEvent(widget)
-	}
+	app.setupKeyPressEvent(app.window)
+	app.setupKeyPressEvent(app.resultList.QListWidget)
+	app.setupKeyPressEvent(app.articleView)
+	app.setupKeyPressEvent(app.historyView.QListWidget)
 
 	// --------------------------------------------------
 	// setting up handlers
@@ -680,7 +692,7 @@ func (app *Application) setupHandlers() {
 			app.window.SetFocus()
 			return
 		case int(qt.Key_Return), int(qt.Key_Enter): // event.Text()="\r"
-			onQuery(entry.Text(), app.queryArgs, false)
+			onQuery(entry.Text(), queryArgs, false)
 			return
 		}
 
@@ -692,7 +704,7 @@ func (app *Application) setupHandlers() {
 				text := entry.Text()
 				// slog.Debug("checking SearchOnType") // FIXME: panics
 				if len(text) >= conf.SearchOnTypeMinLength {
-					onQuery(text, app.queryArgs, true)
+					onQuery(text, queryArgs, true)
 				}
 				return
 			}
