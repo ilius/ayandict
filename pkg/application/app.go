@@ -166,18 +166,21 @@ func (app *Application) postQuery(query string) {
 
 func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 	widget.OnKeyPressEvent(func(super func(event *qt.QKeyEvent), event *qt.QKeyEvent) {
-		switch event.Text() {
-		case " ":
+		switch event.Key() {
+		case int(qt.Key_Space): // " "
 			app.entry.SetFocusWithReason(qt.ShortcutFocusReason)
 			return
-		case "+", "=": // qt.Key_Plus
+		case int(qt.Key_Plus), int(qt.Key_Equal): // "+", "="
 			app.articleView.ZoomIn()
 			return
-		case "-": // qt.Key_Minus
+		case int(qt.Key_Minus): // "-"
 			app.articleView.ZoomOut()
 			return
-		case "\x1b": // Escape
+		case escape: // event.Text()="\x1b"
 			app.resetQuery()
+			return
+		case int(qt.Key_F1):
+			aboutClicked(app.window.QWidget)
 			return
 		}
 		super(event)
