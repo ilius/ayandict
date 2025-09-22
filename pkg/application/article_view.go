@@ -177,12 +177,16 @@ func (view *ArticleView) onContextMenuEvent(_ func(event *qt.QContextMenuEvent),
 }
 
 func (view *ArticleView) createContextMenuWithSelection(menu *qt.QMenu, selected string) {
+	trimmed := strings.Trim(selected, queryForceTrimChars)
+	if trimmed != "" {
+		selected = trimmed
+	}
 	label := "Query Selection"
 	if len(selected) < 20 {
 		label = "Query: " + selected
 	}
 	menu.AddActionWithText(label).OnTriggered(func() {
-		view.doQuery(strings.Trim(selected, queryForceTrimChars))
+		view.doQuery(selected)
 	})
 	menu.AddActionWithText("Copy Selection").OnTriggered(func() {
 		qt.QGuiApplication_Clipboard().SetText2(strings.TrimSpace(selected), qt.QClipboard__Clipboard)
