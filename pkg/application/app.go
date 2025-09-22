@@ -638,6 +638,7 @@ func (app *Application) setupHandlers() {
 			// show "No Favorites" error?
 			return
 		}
+		entry.SetText(term)
 		onQuery(term, queryArgs, false)
 	})
 	app.clearHistoryButton.ConnectClicked(func(checked bool) {
