@@ -25,14 +25,17 @@ const (
 	QS_mainSplitter   = "main_splitter"
 	QS_frequencyTable = "frequencytable"
 
-	escape               = int(qt.Key_Escape)
+	escape = int(qt.Key_Escape)
+
 	shortcutModifierMask = int(qt.ControlModifier) | int(qt.AltModifier) | int(qt.MetaModifier)
 )
 
-// basePx is %66 of the font size in pixels,
-// I'm using it for spacing between widgets
-// kinda like "em" in html, but probably not exactly the same
-var basePx = float32(10)
+var queryModes = []string{
+	"Fuzzy",
+	"Start with",
+	"Regex",
+	"Glob",
+}
 
 type Application struct {
 	*qt.QApplication
@@ -205,14 +208,33 @@ func (app *Application) activityComboChanged(index int) {
 	qsettings.SaveActivityMode(app.qs, app.activityTypeCombo)
 }
 
+// returns basePx which is %66 of the font size in pixels,
+// I'm using it for spacing between widgets
+// kinda like "em" in html, but probably not exactly the same
+func (app *Application) baseFontPixelSize() float32 {
+	return float32(fontPixelSize(
+		qt.QApplication_Font(),
+		qt.QGuiApplication_PrimaryScreen().PhysicalDotsPerInch(),
+	) * 0.66)
+}
+
+func (app *Application) favoriteButtonClicked(checked bool) {
+	term := app.entry.Text()
+	if term == "" {
+		app.queryFavoriteButton.SetChecked(false)
+		return
+	}
+	app.favoritesWidget.SetFavorite(term, checked)
+	if app.resultList.Active != nil && term == app.resultList.Active.Terms()[0] {
+		app.favoriteButton.SetChecked(checked)
+	}
+}
+
 // TODO: break down
 func (app *Application) Run() {
 	app.init()
 
-	basePx = float32(fontPixelSize(
-		qt.QApplication_Font(),
-		qt.QGuiApplication_PrimaryScreen().PhysicalDotsPerInch(),
-	) * 0.66)
+	basePx := app.baseFontPixelSize()
 
 	basePxI := int(basePx)
 	basePxHalf := int(basePx / 2)
@@ -232,30 +254,14 @@ func (app *Application) Run() {
 
 	app.entry = qt.NewQLineEdit2()
 	app.entry.SetPlaceholderText("Type search query and press Enter")
-	// to reduce inner margins:
-	app.entry.SetTextMargins(0, -3, 0, -3)
+	app.entry.SetTextMargins(0, -3, 0, -3) // to reduce inner margins
 
 	app.queryModeCombo = qt.NewQComboBox2()
-	app.queryModeCombo.AddItems([]string{
-		"Fuzzy",
-		"Start with",
-		"Regex",
-		"Glob",
-	})
+	app.queryModeCombo.AddItems(queryModes)
 
 	okButton := qt.NewQPushButton3(" OK ")
 
-	app.queryFavoriteButton = NewFavoriteButton(func(checked bool) {
-		term := app.entry.Text()
-		if term == "" {
-			app.queryFavoriteButton.SetChecked(false)
-			return
-		}
-		app.favoritesWidget.SetFavorite(term, checked)
-		if app.resultList.Active != nil && term == app.resultList.Active.Terms()[0] {
-			app.favoriteButton.SetChecked(checked)
-		}
-	})
+	app.queryFavoriteButton = NewFavoriteButton(app.favoriteButtonClicked)
 	app.queryFavoriteButton.SetToolTips(
 		"Add this query to favorites",
 		"Remove this query from favorites",
