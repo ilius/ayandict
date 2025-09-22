@@ -5,9 +5,7 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
-const (
-	expanding = qt.QSizePolicy__Expanding
-)
+const expanding = qt.QSizePolicy__Expanding
 
 // we trim these characters when user right-clicks on a word without selecting it
 const punctuation = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~،؛؟۔￼"
@@ -17,4 +15,5 @@ const punctuation = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~،؛؟۔￼"
 // so we trim them on right-click -> Query action or on middle-click action
 const queryForceTrimChars = "‘’،؛"
 
+// frequencyTable: set in app.go: Application.Run, used in multiple go files
 var frequencyTable *frequency.FrequencyTable
