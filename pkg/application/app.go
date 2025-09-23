@@ -60,6 +60,7 @@ type Application struct {
 	entry           *qt.QLineEdit
 	queryModeCombo  *qt.QComboBox
 	favoritesWidget *qfavorites.FavoritesWidget
+	frequencyTable  *frequency.FrequencyTable
 
 	favoriteButton       *FavoriteButton
 	queryFavoriteButton  *FavoriteButton
@@ -194,15 +195,15 @@ func (app *Application) activityComboChanged(index int) {
 	switch index {
 	case 0:
 		app.historyView.Show()
-		frequencyTable.Hide()
+		app.frequencyTable.Hide()
 		app.favoritesWidget.Hide()
 	case 1:
 		app.historyView.Hide()
-		frequencyTable.Show()
+		app.frequencyTable.Show()
 		app.favoritesWidget.Hide()
 	case 2:
 		app.historyView.Hide()
-		frequencyTable.Hide()
+		app.frequencyTable.Hide()
 		app.favoritesWidget.Show()
 	}
 	qsettings.SaveActivityMode(app.qs, app.activityTypeCombo)
@@ -269,16 +270,6 @@ func (app *Application) onResultDisplay(terms []string) {
 func (app *Application) Run() {
 	app.init()
 
-	app.queryArgs = &QueryArgs{
-		ArticleView: app.articleView,
-		ResultList:  app.resultList,
-		HeaderLabel: app.headerLabel,
-		HistoryView: app.historyView,
-		PostQuery:   app.postQuery,
-		Entry:       app.entry,
-		ModeCombo:   app.queryModeCombo,
-	}
-
 	basePx := app.baseFontPixelSize()
 
 	basePxI := int(basePx)
@@ -286,10 +277,11 @@ func (app *Application) Run() {
 
 	activityStorage := activity.NewActivityStorage(conf, config.GetConfigDir())
 
-	frequencyTable = frequency.NewFrequencyView(
+	frequencyTable := frequency.NewFrequencyView(
 		activityStorage,
 		conf.MostFrequentMaxSize,
 	)
+	app.frequencyTable = frequencyTable
 
 	// icon := qt.NewQIcon5("./img/icon.png")
 
@@ -297,11 +289,13 @@ func (app *Application) Run() {
 	window.SetWindowTitle(appinfo.APP_DESC)
 	window.Resize(600, 400)
 
-	app.entry = qt.NewQLineEdit2()
-	app.entry.SetPlaceholderText("Type search query and press Enter")
-	app.entry.SetTextMargins(0, -3, 0, -3) // to reduce inner margins
+	entry := qt.NewQLineEdit2()
+	app.entry = entry
+	entry.SetPlaceholderText("Type search query and press Enter")
+	entry.SetTextMargins(0, -3, 0, -3) // to reduce inner margins
 
-	app.queryModeCombo = qt.NewQComboBox2()
+	queryModeCombo := qt.NewQComboBox2()
+	app.queryModeCombo = queryModeCombo
 	app.queryModeCombo.AddItems(queryModes)
 
 	okButton := qt.NewQPushButton3(" OK ")
@@ -330,12 +324,13 @@ func (app *Application) Run() {
 	queryBoxLayout.SetContentsMargins(basePxHalf, basePxHalf, basePxHalf, 0)
 	queryBoxLayout.SetSpacing(basePxI)
 	queryBoxLayout.AddWidget(queryLabel.QWidget)
-	queryBoxLayout.AddWidget(app.entry.QWidget)
-	queryBoxLayout.AddWidget(app.queryModeCombo.QWidget)
+	queryBoxLayout.AddWidget(entry.QWidget)
+	queryBoxLayout.AddWidget(queryModeCombo.QWidget)
 	queryBoxLayout.AddWidget(app.queryFavoriteButton.QWidget)
 	queryBoxLayout.AddWidget(okButton.QWidget)
 
-	app.headerLabel = CreateHeaderLabel(app)
+	headerLabel := CreateHeaderLabel(app)
+	app.headerLabel = headerLabel
 	app.headerLabel.SetAlignment(qt.AlignLeft)
 
 	headerBox := qt.NewQWidget(nil)
@@ -344,17 +339,19 @@ func (app *Application) Run() {
 	// headerBoxLayout.SetSizeConstraint(qt.QLayout__SetMinimumSize)
 	headerBoxLayout.SetContentsMargins(0, 0, 0, 0)
 	headerBoxLayout.AddSpacing(basePxHalf)
-	headerBoxLayout.AddWidget3(app.headerLabel.QWidget, 1, 0)
+	headerBoxLayout.AddWidget3(headerLabel.QWidget, 1, 0)
 	// headerBoxLayout.AddLayout(favoriteButtonVBox, 0)
 	headerBoxLayout.AddWidget3(app.favoriteButton.QWidget, 0, qt.AlignRight)
 	headerBoxLayout.AddSpacing(int(basePx * 1.5))
 	headerBox.SetSizePolicy2(expanding, qt.QSizePolicy__Minimum)
 
-	app.articleView = NewArticleView(app)
+	articleView := NewArticleView(app)
+	app.articleView = articleView
 
-	app.historyView = NewHistoryView(activityStorage, conf.HistoryMaxSize)
+	historyView := NewHistoryView(activityStorage, conf.HistoryMaxSize)
+	app.historyView = historyView
 	if !conf.HistoryDisable {
-		err := app.historyView.Load()
+		err := historyView.Load()
 		if err != nil {
 			slog.Error("error in loading history: " + err.Error())
 		}
@@ -469,7 +466,7 @@ func (app *Application) Run() {
 	activityLayout := qt.NewQVBoxLayout(activityWidget)
 	activityLayout.SetContentsMargins(5, 5, 5, 5)
 	activityLayout.AddWidget(activityTypeCombo.QWidget)
-	activityLayout.AddWidget(app.historyView.QWidget)
+	activityLayout.AddWidget(historyView.QWidget)
 	activityLayout.AddWidget(frequencyTable.QWidget)
 	activityLayout.AddWidget(app.favoritesWidget.QWidget)
 
@@ -478,16 +475,28 @@ func (app *Application) Run() {
 	leftPanel := qt.NewQWidget(nil)
 	leftPanelLayout := qt.NewQVBoxLayout(leftPanel)
 	leftPanelLayout.AddWidget(qt.NewQLabel3("Results").QWidget)
-	app.resultList = NewResultListWidget(
-		app.articleView,
-		app.headerLabel,
+	resultList := NewResultListWidget(
+		articleView,
+		headerLabel,
 		app.onResultDisplay,
 	)
+	app.resultList = resultList
 	leftPanelLayout.AddWidget(app.resultList.QWidget)
 
-	app.headerLabel.doQuery = app.doQuery
-	app.articleView.doQuery = app.doQuery
-	app.historyView.doQuery = app.doQuery
+	app.queryArgs = &QueryArgs{
+		ArticleView:    articleView,
+		ResultList:     resultList,
+		HeaderLabel:    headerLabel,
+		HistoryView:    historyView,
+		PostQuery:      app.postQuery,
+		Entry:          entry,
+		ModeCombo:      queryModeCombo,
+		FrequencyTable: frequencyTable,
+	}
+
+	headerLabel.doQuery = app.doQuery
+	articleView.doQuery = app.doQuery
+	historyView.doQuery = app.doQuery
 
 	rightPanel := qt.NewQTabWidget(nil)
 	_ = rightPanel.AddTab(activityWidget, " Activity ")
@@ -512,9 +521,8 @@ func (app *Application) Run() {
 		okButton,
 		aboutButton,
 		rightPanel,
-		// global:
-		frequencyTable,
 		// fields:
+		app.frequencyTable,
 		app.activityTypeCombo,
 		app.entry,
 		app.queryModeCombo,
@@ -539,7 +547,7 @@ func (app *Application) Run() {
 	app.ReloadFont()
 
 	okButton.OnClicked(func() {
-		onQuery(app.entry.Text(), app.queryArgs, false)
+		onQuery(entry.Text(), app.queryArgs, false)
 	})
 
 	app.setupKeyPressEvent(app.window)
@@ -585,6 +593,7 @@ func (app *Application) setupSettings(qs *qt.QSettings, mainSplitter *qt.QSplitt
 	qsettings.RestoreMainWinGeometry(qs, app.window)
 	qsettings.SetupMainWinGeometrySave(qs, app.window)
 
+	frequencyTable := app.frequencyTable
 	qsettings.RestoreTableColumnsWidth(
 		qs,
 		frequencyTable.QTableWidget,
@@ -606,6 +615,7 @@ func (app *Application) setupHandlers() {
 
 	entry := app.entry
 	queryArgs := app.queryArgs
+	frequencyTable := app.frequencyTable
 
 	frequencyTable.OnItemActivated(func(item *qt.QTableWidgetItem) {
 		key := frequencyTable.Keys[item.Row()]

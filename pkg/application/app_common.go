@@ -1,7 +1,6 @@
 package application
 
 import (
-	"github.com/ilius/ayandict/v3/pkg/application/frequency"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -14,6 +13,3 @@ const punctuation = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~،؛؟۔￼"
 // are also selected, specially non-ascii ones,
 // so we trim them on right-click -> Query action or on middle-click action
 const queryForceTrimChars = "‘’،؛"
-
-// frequencyTable: set in app.go: Application.Run, used in multiple go files
-var frequencyTable *frequency.FrequencyTable

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ilius/ayandict/v3/pkg/application/frequency"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	common "github.com/ilius/go-dict-commons"
 	qt "github.com/mappu/miqt/qt6"
@@ -18,13 +19,14 @@ const resultFlags = uint32(
 		common.ResultFlag_ColorMapping)
 
 type QueryArgs struct {
-	ArticleView *ArticleView
-	ResultList  *ResultListWidget
-	HeaderLabel *HeaderLabel
-	HistoryView *HistoryView
-	PostQuery   func(string)
-	Entry       *qt.QLineEdit
-	ModeCombo   *qt.QComboBox
+	ArticleView    *ArticleView
+	ResultList     *ResultListWidget
+	HeaderLabel    *HeaderLabel
+	HistoryView    *HistoryView
+	PostQuery      func(string)
+	Entry          *qt.QLineEdit
+	ModeCombo      *qt.QComboBox
+	FrequencyTable *frequency.FrequencyTable
 }
 
 func (w *QueryArgs) AddHistoryAndFrequency(query string) {
@@ -32,9 +34,9 @@ func (w *QueryArgs) AddHistoryAndFrequency(query string) {
 		w.HistoryView.Add(query)
 	}
 	if !conf.MostFrequentDisable {
-		frequencyTable.Add(query, 1)
+		w.FrequencyTable.Add(query, 1)
 		if conf.MostFrequentAutoSave {
-			frequencyTable.SaveNoError()
+			w.FrequencyTable.SaveNoError()
 		}
 	}
 }
