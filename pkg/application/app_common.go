@@ -13,3 +13,12 @@ const punctuation = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~،؛؟۔￼"
 // are also selected, specially non-ascii ones,
 // so we trim them on right-click -> Query action or on middle-click action
 const queryForceTrimChars = "‘’،؛"
+
+const (
+	QS_mainSplitter   = "main_splitter"
+	QS_frequencyTable = "frequencytable"
+
+	escape = int(qt.Key_Escape)
+
+	shortcutModifierMask = int(qt.ControlModifier) | int(qt.AltModifier) | int(qt.MetaModifier)
+)
