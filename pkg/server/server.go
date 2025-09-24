@@ -84,70 +84,23 @@ func queryModeParam(r *http.Request) (dictmgr.QueryMode, bool) {
 	return dictmgr.QueryMode(0), false
 }
 
-func api_query(w http.ResponseWriter, r *http.Request) {
-	t := time.Now()
-
+func badRequest(w http.ResponseWriter, msg string) {
 	jsonEncoder := json.NewEncoder(w)
-	w.Header().Set("Content-Type", "application/json")
-
-	query := r.FormValue("query")
-	if query == "" {
-		err := jsonEncoder.Encode(ErrorResponse{Error: "missing query"})
-		if err != nil {
-			logger.Error("error in jsonEncoder.Encode", "err", err)
-		}
-		w.WriteHeader(http.StatusBadRequest)
-		return
+	err := jsonEncoder.Encode(ErrorResponse{Error: msg})
+	if err != nil {
+		logger.Error("error in jsonEncoder.Encode", "err", err)
 	}
+	w.WriteHeader(http.StatusBadRequest)
+}
 
-	mode, ok := queryModeParam(r)
-	if !ok {
-		err := jsonEncoder.Encode(ErrorResponse{Error: "invalid mode"})
-		if err != nil {
-			logger.Error("error in jsonEncoder.Encode", "err", err)
-		}
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	flags := resultFlags
-	switch r.FormValue("qt") {
-	case "":
-	case "5", "6":
-		flags = flags | common.ResultFlag_FixWordLink | common.ResultFlag_ColorMapping
-	default:
-		err := jsonEncoder.Encode(ErrorResponse{Error: "invalid qt version, must be 5 or 6"})
-		if err != nil {
-			logger.Error("error in jsonEncoder.Encode", "err", err)
-		}
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	limit := 0
-	limitStr := r.FormValue("limit")
-	if limitStr != "" {
-		limitI64, err := strconv.ParseUint(limitStr, 10, 0)
-		if err != nil {
-			err := jsonEncoder.Encode(ErrorResponse{Error: "invalid limit"})
-			if err != nil {
-				logger.Error("error in jsonEncoder.Encode", "err", err)
-			}
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		limit = int(limitI64)
-	}
-
-	raw_results := dictmgr.LookupHTML(query, conf, mode, flags, limit)
-	// pass resultFlags to LookupHTML
+func encodeResults(w http.ResponseWriter, raw_results []common.SearchResultIface) []Result {
 	results := make([]Result, len(raw_results))
 	for i, res := range raw_results {
 		header, err := headerlib.GetHeader(headerTpl, res)
 		if err != nil {
 			logger.Error("Error formatting header label", "err", err)
 			w.WriteHeader(http.StatusInternalServerError)
-			return
+			return nil
 		}
 		results[i] = Result{
 			DictName:        res.DictName(),
@@ -159,7 +112,54 @@ func api_query(w http.ResponseWriter, r *http.Request) {
 		}
 		// entry.ResourceDir()
 	}
+	return results
+}
+
+func api_query(w http.ResponseWriter, r *http.Request) {
+	t := time.Now()
+
+	w.Header().Set("Content-Type", "application/json")
+
+	query := r.FormValue("query")
+	if query == "" {
+		badRequest(w, "missing query")
+		return
+	}
+	mode, ok := queryModeParam(r)
+	if !ok {
+		badRequest(w, "invalid mode")
+		return
+	}
+
+	flags := resultFlags
+	switch r.FormValue("qt") {
+	case "":
+	case "5", "6":
+		flags = flags | common.ResultFlag_FixWordLink | common.ResultFlag_ColorMapping
+	default:
+		badRequest(w, "invalid qt version, must be 5 or 6")
+		return
+	}
+
+	limit := 0
+	limitStr := r.FormValue("limit")
+	if limitStr != "" {
+		limitI64, err := strconv.ParseUint(limitStr, 10, 0)
+		if err != nil {
+			badRequest(w, "invalid limit")
+			return
+		}
+		limit = int(limitI64)
+	}
+
+	raw_results := dictmgr.LookupHTML(query, conf, mode, flags, limit)
+	// pass resultFlags to LookupHTML
+	results := encodeResults(w, raw_results)
+	if results == nil {
+		return
+	}
 	logger.Info("LookupHTML running time", "dt", time.Since(t), "query", query)
+	jsonEncoder := json.NewEncoder(w)
 	err := jsonEncoder.Encode(results)
 	if err != nil {
 		logger.Error("error in jsonEncoder.Encode", "err", err)
