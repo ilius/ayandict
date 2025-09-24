@@ -22,11 +22,13 @@ func init() {
 	}
 }
 
+type LoggingConfig struct {
+	NoColor bool   `toml:"no_color" doc:"Disable log colors"`
+	Level   string `toml:"level" doc:"Log level"`
+}
+
 type Config struct {
-	Logging struct {
-		NoColor bool   `toml:"no_color" doc:"Disable log colors"`
-		Level   string `toml:"level" doc:"Log level"`
-	} `toml:"logging" doc:"Logging config"`
+	Logging LoggingConfig `toml:"logging" doc:"Logging config"`
 
 	DirectoryList []string `toml:"directory_list" doc:"List of dictionary directory paths (absolute or relative to home)"`
 
@@ -114,6 +116,10 @@ const defaultHeaderTemplate = `<b><font color='#55f'>{{.DictName}}</font></b>
 
 func Default() *Config {
 	return &Config{
+		Logging: LoggingConfig{
+			NoColor: false,
+			Level:   "info",
+		},
 		DirectoryList: []string{
 			".stardict/dic",
 		},
