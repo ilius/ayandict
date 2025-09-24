@@ -178,6 +178,12 @@ Use arrow keys to scroll through article (when focused)
 
 Default value: ``false``
 
+``misc_buttons_vertical_padding``
+---------------------------------
+Misc buttons vertical padding
+
+Default value: ``0``
+
 ``reduce_minimum_window_width``
 -------------------------------
 Use smaller buttons to reduce minimum width of window

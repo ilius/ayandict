@@ -272,6 +272,7 @@ func (app *Application) Run() {
 	miscLayout.AddWidget(app.randomFavoriteButton.QWidget)
 
 	app.updateMiscButtonsVisibility()
+	app.updateMiscButtonsPadding()
 
 	buttonBox := qt.NewQHBoxLayout2()
 	buttonBox.SetContentsMargins(0, 0, 0, 0)
@@ -467,4 +468,18 @@ func (app *Application) updateMiscButtonsVisibility() {
 	app.reloadStyleButton.SetVisible(conf.MiscButtons.ReloadStyle)
 	app.randomEntryButton.SetVisible(conf.MiscButtons.RandomEntry)
 	app.randomFavoriteButton.SetVisible(conf.MiscButtons.RandomFavorite)
+}
+
+func (app *Application) updateMiscButtonsPadding() {
+	vpadding := conf.MiscButtonsVerticalPadding
+	stylesheet := fmt.Sprintf("padding-top: %dpx; padding-bottom: %dpx;", vpadding, vpadding)
+
+	app.saveHistoryButton.SetStyleSheet(stylesheet)
+	app.clearHistoryButton.SetStyleSheet(stylesheet)
+	app.saveFavoritesButton.SetStyleSheet(stylesheet)
+	app.reloadDictsButton.SetStyleSheet(stylesheet)
+	app.closeDictsButton.SetStyleSheet(stylesheet)
+	app.reloadStyleButton.SetStyleSheet(stylesheet)
+	app.randomEntryButton.SetStyleSheet(stylesheet)
+	app.randomFavoriteButton.SetStyleSheet(stylesheet)
 }

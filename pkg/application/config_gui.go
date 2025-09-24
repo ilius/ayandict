@@ -105,6 +105,7 @@ func (app *Application) ReloadConfig() {
 	onQuery(app.entry.Text(), app.queryArgs, false)
 
 	app.updateMiscButtonsVisibility()
+	app.updateMiscButtonsPadding()
 }
 
 func OpenConfig() {

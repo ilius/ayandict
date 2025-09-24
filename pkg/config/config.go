@@ -97,6 +97,8 @@ type Config struct {
 
 	ArticleArrowKeys bool `toml:"article_arrow_keys" doc:"Use arrow keys to scroll through article (when focused)"`
 
+	MiscButtonsVerticalPadding int `toml:"misc_buttons_vertical_padding" doc:"Misc buttons vertical padding"`
+
 	ReduceMinimumWindowWidth bool `toml:"reduce_minimum_window_width" doc:"Use smaller buttons to reduce minimum width of window"`
 
 	LocalServerPorts []string `toml:"local_server_ports" doc:"Ports for local server. Server runs on first port; Client tries all"`
@@ -200,6 +202,8 @@ func Default() *Config {
 		ArticleZoomFactor: 1.1,
 
 		ArticleArrowKeys: false,
+
+		MiscButtonsVerticalPadding: 0,
 
 		ReduceMinimumWindowWidth: false,
 
