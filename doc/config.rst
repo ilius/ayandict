@@ -254,5 +254,5 @@ Default value: ``false``
 -----------------
 Log level
 
-Default value: ``""``
+Default value: ``"info"``
 
