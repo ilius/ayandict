@@ -29,8 +29,21 @@ type LoggingConfig struct {
 	Level   string `toml:"level" doc:"Log level"`
 }
 
+type MiscButtonsConfig struct {
+	SaveHistory    bool `toml:"save_history" doc:"Show Save History button"`
+	ClearHistory   bool `toml:"clear_history" doc:"Show Clear History button"`
+	SaveFavorites  bool `toml:"save_favorites" doc:"Show Save Favorites button"`
+	ReloadDicts    bool `toml:"reload_dicts" doc:"Show Reload Dicts button"`
+	CloseDicts     bool `toml:"close_dicts" doc:"Show Close Dicts button"`
+	ReloadStyle    bool `toml:"reload_style" doc:"Show Reload Style button"`
+	RandomEntry    bool `toml:"random_entry" doc:"Show Random Entry button"`
+	RandomFavorite bool `toml:"random_favorite" doc:"Show Random Favorite button"`
+}
+
 type Config struct {
 	Logging LoggingConfig `toml:"logging" doc:"Logging config"`
+
+	MiscButtons MiscButtonsConfig `toml:"misc_buttons" doc:"Misc buttons visibility"`
 
 	DirectoryList []string `toml:"directory_list" doc:"List of dictionary directory paths (absolute or relative to home)"`
 
@@ -123,6 +136,16 @@ func Default() *Config {
 		Logging: LoggingConfig{
 			NoColor: false,
 			Level:   "info",
+		},
+		MiscButtons: MiscButtonsConfig{
+			SaveHistory:    true,
+			ClearHistory:   true,
+			SaveFavorites:  true,
+			ReloadDicts:    true,
+			CloseDicts:     true,
+			ReloadStyle:    true,
+			RandomEntry:    true,
+			RandomFavorite: true,
 		},
 		DirectoryList: []string{
 			".stardict/dic",

@@ -256,3 +256,51 @@ Log level
 
 Default value: ``"info"``
 
+``misc_buttons.save_history``
+-----------------------------
+Show Save History button
+
+Default value: ``true``
+
+``misc_buttons.clear_history``
+------------------------------
+Show Clear History button
+
+Default value: ``true``
+
+``misc_buttons.save_favorites``
+-------------------------------
+Show Save Favorites button
+
+Default value: ``true``
+
+``misc_buttons.reload_dicts``
+-----------------------------
+Show Reload Dicts button
+
+Default value: ``true``
+
+``misc_buttons.close_dicts``
+----------------------------
+Show Close Dicts button
+
+Default value: ``true``
+
+``misc_buttons.reload_style``
+-----------------------------
+Show Reload Style button
+
+Default value: ``true``
+
+``misc_buttons.random_entry``
+-----------------------------
+Show Random Entry button
+
+Default value: ``true``
+
+``misc_buttons.random_favorite``
+--------------------------------
+Show Random Favorite button
+
+Default value: ``true``
+
