@@ -232,14 +232,14 @@ Timeout for search on each dictionary. Only works if ``search_worker_count > 1``
 
 Default value: ``"5s"``
 
-``logging: no_color``
----------------------
+``logging.no_color``
+--------------------
 Disable log colors
 
 Default value: ``false``
 
-``logging: level``
-------------------
+``logging.level``
+-----------------
 Log level
 
 Default value: ``""``

@@ -103,7 +103,7 @@ func printMarkdownStruct(spec ConfigStructSpec) {
 		}
 		comment = strings.ReplaceAll(comment, "`", "``")
 
-		keyCode := codeValue(strings.Join(keyPath, ": "))
+		keyCode := codeValue(strings.Join(keyPath, "."))
 		fmt.Println(keyCode)
 		fmt.Println(strings.Repeat("-", len(keyCode)))
 		fmt.Println(comment + "\n")
