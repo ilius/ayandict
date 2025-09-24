@@ -35,16 +35,9 @@ func (app *Application) setupHandlers() {
 		app.dictManager = nil
 		onQuery(entry.Text(), queryArgs, false)
 	})
-	app.closeDictsButton.OnClicked(func() {
-		dictmgr.CloseDicts()
-	})
-	app.openConfigButton.OnClicked(func() {
-		OpenConfig()
-	})
-	app.reloadConfigButton.OnClicked(func() {
-		app.ReloadConfig()
-		onQuery(entry.Text(), queryArgs, false)
-	})
+	app.closeDictsButton.OnClicked(dictmgr.CloseDicts)
+	app.openConfigButton.OnClicked(OpenConfig)
+	app.reloadConfigButton.OnClicked(app.ReloadConfig)
 	app.reloadStyleButton.OnClicked(func() {
 		app.LoadUserStyle()
 		onQuery(entry.Text(), queryArgs, false)
@@ -53,75 +46,13 @@ func (app *Application) setupHandlers() {
 		app.historyView.Save()
 		frequencyTable.SaveNoError()
 	})
-	app.randomEntryButton.OnClicked(func() {
-		res := dictmgr.RandomEntry(conf, resultFlags)
-		if res == nil {
-			return
-		}
-		query := res.F_Terms[0]
-		entry.SetText(query)
-		queryArgs.ResultList.SetResults([]common.SearchResultIface{res})
-		queryArgs.AddHistoryAndFrequency(query)
-		app.postQuery(query)
-	})
-	app.randomFavoriteButton.OnClicked(func() {
-		term := app.favoritesWidget.Data.Random()
-		if term == "" {
-			// show "No Favorites" error?
-			return
-		}
-		entry.SetText(term)
-		onQuery(term, queryArgs, false)
-	})
-	app.clearHistoryButton.OnClicked(func() {
-		app.historyView.ClearHistory()
-		frequencyTable.Clear()
-		frequencyTable.SaveNoError()
-	})
-	app.saveFavoritesButton.OnClicked(func() {
-		err := app.favoritesWidget.Save()
-		if err != nil {
-			slog.Error("error saving favorites: " + err.Error())
-		}
-	})
-	app.clearButton.OnClicked(func() {
-		app.resetQuery()
-	})
-	app.dictsButton.OnClicked(func() {
-		if app.runDictManager() {
-			onQuery(entry.Text(), queryArgs, false)
-		}
-	})
-	entry.OnKeyPressEvent(func(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
-		// slog.Info(
-		// 	"entry: KeyPressEvent",
-		// 	"text", fmt.Sprintf("%#v", event.Text()),
-		// 	"key", event.Key(),
-		// )
-		key := event.Key()
-		switch key {
-		case escape: // event.Text()="\x1b"
-			app.window.SetFocus()
-			return
-		case int(qt.Key_Return), int(qt.Key_Enter): // event.Text()="\r"
-			onQuery(entry.Text(), queryArgs, false)
-			return
-		}
-
-		super(event)
-
-		// event.Modifiers(): qt.NoModifier, qt.ShiftModifier, KeypadModifier
-		if conf.SearchOnType && key < escape {
-			if int(event.Modifiers())&shortcutModifierMask == 0 {
-				text := entry.Text()
-				// slog.Debug("checking SearchOnType") // FIXME: panics
-				if len(text) >= conf.SearchOnTypeMinLength {
-					onQuery(text, queryArgs, true)
-				}
-				return
-			}
-		}
-	})
+	app.clearHistoryButton.OnClicked(app.clearHistoryClicked)
+	app.saveFavoritesButton.OnClicked(app.saveFavoritesClicked)
+	app.clearButton.OnClicked(app.resetQuery)
+	app.dictsButton.OnClicked(app.dictsButtonClicked)
+	app.randomEntryButton.OnClicked(app.randomEntryClicked)
+	app.randomFavoriteButton.OnClicked(app.randomFavoriteClicked)
+	entry.OnKeyPressEvent(app.onEntryKeyPress)
 
 	if config.PrivateMode {
 		app.favoriteButton.SetDisabled(true)
@@ -151,6 +82,37 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 		}
 		super(event)
 	})
+}
+
+func (app *Application) onEntryKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
+	// slog.Info(
+	// 	"entry: KeyPressEvent",
+	// 	"text", fmt.Sprintf("%#v", event.Text()),
+	// 	"key", event.Key(),
+	// )
+	key := event.Key()
+	switch key {
+	case escape: // event.Text()="\x1b"
+		app.window.SetFocus()
+		return
+	case int(qt.Key_Return), int(qt.Key_Enter): // event.Text()="\r"
+		onQuery(app.entry.Text(), app.queryArgs, false)
+		return
+	}
+
+	super(event)
+
+	// event.Modifiers(): qt.NoModifier, qt.ShiftModifier, KeypadModifier
+	if conf.SearchOnType && key < escape {
+		if int(event.Modifiers())&shortcutModifierMask == 0 {
+			text := app.entry.Text()
+			// slog.Debug("checking SearchOnType") // FIXME: panics
+			if len(text) >= conf.SearchOnTypeMinLength {
+				onQuery(text, app.queryArgs, true)
+			}
+			return
+		}
+	}
 }
 
 func (app *Application) activityComboChanged(index int) {
@@ -205,4 +167,45 @@ func (app *Application) favoriteButtonClicked(checked bool) {
 	if term == app.entry.Text() {
 		app.queryFavoriteButton.SetChecked(checked)
 	}
+}
+
+func (app *Application) clearHistoryClicked() {
+	app.historyView.ClearHistory()
+	app.frequencyTable.Clear()
+	app.frequencyTable.SaveNoError()
+}
+
+func (app *Application) saveFavoritesClicked() {
+	err := app.favoritesWidget.Save()
+	if err != nil {
+		slog.Error("error saving favorites: " + err.Error())
+	}
+}
+
+func (app *Application) dictsButtonClicked() {
+	if app.runDictManager() {
+		onQuery(app.entry.Text(), app.queryArgs, false)
+	}
+}
+
+func (app *Application) randomEntryClicked() {
+	res := dictmgr.RandomEntry(conf, resultFlags)
+	if res == nil {
+		return
+	}
+	query := res.F_Terms[0]
+	app.entry.SetText(query)
+	app.queryArgs.ResultList.SetResults([]common.SearchResultIface{res})
+	app.queryArgs.AddHistoryAndFrequency(query)
+	app.postQuery(query)
+}
+
+func (app *Application) randomFavoriteClicked() {
+	term := app.favoritesWidget.Data.Random()
+	if term == "" {
+		// show "No Favorites" error?
+		return
+	}
+	app.entry.SetText(term)
+	onQuery(term, app.queryArgs, false)
 }

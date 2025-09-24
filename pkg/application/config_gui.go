@@ -101,6 +101,7 @@ func (app *Application) ReloadConfig() {
 	}
 	app.headerLabel.ReloadConfig()
 	audioCache.ReloadConfig()
+	onQuery(app.entry.Text(), app.queryArgs, false)
 }
 
 func OpenConfig() {
