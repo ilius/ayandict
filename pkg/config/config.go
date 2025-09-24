@@ -93,6 +93,7 @@ type Config struct {
 
 	WebSearchOnType          bool `toml:"web_search_on_type" doc:"Web: Enable/disable search-on-type"`
 	WebSearchOnTypeMinLength int  `toml:"web_search_on_type_min_length" doc:"Web: Minimum query length for search-on-type"`
+	WebSearchOnTypeOnRegex   bool `toml:"web_search_on_type_on_regex" doc:"Web: Enable/disable search-on-type in Regex mode"`
 
 	WebShowPoweredBy bool `toml:"web_show_powered_by" doc:"Show 'Powered By ...' footer in web."`
 
@@ -184,6 +185,7 @@ func Default() *Config {
 
 		WebSearchOnType:          false,
 		WebSearchOnTypeMinLength: 3,
+		WebSearchOnTypeOnRegex:   false,
 
 		WebShowPoweredBy: true,
 

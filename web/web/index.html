@@ -150,8 +150,13 @@
 					return
 				if len(query) < {{.Config.WebSearchOnTypeMinLength}}:
 					return
+				mode = modeInput.value
+				{{if not .Config.WebSearchOnTypeOnRegex}}
+				if mode == "regex":
+					return
+				{{end}}
 				ajax.post(
-					"/api/query?query=" + query + "&mode=" +  modeInput.value,
+					"/api/query?query=" + query + "&mode=" + mode,
 					cache=False,
 					oncomplete=on_query_result,
 				)

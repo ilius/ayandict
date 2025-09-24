@@ -220,6 +220,12 @@ Web: Minimum query length for search-on-type
 
 Default value: ``3``
 
+``web_search_on_type_on_regex``
+-------------------------------
+Web: Enable/disable search-on-type in Regex mode
+
+Default value: ``false``
+
 ``web_show_powered_by``
 -----------------------
 Show 'Powered By ...' footer in web.
