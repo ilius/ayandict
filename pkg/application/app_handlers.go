@@ -195,6 +195,7 @@ func (app *Application) randomEntryClicked() {
 	}
 	query := res.F_Terms[0]
 	app.entry.SetText(query)
+	app.queryArgs.ResultsLabel.SetText("Results: 1")
 	app.queryArgs.ResultList.SetResults([]common.SearchResultIface{res})
 	app.queryArgs.AddHistoryAndFrequency(query)
 	app.postQuery(query)

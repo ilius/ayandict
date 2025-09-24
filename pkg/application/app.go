@@ -105,6 +105,7 @@ func (app *Application) runDictManager() bool {
 
 func (app *Application) resetQuery() {
 	app.entry.SetText("")
+	app.queryArgs.ResultsLabel.SetText("Results")
 	app.resultList.Clear()
 	app.headerLabel.SetText("")
 	app.articleView.SetHtml("")
@@ -336,7 +337,8 @@ func (app *Application) Run() {
 
 	leftPanel := qt.NewQWidget(nil)
 	leftPanelLayout := qt.NewQVBoxLayout(leftPanel)
-	leftPanelLayout.AddWidget(qt.NewQLabel3("Results").QWidget)
+	resultsLabel := qt.NewQLabel3("Results")
+	leftPanelLayout.AddWidget(resultsLabel.QWidget)
 	resultList := NewResultListWidget(
 		articleView,
 		headerLabel,
@@ -347,6 +349,7 @@ func (app *Application) Run() {
 
 	app.queryArgs = &QueryArgs{
 		ArticleView:    articleView,
+		ResultsLabel:   resultsLabel,
 		ResultList:     resultList,
 		HeaderLabel:    headerLabel,
 		HistoryView:    historyView,

@@ -20,6 +20,7 @@ const resultFlags = uint32(
 
 type QueryArgs struct {
 	ArticleView    *ArticleView
+	ResultsLabel   *qt.QLabel
 	ResultList     *ResultListWidget
 	HeaderLabel    *HeaderLabel
 	HistoryView    *HistoryView
@@ -167,6 +168,7 @@ func onQuery(
 	results := dictmgr.LookupHTML(query, conf, mode, resultFlags, 0)
 	slog.Debug("LookupHTML running time", "dt", time.Since(t), "query", query)
 	queryArgs.ResultList.SetResults(results)
+	queryArgs.ResultsLabel.SetText(fmt.Sprintf("Results: %d", len(results)))
 	if len(results) == 0 {
 		if !isAuto {
 			queryArgs.SetNoResult(query)
