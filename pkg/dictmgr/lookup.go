@@ -3,6 +3,7 @@ package dictmgr
 import (
 	"log/slog"
 	"sort"
+	"strings"
 
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/internal/dicts"
@@ -88,6 +89,11 @@ func LookupHTML(
 		if score1 != score2 {
 			return score1 > score2
 		}
+		term1 := strings.ToLower(res1.Terms()[0])
+		term2 := strings.ToLower(res2.Terms()[0])
+		if term1 != term2 {
+			return term1 < term2
+		}
 		do1 := dicts.DictsOrder[res1.DictName()]
 		do2 := dicts.DictsOrder[res2.DictName()]
 		if do1 != do2 {
@@ -98,11 +104,6 @@ func LookupHTML(
 		// and no need to compare headwords for StarDict when we have entryIndex
 		// since they are already sorted in idx file.
 		// if we added other formats, maybe we can add a config for this
-		// term1 := res1.Terms()[0]
-		// term2 := res2.Terms()[0]
-		// if term1 != term2 {
-		// 	return term1 < term2
-		// }
 		return res1.EntryIndex() < res2.EntryIndex()
 	})
 	if limit == 0 {
