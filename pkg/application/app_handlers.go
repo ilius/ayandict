@@ -1,7 +1,9 @@
 package application
 
 import (
+	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
@@ -208,5 +210,26 @@ func (app *Application) randomFavoriteClicked() {
 		return
 	}
 	app.entry.SetText(term)
-	onQuery(term, app.queryArgs, false)
+	queryArgs := app.queryArgs
+
+	t := time.Now()
+	mode := dictmgr.QueryModeFuzzy
+	switch queryArgs.ModeCombo.CurrentIndex() {
+	case 1: // StartWith
+		mode = dictmgr.QueryModeStartWith
+	case 2: // Regex
+		mode = dictmgr.QueryModeRegex
+	case 3: // Glob
+		mode = dictmgr.QueryModeGlob
+	}
+	results := dictmgr.LookupHTML(term, conf, mode, resultFlags, 0)
+	slog.Debug("LookupHTML running time", "dt", time.Since(t), "query", term)
+	queryArgs.ResultList.SetResults(results)
+	queryArgs.ResultsLabel.SetText(fmt.Sprintf("Results: %d", len(results)))
+	if len(results) == 0 {
+		queryArgs.SetNoResult(term)
+	}
+
+	queryArgs.AddHistoryAndFrequency(term)
+	queryArgs.PostQuery(term)
 }
