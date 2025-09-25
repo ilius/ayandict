@@ -117,6 +117,10 @@ There are tons of web pages that let you download various usable dictionaries, b
 - [kaikki.org](https://kaikki.org/dictionary/index.html)
 - [library.kiwix.org](https://library.kiwix.org/)
 - [freedict.org](https://freedict.org/downloads/) and [@freedict/fd-dictionaries](https://github.com/freedict/fd-dictionaries)
+- [wikdict.com](https://download.wikdict.com/dictionaries/tei/recommended/): More FreeDict (TEI) dictionaries
+- [@reader-dict/monolingual](https://github.com/reader-dict/monolingual): E-book-friendly StarDict dictionaries
+- [@Vuizur/Wiktionary-Dictionaries](https://github.com/Vuizur/Wiktionary-Dictionaries)
+- [@xxyzz/wiktionary_stardict](https://github.com/xxyzz/wiktionary_stardict/releases): generated monthly (15th) from [kaikki.org](https://kaikki.org)
 - [@itkach/slob/wiki/Dictionaries](https://github.com/itkach/slob/wiki/Dictionaries)
 - [goldendict.org](http://goldendict.org/dictionaries.php)
 - [huzheng.org](http://www.huzheng.org/stardict/)
@@ -130,8 +134,10 @@ There are tons of web pages that let you download various usable dictionaries, b
 
 # Keyboard bindings/shortcuts
 
-- **Escape**: clear the input query and results
 - **Space**: (while query entry is not focused) change keyboard focus to query entry
+- **Escape**:
+  - While query entry is focused: focus leaves the entry
+  - While query entry is not focused: clears the query and results
 - **`+`** or **`=`**: Zoom in (article/definition/translation)
 - **`-`**: Zoom out (article/definition/translation)
 
@@ -147,6 +153,8 @@ This works pretty well in most cases, but the only catch is that first letter of
 
 But we also have 3 other search modes added in v2.0.0:
 
-- Start with, shows all terms that start with given string
-- Regex (regular expression), for example `.*symm.*`
-- Glob, for example `*symm*`
+- Start with, shows all terms that start with given query string
+- Regex (regular expression), for example `symm.*y`
+- Glob, for example `symm*y`
+
+In all of these modes, shorter matched terms are given higher score. For example in Regex mode with query `symm.*y`, term "symmetry" comes before "symmetrically" because of smaller length and higher score.
