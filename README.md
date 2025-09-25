@@ -153,6 +153,8 @@ This works pretty well in most cases, but the only catch is that first letter of
 
 But we also have 3 other search modes added in v2.0.0:
 
-- Start with, shows all terms that start with given string
-- Regex (regular expression), for example `.*symm.*`
-- Glob, for example `*symm*`
+- Start with, shows all terms that start with given query string
+- Regex (regular expression), for example `symm.*y`
+- Glob, for example `symm*y`
+
+In all of these modes, shorter matched terms are given higher score. For example in Regex mode with query `symm.*y`, term "symmetry" comes before "symmetrically" because of smaller length and higher score.
