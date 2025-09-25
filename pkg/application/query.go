@@ -164,6 +164,8 @@ func onQuery(
 		mode = dictmgr.QueryModeRegex
 	case 3: // Glob
 		mode = dictmgr.QueryModeGlob
+	case 4: // WordMatch
+		mode = dictmgr.QueryModeWordMatch
 	}
 	results := dictmgr.LookupHTML(query, conf, mode, resultFlags, 0)
 	slog.Debug("LookupHTML running time", "dt", time.Since(t), "query", query)

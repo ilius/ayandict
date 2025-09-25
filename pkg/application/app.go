@@ -22,6 +22,7 @@ var queryModes = []string{
 	"Start with",
 	"Regex",
 	"Glob",
+	"Word Match",
 }
 
 type Application struct {

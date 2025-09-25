@@ -17,6 +17,7 @@ const (
 	QueryModeStartWith
 	QueryModeRegex
 	QueryModeGlob
+	QueryModeWordMatch
 )
 
 func search(
@@ -58,6 +59,11 @@ func search(
 			return nil
 		}
 		return results
+	case QueryModeWordMatch:
+		if !ds.WordMatch() {
+			return nil
+		}
+		return dic.SearchWordMatch(query, workerCount, timeout)
 	}
 	if !ds.Fuzzy() {
 		return nil

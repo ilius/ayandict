@@ -213,15 +213,7 @@ func (app *Application) randomFavoriteClicked() {
 	queryArgs := app.queryArgs
 
 	t := time.Now()
-	mode := dictmgr.QueryModeFuzzy
-	switch queryArgs.ModeCombo.CurrentIndex() {
-	case 1: // StartWith
-		mode = dictmgr.QueryModeStartWith
-	case 2: // Regex
-		mode = dictmgr.QueryModeRegex
-	case 3: // Glob
-		mode = dictmgr.QueryModeGlob
-	}
+	mode := dictmgr.QueryModeWordMatch
 	results := dictmgr.LookupHTML(term, conf, mode, resultFlags, 0)
 	slog.Debug("LookupHTML running time", "dt", time.Since(t), "query", term)
 	queryArgs.ResultList.SetResults(results)
