@@ -5,9 +5,9 @@ name: Go Build
 
 on:
   push:
-    branches: ["main", "v3"]
+    branches: ["main", "v2", "v3"]
   pull_request:
-    branches: ["main"]
+    branches: ["main", "v2", "v3"]
 
 jobs:
   build:
