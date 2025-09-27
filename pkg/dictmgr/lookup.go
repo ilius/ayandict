@@ -71,22 +71,7 @@ func search(
 	return dic.SearchFuzzy(query, workerCount, timeout)
 }
 
-func LookupHTML(
-	query string,
-	conf *config.Config,
-	mode QueryMode,
-	resultFlags uint32,
-	limit int,
-) []common.SearchResultIface {
-	results := []common.SearchResultIface{}
-	for _, dic := range dicts.DictList {
-		if dic.Disabled() || !dic.Loaded() {
-			continue
-		}
-		for _, res := range search(dic, conf, mode, query) {
-			results = append(results, NewSearchResult(res, dic, conf, resultFlags))
-		}
-	}
+func sortResults(results []common.SearchResultIface) {
 	sort.Slice(results, func(i, j int) bool {
 		res1 := results[i]
 		res2 := results[j]
@@ -112,11 +97,45 @@ func LookupHTML(
 		// if we added other formats, maybe we can add a config for this
 		return res1.EntryIndex() < res2.EntryIndex()
 	})
+}
+
+func LookupHTML(
+	query string,
+	conf *config.Config,
+	mode QueryMode,
+	resultFlags uint32,
+	limit int,
+) []common.SearchResultIface {
+	results := []common.SearchResultIface{}
+	for _, dic := range dicts.DictList {
+		if dic.Disabled() || !dic.Loaded() {
+			continue
+		}
+		for _, res := range search(dic, conf, mode, query) {
+			results = append(results, NewSearchResult(res, dic, conf, resultFlags))
+		}
+	}
 	if limit == 0 {
 		limit = conf.MaxResultsTotal
 	}
-	if limit > 0 && len(results) > limit {
-		results = results[:limit]
+	if len(results) <= limit {
+		sortResults(results)
+		return results
 	}
+	// too many results
+	// first only sort by score
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Score() > results[j].Score()
+	})
+	// get rid of extra results
+	results = results[:limit]
+	// get rid of the bottom score (mainly for consistency)
+	minCount := limit * 2 / 3
+	lastScore := results[len(results)-1].Score()
+	for i := len(results) - 2; i > minCount && results[i].Score() == lastScore; i-- {
+		results = results[:i]
+	}
+	// do the final full sort
+	sortResults(results)
 	return results
 }
