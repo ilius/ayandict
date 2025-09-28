@@ -2,10 +2,10 @@ github.com/BurntSushi/toml v1.5.0 h1:W5quZX/G/csjUnuI8SUYlsHs9M38FC7znL0lIO+DvMg
 github.com/BurntSushi/toml v1.5.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2lLoLwho=
 github.com/ilius/glob v0.0.0-20250212111036-4c41f838a304 h1:hrjENbAZEBbffGaAhD6Wd4t1pKUp54wXtKQ4FsMXh/4=
 github.com/ilius/glob v0.0.0-20250212111036-4c41f838a304/go.mod h1:hp4bF1pIJfwcFirp8JaYh3xPs6DPQ/yP1BsTkpVNAg8=
-github.com/ilius/go-dict-commons v0.5.3 h1:2yN13VoDyAJ2LuYzD3wu3BJ23CevjKOJhiOkK/YxViM=
-github.com/ilius/go-dict-commons v0.5.3/go.mod h1:nR6Edm1pxnx9paVX+Cp2j8Jj7/L2xR0HchNV1D6slCQ=
-github.com/ilius/go-stardict/v2 v2.4.1 h1:KTP+8eeNP0Ek8zrVixWDgP1rnLEVTmUEsnwX+SEeU8A=
-github.com/ilius/go-stardict/v2 v2.4.1/go.mod h1:enlx3v1HuhJafmHnG015QgS70zU0yqya/e6EzRDYdsk=
+github.com/ilius/go-dict-commons v0.6.0 h1:GCf9LeF1MpyD0d4xlzwoCLenXH08APbpxLdi7sXoq9M=
+github.com/ilius/go-dict-commons v0.6.0/go.mod h1:nR6Edm1pxnx9paVX+Cp2j8Jj7/L2xR0HchNV1D6slCQ=
+github.com/ilius/go-stardict/v2 v2.5.0 h1:JKZQIRsGyRs7fsl0FYiCmDNf5fnQIkHFNq7OqmHBKKY=
+github.com/ilius/go-stardict/v2 v2.5.0/go.mod h1:N3ThHRBj6urJ0lLCnrkAwscj54iafJtXKWHmRJ2CT04=
 github.com/ilius/is/v2 v2.3.2 h1:14u2j/UTKeIHKlcp/48dabf7+7QJ9JJaaoeHVvfyAOk=
 github.com/ilius/is/v2 v2.3.2/go.mod h1:OMGTmQDDc3Svaj3EoQHeNnXHP0R1HCb5u/Hfm7kuYIM=
 github.com/mappu/miqt v0.11.2 h1:erXnheYNbWh9a7QGNzfVDENlkuwiSw0VJH7Rw6uXBLs=
