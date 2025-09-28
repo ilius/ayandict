@@ -20,6 +20,22 @@ const (
 	QueryModeWordMatch
 )
 
+func QueryModeByName(name string) (QueryMode, bool) {
+	switch name {
+	case "", "fuzzy":
+		return QueryModeFuzzy, true
+	case "startWith":
+		return QueryModeStartWith, true
+	case "regex":
+		return QueryModeRegex, true
+	case "glob":
+		return QueryModeGlob, true
+	case "wordMatch":
+		return QueryModeWordMatch, true
+	}
+	return QueryMode(0), false
+}
+
 func search(
 	dic common.Dictionary,
 	conf *config.Config,

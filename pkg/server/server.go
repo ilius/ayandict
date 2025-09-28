@@ -70,22 +70,6 @@ func getAppName(w http.ResponseWriter, _ *http.Request) {
 	writeMsg(w, appinfo.APP_NAME)
 }
 
-func queryModeParam(r *http.Request) (dictmgr.QueryMode, bool) {
-	switch r.FormValue("mode") {
-	case "", "fuzzy":
-		return dictmgr.QueryModeFuzzy, true
-	case "startWith":
-		return dictmgr.QueryModeStartWith, true
-	case "regex":
-		return dictmgr.QueryModeRegex, true
-	case "glob":
-		return dictmgr.QueryModeGlob, true
-	case "wordMatch":
-		return dictmgr.QueryModeWordMatch, true
-	}
-	return dictmgr.QueryMode(0), false
-}
-
 func badRequest(w http.ResponseWriter, msg string) {
 	jsonEncoder := json.NewEncoder(w)
 	err := jsonEncoder.Encode(ErrorResponse{Error: msg})
@@ -127,7 +111,7 @@ func api_query(w http.ResponseWriter, r *http.Request) {
 		badRequest(w, "missing query")
 		return
 	}
-	mode, ok := queryModeParam(r)
+	mode, ok := dictmgr.QueryModeByName(r.FormValue("mode"))
 	if !ok {
 		badRequest(w, "invalid mode")
 		return
