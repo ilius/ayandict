@@ -106,6 +106,12 @@ Maximum number of search results
 
 Default value: ``40``
 
+``random_favorite_search_mode``
+-------------------------------
+Search mode for Random Favorite
+
+Default value: ``"wordMatch"``
+
 ``audio``
 ---------
 Enable audio in article

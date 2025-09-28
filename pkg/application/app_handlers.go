@@ -213,7 +213,11 @@ func (app *Application) randomFavoriteClicked() {
 	queryArgs := app.queryArgs
 
 	t := time.Now()
-	mode := dictmgr.QueryModeWordMatch
+	mode, ok := dictmgr.QueryModeByName(conf.RandomFavoriteSearchMode)
+	if !ok {
+		slog.Error("invalid random_favorite_search_mode", "value", conf.RandomFavoriteSearchMode)
+		mode = dictmgr.QueryModeWordMatch
+	}
 	results := dictmgr.LookupHTML(term, conf, mode, resultFlags, 0)
 	slog.Debug("LookupHTML running time", "dt", time.Since(t), "query", term)
 	queryArgs.ResultList.SetResults(results)

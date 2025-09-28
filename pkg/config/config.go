@@ -73,6 +73,8 @@ type Config struct {
 
 	MaxResultsTotal int `toml:"max_results_total" doc:"Maximum number of search results"`
 
+	RandomFavoriteSearchMode string `toml:"random_favorite_search_mode" doc:"Search mode for Random Favorite"`
+
 	Audio bool `toml:"audio" doc:"Enable audio in article"`
 
 	AudioMPV bool `toml:"audio_mpv" doc:"Use ‘mpv‘ command for playing audio"`
@@ -178,6 +180,8 @@ func Default() *Config {
 		FavoritesAutoSave: true,
 
 		MaxResultsTotal: 40,
+
+		RandomFavoriteSearchMode: "wordMatch",
 
 		Audio: true,
 
