@@ -71,7 +71,6 @@
 			content = document["content"]
 			headerLabel = document["header-label"]
 
-
 			def is_word_link(target):
 				if "://" not in target:
 					return True
@@ -189,6 +188,7 @@
 					oncomplete=on_random_result,
 				)
 
+			modeInput.bind("change", on_lookup_input_input)
 
 			input.bind("keypress", on_lookup_input_keypress)
 			{{if .Config.WebSearchOnType}}
