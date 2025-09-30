@@ -20,5 +20,5 @@ const (
 
 	escape = int(qt.Key_Escape)
 
-	shortcutModifierMask = int(qt.ControlModifier) | int(qt.AltModifier) | int(qt.MetaModifier)
+	searchOnTypeNotModifierMask = int(qt.AltModifier) | int(qt.MetaModifier)
 )

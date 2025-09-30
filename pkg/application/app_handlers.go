@@ -105,8 +105,9 @@ func (app *Application) onEntryKeyPress(super func(*qt.QKeyEvent), event *qt.QKe
 	super(event)
 
 	// event.Modifiers(): qt.NoModifier, qt.ShiftModifier, KeypadModifier
+	// also Ctrl+V should trigger SearchOnType
 	if conf.SearchOnType && key < escape {
-		if int(event.Modifiers())&shortcutModifierMask == 0 {
+		if int(event.Modifiers())&searchOnTypeNotModifierMask == 0 {
 			text := app.entry.Text()
 			// slog.Debug("checking SearchOnType") // FIXME: panics
 			if len(text) >= conf.SearchOnTypeMinLength {
