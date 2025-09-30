@@ -29,7 +29,7 @@ const (
 	QS_mainSplitter   = "main_splitter"
 	QS_frequencyTable = "frequencytable"
 
-	shortcutModifierMask = int(core.Qt__ControlModifier) | int(core.Qt__AltModifier) | int(core.Qt__MetaModifier)
+	searchOnTypeNotModifierMask = int(core.Qt__AltModifier) | int(core.Qt__MetaModifier)
 )
 
 // basePx is %66 of the font size in pixels,
@@ -678,7 +678,7 @@ func (app *Application) setupHandlers() {
 
 		// event.Modifiers(): qt.NoModifier, qt.ShiftModifier, KeypadModifier
 		if conf.SearchOnType && event.Key() < int(core.Qt__Key_Escape) {
-			if int(event.Modifiers())&shortcutModifierMask == 0 {
+			if int(event.Modifiers())&searchOnTypeNotModifierMask == 0 {
 				text := entry.Text()
 				if len(text) >= conf.SearchOnTypeMinLength {
 					onQuery(text, app.queryArgs, true)
