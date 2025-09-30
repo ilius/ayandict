@@ -17,7 +17,7 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
-var queryModes = []string{
+var searchModes = []string{
 	"Fuzzy",
 	"Start with",
 	"Regex",
@@ -46,7 +46,7 @@ type Application struct {
 	resultList      *ResultListWidget
 	historyView     *HistoryView
 	entry           *qt.QLineEdit
-	queryModeCombo  *qt.QComboBox
+	searchModeCombo *qt.QComboBox
 	favoritesWidget *qfavorites.FavoritesWidget
 	frequencyTable  *frequency.FrequencyTable
 
@@ -155,9 +155,9 @@ func (app *Application) Run() {
 	entry.SetPlaceholderText("Type search query and press Enter")
 	entry.SetTextMargins(0, -3, 0, -3) // to reduce inner margins
 
-	queryModeCombo := qt.NewQComboBox2()
-	app.queryModeCombo = queryModeCombo
-	app.queryModeCombo.AddItems(queryModes)
+	searchModeCombo := qt.NewQComboBox2()
+	app.searchModeCombo = searchModeCombo
+	app.searchModeCombo.AddItems(searchModes)
 
 	okButton := qt.NewQPushButton3(" OK ")
 
@@ -186,7 +186,7 @@ func (app *Application) Run() {
 	queryBoxLayout.SetSpacing(basePxI)
 	queryBoxLayout.AddWidget(queryLabel.QWidget)
 	queryBoxLayout.AddWidget(entry.QWidget)
-	queryBoxLayout.AddWidget(queryModeCombo.QWidget)
+	queryBoxLayout.AddWidget(searchModeCombo.QWidget)
 	queryBoxLayout.AddWidget(app.queryFavoriteButton.QWidget)
 	queryBoxLayout.AddWidget(okButton.QWidget)
 
@@ -356,7 +356,7 @@ func (app *Application) Run() {
 		HistoryView:    historyView,
 		PostQuery:      app.postQuery,
 		Entry:          entry,
-		ModeCombo:      queryModeCombo,
+		ModeCombo:      searchModeCombo,
 		FrequencyTable: frequencyTable,
 	}
 
@@ -391,7 +391,7 @@ func (app *Application) Run() {
 		app.frequencyTable,
 		app.activityTypeCombo,
 		app.entry,
-		app.queryModeCombo,
+		app.searchModeCombo,
 		app.headerLabel,
 		app.articleView,
 		app.historyView,
@@ -435,12 +435,12 @@ func (app *Application) Run() {
 }
 
 func (app *Application) setupSettings(qs *qt.QSettings, mainSplitter *qt.QSplitter) {
-	app.queryModeCombo.OnCurrentIndexChanged(func(i int) {
+	app.searchModeCombo.OnCurrentIndexChanged(func(i int) {
 		text := app.entry.Text()
 		if text != "" {
 			onQuery(text, app.queryArgs, false)
 		}
-		go qsettings.SaveSearchSettings(qs, app.queryModeCombo)
+		go qsettings.SaveSearchSettings(qs, app.searchModeCombo)
 	})
 
 	qsettings.RestoreSplitterSizes(qs, mainSplitter, QS_mainSplitter)
@@ -460,7 +460,7 @@ func (app *Application) setupSettings(qs *qt.QSettings, mainSplitter *qt.QSplitt
 
 	qsettings.SetupSplitterSizesSave(qs, mainSplitter, QS_mainSplitter)
 
-	qsettings.RestoreSearchSettings(qs, app.queryModeCombo)
+	qsettings.RestoreSearchSettings(qs, app.searchModeCombo)
 }
 
 func (app *Application) updateMiscButtonsVisibility() {

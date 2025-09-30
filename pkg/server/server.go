@@ -111,7 +111,7 @@ func api_query(w http.ResponseWriter, r *http.Request) {
 		badRequest(w, "missing query")
 		return
 	}
-	mode, ok := dictmgr.QueryModeByName(r.FormValue("mode"))
+	mode, ok := dictmgr.SearchModeByName(r.FormValue("mode"))
 	if !ok {
 		badRequest(w, "invalid mode")
 		return

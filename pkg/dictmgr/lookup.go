@@ -10,36 +10,36 @@ import (
 	common "github.com/ilius/go-dict-commons"
 )
 
-type QueryMode uint8
+type SearchMode uint8
 
 const (
-	QueryModeFuzzy QueryMode = iota
-	QueryModeStartWith
-	QueryModeRegex
-	QueryModeGlob
-	QueryModeWordMatch
+	SearchModeFuzzy SearchMode = iota
+	SearchModeStartWith
+	SearchModeRegex
+	SearchModeGlob
+	SearchModeWordMatch
 )
 
-func QueryModeByName(name string) (QueryMode, bool) {
+func SearchModeByName(name string) (SearchMode, bool) {
 	switch name {
 	case "", "fuzzy":
-		return QueryModeFuzzy, true
+		return SearchModeFuzzy, true
 	case "startWith":
-		return QueryModeStartWith, true
+		return SearchModeStartWith, true
 	case "regex":
-		return QueryModeRegex, true
+		return SearchModeRegex, true
 	case "glob":
-		return QueryModeGlob, true
+		return SearchModeGlob, true
 	case "wordMatch":
-		return QueryModeWordMatch, true
+		return SearchModeWordMatch, true
 	}
-	return QueryMode(0), false
+	return SearchMode(0), false
 }
 
 func search(
 	dic common.Dictionary,
 	conf *config.Config,
-	mode QueryMode,
+	mode SearchMode,
 	query string,
 ) []*common.SearchResultLow {
 	workerCount := conf.SearchWorkerCount
@@ -50,12 +50,12 @@ func search(
 		ds = &dicts.DictionarySettings{}
 	}
 	switch mode {
-	case QueryModeStartWith:
+	case SearchModeStartWith:
 		if !ds.StartWith() {
 			return nil
 		}
 		return dic.SearchStartWith(query, workerCount, timeout)
-	case QueryModeRegex:
+	case SearchModeRegex:
 		if !ds.Regex() {
 			return nil
 		}
@@ -65,7 +65,7 @@ func search(
 			return nil
 		}
 		return results
-	case QueryModeGlob:
+	case SearchModeGlob:
 		if !ds.Glob() {
 			return nil
 		}
@@ -75,7 +75,7 @@ func search(
 			return nil
 		}
 		return results
-	case QueryModeWordMatch:
+	case SearchModeWordMatch:
 		if !ds.WordMatch() {
 			return nil
 		}
@@ -118,7 +118,7 @@ func sortResults(results []common.SearchResultIface) {
 func LookupHTML(
 	query string,
 	conf *config.Config,
-	mode QueryMode,
+	mode SearchMode,
 	resultFlags uint32,
 	limit int,
 ) []common.SearchResultIface {
