@@ -4,6 +4,7 @@ set -x
 
 FLAGS=(-ldflags '-s -w' -trimpath)
 VERSION=$(go run pkg/version/version.go)
+export CGO_ENABLED=
 
 function build_for_amd64() {
 	OS=$1
