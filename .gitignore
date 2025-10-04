@@ -1,6 +1,6 @@
 .env
 ayandict
-ayandict-*
+ayandict-v*
 qtbox
 pkg/config/doc-gen/doc-gen
 *.exe
