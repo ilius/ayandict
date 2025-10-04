@@ -148,6 +148,14 @@ func (app *Application) Run() {
 
 	window := app.window
 	window.SetWindowTitle(appinfo.APP_DESC)
+	{
+		icon, err := loadPNGIcon("ayandict-64px.png")
+		if err != nil {
+			slog.Error("failed to load window icon", "err", err)
+		} else {
+			window.SetWindowIcon(icon)
+		}
+	}
 	window.Resize(600, 400)
 
 	entry := qt.NewQLineEdit2()
