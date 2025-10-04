@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/ilius/ayandict/v3/pkg/config"
-	qt "github.com/mappu/miqt/qt6"
 )
 
 // the current conf.Style value (unchanged config value)
@@ -51,16 +50,12 @@ func (app *Application) LoadUserStyle() {
 	// 	return
 	// }
 	slog.Info("Loading user style", "stylePath", stylePath)
-	// file := qt.NewQFile2(stylePath)
-	// file.Open(qt.QIODeviceBase__ReadOnly | qt.QIODeviceBase__Text)
-	// stream := qt.NewQTextStream2(file)
-	// app.SetStyleSheet(stream.ReadAll())
 	styleBytes, err := os.ReadFile(stylePath)
 	if err != nil {
 		slog.Error("Error loading style file: "+err.Error(), "stylePath", stylePath)
 		return
 	}
-	_ = qt.QApplication_SetStyleWithStyle(string(styleBytes))
+	app.SetStyleSheet(string(styleBytes))
 	currentStyle = conf.Style
 	{
 		err := readArticleStyle(conf.ArticleStyle)
