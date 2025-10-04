@@ -17,7 +17,7 @@ If you don't have Go language on your system, you can check [Releases](https://g
 If you have Go, you can compile and install the latest code with
 
 ```sh
-go install github.com/ilius/ayandict/v2@latest
+go install github.com/ilius/ayandict/v3@latest
 ```
 
 Or clone the repository, `cd` to it and run `go build`, which will create the binary (`ayandict.exe` or `ayandict`) in this directory.
@@ -156,5 +156,7 @@ But we also have 3 other search modes added in v2.0.0:
 - Start with, shows all terms that start with given query string
 - Regex (regular expression), for example `symm.*y`
 - Glob, for example `symm*y`
+
+Also a new mode "Word Match" is added recently (versions `v2.2.4` and `v3.0.0`).
 
 In all of these modes, shorter matched terms are given higher score. For example in Regex mode with query `symm.*y`, term "symmetry" comes before "symmetrically" because of smaller length and higher score.
