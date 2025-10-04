@@ -3,7 +3,7 @@ package appinfo
 const (
 	APP_NAME = "ayandict"
 	APP_DESC = "AyanDict"
-	VERSION  = "v2.2.3"
+	VERSION  = "v2.2.4"
 )
 
 const ABOUT = `A simple cross-platform desktop dictionary application based on Qt framework and written in Go that uses StarDict dictionary format.
