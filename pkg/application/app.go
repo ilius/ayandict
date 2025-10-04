@@ -416,11 +416,6 @@ func (app *Application) Run() {
 		onQuery(entry.Text(), app.queryArgs, false)
 	})
 
-	app.setupKeyPressEvent(app.window)
-	app.setupKeyPressEvent(app.resultList.QListWidget)
-	app.setupKeyPressEvent(app.articleView)
-	app.setupKeyPressEvent(app.historyView.QListWidget)
-
 	// --------------------------------------------------
 	// setting up handlers
 	app.setupHandlers()

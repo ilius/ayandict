@@ -14,6 +14,15 @@ import (
 )
 
 func (app *Application) setupHandlers() {
+	// MUST not call OnKeyPressEvent multiple times on the same widget
+	// that's why I separated setupArticleViewKeyPressEvent from setupKeyPressEvent
+
+	app.setupKeyPressEvent(app.window)
+	app.setupKeyPressEvent(app.resultList.QListWidget)
+	app.setupKeyPressEvent(app.historyView.QListWidget)
+
+	app.setupArticleViewKeyPressEvent()
+
 	app.articleView.SetupCustomHandlers()
 	app.historyView.SetupCustomHandlers()
 
@@ -68,21 +77,38 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 		switch event.Key() {
 		case int(qt.Key_Space): // " "
 			app.entry.SetFocusWithReason(qt.ShortcutFocusReason)
-			return
 		case int(qt.Key_Plus), int(qt.Key_Equal): // "+", "="
 			app.articleView.ZoomIn()
-			return
 		case int(qt.Key_Minus): // "-"
 			app.articleView.ZoomOut()
-			return
 		case escape: // event.Text()="\x1b"
 			app.resetQuery()
-			return
 		case int(qt.Key_F1):
 			aboutClicked(app.window.QWidget)
-			return
+		case int(qt.Key_PageUp), int(qt.Key_PageDown):
+			qt.QCoreApplication_SendEvent(app.articleView.QObject, event.QEvent)
+		default:
+			super(event)
 		}
-		super(event)
+	})
+}
+
+func (app *Application) setupArticleViewKeyPressEvent() {
+	app.articleView.OnKeyPressEvent(func(super func(event *qt.QKeyEvent), event *qt.QKeyEvent) {
+		switch event.Key() {
+		case int(qt.Key_Space): // " "
+			app.entry.SetFocusWithReason(qt.ShortcutFocusReason)
+		case int(qt.Key_Plus), int(qt.Key_Equal): // "+", "="
+			app.articleView.ZoomIn()
+		case int(qt.Key_Minus): // "-"
+			app.articleView.ZoomOut()
+		case escape: // event.Text()="\x1b"
+			app.resetQuery()
+		case int(qt.Key_F1):
+			aboutClicked(app.window.QWidget)
+		default:
+			super(event)
+		}
 	})
 }
 
