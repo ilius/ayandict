@@ -21,6 +21,16 @@ func loadPNGIcon(filename string) (*qt.QIcon, error) {
 	return icon, nil
 }
 
+func loadPNGPixmap(filename string) (*qt.QPixmap, error) {
+	data, err := res.ReadFile("res/" + filename)
+	if err != nil {
+		return nil, err
+	}
+	pixmap := qt.NewQPixmap()
+	pixmap.LoadFromDataWithData(data)
+	return pixmap, nil
+}
+
 // func loadSVGIcon(filename string) *qt.QIcon {
 // 	data, err := res.ReadFile("res/" + filename)
 // 	if err != nil {

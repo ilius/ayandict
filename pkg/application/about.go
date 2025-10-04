@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+	"log/slog"
 	"runtime"
 
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
@@ -31,15 +32,31 @@ func aboutClicked(
 	window := qt.NewQDialog(parent)
 	window.SetWindowTitle("About AyanDict")
 	window.Resize(700, 500)
+	window.SetWindowIcon(parent.WindowIcon())
 
-	topHBox := qt.NewQHBoxLayout2()
+	topHBox := qt.NewQFrame(nil)
+	topHBoxLayout := qt.NewQHBoxLayout(topHBox.QWidget)
+
+	{
+		pixmap, err := loadPNGPixmap("ayandict-64px.png")
+		if err != nil {
+			slog.Error("failed to load icon image", "err", err)
+		} else {
+			label := qt.NewQLabel2()
+			label.SetPixmap(pixmap)
+			label.SetMinimumWidth(80)
+			topHBoxLayout.AddWidget3(label.QWidget, 0, qt.AlignCenter)
+		}
+	}
+
 	topLabel := qt.NewQLabel3(fmt.Sprintf(
 		"AyanDict version %s\nUsing Qt %v and Go %v",
 		appinfo.VERSION,
 		qt.QLibraryInfo_Version().ToString(),
 		runtime.Version()[2:],
 	))
-	topHBox.AddWidget(topLabel.QWidget)
+	topHBoxLayout.AddWidget(topLabel.QWidget)
+	topHBoxLayout.AddStretch()
 
 	tabWidget := qt.NewQTabWidget2()
 	tabWidget.SetSizePolicy2(expanding, expanding)
@@ -78,7 +95,7 @@ func aboutClicked(
 	})
 
 	mainBox := qt.NewQVBoxLayout(window.QWidget)
-	mainBox.AddLayout(topHBox.Layout())
+	mainBox.AddWidget(topHBox.QWidget)
 	mainBox.AddWidget(tabWidget.QWidget)
 	mainBox.AddWidget(buttonBox.QWidget)
 
