@@ -23,6 +23,7 @@ func NewDictFlagsCheckboxes(hide func()) *DictFlagsCheckboxes {
 	w.addCheckBox("Start with", dicts.FlagNoStartWith)
 	w.addCheckBox("Regex", dicts.FlagNoRegex)
 	w.addCheckBox("Glob", dicts.FlagNoGlob)
+	w.addCheckBox("Word Match", dicts.FlagNoWordMatch)
 
 	hbox.AddSpacing(30) // TODO: parameterize
 	hideButton := widgets.NewQPushButton2("Hide", nil)

@@ -157,4 +157,6 @@ But we also have 3 other search modes added in v2.0.0:
 - Regex (regular expression), for example `symm.*y`
 - Glob, for example `symm*y`
 
+Also a new mode "Word Match" is added recently (version `v2.2.4`).
+
 In all of these modes, shorter matched terms are given higher score. For example in Regex mode with query `symm.*y`, term "symmetry" comes before "symmetrically" because of smaller length and higher score.

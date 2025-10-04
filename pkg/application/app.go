@@ -239,6 +239,7 @@ func (app *Application) Run() {
 		"Start with",
 		"Regex",
 		"Glob",
+		"Word Match",
 	})
 
 	okButton := widgets.NewQPushButton2(" OK ", nil)

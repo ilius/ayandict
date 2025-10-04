@@ -80,6 +80,8 @@ func queryModeParam(r *http.Request) (dictmgr.QueryMode, bool) {
 		return dictmgr.QueryModeRegex, true
 	case "glob":
 		return dictmgr.QueryModeGlob, true
+	case "wordMatch":
+		return dictmgr.QueryModeWordMatch, true
 	}
 	return dictmgr.QueryMode(0), false
 }
