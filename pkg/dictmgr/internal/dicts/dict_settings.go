@@ -39,6 +39,7 @@ func (ds *DictionarySettings) Regex() bool {
 func (ds *DictionarySettings) Glob() bool {
 	return ds.Flags&FlagNoGlob == 0
 }
+
 func (ds *DictionarySettings) WordMatch() bool {
 	return ds.Flags&FlagNoWordMatch == 0
 }
