@@ -53,7 +53,9 @@ func (h *CustomHandler) showRecordInGUI(record slog.Record) {
 	})
 	// \n does not work, <br> and <br/> does
 	// <pre> does not work
-	msg += "<br>" + strings.Join(attrs, "<br>")
+	if len(attrs) > 0 {
+		msg += "<br>" + strings.Join(attrs, "<br>")
+	}
 	qerr.ShowMessage(msg)
 }
 
