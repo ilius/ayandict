@@ -75,17 +75,6 @@ func (app *Application) init() {
 		panic("config local_server_ports is empty")
 	}
 	client.Timeout = conf.LocalClientTimeout
-
-	logging.SetupLoggerAfterConfigLoad(false, conf)
-
-	if ok, _ := findLocalServer(conf.LocalServerPorts); ok {
-		slog.Error("another instance is running")
-		return
-	}
-	go server.StartServer(conf.LocalServerPorts[0])
-
-	app.LoadUserStyle()
-	qdictmgr.InitDicts(conf, true)
 }
 
 func (app *Application) doQuery(query string) {
@@ -130,6 +119,17 @@ func (app *Application) onResultDisplay(terms []string) {
 // TODO: break down
 func (app *Application) Run() {
 	app.init()
+
+	logging.SetupLoggerAfterConfigLoad(false, conf)
+
+	if ok, _ := findLocalServer(conf.LocalServerPorts); ok {
+		slog.Error("another instance is running")
+		return
+	}
+	go server.StartServer(conf.LocalServerPorts[0])
+
+	app.LoadUserStyle()
+	qdictmgr.InitDicts(conf, true)
 
 	basePx := app.baseFontPixelSize()
 
