@@ -116,12 +116,30 @@ func getDictNameByHashMap() map[string][]string {
 	return byHash
 }
 
+func createDirectories(conf *config.Config) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+	for _, dirPath := range conf.DirectoryList {
+		if !filepath.IsAbs(dirPath) {
+			dirPath = filepath.Join(homeDir, dirPath)
+		}
+		_, err := os.Stat(dirPath)
+		if err != nil && os.IsNotExist(err) {
+			slog.Info("Creating directory", "path", dirPath)
+			os.MkdirAll(dirPath, 0o755)
+		}
+	}
+}
+
 func InitDicts(conf *config.Config) {
 	var err error
 	DictSettingsMap, DictsOrder, err = loadDictsSettings()
 	if err != nil {
 		slog.Error("error reading dicts.json: " + err.Error())
 	}
+	createDirectories(conf)
 
 	t := time.Now()
 	DictList, err = stardict.Open(conf.DirectoryList, DictsOrder)
