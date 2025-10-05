@@ -54,7 +54,7 @@ func (h *CustomHandler) showRecordInGUI(record slog.Record) {
 	// \n does not work, <br> and <br/> does
 	// <pre> does not work
 	msg += "<br>" + strings.Join(attrs, "<br>")
-	qerr.Error(msg)
+	qerr.ShowMessage(msg)
 }
 
 func (h *CustomHandler) Handle(ctx context.Context, record slog.Record) error {

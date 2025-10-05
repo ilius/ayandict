@@ -29,7 +29,7 @@ var sqldictOpen = func([]string, map[string]int) []common.Dictionary {
 
 func init() {
 	stardict.ErrorHandler = func(err error) {
-		qerr.Error(err)
+		qerr.ShowMessage(err.Error())
 	}
 }
 
