@@ -12,6 +12,7 @@ VERSION=$(go run pkg/version/version.go)
 
 export CGO_ENABLED=1
 export GOOS=darwin
+export CGO_CXXFLAGS=-std=c++17
 OUT=ayandict-$VERSION-mac-$GOARCH
 go build -o $OUT "${FLAGS[@]}" "$@"
 bzip2 -f $OUT
