@@ -20,7 +20,7 @@ func addTabWithIcon(
 		fmt.Println(err)
 	}
 	if icon == nil {
-		_ = tabWidget.AddTab2(widget, nil, label)
+		_ = tabWidget.AddTab(widget, label)
 		return
 	}
 	_ = tabWidget.AddTab2(widget, icon, label)
