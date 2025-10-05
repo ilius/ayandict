@@ -17,7 +17,7 @@ func addTabWithIcon(
 ) {
 	icon, err := loadPNGIcon(filename)
 	if err != nil {
-		fmt.Println(err)
+		slog.Error("error loading icon", "filename", filename)
 	}
 	if icon == nil {
 		_ = tabWidget.AddTab(widget, label)
@@ -26,9 +26,7 @@ func addTabWithIcon(
 	_ = tabWidget.AddTab2(widget, icon, label)
 }
 
-func aboutClicked(
-	parent *qt.QWidget,
-) {
+func aboutClicked(parent *qt.QWidget) {
 	window := qt.NewQDialog(parent)
 	window.SetWindowTitle("About AyanDict")
 	window.Resize(700, 500)
@@ -87,10 +85,7 @@ func aboutClicked(
 	addTabWithIcon(tabWidget, licenseWidget.QWidget, "License", "license-22.png")
 
 	buttonBox := qt.NewQDialogButtonBox2()
-	buttonBox.AddButton2(
-		"Close",
-		qt.QDialogButtonBox__AcceptRole,
-	).OnClicked(func() {
+	buttonBox.AddButton2("Close", qt.QDialogButtonBox__AcceptRole).OnClicked(func() {
 		window.Accept()
 	})
 
