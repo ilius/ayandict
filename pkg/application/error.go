@@ -1,13 +1,10 @@
+//go:build !darwin
+
 package application
 
 import (
-	"log"
-	"os"
-
 	qt "github.com/mappu/miqt/qt6"
 )
-
-var stdLogger = log.New(os.Stderr, "", log.LstdFlags)
 
 func showErrorMessage(msg string) {
 	defer func() {
