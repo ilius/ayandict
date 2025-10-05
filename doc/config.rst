@@ -188,7 +188,7 @@ Default value: ``false``
 ---------------------------------
 Misc buttons vertical padding
 
-Default value: ``0``
+Default value: ``5``
 
 ``reduce_minimum_window_width``
 -------------------------------

@@ -207,7 +207,7 @@ func Default() *Config {
 
 		ArticleArrowKeys: false,
 
-		MiscButtonsVerticalPadding: 0,
+		MiscButtonsVerticalPadding: 5,
 
 		ReduceMinimumWindowWidth: false,
 
