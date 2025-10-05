@@ -52,6 +52,9 @@ func NewArticleView(app *Application) *ArticleView {
 	widget.SetOpenExternalLinks(true)
 	widget.SetOpenLinks(false)
 	dpi := qt.QGuiApplication_PrimaryScreen().PhysicalDotsPerInch()
+	if dpi <= 0 {
+		panic("failed to get DPI")
+	}
 	view := &ArticleView{
 		QTextBrowser: widget,
 		app:          app,
