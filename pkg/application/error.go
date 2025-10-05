@@ -17,5 +17,9 @@ func showErrorMessage(msg string) {
 		}
 	}()
 	d := qt.NewQErrorMessage(nil)
+	d.OnFinished(func(result int) {
+		d.Destroy()
+	})
 	d.ShowMessage(msg)
+	d.Exec()
 }
