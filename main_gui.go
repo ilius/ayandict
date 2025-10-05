@@ -65,6 +65,11 @@ func main() {
 
 	// slog uses stdout
 	noColor := os.Getenv("NO_COLOLR") != ""
+
+	// to fix issues on MacOS and *BSD
+	// ensure that all UI-related code is executed on the main thread
+	runtime.LockOSThread()
+
 	logging.SetupGUILogger(noColor, logging.DefaultLevel)
 
 	if *noGuiFlag {
@@ -75,6 +80,5 @@ func main() {
 		config.PrivateMode = true
 	}
 
-	runtime.LockOSThread()
 	application.Run()
 }
