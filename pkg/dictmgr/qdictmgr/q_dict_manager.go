@@ -343,7 +343,7 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 		}
 	})
 
-	table.ConnectCellClicked(func(row int, column int) {
+	table.ConnectCurrentCellChanged(func(row int, column int, prevRow int, prevColumn int) {
 		if column < 3 {
 			extraOptionsWidget.Hide()
 			return
