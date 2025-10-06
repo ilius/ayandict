@@ -9,10 +9,34 @@ on:
   pull_request:
     branches: ["v3"]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: macos-14
     steps:
+      - name: Download Go build cache
+        if: ${{ github.ref != 'refs/heads/release-macos' }}
+        id: download-go-build-cache-mac
+        uses: dawidd6/action-download-artifact@v11
+        continue-on-error: true
+        with:
+          workflow_search: true
+          workflow_conclusion: success
+          event: push
+          name: go-build-cache-mac
+          path: /Users/runner/Library/Caches/go-build
+          if_no_artifact_found: ignore
+          use_unzip: true
+          github_token: ${{ github.token }}
+          check_artifacts: true
+          search_artifacts: true
+
+      - name: Check Go build cache
+        run: ls -l /Users/runner/Library/Caches/go-build || true
+
       - uses: actions/checkout@v3
 
       - name: Show kernel info
@@ -29,8 +53,7 @@ jobs:
           go-version: 1.24
 
       - name: Build
-        run: CGO_ENABLED=1 CGO_CXXFLAGS=-std=c++17 go build
-        # -ldflags '-s -w' -trimpath
+        run: CGO_ENABLED=1 CGO_CXXFLAGS=-std=c++17 go build -ldflags '-s -w' -trimpath
 
       - name: CLICK HERE TO DOWNLOAD BINARY
         uses: actions/upload-artifact@v4
@@ -43,7 +66,7 @@ jobs:
       - name: Upload Go build cache
         uses: actions/upload-artifact@v4
         with:
-          name: go-build-cache
+          name: go-build-cache-mac
           if-no-files-found: error
           retention-days: 7
-          path: ~/Library/Caches/go-build
+          path: /Users/runner/Library/Caches/go-build
