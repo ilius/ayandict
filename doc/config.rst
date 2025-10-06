@@ -112,6 +112,48 @@ Search mode for Random Favorite
 
 Default value: ``"wordMatch"``
 
+``scan_popup_clipboard``
+------------------------
+Scan Popup: activate on copy to clipboard
+
+Default value: ``false``
+
+``scan_popup_selection``
+------------------------
+Scan Popup: activate on selection
+
+Default value: ``false``
+
+``scan_popup_mode``
+-------------------
+Scan Popup: search mode
+
+Default value: ``"fuzzy"``
+
+``scan_popup_width``
+--------------------
+Scan Popup: window width
+
+Default value: ``800``
+
+``scan_popup_height``
+---------------------
+Scan Popup: window height
+
+Default value: ``600``
+
+``scan_popup_max_count``
+------------------------
+Scan Popup: max number of windows
+
+Default value: ``1``
+
+``scan_popup_font_size_factor``
+-------------------------------
+Scan Popup: font size factor (relative to app)
+
+Default value: ``0.8``
+
 ``audio``
 ---------
 Enable audio in article

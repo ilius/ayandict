@@ -103,6 +103,7 @@ func (app *Application) ReloadConfig() {
 
 	app.updateMiscButtonsVisibility()
 	app.updateMiscButtonsPadding()
+	app.updateTrayMenu()
 }
 
 func OpenConfig() {

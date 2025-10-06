@@ -3,6 +3,7 @@ package application
 import (
 	"fmt"
 	"log/slog"
+	"sync/atomic"
 
 	"github.com/ilius/ayandict/v3/pkg/activity"
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
@@ -28,6 +29,7 @@ type Application struct {
 	*qt.QApplication
 
 	window *qt.QMainWindow
+	icon   *qt.QIcon
 
 	style *qt.QStyle
 
@@ -63,7 +65,11 @@ type Application struct {
 	dictsButton          *qt.QPushButton
 	activityTypeCombo    *qt.QComboBox
 
-	trayIcon *qt.QSystemTrayIcon
+	trayIcon          *qt.QSystemTrayIcon
+	trayScanSelection *qt.QAction
+	trayScanClipboard *qt.QAction
+
+	scanPopupCount atomic.Int32
 }
 
 func (app *Application) init() {
@@ -150,6 +156,7 @@ func (app *Application) Run() {
 			slog.Error("failed to load window icon", "err", err)
 			panic(err)
 		}
+		app.icon = icon
 		window.SetWindowIcon(icon)
 		app.setupTrayIcon(icon)
 	}
@@ -401,6 +408,8 @@ func (app *Application) Run() {
 	app.qs = qs
 	app.setupSettings(qs, mainSplitter)
 	qsettings.RestoreActivityMode(qs, activityTypeCombo)
+
+	app.setupScanPopup()
 
 	window.Show()
 	_ = qt.QApplication_Exec()

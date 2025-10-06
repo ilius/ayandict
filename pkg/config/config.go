@@ -75,6 +75,14 @@ type Config struct {
 
 	RandomFavoriteSearchMode string `toml:"random_favorite_search_mode" doc:"Search mode for Random Favorite"`
 
+	ScanPopupClipboard      bool    `toml:"scan_popup_clipboard" doc:"Scan Popup: activate on copy to clipboard"`
+	ScanPopupSelection      bool    `toml:"scan_popup_selection" doc:"Scan Popup: activate on selection"`
+	ScanPopupMode           string  `toml:"scan_popup_mode" doc:"Scan Popup: search mode"`
+	ScanPopupWidth          int     `toml:"scan_popup_width" doc:"Scan Popup: window width"`
+	ScanPopupHeight         int     `toml:"scan_popup_height" doc:"Scan Popup: window height"`
+	ScanPopupMaxCount       int32   `toml:"scan_popup_max_count" doc:"Scan Popup: max number of windows"`
+	ScanPopupFontSizeFactor float64 `toml:"scan_popup_font_size_factor" doc:"Scan Popup: font size factor (relative to app)"`
+
 	Audio bool `toml:"audio" doc:"Enable audio in article"`
 
 	AudioMPV bool `toml:"audio_mpv" doc:"Use ‘mpv‘ command for playing audio"`
@@ -182,6 +190,14 @@ func Default() *Config {
 		MaxResultsTotal: 40,
 
 		RandomFavoriteSearchMode: "wordMatch",
+
+		ScanPopupClipboard:      false,
+		ScanPopupSelection:      false,
+		ScanPopupMode:           "fuzzy",
+		ScanPopupWidth:          800,
+		ScanPopupHeight:         600,
+		ScanPopupMaxCount:       1,
+		ScanPopupFontSizeFactor: 0.8,
 
 		Audio: true,
 
