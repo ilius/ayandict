@@ -5,7 +5,8 @@ set -x
 export CGO_ENABLED=1
 
 FLAGS=(-ldflags '-s -w' -trimpath)
-VERSION=$(go run pkg/version/version.go)
+# VERSION=$(go run pkg/version/version.go)
+VERSION=$(git describe --tags)
 
 export GOMAXPROCS=4
 # also can use: go build -p 4
