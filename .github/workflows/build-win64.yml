@@ -1,0 +1,92 @@
+name: Windows Build
+
+on:
+  push:
+    branches: ["build-windows"]
+  pull_request:
+    branches: ["v3"]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Upgrade pip
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip > $null
+
+      - name: Install Qt6
+        shell: pwsh
+        run: |
+          pip install -q --upgrade aqtinstall
+
+          Write-Host "Detecting latest Qt 6.x version..."
+          $versions = python -m aqt list-qt windows desktop | `
+            Select-String -Pattern '6\.[0-9]+(\.[0-9]+)?' -AllMatches | `
+            ForEach-Object { $_.Matches.Value } | Sort-Object -Unique | `
+            Sort-Object { [Version]$_ } -Descending
+
+          if (-not $versions) {
+            Write-Error "Could not detect any Qt 6.x version in aqt output"
+            exit 1
+          }
+
+          $qtVersion = $versions[0]
+          Write-Host "Using Qt version $qtVersion"
+
+          python -m aqt install-qt windows desktop $qtVersion win64_msvc2022_64 `
+            --outputdir C:\Qt `
+            -m all
+
+          # Look for installed folder
+          $qtDir = Get-ChildItem C:\Qt -Directory | Where-Object { $_.Name -match '^6\.' } | Sort-Object -Descending | Select-Object -First 1
+          if (-not $qtDir) {
+            Write-Error "Qt installation failed — version directory not found under C:\Qt"
+            exit 1
+          }
+
+          $qtArchDir = Join-Path $qtDir.FullName "msvc2022_64"
+          if (-not (Test-Path $qtArchDir)) {
+            Write-Error "Qt installation failed — architecture directory not found: $qtArchDir"
+            exit 1
+          }
+
+          Write-Host "Qt successfully installed at $qtArchDir"
+          Write-Host "Listing few files for verification:"
+          Get-ChildItem $qtArchDir\bin | Select-Object -First 10
+
+          echo "QT6_DIR=$qtArchDir" >> $env:GITHUB_ENV
+          echo "PKG_CONFIG_PATH=$qtArchDir\lib\pkgconfig" >> $env:GITHUB_ENV
+
+      - name: Install pkgconf (MSYS2)
+        shell: pwsh
+        run: |
+          choco install -y msys2 > $null
+          & "C:\tools\msys64\usr\bin\bash.exe" -lc "pacman -Sy --noconfirm pkgconf > /dev/null"
+          echo "PKG_CONFIG=C:\tools\msys64\usr\bin\pkgconf.exe" >> $env:GITHUB_ENV
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.24
+
+      - name: Build
+        shell: pwsh
+        run: |
+          $env:PATH = "$env:QT6_DIR\bin;$env:PATH"
+          $env:PKG_CONFIG_PATH = "$env:QT6_DIR\lib\pkgconfig"
+          $env:PKG_CONFIG = "C:\tools\msys64\usr\bin\pkgconf.exe"
+          go build -v -trimpath -ldflags "-s -w" .
+        env:
+          CGO_ENABLED: 1
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ayandict-windows-amd64-${{ github.sha }}
+          if-no-files-found: error
+          retention-days: 7
+          path: ayandict.exe
