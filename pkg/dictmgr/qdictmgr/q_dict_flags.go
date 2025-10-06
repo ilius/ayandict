@@ -53,6 +53,7 @@ func (w *DictFlagsCheckboxes) SetActiveDictSetting(ds *dicts.DictionarySettings)
 	w.checkList[1].SetChecked(ds.StartWith())
 	w.checkList[2].SetChecked(ds.Regex())
 	w.checkList[3].SetChecked(ds.Glob())
+	w.checkList[4].SetChecked(ds.WordMatch())
 }
 
 func (w *DictFlagsCheckboxes) addCheckBox(label string, flag uint16) {
