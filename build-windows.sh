@@ -2,13 +2,7 @@
 set -e
 set -x
 
-if [ -z "$GOARCH" ] ; then
-	echo "GOARCH is not set" 2>&1
-	exit 1
-fi
-
 export CGO_ENABLED=1
-export GOOS=windows
 
 FLAGS=(-ldflags '-s -w' -trimpath)
 VERSION=$(go run pkg/version/version.go)
@@ -24,13 +18,12 @@ function run_zip() {
 	fi
 	if which zip ; then
 		zip $ZIP_PATH $IN_PATH
-		rm $IN_PATH
 		return
 	fi
 }
 
 
-OUT=ayandict-$VERSION-windows-$GOARCH.exe
+OUT=ayandict-$VERSION-windows-$(go env GOARCH).exe
 go build -o $OUT "${FLAGS[@]}" "$@"
 run_zip $OUT
 
