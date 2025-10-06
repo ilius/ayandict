@@ -56,7 +56,7 @@ func (h *CustomHandler) showRecordInGUI(record slog.Record) {
 	if len(attrs) > 0 {
 		msg += "<br>" + strings.Join(attrs, "<br>")
 	}
-	qerr.ShowMessage(msg)
+	qerr.ShowErrorDialog(msg)
 }
 
 func (h *CustomHandler) Handle(ctx context.Context, record slog.Record) error {

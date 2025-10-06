@@ -16,7 +16,7 @@ func Run() {
 		window:         qt.NewQMainWindow(nil),
 		allTextWidgets: []qtcommon.HasSetFont{},
 	}
-	qerr.ShowMessage = showErrorMessage
+	qerr.ShowErrorDialog = showErrorMessage
 	app.style = qt.QApplication_Style()
 	app.bottomBoxStyleOpt = qt.NewQStyleOptionButton()
 	qt.QCoreApplication_SetApplicationName(appinfo.APP_DESC)
