@@ -93,7 +93,7 @@ type Config struct {
 
 	ColorMapping map[string]string `toml:"color_mapping" doc:"Mapping for colors used in article"`
 
-	PopupStyleStr string `toml:"popup_style_str" doc:"Stylesheet (text) for 'Loading' popup"`
+	LoadingPopupStyleStr string `toml:"loading_popup_style_str" doc:"Stylesheet (text) for 'Loading' popup"`
 
 	ArticleZoomFactor float64 `toml:"article_zoom_factor" doc:"Zoom factor for article with mouse wheel or keyboard"`
 
@@ -201,7 +201,7 @@ func Default() *Config {
 
 		ColorMapping: map[string]string{},
 
-		PopupStyleStr: "border: 1px solid red; background-color: #333; color: white",
+		LoadingPopupStyleStr: "border: 1px solid red; background-color: #333; color: white",
 
 		ArticleZoomFactor: 1.1,
 

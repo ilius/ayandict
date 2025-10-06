@@ -17,7 +17,7 @@ func loadingDictsPopup(conf *config.Config) *qt.QLabel {
 	popup.SetAlignment(qt.AlignCenter)
 	popup.SetFixedSize2(300, 100)
 	popup.SetWindowModality(qt.WindowModal)
-	popup.SetStyleSheet(conf.PopupStyleStr)
+	popup.SetStyleSheet(conf.LoadingPopupStyleStr)
 	popup.Show()
 	qt.QCoreApplication_ProcessEvents()
 	return popup

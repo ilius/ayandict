@@ -166,8 +166,8 @@ Mapping for colors used in article
 
 Default value: ``{}``
 
-``popup_style_str``
--------------------
+``loading_popup_style_str``
+---------------------------
 Stylesheet (text) for 'Loading' popup
 
 Default value: ``"border: 1px solid red; background-color: #333; color: white"``
