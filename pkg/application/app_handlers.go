@@ -34,8 +34,12 @@ func (app *Application) setupHandlers() {
 		key := frequencyTable.Keys[item.Row()]
 		app.doQuery(key)
 		newRow := frequencyTable.KeyMap[key]
-		// item.Column() panics!
-		frequencyTable.SetCurrentCell(newRow, 0)
+		column := item.Column()
+		// slog.Info("frequencyTable.OnItemActivated", "newRow", newRow, "column", column)
+		if column < 0 {
+			column = 1 // for some reason, it's -1 instead of 1
+		}
+		frequencyTable.SetCurrentCell(newRow, column)
 	})
 	app.favoritesWidget.OnItemActivated(func(item *qt.QListWidgetItem) {
 		app.doQuery(item.Text())
@@ -135,7 +139,6 @@ func (app *Application) onEntryKeyPress(super func(*qt.QKeyEvent), event *qt.QKe
 	if conf.SearchOnType && key < escape {
 		if int(event.Modifiers())&searchOnTypeNotModifierMask == 0 {
 			text := app.entry.Text()
-			// slog.Debug("checking SearchOnType") // FIXME: panics
 			if len(text) >= conf.SearchOnTypeMinLength {
 				onQuery(text, app.queryArgs, true)
 			}
