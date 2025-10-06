@@ -70,11 +70,8 @@ func shouldReloadDicts(currentList []string, newList []string) bool {
 func (app *Application) ReloadFont() {
 	font := ConfigFont()
 	// app.SetFont only applies to future widgets (DictManager for example)
-	qt.QApplication_SetFont2(font, "")
-	// qt.QApplication_AllWidgets panics
-	// app.AllWidgets() panics
-	// window.Children() panics
-	for _, w := range app.allTextWidgets {
+	qt.QApplication_SetFont(font)
+	for _, w := range qt.QApplication_AllWidgets() {
 		w.SetFont(font)
 	}
 }

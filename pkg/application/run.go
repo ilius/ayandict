@@ -11,9 +11,8 @@ import (
 
 func Run() {
 	app := &Application{
-		QApplication:   qt.NewQApplication(os.Args),
-		window:         qt.NewQMainWindow(nil),
-		allTextWidgets: []qtcommon.HasSetFont{},
+		QApplication: qt.NewQApplication(os.Args),
+		window:       qt.NewQMainWindow(nil),
 	}
 	logging.ShowErrorDialog = showErrorMessage
 	app.style = qt.QApplication_Style()

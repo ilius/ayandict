@@ -11,7 +11,6 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/qdictmgr"
 	"github.com/ilius/ayandict/v3/pkg/logging"
-	"github.com/ilius/ayandict/v3/pkg/qtcommon"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
 	"github.com/ilius/ayandict/v3/pkg/server"
 	qt "github.com/mappu/miqt/qt6"
@@ -37,8 +36,6 @@ type Application struct {
 	bottomBoxStyleOpt *qt.QStyleOptionButton
 
 	dictManager *qdictmgr.DictManager
-
-	allTextWidgets []qtcommon.HasSetFont
 
 	queryArgs       *QueryArgs
 	headerLabel     *HeaderLabel
@@ -85,10 +82,6 @@ func (app *Application) doQuery(query string) {
 func (app *Application) runDictManager() bool {
 	if app.dictManager == nil {
 		app.dictManager = qdictmgr.NewDictManager(app.QApplication, app.window.QWidget, conf)
-		app.allTextWidgets = append(
-			app.allTextWidgets,
-			app.dictManager.TextWidgets...,
-		)
 	}
 	return app.dictManager.Run()
 }
@@ -389,35 +382,6 @@ func (app *Application) Run() {
 
 	qt.QApplication_SetFont(ConfigFont())
 
-	app.allTextWidgets = []qtcommon.HasSetFont{
-		// local:
-		queryLabel,
-		okButton,
-		aboutButton,
-		rightPanel,
-		// fields:
-		app.frequencyTable,
-		app.activityTypeCombo,
-		app.entry,
-		app.searchModeCombo,
-		app.headerLabel,
-		app.articleView,
-		app.historyView,
-		app.favoritesWidget,
-		app.saveHistoryButton,
-		app.clearHistoryButton,
-		app.saveFavoritesButton,
-		app.reloadDictsButton,
-		app.closeDictsButton,
-		app.reloadStyleButton,
-		app.randomEntryButton,
-		app.randomFavoriteButton,
-		app.dictsButton,
-		app.openConfigButton,
-		app.reloadConfigButton,
-		app.clearButton,
-		app.resultList,
-	}
 	app.ReloadFont()
 
 	okButton.OnClicked(func() {
