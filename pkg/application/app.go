@@ -62,6 +62,8 @@ type Application struct {
 	clearButton          *qt.QPushButton
 	dictsButton          *qt.QPushButton
 	activityTypeCombo    *qt.QComboBox
+
+	trayIcon *qt.QSystemTrayIcon
 }
 
 func (app *Application) init() {
@@ -141,14 +143,17 @@ func (app *Application) Run() {
 
 	window := app.window
 	window.SetWindowTitle(appinfo.APP_DESC)
+
 	{
 		icon, err := loadPNGIcon("ayandict-64px.png")
 		if err != nil {
 			slog.Error("failed to load window icon", "err", err)
-		} else {
-			window.SetWindowIcon(icon)
+			panic(err)
 		}
+		window.SetWindowIcon(icon)
+		app.setupTrayIcon(icon)
 	}
+
 	window.Resize(600, 400)
 
 	entry := qt.NewQLineEdit2()
