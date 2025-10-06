@@ -9,12 +9,18 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
+var isMac = runtime.GOOS == "darwin"
+
 func addTabWithIcon(
 	tabWidget *qt.QTabWidget,
 	widget *qt.QWidget,
 	label string,
 	filename string,
 ) {
+	if isMac {
+		_ = tabWidget.AddTab(widget, label)
+		return
+	}
 	icon, err := loadPNGIcon(filename)
 	if err != nil {
 		slog.Error("error loading icon", "filename", filename)
