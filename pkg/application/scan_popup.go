@@ -7,6 +7,7 @@ import (
 
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	qt "github.com/mappu/miqt/qt6"
+	"golang.design/x/hotkey"
 )
 
 type HasOnMouseEvents interface {
@@ -154,4 +155,42 @@ func (app *Application) scanPopup(query string) {
 
 	popup.Resize(conf.ScanPopupWidth, conf.ScanPopupHeight)
 	popup.Show()
+}
+
+func (app *Application) setupScanPopupHotkey() func() {
+	hotkeyMap := map[string]*hotkey.Hotkey{}
+	for _, keyStr := range conf.ScanPopupKeys {
+		// seq := qt.QKeySequence_FromString(keyStr)
+		// slog.Info("setupScanPopup", "seq", seq.ToString())
+		mods, key, err := ParseHotkeyString(keyStr)
+		if err != nil {
+			slog.Error("failed to parse hotkey string", "keyStr", keyStr, "err", err)
+			continue
+		}
+		hkey := hotkey.New(mods, key)
+		slog.Info("setupScanPopup: adding hotkey", "keyStr", keyStr)
+		hotkeyMap[keyStr] = hkey
+
+		slog.Info("setupScanPopup: registering hotkey", "keyStr", keyStr)
+		err = hkey.Register()
+		if err != nil {
+			slog.Error("failed to register hotkey", "err", err)
+		}
+	}
+	slog.Info("setupScanPopup", "hotkeyMap", hotkeyMap)
+	return func() {
+		for _, hkey := range hotkeyMap {
+
+			// Use goroutines to listen independently
+			go func() {
+				hkey := hkey
+				for range hkey.Keydown() {
+					slog.Info("setupScanPopup: Hotkey pressed", "hotkey", hkey.String())
+				}
+			}()
+		}
+
+		// Keep the main thread alive
+		select {}
+	}
 }

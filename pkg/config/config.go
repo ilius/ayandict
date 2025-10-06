@@ -83,6 +83,8 @@ type Config struct {
 	ScanPopupMaxCount       int32   `toml:"scan_popup_max_count" doc:"Scan Popup: max number of windows"`
 	ScanPopupFontSizeFactor float64 `toml:"scan_popup_font_size_factor" doc:"Scan Popup: font size factor (relative to app)"`
 
+	ScanPopupKeys []string `toml:"scan_popup_keys" doc:"List of hotkeys / key bindings for Scan Popup"`
+
 	Audio bool `toml:"audio" doc:"Enable audio in article"`
 
 	AudioMPV bool `toml:"audio_mpv" doc:"Use ‘mpv‘ command for playing audio"`
@@ -198,6 +200,10 @@ func Default() *Config {
 		ScanPopupHeight:         600,
 		ScanPopupMaxCount:       1,
 		ScanPopupFontSizeFactor: 0.8,
+
+		ScanPopupKeys: []string{
+			"Ctrl+Space",
+		},
 
 		Audio: true,
 

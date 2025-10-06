@@ -410,6 +410,8 @@ func (app *Application) Run() {
 	qsettings.RestoreActivityMode(qs, activityTypeCombo)
 
 	app.setupScanPopup()
+	scanFunc := app.setupScanPopupHotkey()
+	go scanFunc()
 
 	window.Show()
 	_ = qt.QApplication_Exec()

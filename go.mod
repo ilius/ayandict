@@ -8,9 +8,13 @@ require (
 	github.com/ilius/go-stardict/v2 v2.5.1
 	github.com/ilius/is/v2 v2.3.2
 	github.com/mappu/miqt v0.11.2
+	golang.design/x/hotkey v0.4.1
 )
 
-require github.com/ilius/glob v0.0.0-20250212111036-4c41f838a304 // indirect
+require (
+	github.com/ilius/glob v0.0.0-20250212111036-4c41f838a304 // indirect
+	golang.design/x/mainthread v0.3.0 // indirect
+)
 
 // replace github.com/ilius/go-stardict/v2 => ../go-stardict
 // replace github.com/ilius/go-dict-sql => ../go-dict-sql
