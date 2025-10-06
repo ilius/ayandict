@@ -73,15 +73,6 @@ func splitIntList(st string) ([]int, error) {
 	return nums, nil
 }
 
-func splitterSizes(splitter *qt.QSplitter) []int {
-	itemCount := splitter.Count()
-	widthList := make([]int, itemCount)
-	for i := range itemCount {
-		widthList[i] = splitter.Widget(i).Geometry().Width()
-	}
-	return widthList
-}
-
 func GetQSettings(parent *qt.QObject) *qt.QSettings {
 	return qt.NewQSettings8("ilius", appinfo.APP_NAME, parent)
 }
@@ -272,8 +263,8 @@ func saveSplitterSizes(qs *qt.QSettings, splitter *qt.QSplitter, mainKey string)
 	// slog.Info("Saving splitter sizes")
 	qs.BeginGroup(*qt.NewQAnyStringView3(mainKey))
 	defer qs.EndGroup()
-	sizes := splitterSizes(splitter)
-	qs.SetValue(qs_sizes, newQVarStr(joinIntList(sizes)))
+	// splitter.Sizes() used to panic in qt5
+	qs.SetValue(qs_sizes, newQVarStr(joinIntList(splitter.Sizes())))
 }
 
 func RestoreSplitterSizes(qs *qt.QSettings, splitter *qt.QSplitter, mainKey string) {
@@ -290,9 +281,6 @@ func RestoreSplitterSizes(qs *qt.QSettings, splitter *qt.QSplitter, mainKey stri
 	}
 	splitter.SetSizes(sizes)
 }
-
-// QSplitter.Sizes() panics:
-// interface conversion: interface {} is []interface {}, not []int
 
 func actionSaveLoop(ch <-chan time.Time, callable func()) {
 	var lastSave time.Time

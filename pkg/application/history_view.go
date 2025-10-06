@@ -92,11 +92,9 @@ func (h *HistoryView) SetupCustomHandlers() {
 		panic("doQuery is not set")
 	}
 
-	// on old (qt5) binding: view.SelectedItems() panics
-	// and even after fixing panic, doesn't return anything
-	// you have to use view.CurrentIndex()
 	h.OnMousePressEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 		super(event)
+		// slog.Info("HistoryView", "SelectedItems", h.SelectedItems())
 		index := h.CurrentIndex()
 		if index == nil {
 			return

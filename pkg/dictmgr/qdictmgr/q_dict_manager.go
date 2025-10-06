@@ -156,12 +156,9 @@ func (dm *DictManager) setItem(
 	table.SetItem(index, dm_col_dictName, dm.newItem(dictName))
 }
 
-// table.SelectedIndexes() panics/crashes
-// so do methods in table.SelectionModel()
-// you have to use table.CurrentRow(), table.CurrentIndex()
-// or table.CurrentItem()
 func (dm *DictManager) toolbarUp() {
 	table := dm.TableWidget
+	// slog.Info("DictManager", "SelectedIndexes", table.SelectedItems())
 	row := table.CurrentRow()
 	if row < 1 {
 		return
