@@ -236,12 +236,6 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 	volumeInput := dm.VolumeInput
 
 	table.SetColumnCount(columns)
-	header := table.HorizontalHeader()
-	header.ResizeSection(dm_col_enable, 10)
-	header.ResizeSection(dm_col_header, 10)
-	header.ResizeSection(dm_col_symbol, 20)
-	header.ResizeSection(dm_col_entries, 80)
-	header.ResizeSection(dm_col_dictName, 500)
 
 	table.SetHorizontalHeaderItem(
 		dm_col_enable,
@@ -263,6 +257,14 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 		dm_col_dictName,
 		qt.NewQTableWidgetItem2("Name"),
 	)
+
+	header := table.HorizontalHeader()
+	header.SetSectionResizeMode2(dm_col_enable, qt.QHeaderView__ResizeToContents)
+	header.SetSectionResizeMode2(dm_col_header, qt.QHeaderView__ResizeToContents)
+	header.SetSectionResizeMode2(dm_col_symbol, qt.QHeaderView__ResizeToContents)
+	header.SetSectionResizeMode2(dm_col_entries, qt.QHeaderView__ResizeToContents)
+	header.SetSectionResizeMode2(dm_col_dictName, qt.QHeaderView__Stretch)
+	header.ResizeSections(qt.QHeaderView__ResizeToContents)
 
 	extraOptionsWidget := qt.NewQWidget2()
 	extraOptionsVBox := qt.NewQVBoxLayout2()
