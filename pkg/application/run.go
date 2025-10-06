@@ -5,8 +5,7 @@ import (
 	"os"
 
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
-	"github.com/ilius/ayandict/v3/pkg/qtcommon"
-	"github.com/ilius/ayandict/v3/pkg/qtcommon/qerr"
+	"github.com/ilius/ayandict/v3/pkg/logging"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -16,7 +15,7 @@ func Run() {
 		window:         qt.NewQMainWindow(nil),
 		allTextWidgets: []qtcommon.HasSetFont{},
 	}
-	qerr.ShowErrorDialog = showErrorMessage
+	logging.ShowErrorDialog = showErrorMessage
 	app.style = qt.QApplication_Style()
 	app.bottomBoxStyleOpt = qt.NewQStyleOptionButton()
 	qt.QCoreApplication_SetApplicationName(appinfo.APP_DESC)

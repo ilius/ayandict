@@ -10,11 +10,13 @@ import (
 
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/go-color"
-	"github.com/ilius/ayandict/v3/pkg/qtcommon/qerr"
 	"github.com/ilius/ayandict/v3/pkg/slogcolor"
 )
 
 const DefaultLevel = slog.LevelInfo
+
+// ShowErrorDialog: set in GUI application
+var ShowErrorDialog = func(_ string) {}
 
 func SetupGUILogger(noColor bool, level slog.Level) {
 	handler := NewColoredHandler(noColor, level)
@@ -56,7 +58,7 @@ func (h *CustomHandler) showRecordInGUI(record slog.Record) {
 	if len(attrs) > 0 {
 		msg += "<br>" + strings.Join(attrs, "<br>")
 	}
-	qerr.ShowErrorDialog(msg)
+	ShowErrorDialog(msg)
 }
 
 func (h *CustomHandler) Handle(ctx context.Context, record slog.Record) error {

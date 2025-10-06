@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/ilius/ayandict/v3/pkg/config"
-	"github.com/ilius/ayandict/v3/pkg/qtcommon/qerr"
+	"github.com/ilius/ayandict/v3/pkg/logging"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/go-stardict/v2"
 )
@@ -29,7 +29,7 @@ var sqldictOpen = func([]string, map[string]int) []common.Dictionary {
 
 func init() {
 	stardict.ErrorHandler = func(err error) {
-		qerr.ShowErrorDialog(err.Error())
+		logging.ShowErrorDialog(err.Error())
 	}
 }
 
