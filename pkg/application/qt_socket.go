@@ -14,7 +14,7 @@ const (
 
 func (app *Application) startLocalSocketServer() bool {
 	server := network.NewQLocalServer()
-	if !server.Listen(appinfo.APP_NAME) {
+	if !server.Listen(appinfo.LOCAL_SOCKET_NAME) {
 		return false
 	}
 	server.OnNewConnection(func() {

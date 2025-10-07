@@ -1,10 +1,16 @@
 package appinfo
 
+import (
+	"os/user"
+)
+
 const (
 	APP_NAME = "ayandict"
 	APP_DESC = "AyanDict"
 	VERSION  = "v3.0.0beta4"
 )
+
+var LOCAL_SOCKET_NAME = APP_NAME + "-" + userId()
 
 const ABOUT = `A simple cross-platform desktop dictionary application based on Qt framework and written in Go that uses StarDict dictionary format.
 
@@ -24,3 +30,11 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 `
+
+func userId() string {
+	u, err := user.Current()
+	if err != nil {
+		panic(err)
+	}
+	return u.Uid
+}

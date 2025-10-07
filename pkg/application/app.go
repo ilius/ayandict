@@ -123,7 +123,7 @@ func (app *Application) onResultDisplay(terms []string) {
 }
 
 func (app *Application) onExit() {
-	network.QLocalServer_RemoveServer(appinfo.APP_NAME)
+	network.QLocalServer_RemoveServer(appinfo.LOCAL_SOCKET_NAME)
 }
 
 func (app *Application) Exit() {
