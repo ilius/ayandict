@@ -15,6 +15,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
 	"github.com/ilius/ayandict/v3/pkg/server"
 	qt "github.com/mappu/miqt/qt6"
+	"github.com/mappu/miqt/qt6/network"
 )
 
 var searchModes = []string{
@@ -123,11 +124,19 @@ func (app *Application) Run() {
 
 	logging.SetupLoggerAfterConfigLoad(false, conf)
 
-	if ok, _ := findLocalServer(conf.LocalServerPorts); ok {
-		slog.Error("another instance is running")
+	slog.Info("Run", "WebEnable", conf.WebEnable)
+	if conf.WebEnable {
+		if ok, _ := findLocalWebServer(conf.LocalServerPorts); ok {
+			slog.Error("another instance is running")
+			return
+		}
+		go server.StartServer(conf.LocalServerPorts[0])
+	}
+	if !app.startLocalSocketServer() {
+		slog.Error("another instance is running, or dead socket (/tmp/ayandict*)")
 		return
 	}
-	go server.StartServer(conf.LocalServerPorts[0])
+	defer network.QLocalServer_RemoveServer(appinfo.APP_NAME)
 
 	app.LoadUserStyle()
 	qdictmgr.InitDicts(conf, true)

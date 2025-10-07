@@ -12,23 +12,23 @@ import (
 )
 
 const (
-	localhost     = "127.0.0.1"
-	serverAppName = "app-name"
+	localhost        = "127.0.0.1"
+	webServerAppName = "app-name"
 )
 
 var client = &http.Client{
 	Timeout: 100 * time.Millisecond,
 }
 
-func findLocalServer(ports []string) (bool, string) {
+func findLocalWebServer(ports []string) (bool, string) {
 	for _, port := range ports {
 		_url := &url.URL{
 			Scheme: "http",
 			Host:   net.JoinHostPort(localhost, port),
-			Path:   serverAppName,
+			Path:   webServerAppName,
 		}
 		_urlStr := _url.String()
-		slog.Debug("findLocalServer, trying " + _urlStr)
+		slog.Debug("findLocalWebServer, trying " + _urlStr)
 		t := time.Now()
 		res, err := client.Get(_urlStr)
 		if err != nil {
@@ -40,7 +40,7 @@ func findLocalServer(ports []string) (bool, string) {
 		slog.Debug("local server responded", "url", _urlStr, "dt", time.Since(t))
 		data, err := io.ReadAll(res.Body)
 		if err != nil {
-			slog.Error("error in findLocalServer while reading response body: " + err.Error())
+			slog.Error("error in findLocalWebServer while reading response body: " + err.Error())
 			continue
 		}
 		res.Body.Close()
