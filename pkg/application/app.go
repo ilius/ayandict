@@ -179,6 +179,14 @@ func (app *Application) Run() {
 
 	window := app.window
 	window.SetWindowTitle(appinfo.APP_DESC)
+	window.OnCloseEvent(func(super func(*qt.QCloseEvent), event *qt.QCloseEvent) {
+		if app.trayIcon != nil && app.trayIcon.IsVisible() {
+			event.Ignore()
+			window.Hide()
+			return
+		}
+		super(event)
+	})
 
 	{
 		icon, err := loadPNGIcon("ayandict-64px.png")
