@@ -3,7 +3,10 @@ package application
 import (
 	"fmt"
 	"log/slog"
+	"os"
+	"os/signal"
 	"sync/atomic"
+	"syscall"
 
 	"github.com/ilius/ayandict/v3/pkg/activity"
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
@@ -118,6 +121,15 @@ func (app *Application) onResultDisplay(terms []string) {
 	app.favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(terms[0]))
 }
 
+func (app *Application) onExit() {
+	network.QLocalServer_RemoveServer(appinfo.APP_NAME)
+}
+
+func (app *Application) Exit() {
+	app.onExit()
+	os.Exit(0)
+}
+
 // TODO: break down
 func (app *Application) Run() {
 	app.init()
@@ -136,7 +148,15 @@ func (app *Application) Run() {
 		slog.Error("another instance is running, or dead socket (/tmp/ayandict*)")
 		return
 	}
-	defer network.QLocalServer_RemoveServer(appinfo.APP_NAME)
+	app.OnAboutToQuit(app.onExit)
+	{
+		sigs := make(chan os.Signal, 1)
+		signal.Notify(sigs, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+		go func() {
+			<-sigs
+			app.Exit()
+		}()
+	}
 
 	app.LoadUserStyle()
 	qdictmgr.InitDicts(conf, true)

@@ -2,7 +2,6 @@ package application
 
 import (
 	"log/slog"
-	"os"
 
 	qt "github.com/mappu/miqt/qt6"
 )
@@ -31,7 +30,7 @@ func (app *Application) setTrayMenu() {
 	{
 		action := qt.NewQAction2("Quit")
 		// icon will not align with checkboxes! so forget it!
-		action.OnTriggered(func() { os.Exit(0) })
+		action.OnTriggered(func() { app.Exit() })
 		menu.AddAction(action)
 	}
 	{
