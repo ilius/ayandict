@@ -51,7 +51,7 @@ func (app *Application) setTrayMenu() {
 		})
 		actions = append(actions, action)
 	}
-	{
+	if qt.QGuiApplication_Clipboard().SupportsSelection() {
 		action := qt.NewQAction2("Scan Selection")
 		action.SetCheckable(true)
 		action.SetChecked(conf.ScanPopupSelection)
@@ -89,7 +89,9 @@ func (app *Application) setTrayMenu() {
 }
 
 func (app *Application) updateTrayMenu() {
-	app.trayScanSelection.SetChecked(conf.ScanPopupSelection)
+	if app.trayScanSelection != nil {
+		app.trayScanSelection.SetChecked(conf.ScanPopupSelection)
+	}
 	app.trayScanClipboard.SetChecked(conf.ScanPopupClipboard)
 	app.trayScanAPI.SetChecked(conf.ScanPopupAPI)
 }
