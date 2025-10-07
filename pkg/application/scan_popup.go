@@ -42,6 +42,7 @@ func (app *Application) scanPopup(query string) {
 	})
 
 	query = strings.TrimSpace(query)
+	query = strings.Trim(query, punctuation)
 	if query == "" {
 		return
 	}
