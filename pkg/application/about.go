@@ -32,11 +32,10 @@ func addTabWithIcon(
 	_ = tabWidget.AddTab2(widget, icon, label)
 }
 
-func aboutClicked(parent *qt.QWidget, icon *qt.QIcon) {
-	window := qt.NewQDialog(parent)
-	window.SetWindowTitle("About AyanDict")
-	window.Resize(700, 500)
-	window.SetWindowIcon(icon)
+func aboutClickedWidget(widget *qt.QWidget, icon *qt.QIcon) {
+	widget.SetWindowTitle("About AyanDict")
+	widget.Resize(700, 500)
+	widget.SetWindowIcon(icon)
 
 	topHBox := qt.NewQFrame(nil)
 	topHBoxLayout := qt.NewQHBoxLayout(topHBox.QWidget)
@@ -92,13 +91,11 @@ func aboutClicked(parent *qt.QWidget, icon *qt.QIcon) {
 
 	buttonBox := qt.NewQDialogButtonBox2()
 	buttonBox.AddButton2("Close", qt.QDialogButtonBox__AcceptRole).OnClicked(func() {
-		window.Accept()
+		widget.Close()
 	})
 
-	mainBox := qt.NewQVBoxLayout(window.QWidget)
+	mainBox := qt.NewQVBoxLayout(widget)
 	mainBox.AddWidget(topHBox.QWidget)
 	mainBox.AddWidget(tabWidget.QWidget)
 	mainBox.AddWidget(buttonBox.QWidget)
-
-	_ = window.Exec()
 }

@@ -26,9 +26,9 @@ func (app *Application) setupTrayIcon(icon *qt.QIcon) {
 }
 
 func (app *Application) setTrayMenu() {
-	menu := qt.NewQMenu2()
 	actions := []*qt.QAction{}
 	// icon will not align with checkboxes! so forget it!
+	menu := qt.NewQMenu2()
 	{
 		action := qt.NewQAction2("Quit")
 		action.OnTriggered(app.Exit)
@@ -37,7 +37,9 @@ func (app *Application) setTrayMenu() {
 	{
 		action := qt.NewQAction2("About")
 		action.OnTriggered(func() {
-			aboutClicked(menu.QWidget, app.icon)
+			widget := qt.NewQDialog(menu.QWidget)
+			aboutClickedWidget(widget.QWidget, app.icon)
+			widget.Show()
 		})
 		actions = append(actions, action)
 	}
