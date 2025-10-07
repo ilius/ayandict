@@ -124,6 +124,12 @@ Scan Popup: activate on selection
 
 Default value: ``false``
 
+``scan_popup_api``
+------------------
+Scan Popup: activate via API (socket/pipe)
+
+Default value: ``false``
+
 ``scan_popup_mode``
 -------------------
 Scan Popup: search mode

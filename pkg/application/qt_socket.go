@@ -21,10 +21,12 @@ func (app *Application) startLocalSocketServer() bool {
 		conn := server.NextPendingConnection()
 		conn.OnReadyRead(func() {
 			data := string(conn.ReadAll())
-			slog.Info("startLocalSocketServer: received:", "data", data)
+			slog.Debug("LocalSocketServer: received:", "data", data)
 			if strings.HasPrefix(data, s_scanpopup) {
-				query := data[len(s_scanpopup):]
-				app.scanPopup(query)
+				if conf.ScanPopupAPI {
+					query := data[len(s_scanpopup):]
+					app.scanPopup(query)
+				}
 			}
 		})
 	})

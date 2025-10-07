@@ -53,6 +53,16 @@ func (app *Application) setTrayMenu() {
 		menu.AddAction(action)
 		app.trayScanClipboard = action
 	}
+	{
+		action := qt.NewQAction2("Scan via API")
+		action.SetCheckable(true)
+		action.SetChecked(conf.ScanPopupAPI)
+		action.OnTriggeredWithChecked(func(checked bool) {
+			conf.ScanPopupAPI = checked
+		})
+		menu.AddAction(action)
+		app.trayScanAPI = action
+	}
 
 	app.trayIcon.SetContextMenu(menu)
 }
@@ -60,4 +70,5 @@ func (app *Application) setTrayMenu() {
 func (app *Application) updateTrayMenu() {
 	app.trayScanSelection.SetChecked(conf.ScanPopupSelection)
 	app.trayScanClipboard.SetChecked(conf.ScanPopupClipboard)
+	app.trayScanAPI.SetChecked(conf.ScanPopupAPI)
 }

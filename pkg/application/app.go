@@ -72,6 +72,7 @@ type Application struct {
 	trayIcon          *qt.QSystemTrayIcon
 	trayScanSelection *qt.QAction
 	trayScanClipboard *qt.QAction
+	trayScanAPI       *qt.QAction
 
 	scanPopupCount atomic.Int32
 }
