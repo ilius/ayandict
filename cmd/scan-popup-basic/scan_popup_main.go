@@ -22,7 +22,8 @@ func main() {
 		slog.Error("time out while waiting for connection")
 		os.Exit(1)
 	}
-	slog.Info("sending data")
+	slog.Info("writing data", "query", query)
 	_ = client.Write2([]byte(s_scanpopup + query))
+	slog.Info("flushing")
 	client.Flush()
 }
