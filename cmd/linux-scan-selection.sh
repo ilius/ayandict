@@ -21,7 +21,4 @@ clip_get() {
     fi
 }
 
-
-DIR=$(dirname $0)
-cd $DIR
-./scan-popup-basic $(clip_get primary)
+echo scanpopup:$(clip_get primary) | socat - UNIX-CONNECT:/tmp/ayandict-$UID
