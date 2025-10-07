@@ -27,11 +27,27 @@ func (app *Application) setupTrayIcon(icon *qt.QIcon) {
 
 func (app *Application) setTrayMenu() {
 	menu := qt.NewQMenu2()
+	actions := []*qt.QAction{}
+	// icon will not align with checkboxes! so forget it!
 	{
 		action := qt.NewQAction2("Quit")
-		// icon will not align with checkboxes! so forget it!
-		action.OnTriggered(func() { app.Exit() })
-		menu.AddAction(action)
+		action.OnTriggered(app.Exit)
+		actions = append(actions, action)
+	}
+	{
+		action := qt.NewQAction2("About")
+		action.OnTriggered(func() {
+			aboutClicked(menu.QWidget, app.icon)
+		})
+		actions = append(actions, action)
+	}
+	{
+		action := qt.NewQAction2("Show Window")
+		action.OnTriggered(func() {
+			app.window.Show()
+			app.window.Raise()
+		})
+		actions = append(actions, action)
 	}
 	{
 		action := qt.NewQAction2("Scan Selection")
@@ -40,7 +56,7 @@ func (app *Application) setTrayMenu() {
 		action.OnTriggeredWithChecked(func(checked bool) {
 			conf.ScanPopupSelection = checked
 		})
-		menu.AddAction(action)
+		actions = append(actions, action)
 		app.trayScanSelection = action
 	}
 	{
@@ -50,7 +66,7 @@ func (app *Application) setTrayMenu() {
 		action.OnTriggeredWithChecked(func(checked bool) {
 			conf.ScanPopupClipboard = checked
 		})
-		menu.AddAction(action)
+		actions = append(actions, action)
 		app.trayScanClipboard = action
 	}
 	{
@@ -60,10 +76,13 @@ func (app *Application) setTrayMenu() {
 		action.OnTriggeredWithChecked(func(checked bool) {
 			conf.ScanPopupAPI = checked
 		})
-		menu.AddAction(action)
+		actions = append(actions, action)
 		app.trayScanAPI = action
 	}
-
+	// TODO: reverse order of actions if tray icon is closer to top of screen
+	for _, action := range actions {
+		menu.AddAction(action)
+	}
 	app.trayIcon.SetContextMenu(menu)
 }
 

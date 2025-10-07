@@ -88,7 +88,7 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 		case escape: // event.Text()="\x1b"
 			app.resetQuery()
 		case int(qt.Key_F1):
-			aboutClicked(app.window.QWidget)
+			app.aboutClicked()
 		case int(qt.Key_PageUp), int(qt.Key_PageDown):
 			qt.QCoreApplication_SendEvent(app.articleView.QObject, event.QEvent)
 		default:
@@ -109,7 +109,7 @@ func (app *Application) setupArticleViewKeyPressEvent() {
 		case escape: // event.Text()="\x1b"
 			app.resetQuery()
 		case int(qt.Key_F1):
-			aboutClicked(app.window.QWidget)
+			app.aboutClicked()
 		default:
 			super(event)
 		}

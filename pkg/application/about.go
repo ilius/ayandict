@@ -32,11 +32,11 @@ func addTabWithIcon(
 	_ = tabWidget.AddTab2(widget, icon, label)
 }
 
-func aboutClicked(parent *qt.QWidget) {
+func aboutClicked(parent *qt.QWidget, icon *qt.QIcon) {
 	window := qt.NewQDialog(parent)
 	window.SetWindowTitle("About AyanDict")
 	window.Resize(700, 500)
-	window.SetWindowIcon(parent.WindowIcon())
+	window.SetWindowIcon(icon)
 
 	topHBox := qt.NewQFrame(nil)
 	topHBoxLayout := qt.NewQHBoxLayout(topHBox.QWidget)

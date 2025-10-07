@@ -498,3 +498,7 @@ func (app *Application) updateMiscButtonsPadding() {
 	app.randomEntryButton.SetStyleSheet(stylesheet)
 	app.randomFavoriteButton.SetStyleSheet(stylesheet)
 }
+
+func (app *Application) aboutClicked() {
+	aboutClicked(app.window.QWidget, app.icon)
+}

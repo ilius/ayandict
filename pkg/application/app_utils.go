@@ -33,7 +33,7 @@ func (app *Application) makeAboutButton(conf *config.Config) *qt.QPushButton {
 	}
 	aboutButton := app.newIconTextButton(aboutButtonLabel, qt.QStyle__SP_MessageBoxInformation)
 	aboutButton.OnClicked(func() {
-		aboutClicked(app.window.QWidget)
+		app.aboutClicked()
 	})
 	return aboutButton
 }
