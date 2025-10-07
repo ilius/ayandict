@@ -35,7 +35,7 @@ func (app *Application) scanPopup(query string) {
 	}
 	app.scanPopupCount.Add(1)
 	popup := qt.NewQWidget2()
-	popup.SetWindowFlag(qt.FramelessWindowHint | qt.WindowStaysOnTopHint)
+	popup.SetWindowFlag(qt.FramelessWindowHint | qt.WindowStaysOnTopHint | qt.Tool)
 	popup.SetWindowIcon(app.icon)
 	popup.OnCloseEvent(func(super func(*qt.QCloseEvent), event *qt.QCloseEvent) {
 		app.scanPopupCount.Add(-1)
