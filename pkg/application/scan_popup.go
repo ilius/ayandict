@@ -142,10 +142,18 @@ func (app *Application) scanPopup(query string) {
 
 	results := dictmgr.LookupHTML(query, conf, mode, resultFlags, 0)
 	if len(results) == 0 {
+		slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", 0, "query", query)
+		if conf.ScanPopupMinScore > 0 {
+			return
+		}
 		articleView.SetHtml(fmt.Sprintf("No results for %#v", query))
 		popup.SetWindowTitle(query)
 	} else {
 		res := results[0]
+		slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", res.Score()/2, "query", query)
+		if conf.ScanPopupMinScore > int(res.Score())/2 {
+			return
+		}
 		articleView.SetResult(res)
 		headerLabel.SetResult(res)
 		popup.SetWindowTitle(res.Terms()[0])

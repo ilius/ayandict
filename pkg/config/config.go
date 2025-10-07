@@ -78,6 +78,7 @@ type Config struct {
 	ScanPopupClipboard      bool    `toml:"scan_popup_clipboard" doc:"Scan Popup: activate on copy to clipboard"`
 	ScanPopupSelection      bool    `toml:"scan_popup_selection" doc:"Scan Popup: activate on selection"`
 	ScanPopupMode           string  `toml:"scan_popup_mode" doc:"Scan Popup: search mode"`
+	ScanPopupMinScore       int     `toml:"scan_popup_min_score" doc:"Scan Popup: minimum score (0 to 100)"`
 	ScanPopupWidth          int     `toml:"scan_popup_width" doc:"Scan Popup: window width"`
 	ScanPopupHeight         int     `toml:"scan_popup_height" doc:"Scan Popup: window height"`
 	ScanPopupMaxCount       int32   `toml:"scan_popup_max_count" doc:"Scan Popup: max number of windows"`
@@ -194,6 +195,7 @@ func Default() *Config {
 		ScanPopupClipboard:      false,
 		ScanPopupSelection:      false,
 		ScanPopupMode:           "fuzzy",
+		ScanPopupMinScore:       0,
 		ScanPopupWidth:          800,
 		ScanPopupHeight:         600,
 		ScanPopupMaxCount:       1,

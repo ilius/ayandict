@@ -130,6 +130,12 @@ Scan Popup: search mode
 
 Default value: ``"fuzzy"``
 
+``scan_popup_min_score``
+------------------------
+Scan Popup: minimum score (0 to 100)
+
+Default value: ``0``
+
 ``scan_popup_width``
 --------------------
 Scan Popup: window width
