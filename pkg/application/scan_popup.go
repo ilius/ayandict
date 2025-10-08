@@ -55,18 +55,20 @@ func (app *Application) scanPopup(query string) {
 	font.SetPixelSize(int(float64(font.PixelSize()) * conf.ScanPopupFontSizeFactor))
 	popup.SetFont(&font)
 
-	queryInMainWindow := func() {
+	doQuery := func(query string) {
 		popup.Close()
 		app.window.Show()
 		app.window.ActivateWindow()
 		app.entry.SetText(query)
 		onQuery(query, app.queryArgs, false)
 	}
-	headerLabel := NewHeaderLabel(app, func(term string) { queryInMainWindow() })
+
+	headerLabel := NewHeaderLabel(app, doQuery)
 	headerLabel.SetFont(&font)
 
-	articleView := NewArticleView(app)
+	articleView := NewArticleView(app, doQuery)
 	articleView.SetFont(&font)
+	articleView.SetupCustomHandlers()
 
 	popupLayout := qt.NewQVBoxLayout(popup)
 
@@ -79,7 +81,9 @@ func (app *Application) scanPopup(query string) {
 	})
 	mainButton := qt.NewQPushButton3("Main")
 	mainButton.SetFont(&font)
-	mainButton.OnClicked(queryInMainWindow)
+	mainButton.OnClicked(func() {
+		doQuery(query)
+	})
 
 	// favoriteButton := NewFavoriteButton(app.favoriteButtonClicked)
 	// favoriteButton.SetToolTips(

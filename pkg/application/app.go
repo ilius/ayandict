@@ -257,7 +257,7 @@ func (app *Application) Run() {
 	headerBoxLayout.AddSpacing(int(basePx * 1.5))
 	headerBox.SetSizePolicy2(expanding, qt.QSizePolicy__Minimum)
 
-	articleView := NewArticleView(app)
+	articleView := NewArticleView(app, app.doQuery)
 	app.articleView = articleView
 
 	historyView := NewHistoryView(activityStorage, conf.HistoryMaxSize)
@@ -411,7 +411,6 @@ func (app *Application) Run() {
 		FrequencyTable: frequencyTable,
 	}
 
-	articleView.doQuery = app.doQuery
 	historyView.doQuery = app.doQuery
 
 	rightPanel := qt.NewQTabWidget(nil)

@@ -45,7 +45,7 @@ type ArticleView struct {
 	dictName string
 }
 
-func NewArticleView(app *Application) *ArticleView {
+func NewArticleView(app *Application, doQuery func(string)) *ArticleView {
 	widget := qt.NewQTextBrowser(nil)
 	// widget := webengine.NewQWebEngineView(nil)
 	widget.SetReadOnly(true)
@@ -64,6 +64,7 @@ func NewArticleView(app *Application) *ArticleView {
 		view.onKeyPressEvent(event)
 		super(event)
 	})
+	view.doQuery = doQuery
 	return view
 }
 
