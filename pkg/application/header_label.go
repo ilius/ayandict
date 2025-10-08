@@ -21,7 +21,7 @@ type HeaderLabel struct {
 	doQuery func(string)
 }
 
-func NewHeaderLabel(app *Application) *HeaderLabel {
+func NewHeaderLabel(app *Application, doQuery func(string)) *HeaderLabel {
 	qLabel := qt.NewQLabel2()
 	qLabel.SetTextInteractionFlags(qt.TextSelectableByMouse)
 	// | qt.TextSelectableByKeyboard
@@ -38,6 +38,7 @@ func NewHeaderLabel(app *Application) *HeaderLabel {
 		menu := label.createContextMenu(qLabel.SelectedText() != "")
 		menu.Popup(event.GlobalPos())
 	})
+	label.doQuery = doQuery
 	return label
 }
 

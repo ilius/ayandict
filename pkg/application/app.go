@@ -241,7 +241,7 @@ func (app *Application) Run() {
 	queryBoxLayout.AddWidget(app.queryFavoriteButton.QWidget)
 	queryBoxLayout.AddWidget(okButton.QWidget)
 
-	headerLabel := NewHeaderLabel(app)
+	headerLabel := NewHeaderLabel(app, app.doQuery)
 	app.headerLabel = headerLabel
 	app.headerLabel.SetAlignment(qt.AlignLeft)
 
@@ -411,7 +411,6 @@ func (app *Application) Run() {
 		FrequencyTable: frequencyTable,
 	}
 
-	headerLabel.doQuery = app.doQuery
 	articleView.doQuery = app.doQuery
 	historyView.doQuery = app.doQuery
 

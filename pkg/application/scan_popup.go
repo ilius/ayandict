@@ -55,7 +55,14 @@ func (app *Application) scanPopup(query string) {
 	font.SetPixelSize(int(float64(font.PixelSize()) * conf.ScanPopupFontSizeFactor))
 	popup.SetFont(&font)
 
-	headerLabel := NewHeaderLabel(app)
+	queryInMainWindow := func() {
+		popup.Close()
+		app.window.Show()
+		app.window.ActivateWindow()
+		app.entry.SetText(query)
+		onQuery(query, app.queryArgs, false)
+	}
+	headerLabel := NewHeaderLabel(app, func(term string) { queryInMainWindow() })
 	headerLabel.SetFont(&font)
 
 	articleView := NewArticleView(app)
@@ -64,15 +71,6 @@ func (app *Application) scanPopup(query string) {
 	popupLayout := qt.NewQVBoxLayout(popup)
 
 	headerBox := qt.NewQHBoxLayout2()
-
-	queryInMainWindow := func() {
-		popup.Close()
-		app.window.Show()
-		app.window.ActivateWindow()
-		app.entry.SetText(query)
-		onQuery(query, app.queryArgs, false)
-	}
-	headerLabel.doQuery = func(term string) { queryInMainWindow() }
 
 	closeButton := qt.NewQPushButton3("Close")
 	closeButton.SetFont(&font)
