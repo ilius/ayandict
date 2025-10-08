@@ -149,6 +149,12 @@ func (app *Application) Run() {
 		slog.Error("another instance is running, or dead socket (/tmp/ayandict*)")
 		return
 	}
+	defer func() {
+		if r := recover(); r != nil {
+			app.onExit()
+			panic(r)
+		}
+	}()
 	app.OnAboutToQuit(app.onExit)
 	{
 		sigs := make(chan os.Signal, 1)
