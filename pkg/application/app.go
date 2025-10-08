@@ -260,7 +260,11 @@ func (app *Application) Run() {
 	articleView := NewArticleView(app, app.doQuery)
 	app.articleView = articleView
 
-	historyView := NewHistoryView(activityStorage, conf.HistoryMaxSize)
+	historyView := NewHistoryView(
+		activityStorage,
+		conf.HistoryMaxSize,
+		app.doQuery,
+	)
 	app.historyView = historyView
 	if !conf.HistoryDisable {
 		err := historyView.Load()
@@ -410,8 +414,6 @@ func (app *Application) Run() {
 		ModeCombo:      searchModeCombo,
 		FrequencyTable: frequencyTable,
 	}
-
-	historyView.doQuery = app.doQuery
 
 	rightPanel := qt.NewQTabWidget(nil)
 	_ = rightPanel.AddTab(activityWidget, " Activity ")

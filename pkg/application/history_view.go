@@ -20,12 +20,14 @@ type HistoryView struct {
 func NewHistoryView(
 	storage *activity.ActivityStorage,
 	maxSize int,
+	doQuery func(query string),
 ) *HistoryView {
 	widget := qt.NewQListWidget(nil)
 	return &HistoryView{
 		storage:     storage,
 		maxSize:     maxSize,
 		QListWidget: widget,
+		doQuery:     doQuery,
 	}
 }
 
