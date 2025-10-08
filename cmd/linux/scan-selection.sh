@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Get clipboard or primary text regardless of Wayland/X11
 clip_get() {
     # usage: clip_get [clipboard|primary]
