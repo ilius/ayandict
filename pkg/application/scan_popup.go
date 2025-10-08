@@ -103,7 +103,7 @@ func (p *ScanPopup) doQuery(query string) {
 	p.app.window.Show()
 	p.app.window.ActivateWindow()
 	p.app.entry.SetText(query)
-	onQuery(query, p.app.queryArgs, false)
+	p.app.queryArgs.onQuery(query, false)
 }
 
 func (p *ScanPopup) doMainQueryNoArg() {

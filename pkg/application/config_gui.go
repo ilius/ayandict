@@ -105,7 +105,7 @@ func (app *Application) ReloadConfig() {
 	app.headerLabel.ReloadConfig()
 	audioCache.ReloadConfig()
 
-	onQuery(app.entry.Text(), app.queryArgs, false)
+	app.queryArgs.onQuery(app.entry.Text(), false)
 
 	app.updateMiscButtonsVisibility()
 	app.updateMiscButtonsPadding()

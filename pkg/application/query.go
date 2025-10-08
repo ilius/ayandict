@@ -47,11 +47,7 @@ func (w *QueryArgs) SetNoResult(query string) {
 	w.AddHistoryAndFrequency(query)
 }
 
-func onQuery(
-	query string,
-	queryArgs *QueryArgs,
-	isAuto bool,
-) {
+func (queryArgs *QueryArgs) onQuery(query string, isAuto bool) {
 	if query == "" {
 		if !isAuto {
 			queryArgs.ArticleView.SetHtml("")

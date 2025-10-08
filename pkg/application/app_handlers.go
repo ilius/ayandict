@@ -48,14 +48,14 @@ func (app *Application) setupHandlers() {
 	app.reloadDictsButton.OnClicked(func() {
 		qdictmgr.InitDicts(conf, true)
 		app.dictManager = nil
-		onQuery(entry.Text(), queryArgs, false)
+		queryArgs.onQuery(entry.Text(), false)
 	})
 	app.closeDictsButton.OnClicked(dictmgr.CloseDicts)
 	app.openConfigButton.OnClicked(OpenConfig)
 	app.reloadConfigButton.OnClicked(app.ReloadConfig)
 	app.reloadStyleButton.OnClicked(func() {
 		app.LoadUserStyle()
-		onQuery(entry.Text(), queryArgs, false)
+		queryArgs.onQuery(entry.Text(), false)
 	})
 	app.saveHistoryButton.OnClicked(func() {
 		app.historyView.Save()
@@ -128,7 +128,7 @@ func (app *Application) onEntryKeyPress(super func(*qt.QKeyEvent), event *qt.QKe
 		app.window.SetFocus()
 		return
 	case int(qt.Key_Return), int(qt.Key_Enter): // event.Text()="\r"
-		onQuery(app.entry.Text(), app.queryArgs, false)
+		app.queryArgs.onQuery(app.entry.Text(), false)
 		return
 	}
 
@@ -140,7 +140,7 @@ func (app *Application) onEntryKeyPress(super func(*qt.QKeyEvent), event *qt.QKe
 		if int(event.Modifiers())&searchOnTypeNotModifierMask == 0 {
 			text := app.entry.Text()
 			if len(text) >= conf.SearchOnTypeMinLength {
-				onQuery(text, app.queryArgs, true)
+				app.queryArgs.onQuery(text, true)
 			}
 			return
 		}
@@ -216,7 +216,7 @@ func (app *Application) saveFavoritesClicked() {
 
 func (app *Application) dictsButtonClicked() {
 	if app.runDictManager() {
-		onQuery(app.entry.Text(), app.queryArgs, false)
+		app.queryArgs.onQuery(app.entry.Text(), false)
 	}
 }
 

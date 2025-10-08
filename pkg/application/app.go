@@ -88,7 +88,7 @@ func (app *Application) init() {
 }
 
 func (app *Application) doQuery(query string) {
-	onQuery(query, app.queryArgs, false)
+	app.queryArgs.onQuery(query, false)
 	app.entry.SetText(query)
 }
 
@@ -435,7 +435,7 @@ func (app *Application) Run() {
 	app.ReloadFont()
 
 	okButton.OnClicked(func() {
-		onQuery(entry.Text(), app.queryArgs, false)
+		app.queryArgs.onQuery(entry.Text(), false)
 	})
 
 	// --------------------------------------------------
@@ -457,7 +457,7 @@ func (app *Application) setupSettings(qs *qt.QSettings, mainSplitter *qt.QSplitt
 	app.searchModeCombo.OnCurrentIndexChanged(func(i int) {
 		text := app.entry.Text()
 		if text != "" {
-			onQuery(text, app.queryArgs, false)
+			app.queryArgs.onQuery(text, false)
 		}
 		go qsettings.SaveSearchSettings(qs, app.searchModeCombo)
 	})
