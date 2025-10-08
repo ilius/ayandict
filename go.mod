@@ -7,6 +7,7 @@ require (
 	github.com/ilius/go-dict-commons v0.6.0
 	github.com/ilius/go-stardict/v2 v2.5.1
 	github.com/ilius/is/v2 v2.3.2
+	github.com/jezek/xgb v1.1.1
 	github.com/mappu/miqt v0.11.2
 )
 
