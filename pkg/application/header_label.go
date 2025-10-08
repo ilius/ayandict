@@ -12,8 +12,6 @@ import (
 type HeaderLabel struct {
 	*qt.QLabel
 
-	app *Application
-
 	result common.SearchResultIface
 
 	text string
@@ -21,7 +19,7 @@ type HeaderLabel struct {
 	doQuery func(string)
 }
 
-func NewHeaderLabel(app *Application, doQuery func(string)) *HeaderLabel {
+func NewHeaderLabel(doQuery func(string)) *HeaderLabel {
 	qLabel := qt.NewQLabel2()
 	qLabel.SetTextInteractionFlags(qt.TextSelectableByMouse)
 	// | qt.TextSelectableByKeyboard
@@ -31,7 +29,6 @@ func NewHeaderLabel(app *Application, doQuery func(string)) *HeaderLabel {
 	qLabel.SetSizePolicy2(expanding, qt.QSizePolicy__Minimum)
 	label := &HeaderLabel{
 		QLabel: qLabel,
-		app:    app,
 	}
 	qLabel.OnContextMenuEvent(func(super func(*qt.QContextMenuEvent), event *qt.QContextMenuEvent) {
 		event.Ignore()

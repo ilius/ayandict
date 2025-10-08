@@ -30,8 +30,11 @@ func (app *Application) setupScanPopup() {
 }
 
 type ScanPopup struct {
-	app             *Application
+	// app: used for moveToMainWindow
+	app *Application
+
 	query           string // use only in doMainQueryNoArg and lookup
+	icon            *qt.QIcon
 	popup           *qt.QWidget
 	mode            dictmgr.SearchMode
 	dragRelativePos *qt.QPoint
@@ -43,13 +46,13 @@ type ScanPopup struct {
 func (p *ScanPopup) init() {
 	popup := p.popup
 	popup.SetWindowFlag(qt.FramelessWindowHint | qt.WindowStaysOnTopHint | qt.Tool)
-	popup.SetWindowIcon(p.app.icon)
+	popup.SetWindowIcon(p.icon)
 
-	p.headerLabel = NewHeaderLabel(p.app, p.doQuery)
+	p.headerLabel = NewHeaderLabel(p.doQuery)
 	p.headerLabel.SetFont(p.font)
 	p.headerLabel.SetMouseTracking(true)
 
-	p.articleView = NewArticleView(p.app, p.doQuery)
+	p.articleView = NewArticleView(p.doQuery)
 	p.articleView.SetFont(p.font)
 	p.articleView.SetupCustomHandlers()
 
@@ -164,16 +167,43 @@ func (p *ScanPopup) autoResize() {
 	p.popup.Resize(conf.ScanPopupWidth, conf.ScanPopupHeight)
 }
 
+func (app *Application) onScanPopupCloseEvent(super func(*qt.QCloseEvent), event *qt.QCloseEvent) {
+	app.scanPopupCount.Add(-1)
+}
+
+func NewScanPopup(
+	app *Application,
+	icon *qt.QIcon,
+	query string,
+	mode dictmgr.SearchMode,
+) *ScanPopup {
+	font := configFontWithFactor(conf.ScanPopupFontSizeFactor)
+	popup := qt.NewQWidget2()
+	popup.OnCloseEvent(app.onScanPopupCloseEvent)
+	popup.SetFont(font)
+	p := &ScanPopup{
+		app:   app,
+		query: query,
+		icon:  icon,
+		popup: popup,
+		mode:  mode,
+		font:  font,
+	}
+	p.init()
+
+	return p
+}
+
+func (p *ScanPopup) Run() {
+	p.doQuery(p.query)
+	p.popup.Show()
+}
+
 func (app *Application) scanPopup(query string) {
 	if conf.ScanPopupMaxCount > 0 && app.scanPopupCount.Load() >= conf.ScanPopupMaxCount {
 		return
 	}
 	app.scanPopupCount.Add(1)
-
-	popup := qt.NewQWidget2()
-	popup.OnCloseEvent(func(super func(*qt.QCloseEvent), event *qt.QCloseEvent) {
-		app.scanPopupCount.Add(-1)
-	})
 
 	query = strings.TrimSpace(query)
 	query = strings.Trim(query, punctuation)
@@ -185,17 +215,6 @@ func (app *Application) scanPopup(query string) {
 		slog.Error("invalid scan_popup_mode", "value", conf.ScanPopupMode)
 	}
 
-	font := configFontWithFactor(conf.ScanPopupFontSizeFactor)
-	popup.SetFont(font)
-
-	p := &ScanPopup{
-		app:   app,
-		query: query,
-		popup: popup,
-		mode:  mode,
-		font:  font,
-	}
-	p.init()
-	p.doQuery(query)
-	popup.Show()
+	p := NewScanPopup(app, app.icon, query, mode)
+	p.Run()
 }

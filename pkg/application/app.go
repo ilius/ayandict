@@ -241,7 +241,7 @@ func (app *Application) Run() {
 	queryBoxLayout.AddWidget(app.queryFavoriteButton.QWidget)
 	queryBoxLayout.AddWidget(okButton.QWidget)
 
-	headerLabel := NewHeaderLabel(app, app.doQuery)
+	headerLabel := NewHeaderLabel(app.doQuery)
 	app.headerLabel = headerLabel
 	app.headerLabel.SetAlignment(qt.AlignLeft)
 
@@ -257,7 +257,7 @@ func (app *Application) Run() {
 	headerBoxLayout.AddSpacing(int(basePx * 1.5))
 	headerBox.SetSizePolicy2(expanding, qt.QSizePolicy__Minimum)
 
-	articleView := NewArticleView(app, app.doQuery)
+	articleView := NewArticleView(app.doQuery)
 	app.articleView = articleView
 
 	historyView := NewHistoryView(

@@ -34,7 +34,6 @@ var dummyParagRE = regexp.MustCompile(`<p [^<>]*><br />(</p>|$)`)
 type ArticleView struct {
 	*qt.QTextBrowser
 
-	app     *Application
 	dpi     float64
 	doQuery func(string)
 
@@ -45,7 +44,7 @@ type ArticleView struct {
 	dictName string
 }
 
-func NewArticleView(app *Application, doQuery func(string)) *ArticleView {
+func NewArticleView(doQuery func(string)) *ArticleView {
 	widget := qt.NewQTextBrowser(nil)
 	// widget := webengine.NewQWebEngineView(nil)
 	widget.SetReadOnly(true)
@@ -57,7 +56,6 @@ func NewArticleView(app *Application, doQuery func(string)) *ArticleView {
 	}
 	view := &ArticleView{
 		QTextBrowser: widget,
-		app:          app,
 		dpi:          dpi,
 	}
 	widget.OnKeyPressEvent(func(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
