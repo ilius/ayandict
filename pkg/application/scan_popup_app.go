@@ -29,8 +29,6 @@ func (app *Application) scanPopup(query string) {
 	if conf.ScanPopupMaxCount > 0 && app.scanPopupCount.Load() >= conf.ScanPopupMaxCount {
 		return
 	}
-	app.scanPopupCount.Add(1)
-
 	query = strings.TrimSpace(query)
 	query = strings.Trim(query, punctuation)
 	if query == "" {
@@ -40,6 +38,8 @@ func (app *Application) scanPopup(query string) {
 	if !valid {
 		slog.Error("invalid scan_popup_mode", "value", conf.ScanPopupMode)
 	}
+
+	app.scanPopupCount.Add(1)
 
 	p := NewScanPopup(
 		query,
