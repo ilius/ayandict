@@ -1,0 +1,72 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Mac Build
+
+on:
+  push:
+    branches: ["v3", "build-mac-intel"]
+  pull_request:
+    branches: ["v3"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-13
+    steps:
+      - name: Download Go build cache
+        if: ${{ github.ref != 'refs/heads/release-macos' }}
+        id: download-go-build-cache-mac-intel
+        uses: dawidd6/action-download-artifact@v11
+        continue-on-error: true
+        with:
+          workflow_search: true
+          workflow_conclusion: success
+          event: push
+          name: go-build-cache-mac-intel
+          path: /Users/runner/Library/Caches/go-build
+          if_no_artifact_found: ignore
+          use_unzip: true
+          github_token: ${{ github.token }}
+          check_artifacts: true
+          search_artifacts: true
+
+      - name: Check Go build cache
+        run: ls -l /Users/runner/Library/Caches/go-build || true
+
+      - uses: actions/checkout@v3
+
+      - name: Show kernel info
+        run: uname -a
+
+      - name: Install Qt6
+        run: |
+          brew update >/dev/null
+          brew install gcc cmake ninja openssl@3 zlib qt6 pkg-config
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.24
+
+      - name: Build
+        run: CGO_ENABLED=1 CGO_CXXFLAGS=-std=c++17 go build -ldflags '-s -w' -trimpath
+
+      - name: CLICK HERE TO DOWNLOAD BINARY
+        uses: actions/upload-artifact@v4
+        with:
+          name: ayandict-mac-arm64-${{ github.sha }}
+          if-no-files-found: error
+          retention-days: 7
+          path: ayandict
+
+      - name: Upload Go build cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-build-cache-mac-intel
+          if-no-files-found: error
+          retention-days: 7
+          path: /Users/runner/Library/Caches/go-build
