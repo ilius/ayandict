@@ -30,6 +30,12 @@ func ConfigFont() *qt.QFont {
 	return font
 }
 
+func configFontWithFactor(factor float64) *qt.QFont {
+	font := *ConfigFont()
+	font.SetPixelSize(int(float64(font.PixelSize()) * factor))
+	return &font
+}
+
 func LoadConfig() bool {
 	confMutex.Lock()
 	defer confMutex.Unlock()

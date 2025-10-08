@@ -29,14 +29,152 @@ func (app *Application) setupScanPopup() {
 	})
 }
 
+type ScanPopup struct {
+	app             *Application
+	query           string // use only in doMainQueryNoArg and lookup
+	popup           *qt.QWidget
+	mode            dictmgr.SearchMode
+	dragRelativePos *qt.QPoint
+	font            *qt.QFont
+	headerLabel     *HeaderLabel
+	articleView     *ArticleView
+}
+
+func (p *ScanPopup) init() {
+	popup := p.popup
+	popup.SetWindowFlag(qt.FramelessWindowHint | qt.WindowStaysOnTopHint | qt.Tool)
+	popup.SetWindowIcon(p.app.icon)
+
+	p.headerLabel = NewHeaderLabel(p.app, p.doQuery)
+	p.headerLabel.SetFont(p.font)
+	p.headerLabel.SetMouseTracking(true)
+
+	p.articleView = NewArticleView(p.app, p.doQuery)
+	p.articleView.SetFont(p.font)
+	p.articleView.SetupCustomHandlers()
+
+	popup.MoveWithQPoint(qt.QCursor_Pos())
+	popup.OnKeyPressEvent(p.onPopupKeyPress)
+
+	for _, widget := range []HasOnMouseEvents{
+		p.headerLabel,
+		popup,
+	} {
+		widget.OnMousePressEvent(p.onDragMousePress)
+		widget.OnMouseMoveEvent(p.onDragMouseMove)
+		widget.OnMouseReleaseEvent(p.onDragMouseRelease)
+	}
+
+	popupLayout := qt.NewQVBoxLayout(popup)
+
+	headerBox := qt.NewQHBoxLayout2()
+
+	closeButton := qt.NewQPushButton3("Close")
+	closeButton.SetFont(p.font)
+	closeButton.OnClicked(func() {
+		_ = popup.Close()
+	})
+	mainButton := qt.NewQPushButton3("Main")
+	mainButton.SetFont(p.font)
+	mainButton.OnClicked(p.doMainQueryNoArg)
+
+	// favoriteButton := NewFavoriteButton(app.favoriteButtonClicked)
+	// favoriteButton.SetToolTips(
+	// 	"Add this term to favorites",
+	// 	"Remove this term from favorites",
+	// )
+
+	headerButtonBox := qt.NewQVBoxLayout2()
+	headerButtonBox.AddWidget(closeButton.QWidget)
+	headerButtonBox.AddWidget(mainButton.QWidget)
+	headerButtonBox.AddStretch()
+
+	headerBox.AddWidget2(p.headerLabel.QWidget, 10)
+	headerBox.AddStretch()
+	headerBox.AddLayout(headerButtonBox.QLayout)
+
+	popupLayout.AddLayout(headerBox.QLayout)
+	// headerBox.AddWidget(favoriteButton.QWidget)
+	popupLayout.AddWidget2(p.articleView.QWidget, 10)
+}
+
+func (p *ScanPopup) doQuery(query string) {
+	p.popup.Close()
+	p.app.window.Show()
+	p.app.window.ActivateWindow()
+	p.app.entry.SetText(query)
+	onQuery(query, p.app.queryArgs, false)
+}
+
+func (p *ScanPopup) doMainQueryNoArg() {
+	p.popup.Close()
+	p.app.window.Show()
+	p.app.window.ActivateWindow()
+	p.app.doQuery(p.query)
+}
+
+func (p *ScanPopup) onPopupKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
+	if event.Key() == escape {
+		p.popup.Close()
+		return
+	}
+	super(event)
+}
+
+func (p *ScanPopup) onDragMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+	if event.Button() != qt.LeftButton {
+		super(event)
+		return
+	}
+	p.dragRelativePos = event.Pos()
+}
+
+func (p *ScanPopup) onDragMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+	if p.dragRelativePos == nil {
+		super(event)
+		return
+	}
+	p.popup.Move(
+		event.GlobalX()-p.dragRelativePos.X(),
+		event.GlobalY()-p.dragRelativePos.Y(),
+	)
+}
+
+func (p *ScanPopup) onDragMouseRelease(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+	p.dragRelativePos = nil
+	super(event)
+}
+
+func (p *ScanPopup) lookup() {
+	query := p.query
+	results := dictmgr.LookupHTML(query, conf, p.mode, resultFlags, 0)
+	if len(results) == 0 {
+		slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", 0, "query", query)
+		if conf.ScanPopupMinScore > 0 {
+			return
+		}
+		p.articleView.SetHtml(fmt.Sprintf("No results for %#v", query))
+		p.popup.SetWindowTitle(query)
+		return
+	}
+	res := results[0]
+	slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", res.Score()/2, "query", query)
+	if conf.ScanPopupMinScore > int(res.Score())/2 {
+		return
+	}
+	p.articleView.SetResult(res)
+	p.headerLabel.SetResult(res)
+	p.popup.SetWindowTitle(res.Terms()[0])
+	// favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(res.Terms()[0]))
+}
+
 func (app *Application) scanPopup(query string) {
 	if conf.ScanPopupMaxCount > 0 && app.scanPopupCount.Load() >= conf.ScanPopupMaxCount {
 		return
 	}
 	app.scanPopupCount.Add(1)
+
 	popup := qt.NewQWidget2()
-	popup.SetWindowFlag(qt.FramelessWindowHint | qt.WindowStaysOnTopHint | qt.Tool)
-	popup.SetWindowIcon(app.icon)
 	popup.OnCloseEvent(func(super func(*qt.QCloseEvent), event *qt.QCloseEvent) {
 		app.scanPopupCount.Add(-1)
 	})
@@ -51,117 +189,18 @@ func (app *Application) scanPopup(query string) {
 		slog.Error("invalid scan_popup_mode", "value", conf.ScanPopupMode)
 	}
 
-	font := *ConfigFont()
-	font.SetPixelSize(int(float64(font.PixelSize()) * conf.ScanPopupFontSizeFactor))
-	popup.SetFont(&font)
+	font := configFontWithFactor(conf.ScanPopupFontSizeFactor)
+	popup.SetFont(font)
 
-	doQuery := func(query string) {
-		popup.Close()
-		app.window.Show()
-		app.window.ActivateWindow()
-		app.entry.SetText(query)
-		onQuery(query, app.queryArgs, false)
+	p := &ScanPopup{
+		app:   app,
+		query: query,
+		popup: popup,
+		mode:  mode,
+		font:  font,
 	}
-
-	headerLabel := NewHeaderLabel(app, doQuery)
-	headerLabel.SetFont(&font)
-
-	articleView := NewArticleView(app, doQuery)
-	articleView.SetFont(&font)
-	articleView.SetupCustomHandlers()
-
-	popupLayout := qt.NewQVBoxLayout(popup)
-
-	headerBox := qt.NewQHBoxLayout2()
-
-	closeButton := qt.NewQPushButton3("Close")
-	closeButton.SetFont(&font)
-	closeButton.OnClicked(func() {
-		popup.Close()
-	})
-	mainButton := qt.NewQPushButton3("Main")
-	mainButton.SetFont(&font)
-	mainButton.OnClicked(func() {
-		doQuery(query)
-	})
-
-	// favoriteButton := NewFavoriteButton(app.favoriteButtonClicked)
-	// favoriteButton.SetToolTips(
-	// 	"Add this term to favorites",
-	// 	"Remove this term from favorites",
-	// )
-
-	headerButtonBox := qt.NewQVBoxLayout2()
-	headerButtonBox.AddWidget(closeButton.QWidget)
-	headerButtonBox.AddWidget(mainButton.QWidget)
-	headerButtonBox.AddStretch()
-
-	headerBox.AddWidget2(headerLabel.QWidget, 10)
-	headerBox.AddStretch()
-	headerBox.AddLayout(headerButtonBox.QLayout)
-
-	popupLayout.AddLayout(headerBox.QLayout)
-	// headerBox.AddWidget(favoriteButton.QWidget)
-	popupLayout.AddWidget2(articleView.QWidget, 10)
-
-	popup.MoveWithQPoint(qt.QCursor_Pos())
-	popup.OnKeyPressEvent(func(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
-		if event.Key() == escape {
-			popup.Close()
-			return
-		}
-		super(event)
-	})
-
-	headerLabel.SetMouseTracking(true)
-
-	var dragRelativePos *qt.QPoint
-	for _, widget := range []HasOnMouseEvents{
-		headerLabel,
-		popup,
-	} {
-		widget.OnMousePressEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
-			if event.Button() != qt.LeftButton {
-				super(event)
-				return
-			}
-			dragRelativePos = event.Pos()
-		})
-		widget.OnMouseMoveEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
-			if dragRelativePos == nil {
-				super(event)
-				return
-			}
-			popup.Move(
-				event.GlobalX()-dragRelativePos.X(),
-				event.GlobalY()-dragRelativePos.Y(),
-			)
-		})
-		widget.OnMouseReleaseEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
-			dragRelativePos = nil
-			super(event)
-		})
-	}
-
-	results := dictmgr.LookupHTML(query, conf, mode, resultFlags, 0)
-	if len(results) == 0 {
-		slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", 0, "query", query)
-		if conf.ScanPopupMinScore > 0 {
-			return
-		}
-		articleView.SetHtml(fmt.Sprintf("No results for %#v", query))
-		popup.SetWindowTitle(query)
-	} else {
-		res := results[0]
-		slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", res.Score()/2, "query", query)
-		if conf.ScanPopupMinScore > int(res.Score())/2 {
-			return
-		}
-		articleView.SetResult(res)
-		headerLabel.SetResult(res)
-		popup.SetWindowTitle(res.Terms()[0])
-		// favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(res.Terms()[0]))
-	}
+	p.init()
+	p.lookup()
 
 	popup.Resize(conf.ScanPopupWidth, conf.ScanPopupHeight)
 	popup.Show()
