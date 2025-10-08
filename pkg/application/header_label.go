@@ -21,7 +21,7 @@ type HeaderLabel struct {
 	doQuery func(string)
 }
 
-func CreateHeaderLabel(app *Application) *HeaderLabel {
+func NewHeaderLabel(app *Application) *HeaderLabel {
 	qLabel := qt.NewQLabel2()
 	qLabel.SetTextInteractionFlags(qt.TextSelectableByMouse)
 	// | qt.TextSelectableByKeyboard

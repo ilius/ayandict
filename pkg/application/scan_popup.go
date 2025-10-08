@@ -55,7 +55,7 @@ func (app *Application) scanPopup(query string) {
 	font.SetPixelSize(int(float64(font.PixelSize()) * conf.ScanPopupFontSizeFactor))
 	popup.SetFont(&font)
 
-	headerLabel := CreateHeaderLabel(app)
+	headerLabel := NewHeaderLabel(app)
 	headerLabel.SetFont(&font)
 
 	articleView := NewArticleView(app)
