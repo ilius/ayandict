@@ -11,10 +11,11 @@ func (app *Application) setupTrayIcon(icon *qt.QIcon) {
 	trayIcon := qt.NewQSystemTrayIcon2(icon)
 	app.trayIcon = trayIcon
 	trayIcon.OnActivated(func(reason qt.QSystemTrayIcon__ActivationReason) {
-		if window.IsVisible() {
+		if window.IsActiveWindow() {
 			window.Hide()
 		} else {
 			window.Show()
+			window.ActivateWindow()
 		}
 	})
 	trayIcon.OnMessageClicked(func() {
@@ -47,7 +48,7 @@ func (app *Application) setTrayMenu() {
 		action := qt.NewQAction2("Show Window")
 		action.OnTriggered(func() {
 			app.window.Show()
-			app.window.Raise()
+			app.window.ActivateWindow()
 		})
 		actions = append(actions, action)
 	}
