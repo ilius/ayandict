@@ -3,11 +3,12 @@ package application
 import (
 	"fmt"
 	"log/slog"
-	"strings"
 
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	qt "github.com/mappu/miqt/qt6"
 )
+
+type QCloseEventFunc = func(super func(*qt.QCloseEvent), event *qt.QCloseEvent)
 
 type HasOnMouseEvents interface {
 	OnMousePressEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent))
@@ -16,44 +17,62 @@ type HasOnMouseEvents interface {
 	ObjectName() string
 }
 
-func (app *Application) setupScanPopup() {
-	clipboard := qt.QGuiApplication_Clipboard()
-	clipboard.OnChanged(func(mode qt.QClipboard__Mode) {
-		if mode == qt.QClipboard__Clipboard && !conf.ScanPopupClipboard {
-			return
-		}
-		if mode == qt.QClipboard__Selection && !conf.ScanPopupSelection {
-			return
-		}
-		app.scanPopup(clipboard.TextWithMode(mode))
-	})
+func NewScanPopup(
+	query string,
+	mode dictmgr.SearchMode,
+	icon *qt.QIcon,
+	showInMain func(query string),
+	onCloseEvent QCloseEventFunc,
+) *ScanPopup {
+	popup := qt.NewQWidget2()
+	popup.OnCloseEvent(onCloseEvent)
+
+	p := &ScanPopup{
+		query:      query,
+		mode:       mode,
+		icon:       icon,
+		popup:      popup,
+		showInMain: showInMain,
+	}
+	p.init()
+	return p
 }
 
 type ScanPopup struct {
-	// app: used for moveToMainWindow
-	app *Application
+	// set by factory func:
+	query      string             // used in doMainQueryNoArg and Run
+	mode       dictmgr.SearchMode // used in doQuery
+	icon       *qt.QIcon
+	popup      *qt.QWidget
+	showInMain func(query string)
 
-	query           string // use only in doMainQueryNoArg and lookup
-	icon            *qt.QIcon
-	popup           *qt.QWidget
-	mode            dictmgr.SearchMode
+	// set by init method:
+	headerLabel *HeaderLabel
+	articleView *ArticleView
+
+	// set on drag:
 	dragRelativePos *qt.QPoint
-	font            *qt.QFont
-	headerLabel     *HeaderLabel
-	articleView     *ArticleView
+}
+
+func (p *ScanPopup) Run() {
+	p.doQuery(p.query)
+	p.popup.Show()
 }
 
 func (p *ScanPopup) init() {
+	font := configFontWithFactor(conf.ScanPopupFontSizeFactor)
+
 	popup := p.popup
 	popup.SetWindowFlag(qt.FramelessWindowHint | qt.WindowStaysOnTopHint | qt.Tool)
 	popup.SetWindowIcon(p.icon)
+	popup.SetFont(font)
 
 	p.headerLabel = NewHeaderLabel(p.doQuery)
-	p.headerLabel.SetFont(p.font)
+	p.headerLabel.SetFont(font)
 	p.headerLabel.SetMouseTracking(true)
 
 	p.articleView = NewArticleView(p.doQuery)
-	p.articleView.SetFont(p.font)
+	p.articleView.SetFont(font)
 	p.articleView.SetupCustomHandlers()
 
 	popup.MoveWithQPoint(qt.QCursor_Pos())
@@ -73,12 +92,12 @@ func (p *ScanPopup) init() {
 	headerBox := qt.NewQHBoxLayout2()
 
 	closeButton := qt.NewQPushButton3("Close")
-	closeButton.SetFont(p.font)
+	closeButton.SetFont(font)
 	closeButton.OnClicked(func() {
 		_ = popup.Close()
 	})
 	mainButton := qt.NewQPushButton3("Main")
-	mainButton.SetFont(p.font)
+	mainButton.SetFont(font)
 	mainButton.OnClicked(p.moveToMainWindow)
 
 	// favoriteButton := NewFavoriteButton(app.favoriteButtonClicked)
@@ -126,9 +145,7 @@ func (p *ScanPopup) doQuery(query string) {
 
 func (p *ScanPopup) moveToMainWindow() {
 	p.popup.Close()
-	p.app.window.Show()
-	p.app.window.ActivateWindow()
-	p.app.doQuery(p.query)
+	p.showInMain(p.query)
 }
 
 func (p *ScanPopup) onPopupKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
@@ -165,56 +182,4 @@ func (p *ScanPopup) onDragMouseRelease(super func(*qt.QMouseEvent), event *qt.QM
 
 func (p *ScanPopup) autoResize() {
 	p.popup.Resize(conf.ScanPopupWidth, conf.ScanPopupHeight)
-}
-
-func (app *Application) onScanPopupCloseEvent(super func(*qt.QCloseEvent), event *qt.QCloseEvent) {
-	app.scanPopupCount.Add(-1)
-}
-
-func NewScanPopup(
-	app *Application,
-	icon *qt.QIcon,
-	query string,
-	mode dictmgr.SearchMode,
-) *ScanPopup {
-	font := configFontWithFactor(conf.ScanPopupFontSizeFactor)
-	popup := qt.NewQWidget2()
-	popup.OnCloseEvent(app.onScanPopupCloseEvent)
-	popup.SetFont(font)
-	p := &ScanPopup{
-		app:   app,
-		query: query,
-		icon:  icon,
-		popup: popup,
-		mode:  mode,
-		font:  font,
-	}
-	p.init()
-
-	return p
-}
-
-func (p *ScanPopup) Run() {
-	p.doQuery(p.query)
-	p.popup.Show()
-}
-
-func (app *Application) scanPopup(query string) {
-	if conf.ScanPopupMaxCount > 0 && app.scanPopupCount.Load() >= conf.ScanPopupMaxCount {
-		return
-	}
-	app.scanPopupCount.Add(1)
-
-	query = strings.TrimSpace(query)
-	query = strings.Trim(query, punctuation)
-	if query == "" {
-		return
-	}
-	mode, valid := dictmgr.SearchModeByName(conf.ScanPopupMode)
-	if !valid {
-		slog.Error("invalid scan_popup_mode", "value", conf.ScanPopupMode)
-	}
-
-	p := NewScanPopup(app, app.icon, query, mode)
-	p.Run()
 }
