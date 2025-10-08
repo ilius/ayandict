@@ -76,7 +76,7 @@ func (p *ScanPopup) init() {
 	})
 	mainButton := qt.NewQPushButton3("Main")
 	mainButton.SetFont(p.font)
-	mainButton.OnClicked(p.doMainQueryNoArg)
+	mainButton.OnClicked(p.moveToMainWindow)
 
 	// favoriteButton := NewFavoriteButton(app.favoriteButtonClicked)
 	// favoriteButton.SetToolTips(
@@ -99,14 +99,29 @@ func (p *ScanPopup) init() {
 }
 
 func (p *ScanPopup) doQuery(query string) {
-	p.popup.Close()
-	p.app.window.Show()
-	p.app.window.ActivateWindow()
-	p.app.entry.SetText(query)
-	p.app.queryArgs.onQuery(query, false)
+	results := dictmgr.LookupHTML(query, conf, p.mode, resultFlags, 0)
+	if len(results) == 0 {
+		slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", 0, "query", query)
+		if conf.ScanPopupMinScore > 0 {
+			return
+		}
+		p.articleView.SetHtml(fmt.Sprintf("No results for %#v", query))
+		p.popup.SetWindowTitle(query)
+		return
+	}
+	res := results[0]
+	slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", res.Score()/2, "query", query)
+	if conf.ScanPopupMinScore > int(res.Score())/2 {
+		return
+	}
+	p.articleView.SetResult(res)
+	p.headerLabel.SetResult(res)
+	p.popup.SetWindowTitle(res.Terms()[0])
+	// favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(res.Terms()[0]))
+	p.autoResize()
 }
 
-func (p *ScanPopup) doMainQueryNoArg() {
+func (p *ScanPopup) moveToMainWindow() {
 	p.popup.Close()
 	p.app.window.Show()
 	p.app.window.ActivateWindow()
@@ -145,27 +160,8 @@ func (p *ScanPopup) onDragMouseRelease(super func(*qt.QMouseEvent), event *qt.QM
 	super(event)
 }
 
-func (p *ScanPopup) lookup() {
-	query := p.query
-	results := dictmgr.LookupHTML(query, conf, p.mode, resultFlags, 0)
-	if len(results) == 0 {
-		slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", 0, "query", query)
-		if conf.ScanPopupMinScore > 0 {
-			return
-		}
-		p.articleView.SetHtml(fmt.Sprintf("No results for %#v", query))
-		p.popup.SetWindowTitle(query)
-		return
-	}
-	res := results[0]
-	slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", res.Score()/2, "query", query)
-	if conf.ScanPopupMinScore > int(res.Score())/2 {
-		return
-	}
-	p.articleView.SetResult(res)
-	p.headerLabel.SetResult(res)
-	p.popup.SetWindowTitle(res.Terms()[0])
-	// favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(res.Terms()[0]))
+func (p *ScanPopup) autoResize() {
+	p.popup.Resize(conf.ScanPopupWidth, conf.ScanPopupHeight)
 }
 
 func (app *Application) scanPopup(query string) {
@@ -200,8 +196,6 @@ func (app *Application) scanPopup(query string) {
 		font:  font,
 	}
 	p.init()
-	p.lookup()
-
-	popup.Resize(conf.ScanPopupWidth, conf.ScanPopupHeight)
+	p.doQuery(query)
 	popup.Show()
 }
