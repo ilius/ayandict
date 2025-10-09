@@ -46,6 +46,7 @@ func (app *Application) scanPopup(query string) {
 		mode,
 		app.icon,
 		app.showWindowAndQuery,
+		app.queryArgs.AddHistoryAndFrequency,
 		app.onScanPopupCloseEvent,
 	)
 	p.Run()

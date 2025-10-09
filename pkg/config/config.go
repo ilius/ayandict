@@ -83,6 +83,7 @@ type Config struct {
 	ScanPopupWidth     int    `toml:"scan_popup_width" doc:"Scan Popup: window width"`
 	ScanPopupHeight    int    `toml:"scan_popup_height" doc:"Scan Popup: window height"`
 	ScanPopupMaxCount  int32  `toml:"scan_popup_max_count" doc:"Scan Popup: max number of windows"`
+	ScanPopupHistory   bool   `toml:"scan_popup_history" doc:"Scan Popup: add to history"`
 
 	ScanPopupFontSizeFactor float64 `toml:"scan_popup_font_size_factor" doc:"Scan Popup: font size factor (relative to app)"`
 
@@ -196,14 +197,16 @@ func Default() *Config {
 
 		RandomFavoriteSearchMode: "wordMatch",
 
-		ScanPopupClipboard:      false,
-		ScanPopupSelection:      false,
-		ScanPopupAPI:            false,
-		ScanPopupMode:           "fuzzy",
-		ScanPopupMinScore:       0,
-		ScanPopupWidth:          800,
-		ScanPopupHeight:         600,
-		ScanPopupMaxCount:       1,
+		ScanPopupClipboard: false,
+		ScanPopupSelection: false,
+		ScanPopupAPI:       false,
+		ScanPopupMode:      "fuzzy",
+		ScanPopupMinScore:  0,
+		ScanPopupWidth:     800,
+		ScanPopupHeight:    600,
+		ScanPopupMaxCount:  1,
+		ScanPopupHistory:   true,
+
 		ScanPopupFontSizeFactor: 0.8,
 
 		ScanPopupBypassWindowManager: true,

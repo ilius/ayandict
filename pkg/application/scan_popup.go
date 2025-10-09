@@ -22,6 +22,7 @@ func NewScanPopup(
 	mode dictmgr.SearchMode,
 	icon *qt.QIcon,
 	showInMain func(query string),
+	addHistory func(query string),
 	onCloseEvent QCloseEventFunc,
 ) *ScanPopup {
 	popup := qt.NewQWidget2()
@@ -33,6 +34,7 @@ func NewScanPopup(
 		icon:       icon,
 		popup:      popup,
 		showInMain: showInMain,
+		addHistory: addHistory,
 	}
 	p.init()
 	return p
@@ -45,6 +47,7 @@ type ScanPopup struct {
 	icon       *qt.QIcon
 	popup      *qt.QWidget
 	showInMain func(query string)
+	addHistory func(query string)
 
 	// set by init method:
 	headerLabel *HeaderLabel
@@ -147,6 +150,9 @@ func (p *ScanPopup) doQuery(query string) {
 	p.popup.SetWindowTitle(res.Terms()[0])
 	// favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(res.Terms()[0]))
 	p.autoResize()
+	if conf.ScanPopupHistory {
+		p.addHistory(query)
+	}
 }
 
 func (p *ScanPopup) moveToMainWindow() {
