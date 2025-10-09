@@ -75,15 +75,18 @@ type Config struct {
 
 	RandomFavoriteSearchMode string `toml:"random_favorite_search_mode" doc:"Search mode for Random Favorite"`
 
-	ScanPopupClipboard      bool    `toml:"scan_popup_clipboard" doc:"Scan Popup: activate on copy to clipboard"`
-	ScanPopupSelection      bool    `toml:"scan_popup_selection" doc:"Scan Popup: activate on selection"`
-	ScanPopupAPI            bool    `toml:"scan_popup_api" doc:"Scan Popup: activate via API (socket/pipe)"`
-	ScanPopupMode           string  `toml:"scan_popup_mode" doc:"Scan Popup: search mode"`
-	ScanPopupMinScore       int     `toml:"scan_popup_min_score" doc:"Scan Popup: minimum score (0 to 100)"`
-	ScanPopupWidth          int     `toml:"scan_popup_width" doc:"Scan Popup: window width"`
-	ScanPopupHeight         int     `toml:"scan_popup_height" doc:"Scan Popup: window height"`
-	ScanPopupMaxCount       int32   `toml:"scan_popup_max_count" doc:"Scan Popup: max number of windows"`
+	ScanPopupClipboard bool   `toml:"scan_popup_clipboard" doc:"Scan Popup: activate on copy to clipboard"`
+	ScanPopupSelection bool   `toml:"scan_popup_selection" doc:"Scan Popup: activate on selection"`
+	ScanPopupAPI       bool   `toml:"scan_popup_api" doc:"Scan Popup: activate via API (socket/pipe)"`
+	ScanPopupMode      string `toml:"scan_popup_mode" doc:"Scan Popup: search mode"`
+	ScanPopupMinScore  int    `toml:"scan_popup_min_score" doc:"Scan Popup: minimum score (0 to 100)"`
+	ScanPopupWidth     int    `toml:"scan_popup_width" doc:"Scan Popup: window width"`
+	ScanPopupHeight    int    `toml:"scan_popup_height" doc:"Scan Popup: window height"`
+	ScanPopupMaxCount  int32  `toml:"scan_popup_max_count" doc:"Scan Popup: max number of windows"`
+
 	ScanPopupFontSizeFactor float64 `toml:"scan_popup_font_size_factor" doc:"Scan Popup: font size factor (relative to app)"`
+
+	ScanPopupBypassWindowManager bool `toml:"scan_popup_bypass_window_manager" doc:"Scan Popup: bypass window manager"`
 
 	Audio bool `toml:"audio" doc:"Enable audio in article"`
 
@@ -202,6 +205,8 @@ func Default() *Config {
 		ScanPopupHeight:         600,
 		ScanPopupMaxCount:       1,
 		ScanPopupFontSizeFactor: 0.8,
+
+		ScanPopupBypassWindowManager: true,
 
 		Audio: true,
 

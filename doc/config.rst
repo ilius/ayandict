@@ -166,6 +166,12 @@ Scan Popup: font size factor (relative to app)
 
 Default value: ``0.8``
 
+``scan_popup_bypass_window_manager``
+------------------------------------
+Scan Popup: bypass window manager
+
+Default value: ``true``
+
 ``audio``
 ---------
 Enable audio in article

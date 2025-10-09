@@ -63,7 +63,13 @@ func (p *ScanPopup) init() {
 	font := configFontWithFactor(conf.ScanPopupFontSizeFactor)
 
 	popup := p.popup
-	popup.SetWindowFlag(qt.FramelessWindowHint | qt.WindowStaysOnTopHint | qt.Tool)
+	flag := qt.FramelessWindowHint |
+		qt.WindowStaysOnTopHint |
+		qt.Tool
+	if conf.ScanPopupBypassWindowManager {
+		flag |= qt.BypassWindowManagerHint
+	}
+	popup.SetWindowFlag(flag)
 	popup.SetWindowIcon(p.icon)
 	popup.SetFont(font)
 
