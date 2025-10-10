@@ -14,7 +14,7 @@ func (app *Application) setupTrayIcon(icon *qt.QIcon) {
 		if window.IsActiveWindow() {
 			window.Hide()
 		} else {
-			window.Show()
+			window.ShowNormal()
 			window.ActivateWindow()
 		}
 	})
@@ -47,7 +47,7 @@ func (app *Application) setTrayMenu() {
 	{
 		action := qt.NewQAction2("Show Window")
 		action.OnTriggered(func() {
-			app.window.Show()
+			app.window.ShowNormal()
 			app.window.ActivateWindow()
 		})
 		actions = append(actions, action)

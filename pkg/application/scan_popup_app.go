@@ -53,7 +53,7 @@ func (app *Application) scanPopup(query string) {
 }
 
 func (app *Application) showWindowAndQuery(query string) {
-	app.window.Show()
+	app.window.ShowNormal()
 	app.window.ActivateWindow()
 	app.doQuery(query)
 }

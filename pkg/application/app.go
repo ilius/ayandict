@@ -523,5 +523,5 @@ func (app *Application) updateMiscButtonsPadding() {
 func (app *Application) aboutClicked() {
 	window := qt.NewQDialog(app.window.QWidget)
 	aboutClickedWidget(window.QWidget, app.icon)
-	window.Show()
+	window.ShowNormal()
 }
