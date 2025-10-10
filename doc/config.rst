@@ -112,6 +112,12 @@ Search mode for Random Favorite
 
 Default value: ``"wordMatch"``
 
+``start_hidden``
+----------------
+Hide main window on startup (if tray icon is available)
+
+Default value: ``false``
+
 ``scan_popup_clipboard``
 ------------------------
 Scan Popup: activate on copy to clipboard

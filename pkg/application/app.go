@@ -455,7 +455,9 @@ func (app *Application) Run() {
 
 	app.setupScanPopup()
 
-	window.Show()
+	if !(conf.StartHidden && app.trayIcon != nil && app.trayIcon.IsVisible()) {
+		window.Show()
+	}
 	_ = qt.QApplication_Exec()
 }
 

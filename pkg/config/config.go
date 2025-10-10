@@ -75,6 +75,8 @@ type Config struct {
 
 	RandomFavoriteSearchMode string `toml:"random_favorite_search_mode" doc:"Search mode for Random Favorite"`
 
+	StartHidden bool `toml:"start_hidden" doc:"Hide main window on startup (if tray icon is available)"`
+
 	ScanPopupClipboard bool   `toml:"scan_popup_clipboard" doc:"Scan Popup: activate on copy to clipboard"`
 	ScanPopupSelection bool   `toml:"scan_popup_selection" doc:"Scan Popup: activate on selection"`
 	ScanPopupAPI       bool   `toml:"scan_popup_api" doc:"Scan Popup: activate via API (socket/pipe)"`
@@ -196,6 +198,8 @@ func Default() *Config {
 		MaxResultsTotal: 40,
 
 		RandomFavoriteSearchMode: "wordMatch",
+
+		StartHidden: false,
 
 		ScanPopupClipboard: false,
 		ScanPopupSelection: false,
