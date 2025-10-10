@@ -91,6 +91,10 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 			app.aboutClicked()
 		case int(qt.Key_PageUp), int(qt.Key_PageDown):
 			qt.QCoreApplication_SendEvent(app.articleView.QObject, event.QEvent)
+		case int(qt.Key_Q):
+			if event.Modifiers()&qt.ControlModifier > 0 {
+				app.Exit()
+			}
 		default:
 			super(event)
 		}
@@ -110,6 +114,10 @@ func (app *Application) setupArticleViewKeyPressEvent() {
 			app.resetQuery()
 		case int(qt.Key_F1):
 			app.aboutClicked()
+		case int(qt.Key_Q):
+			if event.Modifiers()&qt.ControlModifier > 0 {
+				app.Exit()
+			}
 		default:
 			super(event)
 		}
