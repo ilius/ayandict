@@ -27,6 +27,8 @@ type QueryArgs struct {
 	Entry          *qt.QLineEdit
 	ModeCombo      *qt.QComboBox
 	FrequencyTable *frequency.FrequencyTable
+
+	DisableHistory bool // temporarily disable history
 }
 
 func (w *QueryArgs) AddHistoryAndFrequency(query string) {
@@ -79,14 +81,24 @@ func (queryArgs *QueryArgs) onQuery(query string, isAuto bool) {
 			queryArgs.SetNoResult(query)
 		}
 	}
-	if isAuto {
-		if len(results) > 0 {
-			if results[0].Score() == 200 {
-				queryArgs.AddHistoryAndFrequency(query)
-			}
-		}
-	} else {
+	if queryArgs.historyOnQuery(isAuto, results) {
 		queryArgs.AddHistoryAndFrequency(query)
 	}
 	queryArgs.PostQuery(query)
+}
+
+func (q *QueryArgs) historyOnQuery(isAuto bool, results []common.SearchResultIface) bool {
+	if q.DisableHistory {
+		return false
+	}
+	if !isAuto {
+		return true
+	}
+	// isAuto=true (search-on-type)
+	if len(results) > 0 {
+		if results[0].Score() == 200 {
+			return true
+		}
+	}
+	return false
 }

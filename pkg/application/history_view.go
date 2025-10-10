@@ -64,6 +64,7 @@ func (h *HistoryView) Add(query string) {
 	if conf.HistoryAutoSave {
 		h.Save()
 	}
+	h.SetCurrentRow(0)
 }
 
 func (h *HistoryView) AddHistoryList(list []string) {
@@ -117,4 +118,30 @@ func (h *HistoryView) SetupCustomHandlers() {
 	// view.OnItemClicked(func(item *qt.QListWidgetItem) {
 	// 	doQuery(item.Text())
 	// })
+}
+
+func (h *HistoryView) ClearCursor() {
+	h.ClearSelection()
+	h.ClearFocus()
+	h.SetCurrentRow(-1)
+}
+
+func (h *HistoryView) GoBack() {
+	row := h.CurrentRow() + 1
+	if row > h.Count()-1 {
+		return
+	}
+	h.SetCurrentRow(row)
+	h.SetFocus()
+	h.doQuery(h.Item(row).Text())
+}
+
+func (h *HistoryView) GoForward() {
+	row := h.CurrentRow() - 1
+	if row < 0 {
+		return
+	}
+	h.SetCurrentRow(row)
+	h.SetFocus()
+	h.doQuery(h.Item(row).Text())
 }

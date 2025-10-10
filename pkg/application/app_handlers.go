@@ -95,6 +95,14 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 			if event.Modifiers()&qt.ControlModifier > 0 {
 				app.Exit()
 			}
+		case int(qt.Key_Left):
+			if event.Modifiers()&qt.AltModifier > 0 {
+				app.goBackInHistory()
+			}
+		case int(qt.Key_Right):
+			if event.Modifiers()&qt.AltModifier > 0 {
+				app.goForwardInHistory()
+			}
 		default:
 			super(event)
 		}
@@ -118,10 +126,34 @@ func (app *Application) setupArticleViewKeyPressEvent() {
 			if event.Modifiers()&qt.ControlModifier > 0 {
 				app.Exit()
 			}
+		case int(qt.Key_Left):
+			if event.Modifiers()&qt.AltModifier > 0 {
+				app.goBackInHistory()
+			}
+		case int(qt.Key_Right):
+			if event.Modifiers()&qt.AltModifier > 0 {
+				app.goForwardInHistory()
+			}
 		default:
 			super(event)
 		}
 	})
+}
+
+func (app *Application) goBackInHistory() {
+	app.queryArgs.DisableHistory = true
+	defer func() {
+		app.queryArgs.DisableHistory = false
+	}()
+	app.historyView.GoBack()
+}
+
+func (app *Application) goForwardInHistory() {
+	app.queryArgs.DisableHistory = true
+	defer func() {
+		app.queryArgs.DisableHistory = false
+	}()
+	app.historyView.GoForward()
 }
 
 func (app *Application) onEntryKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {

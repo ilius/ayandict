@@ -107,6 +107,7 @@ func (app *Application) resetQuery() {
 	app.articleView.SetHtml("")
 	app.favoriteButton.Hide()
 	app.queryFavoriteButton.SetChecked(false)
+	app.historyView.ClearCursor()
 }
 
 func (app *Application) postQuery(query string) {
