@@ -41,13 +41,17 @@ func fontPointSize(font *qt.QFont, dpi float64) float64 {
 	return float64(pixels) * 72.0 / dpi
 }
 
-func fontPixelSize(font *qt.QFont, dpi float64) float64 {
+func fontPixelSize(font *qt.QFont, screen *qt.QScreen) float64 {
 	pixels := font.PixelSize()
 	if pixels > 0 {
 		return float64(pixels)
 	}
 
 	points := font.PointSizeF()
+	dpi := screen.PhysicalDotsPerInch()
+	if dpi <= 0 {
+		panic("failed to get DPI")
+	}
 	return points * dpi / 72.0
 }
 

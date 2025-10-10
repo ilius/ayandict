@@ -29,6 +29,8 @@ var searchModes = []string{
 	"Word Match",
 }
 
+var systemFont *qt.QFont
+
 type Application struct {
 	*qt.QApplication
 
@@ -436,6 +438,8 @@ func (app *Application) Run() {
 	mainSplitter.SetStretchFactor(2, 1)
 
 	window.SetCentralWidget(mainSplitter.QWidget)
+
+	systemFont = qt.QApplication_Font()
 
 	qt.QApplication_SetFont(ConfigFont())
 

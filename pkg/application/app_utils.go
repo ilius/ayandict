@@ -11,7 +11,7 @@ import (
 func (app *Application) baseFontPixelSize() float32 {
 	return float32(fontPixelSize(
 		qt.QApplication_Font(),
-		qt.QGuiApplication_PrimaryScreen().PhysicalDotsPerInch(),
+		app.window.Screen(),
 	) * 0.66)
 }
 

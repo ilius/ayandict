@@ -84,7 +84,10 @@ func (p *ScanPopup) init() {
 	p.articleView.SetFont(font)
 	p.articleView.SetupCustomHandlers()
 
-	popup.MoveWithQPoint(qt.QCursor_Pos())
+	pos := qt.QCursor_Pos()
+	screen := qt.QGuiApplication_ScreenAt(pos)
+	popup.Move(pos.X(), pos.Y()+int(fontPixelSize(systemFont, screen)))
+
 	popup.OnKeyPressEvent(p.onPopupKeyPress)
 
 	for _, widget := range []HasOnMouseEvents{
