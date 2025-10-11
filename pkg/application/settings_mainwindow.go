@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"os"
 	"path"
-	"sync"
 	"time"
 
 	"github.com/ilius/ayandict/v3/pkg/config"
@@ -14,10 +13,7 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
-var (
-	mainWindowPath = path.Join(config.GetConfigDir(), qsettings.QS_mainwindow+".json")
-	mainWindowLock = sync.Mutex{}
-)
+var mainWindowPath = path.Join(config.GetConfigDir(), qsettings.QS_mainwindow+".json")
 
 type MainWindowSettings struct {
 	X            int  `json:"x"`
@@ -30,8 +26,6 @@ type MainWindowSettings struct {
 }
 
 func (s *MainWindowSettings) Save() {
-	mainWindowLock.Lock()
-	defer mainWindowLock.Unlock()
 	b, err := json.Marshal(s)
 	if err != nil {
 		slog.Error("error encoding main window settings", "err", err, "path", mainWindowPath)
@@ -45,8 +39,6 @@ func (s *MainWindowSettings) Save() {
 }
 
 func (s *MainWindowSettings) Load() {
-	mainWindowLock.Lock()
-	defer mainWindowLock.Unlock()
 	b, err := os.ReadFile(mainWindowPath)
 	if err != nil {
 		if !os.IsNotExist(err) {
@@ -91,7 +83,7 @@ func (app *Application) restoreMainWindowSettings() {
 }
 
 func (app *Application) setupMainWindowSettings() {
-	ch := make(chan time.Time, 100)
+	ch := app.mainWindowSettingsChan
 	app.window.OnMoveEvent(func(super func(*qt.QMoveEvent), event *qt.QMoveEvent) {
 		ch <- time.Now()
 	})
@@ -100,7 +92,5 @@ func (app *Application) setupMainWindowSettings() {
 	})
 	// DO NO CALL app.searchModeCombo.OnCurrentIndexChanged
 	// OR app.activityTypeCombo.OnCurrentIndexChanged
-	go qsettings.ActionSaveLoop(ch, func() {
-		app.saveMainWindowSettings()
-	})
+	go qsettings.ActionSaveLoop(ch, app.saveMainWindowSettings)
 }

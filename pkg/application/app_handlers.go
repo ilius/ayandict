@@ -201,7 +201,7 @@ func (app *Application) activityComboChanged(index int) {
 		app.frequencyTable.Hide()
 		app.favoritesWidget.Show()
 	}
-	app.saveMainWindowSettings()
+	app.mainWindowSettingsChan <- time.Now()
 }
 
 func (app *Application) okButtonResized(

@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"sync/atomic"
 	"syscall"
+	"time"
 
 	"github.com/ilius/ayandict/v3/pkg/activity"
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
@@ -39,7 +40,7 @@ type Application struct {
 
 	style *qt.QStyle
 
-	qs *qt.QSettings
+	mainWindowSettingsChan chan time.Time
 
 	bottomBoxStyleOpt *qt.QStyleOptionButton
 
@@ -87,6 +88,7 @@ func (app *Application) init() {
 		panic("config local_server_ports is empty")
 	}
 	client.Timeout = conf.LocalClientTimeout
+	app.mainWindowSettingsChan = make(chan time.Time, 100)
 }
 
 func (app *Application) doQuery(query string) {
@@ -457,7 +459,6 @@ func (app *Application) Run() {
 	app.setupHandlers()
 
 	qs := qt.NewQSettings8("ilius", appinfo.APP_NAME, window.QObject)
-	app.qs = qs
 	app.setupSettings(qs, mainSplitter)
 
 	app.setupScanPopup()
@@ -474,7 +475,7 @@ func (app *Application) setupSettings(qs *qt.QSettings, mainSplitter *qt.QSplitt
 		if text != "" {
 			app.queryArgs.onQuery(text, false)
 		}
-		app.saveMainWindowSettings()
+		app.mainWindowSettingsChan <- time.Now()
 	})
 
 	qsettings.RestoreSplitterSizes(mainSplitter, QS_mainSplitter)
