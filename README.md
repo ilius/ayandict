@@ -34,43 +34,43 @@ You can also compile in web-only / non-GUI mode with `go build -v -tags nogui` c
 
 # Screenshots
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-linux-light-wordnet.png" width="70%" height="70%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v30-linux-dark-wordnet.png" width="70%" height="70%"/>
 
-Linux - light style (default)
+Linux - dark style + Favorites
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-linux-dark-wordnet.png" width="70%" height="70%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v30-linux-light-wordnet.png" width="70%" height="70%"/>
 
-Linux - dark style ([Breeze](https://github.com/Alexhuszagh/BreezeStyleSheets)) + Favorites
+Linux - light style
 
 ______________________________________________________________________
 
 <img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-windows-light-wordnet.png" width="70%" height="70%"/>
 
-Windows - light style (default)
+Windows - light style
 
 ______________________________________________________________________
 
 <img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-windows-dark-wordnet.png" width="70%" height="70%"/>
 
-Windows - dark style ([Breeze](https://github.com/Alexhuszagh/BreezeStyleSheets))
+Windows - dark style
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-linux-dark-frequent-wordnet.png" width="70%" height="70%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v30-linux-dark-frequent-wordnet.png" width="70%" height="70%"/>
 
 Most Frequent queries
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-linux-dark-dict-manager.png" width="70%" height="70%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v30-linux-dark-dict-manager.png" width="70%" height="70%"/>
 
 Dictionaries dialog
 
 ______________________________________________________________________
 
-<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v20-linux-dark-misc-empty.png" width="70%" height="70%"/>
+<img src="https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v30-linux-dark-misc-empty.png" width="70%" height="70%"/>
 
 Misc tab
 
