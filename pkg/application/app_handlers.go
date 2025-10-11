@@ -8,7 +8,6 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/qdictmgr"
-	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
 	common "github.com/ilius/go-dict-commons"
 	qt "github.com/mappu/miqt/qt6"
 )
@@ -202,7 +201,7 @@ func (app *Application) activityComboChanged(index int) {
 		app.frequencyTable.Hide()
 		app.favoritesWidget.Show()
 	}
-	qsettings.SaveActivityMode(app.qs, app.activityTypeCombo)
+	app.saveMainWindowSettings()
 }
 
 func (app *Application) okButtonResized(

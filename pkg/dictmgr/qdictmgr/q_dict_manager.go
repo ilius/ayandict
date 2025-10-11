@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/ilius/ayandict/v3/pkg/appinfo"
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/internal/dicts"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon"
@@ -67,8 +68,8 @@ func NewDictManager(
 
 	infoMap := makeDictInfoMap(dicts.DictList)
 
-	qs := qsettings.GetQSettings(window.QObject)
-	qsettings.RestoreWinGeometry(qs, window.QWidget, QS_dictManager)
+	qs := qt.NewQSettings8("ilius", appinfo.APP_NAME, window.QObject)
+	qsettings.RestoreWindowGeometry(window.QWidget, QS_dictManager)
 
 	table := qt.NewQTableWidget2()
 	volumeInput := qt.NewQSpinBox2()
@@ -381,10 +382,10 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 		QS_dictManager,
 	)
 	table.HorizontalHeader().OnSectionResized(func(logicalIndex int, oldSize int, newSize int) {
-		qsettings.SaveTableColumnsWidth(qs, table, QS_dictManager)
+		qsettings.SaveTableColumnsWidth(table, QS_dictManager)
 	})
 
-	qsettings.SetupDialogGeometrySave(qs, dm.Dialog, QS_dictManager)
+	qsettings.SetupDialogGeometrySave(dm.Dialog, QS_dictManager)
 }
 
 // updates global var dictSettingsMap

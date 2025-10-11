@@ -456,10 +456,9 @@ func (app *Application) Run() {
 	// setting up handlers
 	app.setupHandlers()
 
-	qs := qsettings.GetQSettings(window.QObject)
+	qs := qt.NewQSettings8("ilius", appinfo.APP_NAME, window.QObject)
 	app.qs = qs
 	app.setupSettings(qs, mainSplitter)
-	qsettings.RestoreActivityMode(qs, activityTypeCombo)
 
 	app.setupScanPopup()
 
@@ -475,12 +474,12 @@ func (app *Application) setupSettings(qs *qt.QSettings, mainSplitter *qt.QSplitt
 		if text != "" {
 			app.queryArgs.onQuery(text, false)
 		}
-		go qsettings.SaveSearchSettings(qs, app.searchModeCombo)
+		app.saveMainWindowSettings()
 	})
 
-	qsettings.RestoreSplitterSizes(qs, mainSplitter, QS_mainSplitter)
-	qsettings.RestoreMainWinGeometry(qs, app.window)
-	qsettings.SetupMainWinGeometrySave(qs, app.window)
+	qsettings.RestoreSplitterSizes(mainSplitter, QS_mainSplitter)
+	app.restoreMainWindowSettings()
+	app.setupMainWindowSettings()
 
 	frequencyTable := app.frequencyTable
 	qsettings.RestoreTableColumnsWidth(
@@ -490,12 +489,10 @@ func (app *Application) setupSettings(qs *qt.QSettings, mainSplitter *qt.QSplitt
 	)
 	// frequencyTable.OnColumnResized does not work
 	frequencyTable.HorizontalHeader().OnSectionResized(func(logicalIndex int, oldSize int, newSize int) {
-		qsettings.SaveTableColumnsWidth(qs, frequencyTable.QTableWidget, QS_frequencyTable)
+		qsettings.SaveTableColumnsWidth(frequencyTable.QTableWidget, QS_frequencyTable)
 	})
 
-	qsettings.SetupSplitterSizesSave(qs, mainSplitter, QS_mainSplitter)
-
-	qsettings.RestoreSearchSettings(qs, app.searchModeCombo)
+	qsettings.SetupSplitterSizesSave(mainSplitter, QS_mainSplitter)
 }
 
 func (app *Application) updateMiscButtonsVisibility() {
