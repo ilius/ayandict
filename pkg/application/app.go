@@ -205,6 +205,9 @@ func (app *Application) Run() {
 		}
 		app.icon = icon
 		window.SetWindowIcon(icon)
+		if !qt.QSystemTrayIcon_IsSystemTrayAvailable() {
+			slog.Warn("system tray is not available")
+		}
 		app.setupTrayIcon(icon)
 	}
 
