@@ -53,8 +53,8 @@ type ScanPopup struct {
 	headerLabel *HeaderLabel
 	articleView *ArticleView
 
-	// set on drag:
-	dragRelativePos *qt.QPoint
+	// dragPos: position of mouse relative to window, when drag starts
+	dragPos *qt.QPoint
 }
 
 func (p *ScanPopup) Run() {
@@ -176,22 +176,22 @@ func (p *ScanPopup) onDragMousePress(super func(*qt.QMouseEvent), event *qt.QMou
 		super(event)
 		return
 	}
-	p.dragRelativePos = event.Pos()
+	p.dragPos = event.Pos()
 }
 
 func (p *ScanPopup) onDragMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
-	if p.dragRelativePos == nil {
+	if p.dragPos == nil {
 		super(event)
 		return
 	}
 	p.popup.Move(
-		event.GlobalX()-p.dragRelativePos.X(),
-		event.GlobalY()-p.dragRelativePos.Y(),
+		event.GlobalX()-p.dragPos.X(),
+		event.GlobalY()-p.dragPos.Y(),
 	)
 }
 
 func (p *ScanPopup) onDragMouseRelease(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
-	p.dragRelativePos = nil
+	p.dragPos = nil
 	super(event)
 }
 
