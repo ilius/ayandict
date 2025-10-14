@@ -521,6 +521,16 @@ func (app *Application) updateMiscButtonsPadding() {
 	app.randomFavoriteButton.SetStyleSheet(stylesheet)
 }
 
+func (app *Application) onStatusIconClick() {
+	window := app.window
+	if window.IsActiveWindow() {
+		window.Hide()
+	} else {
+		window.ShowNormal()
+		window.ActivateWindow()
+	}
+}
+
 func (app *Application) aboutClicked() {
 	window := qt.NewQDialog(app.window.QWidget)
 	aboutClickedWidget(window.QWidget, app.icon)
