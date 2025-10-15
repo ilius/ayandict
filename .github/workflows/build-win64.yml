@@ -1,4 +1,4 @@
-name: Windows Build
+name: Windows Build (Portable)
 
 on:
   push:
@@ -9,89 +9,74 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
       - uses: actions/checkout@v3
 
-      - name: Upgrade pip
+      # Install Python + aqtinstall to fetch Qt binaries
+      - name: Install aqtinstall
+        run: pip install -q aqtinstall
+
+      # Download and install the latest Qt6 MSVC build (dynamic)
+      - name: Install Qt 6 (MSVC 2022)
         shell: pwsh
         run: |
-          python -m pip install --upgrade pip > $null
+          $QtRoot = "C:\Qt"
+          $QtVersion = "6.10.0"
+          $QtArch = "win64_msvc2022_64"
+          python -m aqt install-qt windows desktop $QtVersion $QtArch `
+            --outputdir $QtRoot --modules qtbase qttools qttranslations
 
-      - name: Install Qt 6
-        shell: pwsh
-        run: |
-          pip install -q --upgrade aqtinstall
-
-          Write-Host "Detecting latest Qt 6.x version..."
-          $qtVer = (python -m aqt list-qt windows desktop --latest-version | Select-String '^6\.' | Select-Object -First 1).ToString().Trim()
-          if (-not $qtVer) { Write-Error "Could not detect any Qt 6.x version in aqt output"; exit 1 }
-
-          Write-Host "Installing Qt version $qtVer..."
-          python -m aqt install-qt windows desktop $qtVer win64_msvc2022_64 --outputdir C:\Qt -m all
-
-          # Find architecture folder (e.g. C:\Qt\6.10.0\msvc2022_64)
-          $qtDir = Get-ChildItem C:\Qt -Directory | Where-Object { $_.Name -match '^6\.' } | Sort-Object Name -Descending | Select-Object -First 1
-          $qtArchDir = Join-Path $qtDir.FullName 'msvc2022_64'
-
-          if (-not (Test-Path "$qtArchDir\lib")) {
-            Write-Error "Qt installation failed — directory not created."
+          $qtDir = "$QtRoot\$QtVersion\$QtArch"
+          if (-not (Test-Path $qtDir)) {
+            Write-Error "❌ Qt install failed — $qtDir not found"
             exit 1
           }
 
-          echo "QT6_DIR=$qtArchDir" | Out-File -FilePath $env:GITHUB_ENV -Append
-          echo "CGO_CFLAGS=-I$qtArchDir\include" | Out-File -FilePath $env:GITHUB_ENV -Append
-          echo "CGO_LDFLAGS=-L$qtArchDir\lib" | Out-File -FilePath $env:GITHUB_ENV -Append
-          echo "Path=$qtArchDir\bin;$env:Path" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "QT6_DIR=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "CGO_CFLAGS=-I$qtDir\include" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "CGO_LDFLAGS=-L$qtDir\lib" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "Path=$qtDir\bin;$env:Path" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-          Write-Host "Installed Qt to $qtArchDir"
-          Write-Host "Added C headers and libs to CGO_* environment variables"
+          Write-Host "✅ Installed Qt to $qtDir"
 
-      - name: Install pkgconf (MSYS2)
-        shell: pwsh
-        run: |
-          choco install -y msys2 > $null
-          & "C:\tools\msys64\usr\bin\bash.exe" -lc "pacman -Sy --noconfirm pkgconf > /dev/null"
-          echo "PKG_CONFIG=C:\tools\msys64\usr\bin\pkgconf.exe" >> $env:GITHUB_ENV
-
-      - name: Setup Go
+      # Install and configure Go
+      - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: 1.24
 
-      # - name: Build
-      #   shell: pwsh
-      #   env:
-      #     CGO_ENABLED: 1
-      #   run: |
-      #     $env:PATH = "$env:QT6_DIR\bin;$env:PATH"
-      #     $env:PKG_CONFIG_PATH = "$env:QT6_DIR\lib\pkgconfig"
-      #     $env:PKG_CONFIG = "C:\tools\msys64\usr\bin\pkgconf.exe"
-      #     go build -v -trimpath -ldflags "-s -w" .
-
-
-      - name: Build Go app
+      # Build the Go executable using miqt + Qt
+      - name: Build Go binary
         shell: pwsh
-        env:
-          CGO_ENABLED: 1
         run: |
-          Write-Host "PKG_CONFIG_PATH = $env:PKG_CONFIG_PATH"
-          Write-Host "QT6_DIR = $env:QT6_DIR"
-
-          # Check that pkgconf can find Qt
-          & pkgconf --modversion Qt6Widgets
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "pkgconf cannot find Qt6Widgets!"
+          go env -w CGO_ENABLED=1
+          go build -v -o ayandict.exe ./cmd/ayandict
+          if (-not (Test-Path "ayandict.exe")) {
+            Write-Error "❌ Build failed — ayandict.exe not created"
             exit 1
           }
+          Write-Host "✅ Build succeeded"
 
-          go build -v ./cmd/ayandict
+      # Bundle Qt DLLs and plugins using windeployqt
+      - name: Bundle Qt dependencies
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item ayandict.exe dist/
+          & "$env:QT6_DIR\bin\windeployqt.exe" dist\ayandict.exe --release
+          Write-Host "✅ Qt DLLs bundled into dist/"
 
+      # Compress the portable folder into a zip file
+      - name: Create zip archive
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist\* -DestinationPath ayandict-win64.zip
+          Write-Host "✅ Created ayandict-win64.zip"
 
-      - name: Upload binary artifact
+      # Upload the zipped portable build as an artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ayandict-windows-amd64-${{ github.sha }}
-          if-no-files-found: error
+          name: ayandict-win64-${{ github.sha }}
+          path: ayandict-win64.zip
           retention-days: 7
-          path: ayandict.exe
