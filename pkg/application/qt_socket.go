@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	s_scanpopup = "scanpopup:"
+	s_scanPopup          = "scanpopup:"
+	s_statusIconActivate = "statusicon:activate"
 )
 
 func (app *Application) startLocalSocketServer() bool {
@@ -20,13 +21,17 @@ func (app *Application) startLocalSocketServer() bool {
 	server.OnNewConnection(func() {
 		conn := server.NextPendingConnection()
 		conn.OnReadyRead(func() {
-			data := string(conn.ReadAll())
-			slog.Debug("LocalSocketServer: received:", "data", data)
-			if strings.HasPrefix(data, s_scanpopup) {
+			cmd := strings.TrimSpace(string(conn.ReadAll()))
+			slog.Debug("LocalSocketServer: received:", "data", cmd)
+			if strings.HasPrefix(cmd, s_scanPopup) {
 				if conf.ScanPopupAPI {
-					query := data[len(s_scanpopup):]
+					query := cmd[len(s_scanPopup):]
 					app.scanPopup(query)
 				}
+			} else if cmd == s_statusIconActivate {
+				app.onStatusIconClick()
+			} else {
+				slog.Warn("server: unsupported command", "cmd", cmd)
 			}
 		})
 	})
