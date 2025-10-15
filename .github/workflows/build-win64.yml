@@ -18,48 +18,34 @@ jobs:
         run: |
           python -m pip install --upgrade pip > $null
 
-      - name: Install Qt6
+      - name: Install Qt 6
         shell: pwsh
         run: |
           pip install -q --upgrade aqtinstall
 
           Write-Host "Detecting latest Qt 6.x version..."
-          $versions = python -m aqt list-qt windows desktop | `
-            Select-String -Pattern '6\.[0-9]+(\.[0-9]+)?' -AllMatches | `
-            ForEach-Object { $_.Matches.Value } | Sort-Object -Unique | `
-            Sort-Object { [Version]$_ } -Descending
+          $qtVer = (python -m aqt list-qt windows desktop --latest-version | Select-String '^6\.' | Select-Object -First 1).ToString().Trim()
+          if (-not $qtVer) { Write-Error "Could not detect any Qt 6.x version in aqt output"; exit 1 }
 
-          if (-not $versions) {
-            Write-Error "Could not detect any Qt 6.x version in aqt output"
+          Write-Host "Installing Qt version $qtVer..."
+          python -m aqt install-qt windows desktop $qtVer win64_msvc2022_64 --outputdir C:\Qt -m all
+
+          # Find architecture folder (e.g. C:\Qt\6.10.0\msvc2022_64)
+          $qtDir = Get-ChildItem C:\Qt -Directory | Where-Object { $_.Name -match '^6\.' } | Sort-Object Name -Descending | Select-Object -First 1
+          $qtArchDir = Join-Path $qtDir.FullName 'msvc2022_64'
+
+          if (-not (Test-Path "$qtArchDir\lib\pkgconfig")) {
+            Write-Error "Qt installation failed — directory not created or pkgconfig missing."
             exit 1
           }
 
-          $qtVersion = $versions[0]
-          Write-Host "Using Qt version $qtVersion"
+          # Export environment for next steps
+          echo "QT6_DIR=$qtArchDir" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "PKG_CONFIG_PATH=$qtArchDir\lib\pkgconfig" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "Path=$qtArchDir\bin;$env:Path" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-          python -m aqt install-qt windows desktop $qtVersion win64_msvc2022_64 `
-            --outputdir C:\Qt `
-            -m all
-
-          # Look for installed folder
-          $qtDir = Get-ChildItem C:\Qt -Directory | Where-Object { $_.Name -match '^6\.' } | Sort-Object -Descending | Select-Object -First 1
-          if (-not $qtDir) {
-            Write-Error "Qt installation failed — version directory not found under C:\Qt"
-            exit 1
-          }
-
-          $qtArchDir = Join-Path $qtDir.FullName "msvc2022_64"
-          if (-not (Test-Path $qtArchDir)) {
-            Write-Error "Qt installation failed — architecture directory not found: $qtArchDir"
-            exit 1
-          }
-
-          Write-Host "Qt successfully installed at $qtArchDir"
-          Write-Host "Listing few files for verification:"
-          Get-ChildItem $qtArchDir\bin | Select-Object -First 10
-
-          echo "QT6_DIR=$qtArchDir" >> $env:GITHUB_ENV
-          echo "PKG_CONFIG_PATH=$qtArchDir\lib\pkgconfig" >> $env:GITHUB_ENV
+          Write-Host "Installed Qt to $qtArchDir"
+          Write-Host "Added $qtArchDir\lib\pkgconfig to PKG_CONFIG_PATH"
 
       - name: Install pkgconf (MSYS2)
         shell: pwsh
@@ -73,15 +59,34 @@ jobs:
         with:
           go-version: 1.24
 
-      - name: Build
+      # - name: Build
+      #   shell: pwsh
+      #   env:
+      #     CGO_ENABLED: 1
+      #   run: |
+      #     $env:PATH = "$env:QT6_DIR\bin;$env:PATH"
+      #     $env:PKG_CONFIG_PATH = "$env:QT6_DIR\lib\pkgconfig"
+      #     $env:PKG_CONFIG = "C:\tools\msys64\usr\bin\pkgconf.exe"
+      #     go build -v -trimpath -ldflags "-s -w" .
+
+
+      - name: Build Go app
         shell: pwsh
-        run: |
-          $env:PATH = "$env:QT6_DIR\bin;$env:PATH"
-          $env:PKG_CONFIG_PATH = "$env:QT6_DIR\lib\pkgconfig"
-          $env:PKG_CONFIG = "C:\tools\msys64\usr\bin\pkgconf.exe"
-          go build -v -trimpath -ldflags "-s -w" .
         env:
           CGO_ENABLED: 1
+        run: |
+          Write-Host "PKG_CONFIG_PATH = $env:PKG_CONFIG_PATH"
+          Write-Host "QT6_DIR = $env:QT6_DIR"
+
+          # Check that pkgconf can find Qt
+          & pkgconf --modversion Qt6Widgets
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "pkgconf cannot find Qt6Widgets!"
+            exit 1
+          }
+
+          go build -v ./cmd/ayandict
+
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
