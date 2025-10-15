@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
+	"github.com/ilius/ayandict/v3/pkg/qplatform"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -66,13 +67,16 @@ func (p *ScanPopup) init() {
 	font := configFontWithFactor(conf.ScanPopupFontSizeFactor)
 
 	popup := p.popup
-	flag := qt.FramelessWindowHint |
-		qt.WindowStaysOnTopHint |
-		qt.Tool
-	if conf.ScanPopupBypassWindowManager {
-		flag |= qt.BypassWindowManagerHint
+	flags := qt.WindowStaysOnTopHint | qt.Tool
+	if qplatform.CanMoveWindow() {
+		flags |= qt.FramelessWindowHint
+		if conf.ScanPopupBypassWindowManager {
+			flags |= qt.BypassWindowManagerHint
+		}
+	} else {
+		slog.Info("ScanPopup: normal (bordered), platform does not support moving window")
 	}
-	popup.SetWindowFlags(flag)
+	popup.SetWindowFlags(flags)
 	popup.SetWindowIcon(p.icon)
 	popup.SetFont(font)
 

@@ -76,3 +76,9 @@ func HideWindowFromTaskbar(widget *qt.QWidget) {
 	slog.Debug("X11: hide_from_taskbar", "winID", winID)
 	C.hide_from_taskbar(C.ulong(winID))
 }
+
+func CanMoveWindow() bool {
+	return os.Getenv("WAYLAND_DISPLAY") == ""
+}
+
+// "Scan Selection" and "Scan Clipboard" work on Wayland, but only within the app.

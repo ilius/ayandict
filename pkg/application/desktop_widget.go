@@ -16,8 +16,12 @@ func (app *Application) setupDekstopWidget() {
 		return
 	}
 	widget := qt.NewQWidget2()
-	widget.SetWindowFlags(qt.FramelessWindowHint |
-		qt.WindowStaysOnBottomHint | qt.Window)
+
+	flags := qt.WindowStaysOnBottomHint | qt.Window
+	if qplatform.CanMoveWindow() {
+		flags |= qt.FramelessWindowHint
+	}
+	widget.SetWindowFlags(flags)
 
 	layout := qt.NewQHBoxLayout(widget)
 
