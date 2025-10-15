@@ -170,7 +170,7 @@ Default value: ``600``
 ------------------------
 Scan Popup: max number of windows
 
-Default value: ``1``
+Default value: ``3``
 
 ``scan_popup_history``
 ----------------------
@@ -189,6 +189,12 @@ Default value: ``0.8``
 Scan Popup: bypass window manager
 
 Default value: ``true``
+
+``random_favorite_popup_interval_seconds``
+------------------------------------------
+Show a random favorite term popup every N seconds (0 to disable)
+
+Default value: ``0``
 
 ``audio``
 ---------

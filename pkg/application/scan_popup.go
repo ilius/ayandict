@@ -21,6 +21,7 @@ type HasOnMouseEvents interface {
 func NewScanPopup(
 	query string,
 	mode dictmgr.SearchMode,
+	pos *qt.QPoint,
 	icon *qt.QIcon,
 	showInMain func(query string),
 	addHistory func(query string),
@@ -32,6 +33,7 @@ func NewScanPopup(
 	p := &ScanPopup{
 		query:      query,
 		mode:       mode,
+		pos:        pos,
 		icon:       icon,
 		popup:      popup,
 		showInMain: showInMain,
@@ -45,6 +47,7 @@ type ScanPopup struct {
 	// set by factory func:
 	query      string             // used in doMainQueryNoArg and Run
 	mode       dictmgr.SearchMode // used in doQuery
+	pos        *qt.QPoint
 	icon       *qt.QIcon
 	popup      *qt.QWidget
 	showInMain func(query string)
@@ -88,9 +91,18 @@ func (p *ScanPopup) init() {
 	p.articleView.SetFont(font)
 	p.articleView.SetupCustomHandlers()
 
-	pos := qt.QCursor_Pos()
-	screen := qt.QGuiApplication_ScreenAt(pos)
-	popup.Move(pos.X(), pos.Y()+int(fontPixelSize(systemFont, screen)))
+	pos := p.pos
+	if pos == nil {
+		screen := qt.QGuiApplication_Screens()[0]
+		ss := screen.Size()
+		popup.Move(
+			(ss.Width()-conf.ScanPopupWidth)/2,
+			(ss.Height()-conf.ScanPopupHeight)/2,
+		)
+	} else {
+		screen := qt.QGuiApplication_ScreenAt(pos)
+		popup.Move(pos.X(), pos.Y()+int(fontPixelSize(systemFont, screen)))
+	}
 
 	popup.OnKeyPressEvent(p.onPopupKeyPress)
 

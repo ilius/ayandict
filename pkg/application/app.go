@@ -477,6 +477,18 @@ func (app *Application) Run() {
 		window.Show()
 	}
 
+	if conf.RandomFavoritePopupIntervalSeconds > 0 {
+		timer := qt.NewQTimer()
+		timer.SetSingleShot(true)
+		interval := 1000 * conf.RandomFavoritePopupIntervalSeconds
+		timer.OnTimeout(func() {
+			app.randomFavoritePopup(func() {
+				timer.Start(interval)
+			})
+		})
+		timer.Start(interval)
+	}
+
 	_ = qt.QApplication_Exec()
 }
 

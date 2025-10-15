@@ -94,6 +94,8 @@ type Config struct {
 
 	ScanPopupBypassWindowManager bool `toml:"scan_popup_bypass_window_manager" doc:"Scan Popup: bypass window manager"`
 
+	RandomFavoritePopupIntervalSeconds int `toml:"random_favorite_popup_interval_seconds" doc:"Show a random favorite term popup every N seconds (0 to disable)"`
+
 	Audio bool `toml:"audio" doc:"Enable audio in article"`
 
 	AudioMPV bool `toml:"audio_mpv" doc:"Use ‘mpv‘ command for playing audio"`
@@ -211,7 +213,7 @@ func Default() *Config {
 		ScanPopupMinScore:  0,
 		ScanPopupWidth:     800,
 		ScanPopupHeight:    600,
-		ScanPopupMaxCount:  1,
+		ScanPopupMaxCount:  3,
 		ScanPopupHistory:   true,
 
 		ScanPopupFontSizeFactor: 0.8,

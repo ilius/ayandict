@@ -25,14 +25,14 @@ func (app *Application) onScanPopupCloseEvent(super func(*qt.QCloseEvent), event
 	app.scanPopupCount.Add(-1)
 }
 
-func (app *Application) scanPopup(query string) {
+func (app *Application) scanPopup(query string) *ScanPopup {
 	if conf.ScanPopupMaxCount > 0 && app.scanPopupCount.Load() >= conf.ScanPopupMaxCount {
-		return
+		return nil
 	}
 	query = strings.TrimSpace(query)
 	query = strings.Trim(query, punctuation)
 	if query == "" {
-		return
+		return nil
 	}
 	mode, valid := dictmgr.SearchModeByName(conf.ScanPopupMode)
 	if !valid {
@@ -44,16 +44,46 @@ func (app *Application) scanPopup(query string) {
 	p := NewScanPopup(
 		query,
 		mode,
+		qt.QCursor_Pos(),
 		app.icon,
 		app.showWindowAndQuery,
 		app.queryArgs.AddHistoryAndFrequency,
 		app.onScanPopupCloseEvent,
 	)
 	p.Run()
+	return p
 }
 
 func (app *Application) showWindowAndQuery(query string) {
 	app.window.ShowNormal()
 	app.window.ActivateWindow()
 	app.doQuery(query)
+}
+
+func (app *Application) randomFavoritePopup(onClose func()) {
+	term := app.favoritesWidget.Data.Random()
+	if term == "" {
+		// show "No Favorites" error?
+		return
+	}
+	if conf.ScanPopupMaxCount > 0 && app.scanPopupCount.Load() >= conf.ScanPopupMaxCount {
+		return
+	}
+	app.scanPopupCount.Add(1)
+
+	onCloseNew := func(super func(event *qt.QCloseEvent), event *qt.QCloseEvent) {
+		app.scanPopupCount.Add(-1)
+		onClose()
+	}
+
+	p := NewScanPopup(
+		term,
+		dictmgr.SearchModeStartWith,
+		nil, // on center of primary screen
+		app.icon,
+		app.showWindowAndQuery,
+		app.queryArgs.AddHistoryAndFrequency,
+		onCloseNew,
+	)
+	p.Run()
 }
