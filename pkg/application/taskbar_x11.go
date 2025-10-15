@@ -8,12 +8,16 @@ package application
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 void hide_from_taskbar(unsigned long wid) {
     Display *dpy = XOpenDisplay(NULL);
-    if (!dpy) return;
+    if (!dpy) {
+        fprintf(stderr, "Cannot open display\n");
+        return;
+    }
 
     Window root = DefaultRootWindow(dpy);
     Atom net_wm_state = XInternAtom(dpy, "_NET_WM_STATE", False);
@@ -51,6 +55,7 @@ import "C"
 
 import (
 	"log/slog"
+	"os"
 
 	qt "github.com/mappu/miqt/qt6"
 )
@@ -59,11 +64,15 @@ import (
 func hideWindowFromTaskbar(widget *qt.QWidget) {
 	defer func() {
 		if r := recover(); r != nil {
-			slog.Warn("X11: error while trying to remove window from taskbar", "err", r)
+			slog.Warn("X11: error while trying to remove window from taskbar", "r", r)
 		}
 	}()
+	if os.Getenv("DISPLAY") == "" {
+		slog.Debug("No DISPLAY variable; X11 not available (probably pure Wayland)")
+		return
+	}
 
 	winID := widget.WinId()
-	slog.Info("X11: hide_from_taskbar", "winID", winID)
+	slog.Debug("X11: hide_from_taskbar", "winID", winID)
 	C.hide_from_taskbar(C.ulong(winID))
 }
