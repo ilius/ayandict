@@ -16,15 +16,15 @@ jobs:
       - name: Install aqtinstall
         run: pip install -q aqtinstall
 
-      # Download and install the latest Qt6 MSVC build (dynamic)
       - name: Install Qt 6 (MSVC 2022)
         shell: pwsh
         run: |
           $QtRoot = "C:\Qt"
           $QtVersion = "6.10.0"
           $QtArch = "win64_msvc2022_64"
-          python -m aqt install-qt windows desktop $QtVersion $QtArch `
-            --outputdir $QtRoot --modules qtbase qttools qttranslations
+
+          # Install base Qt + tools (no module flags, 6.10 already includes them)
+          python -m aqt install-qt windows desktop $QtVersion $QtArch --outputdir $QtRoot
 
           $qtDir = "$QtRoot\$QtVersion\$QtArch"
           if (-not (Test-Path $qtDir)) {
