@@ -118,6 +118,12 @@ Hide main window on startup (if tray icon is available)
 
 Default value: ``false``
 
+``dektop_widget``
+-----------------
+Dektop Widget: enable
+
+Default value: ``false``
+
 ``scan_popup_clipboard``
 ------------------------
 Scan Popup: activate on copy to clipboard
@@ -134,7 +140,7 @@ Default value: ``false``
 ------------------
 Scan Popup: activate via API (socket/pipe)
 
-Default value: ``false``
+Default value: ``true``
 
 ``scan_popup_mode``
 -------------------
