@@ -206,7 +206,7 @@ func Default() *Config {
 
 		ScanPopupClipboard: false,
 		ScanPopupSelection: false,
-		ScanPopupAPI:       false,
+		ScanPopupAPI:       true,
 		ScanPopupMode:      "fuzzy",
 		ScanPopupMinScore:  0,
 		ScanPopupWidth:     800,
