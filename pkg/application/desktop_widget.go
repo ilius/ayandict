@@ -2,6 +2,7 @@ package application
 
 import (
 	"log/slog"
+	"time"
 
 	qt "github.com/mappu/miqt/qt6"
 )
@@ -15,7 +16,7 @@ func (app *Application) setupDekstopWidget() {
 	}
 	widget := qt.NewQWidget2()
 	widget.SetWindowFlags(qt.FramelessWindowHint |
-		qt.WindowStaysOnBottomHint | qt.Tool | qt.BypassWindowManagerHint)
+		qt.WindowStaysOnBottomHint | qt.Window)
 
 	layout := qt.NewQHBoxLayout(widget)
 
@@ -48,6 +49,11 @@ func (w *DektopWidget) init() {
 	w.OnMousePressEvent(w.onDragMousePress)
 	w.OnMouseMoveEvent(w.onDragMouseMove)
 	w.OnMouseReleaseEvent(w.onDragMouseRelease)
+
+	go func() {
+		time.Sleep(200 * time.Millisecond)
+		hideWindowFromTaskbar(w.QWidget)
+	}()
 
 	// timer := qt.NewQTimer()
 	// timer.SetSingleShot(true)

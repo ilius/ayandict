@@ -472,7 +472,6 @@ func (app *Application) Run() {
 
 	if conf.DektopWidget {
 		app.setupDekstopWidget()
-		app.window.SetWindowFlag(qt.Tool)
 	}
 	if !(conf.StartHidden && app.trayIcon != nil && app.trayIcon.IsVisible()) {
 		window.Show()
