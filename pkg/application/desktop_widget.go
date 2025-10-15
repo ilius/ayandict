@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/ilius/ayandict/v3/pkg/qplatform"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -52,7 +53,7 @@ func (w *DektopWidget) init() {
 
 	go func() {
 		time.Sleep(200 * time.Millisecond)
-		hideWindowFromTaskbar(w.QWidget)
+		qplatform.HideWindowFromTaskbar(w.QWidget)
 	}()
 
 	// timer := qt.NewQTimer()

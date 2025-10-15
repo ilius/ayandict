@@ -1,11 +1,11 @@
 //go:build linux && wayland
 // +build linux,wayland
 
-package application
+package qplatform
 
 import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
 // Remove a Qt/miqt window from the taskbar and pager on X11.
-func hideWindowFromTaskbar(widget *qt.QWidget) {}
+func HideWindowFromTaskbar(widget *qt.QWidget) {}

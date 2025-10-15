@@ -1,7 +1,7 @@
 //go:build !(windows || darwin) && !wayland
 // +build !windows,!darwin,!wayland
 
-package application
+package qplatform
 
 /*
 #cgo pkg-config: x11
@@ -61,7 +61,7 @@ import (
 )
 
 // Remove a Qt/miqt window from the taskbar and pager on X11.
-func hideWindowFromTaskbar(widget *qt.QWidget) {
+func HideWindowFromTaskbar(widget *qt.QWidget) {
 	defer func() {
 		if r := recover(); r != nil {
 			slog.Warn("X11: error while trying to remove window from taskbar", "r", r)
