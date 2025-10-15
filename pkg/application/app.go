@@ -72,6 +72,10 @@ type Application struct {
 	dictsButton          *qt.QPushButton
 	activityTypeCombo    *qt.QComboBox
 
+	statusIconActions []*qt.QAction
+
+	desktopWidget *DektopWidget
+
 	trayIcon          *qt.QSystemTrayIcon
 	trayScanSelection *qt.QAction
 	trayScanClipboard *qt.QAction
@@ -199,6 +203,12 @@ func (app *Application) Run() {
 		super(event)
 	})
 
+	if !qt.QSystemTrayIcon_IsSystemTrayAvailable() {
+		if !conf.DektopWidget {
+			slog.Warn("system tray is not available, enabling desktop widget")
+			conf.DektopWidget = true
+		}
+	}
 	{
 		icon, err := loadPNGIcon("ayandict-64px.png")
 		if err != nil {
@@ -207,9 +217,6 @@ func (app *Application) Run() {
 		}
 		app.icon = icon
 		window.SetWindowIcon(icon)
-		if !qt.QSystemTrayIcon_IsSystemTrayAvailable() {
-			slog.Warn("system tray is not available")
-		}
 		app.setupTrayIcon(icon)
 	}
 
@@ -463,9 +470,14 @@ func (app *Application) Run() {
 
 	app.setupScanPopup()
 
+	if conf.DektopWidget {
+		app.setupDekstopWidget()
+		app.window.SetWindowFlag(qt.Tool)
+	}
 	if !(conf.StartHidden && app.trayIcon != nil && app.trayIcon.IsVisible()) {
 		window.Show()
 	}
+
 	_ = qt.QApplication_Exec()
 }
 

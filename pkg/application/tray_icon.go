@@ -15,15 +15,14 @@ func (app *Application) setupTrayIcon(icon *qt.QIcon) {
 	trayIcon.OnMessageClicked(func() {
 		slog.Info("trayIcon.OnMessageClicked")
 	})
+	app.statusIconActions = app.createStatusIconActions()
 	app.setTrayMenu()
 
 	trayIcon.Show()
 }
 
-func (app *Application) setTrayMenu() {
+func (app *Application) createStatusIconActions() []*qt.QAction {
 	actions := []*qt.QAction{}
-	// icon will not align with checkboxes! so forget it!
-	menu := qt.NewQMenu2()
 	{
 		action := qt.NewQAction2("Quit")
 		action.OnTriggered(app.Exit)
@@ -32,7 +31,7 @@ func (app *Application) setTrayMenu() {
 	{
 		action := qt.NewQAction2("About")
 		action.OnTriggered(func() {
-			widget := qt.NewQDialog(menu.QWidget)
+			widget := qt.NewQDialog(app.window.QWidget)
 			aboutClickedWidget(widget.QWidget, app.icon)
 			widget.Show()
 		})
@@ -76,8 +75,14 @@ func (app *Application) setTrayMenu() {
 		actions = append(actions, action)
 		app.trayScanAPI = action
 	}
+	return actions
+}
+
+func (app *Application) setTrayMenu() {
+	// icon will not align with checkboxes! so forget it!
+	menu := qt.NewQMenu2()
 	// TODO: reverse order of actions if tray icon is closer to top of screen
-	for _, action := range actions {
+	for _, action := range app.statusIconActions {
 		menu.AddAction(action)
 	}
 	app.trayIcon.SetContextMenu(menu)

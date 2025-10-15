@@ -72,7 +72,7 @@ func (p *ScanPopup) init() {
 	if conf.ScanPopupBypassWindowManager {
 		flag |= qt.BypassWindowManagerHint
 	}
-	popup.SetWindowFlag(flag)
+	popup.SetWindowFlags(flag)
 	popup.SetWindowIcon(p.icon)
 	popup.SetFont(font)
 
