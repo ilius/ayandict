@@ -95,11 +95,11 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 				app.Exit()
 			}
 		case int(qt.Key_Left):
-			if event.Modifiers()&qt.AltModifier > 0 {
+			if event.Modifiers()&altCtrlModifier > 0 {
 				app.goBackInHistory()
 			}
 		case int(qt.Key_Right):
-			if event.Modifiers()&qt.AltModifier > 0 {
+			if event.Modifiers()&altCtrlModifier > 0 {
 				app.goForwardInHistory()
 			}
 		default:
@@ -126,11 +126,11 @@ func (app *Application) setupArticleViewKeyPressEvent() {
 				app.Exit()
 			}
 		case int(qt.Key_Left):
-			if event.Modifiers()&qt.AltModifier > 0 {
+			if event.Modifiers()&altCtrlModifier > 0 {
 				app.goBackInHistory()
 			}
 		case int(qt.Key_Right):
-			if event.Modifiers()&qt.AltModifier > 0 {
+			if event.Modifiers()&altCtrlModifier > 0 {
 				app.goForwardInHistory()
 			}
 		default:

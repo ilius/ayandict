@@ -6,6 +6,8 @@ import (
 
 const expanding = qt.QSizePolicy__Expanding
 
+const altCtrlModifier = qt.AltModifier | qt.ControlModifier
+
 // we trim these characters when user right-clicks on a word without selecting it
 const punctuation = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~،؛؟۔￼"
 

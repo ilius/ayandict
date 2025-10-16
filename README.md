@@ -140,9 +140,9 @@ There are tons of web pages that let you download various usable dictionaries, b
   - While query entry is not focused: clears the query and results
 - **`+`** or **`=`**: Zoom in (article/definition/translation)
 - **`-`**: Zoom out (article/definition/translation)
-- **Alt + Left**: Go back in history (tab "Recent")
-- **Alt + Right**: Go forward in history (selected term in tab "Recent")
-- **Ctrl+Q**: Quit / exit application
+- **Alt + Left** or **Ctrl + Left**: Go back in history (tab "Recent")
+- **Alt + Right** or **Ctrl + Right**: Go forward in history (selected term in tab "Recent")
+- **Ctrl + Q**: Quit / exit application
 - **F1**: Show About window
 
 # Search Algorithm
