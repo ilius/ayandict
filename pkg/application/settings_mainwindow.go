@@ -34,7 +34,6 @@ func (s *MainWindowSettings) Save() {
 	err = os.WriteFile(mainWindowPath, b, 0o644)
 	if err != nil {
 		slog.Error("error saving main window settings", "err", err, "path", mainWindowPath)
-		return
 	}
 }
 
@@ -49,7 +48,6 @@ func (s *MainWindowSettings) Load() {
 	err = json.Unmarshal(b, s)
 	if err != nil {
 		slog.Error("error decoding main window settings", "err", err, "path", mainWindowPath)
-		return
 	}
 }
 

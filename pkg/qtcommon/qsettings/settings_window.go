@@ -27,7 +27,6 @@ func (s *WindowSettings) Save(fname string) {
 	err = os.WriteFile(fpath, b, 0o644)
 	if err != nil {
 		slog.Error("error saving window settings", "err", err, "path", fpath)
-		return
 	}
 }
 
@@ -43,6 +42,5 @@ func (s *WindowSettings) Load(fname string) {
 	err = json.Unmarshal(b, s)
 	if err != nil {
 		slog.Error("error decoding window settings", "err", err, "path", fpath)
-		return
 	}
 }
