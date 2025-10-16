@@ -63,6 +63,7 @@ jobs:
           go env
           go build -v -o ayandict.exe
           if (-not (Test-Path "ayandict.exe")) {
+            ls
             Write-Error "Build failed — ayandict.exe not created"
             exit 1
           }
