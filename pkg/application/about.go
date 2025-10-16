@@ -90,12 +90,89 @@ func aboutClickedWidget(widget *qt.QWidget, icon *qt.QIcon) {
 	addTabWithIcon(tabWidget, licenseWidget.QWidget, "License", "license-22.png")
 
 	buttonBox := qt.NewQDialogButtonBox2()
-	buttonBox.AddButton2("Close", qt.QDialogButtonBox__AcceptRole).OnClicked(func() {
+	buttonBox.AddButton2("Keyboard Shortcuts", qt.QDialogButtonBox__AcceptRole).OnClicked(func() {
+		showKeyBindings(widget, icon)
+	})
+	closeButton := buttonBox.AddButton2("  Close  ", qt.QDialogButtonBox__AcceptRole)
+	closeButton.OnClicked(func() {
 		widget.Close()
 	})
+	// closeButton.SetDefault(true)
 
 	mainBox := qt.NewQVBoxLayout(widget)
 	mainBox.AddWidget(topHBox.QWidget)
 	mainBox.AddWidget(tabWidget.QWidget)
 	mainBox.AddWidget(buttonBox.QWidget)
+}
+
+func labelFrameWithLine(text string) *qt.QFrame {
+	label := qt.NewQLabel3(text)
+	frame := qt.NewQFrame2()
+	// frame.SetStyleSheet("border: 1px solid rgba(128,128,128,0.5);")
+	frame.SetFrameShape(qt.QFrame__Box)    // The border shape
+	frame.SetFrameShadow(qt.QFrame__Plain) // Flat (not sunken/raised)
+	frame.SetLineWidth(1)
+	frameLayout := qt.NewQHBoxLayout(frame.QWidget)
+	frameLayout.AddWidget3(label.QWidget, 1, qt.AlignLeft)
+	return frame
+}
+
+func showKeyBindings(parent *qt.QWidget, icon *qt.QIcon) {
+	dialog := qt.NewQDialog(parent)
+	dialog.SetWindowIcon(icon)
+	dialog.SetWindowTitle("Keyboard Shortcuts")
+	dialog.Resize(800, 600)
+	layout := qt.NewQGridLayout2()
+
+	layout.SetColumnStretch(0, 0)
+	layout.SetColumnStretch(1, 1)
+	layout.SetColumnStretch(2, 0)
+
+	layout.AddWidget2(qt.NewQLabel3("Key").QWidget, 0, 0)
+	layout.AddWidget2(qt.NewQLabel3("while").QWidget, 0, 1)
+	layout.AddWidget2(qt.NewQLabel3("Action").QWidget, 0, 2)
+
+	for rowI, data := range appinfo.KeyBindings {
+		if data[1] == "" {
+			layout.AddWidget3(
+				labelFrameWithLine(data[0]).QWidget,
+				rowI+1, 0, 1, 2,
+			)
+		} else {
+			layout.AddWidget3(
+				labelFrameWithLine(data[0]).QWidget,
+				rowI+1, 0, 1, 1,
+			)
+			layout.AddWidget3(
+				labelFrameWithLine(data[1]).QWidget,
+				rowI+1, 1, 1, 1,
+			)
+		}
+		layout.AddWidget3(
+			labelFrameWithLine(data[2]).QWidget,
+			rowI+1, 2, 1, 1,
+		)
+	}
+
+	dialog.OnKeyPressEvent(func(super func(e *qt.QKeyEvent), e *qt.QKeyEvent) {
+		if e.Key() == int(qt.Key_Escape) {
+			dialog.Close()
+			return
+		}
+		super(e)
+	})
+
+	buttonBox := qt.NewQDialogButtonBox2()
+	buttonBox.AddButton2(
+		"  Close  ",
+		qt.QDialogButtonBox__AcceptRole,
+	).OnClicked(func() { dialog.Close() })
+
+	mainBox := qt.NewQVBoxLayout2()
+	mainBox.AddLayout2(layout.Layout(), 1)
+	mainBox.AddSpacing(10)
+	mainBox.AddWidget(buttonBox.QWidget)
+	dialog.SetLayout(mainBox.Layout())
+
+	dialog.Exec()
 }
