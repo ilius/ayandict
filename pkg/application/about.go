@@ -105,16 +105,16 @@ func aboutClickedWidget(widget *qt.QWidget, icon *qt.QIcon) {
 	mainBox.AddWidget(buttonBox.QWidget)
 }
 
-func labelFrameWithLine(text string) *qt.QFrame {
+func linedLabel(text string, right int, bottom int) *qt.QWidget {
 	label := qt.NewQLabel3(text)
 	frame := qt.NewQFrame2()
-	// frame.SetStyleSheet("border: 1px solid rgba(128,128,128,0.5);")
 	frame.SetFrameShape(qt.QFrame__Box)    // The border shape
 	frame.SetFrameShadow(qt.QFrame__Plain) // Flat (not sunken/raised)
-	frame.SetLineWidth(1)
+	frame.SetContentsMargins(1, 1, right, bottom)
 	frameLayout := qt.NewQHBoxLayout(frame.QWidget)
-	frameLayout.AddWidget3(label.QWidget, 1, qt.AlignLeft)
-	return frame
+	frameLayout.AddWidget3(label.QWidget, 1, qt.AlignCenter)
+	frameLayout.SetContentsMargins(3, 0, 3, 0)
+	return frame.QWidget
 }
 
 func showKeyBindings(parent *qt.QWidget, icon *qt.QIcon) {
@@ -122,36 +122,34 @@ func showKeyBindings(parent *qt.QWidget, icon *qt.QIcon) {
 	dialog.SetWindowIcon(icon)
 	dialog.SetWindowTitle("Keyboard Shortcuts")
 	dialog.Resize(800, 600)
+
 	layout := qt.NewQGridLayout2()
+
+	layout.SetVerticalSpacing(0)
+	layout.SetHorizontalSpacing(0)
 
 	layout.SetColumnStretch(0, 0)
 	layout.SetColumnStretch(1, 1)
 	layout.SetColumnStretch(2, 0)
 
-	layout.AddWidget2(qt.NewQLabel3("Key").QWidget, 0, 0)
-	layout.AddWidget2(qt.NewQLabel3("while").QWidget, 0, 1)
-	layout.AddWidget2(qt.NewQLabel3("Action").QWidget, 0, 2)
+	layout.AddWidget4(qt.NewQLabel3("Key").QWidget, 0, 0, qt.AlignCenter)
+	layout.AddWidget4(qt.NewQLabel3("while").QWidget, 0, 1, qt.AlignCenter)
+	layout.AddWidget4(qt.NewQLabel3("Action").QWidget, 0, 2, qt.AlignCenter)
 
 	for rowI, data := range appinfo.KeyBindings {
-		if data[1] == "" {
-			layout.AddWidget3(
-				labelFrameWithLine(data[0]).QWidget,
-				rowI+1, 0, 1, 2,
-			)
-		} else {
-			layout.AddWidget3(
-				labelFrameWithLine(data[0]).QWidget,
-				rowI+1, 0, 1, 1,
-			)
-			layout.AddWidget3(
-				labelFrameWithLine(data[1]).QWidget,
-				rowI+1, 1, 1, 1,
-			)
+		bottom := 0
+		if rowI == len(appinfo.KeyBindings)-1 {
+			bottom = 1
 		}
-		layout.AddWidget3(
-			labelFrameWithLine(data[2]).QWidget,
-			rowI+1, 2, 1, 1,
-		)
+		widget1 := linedLabel(data[0], 0, bottom)
+		if data[1] == "" {
+			layout.AddWidget3(widget1, rowI+1, 0, 1, 2)
+		} else {
+			widget2 := linedLabel(data[1], 0, bottom)
+			layout.AddWidget3(widget1, rowI+1, 0, 1, 1)
+			layout.AddWidget3(widget2, rowI+1, 1, 1, 1)
+		}
+		layout.AddWidget3(linedLabel(data[2], 1, bottom), rowI+1, 2, 1, 1)
 	}
 
 	dialog.OnKeyPressEvent(func(super func(e *qt.QKeyEvent), e *qt.QKeyEvent) {
