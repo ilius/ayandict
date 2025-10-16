@@ -50,7 +50,7 @@ jobs:
         shell: pwsh
         run: |
           go env -w CGO_ENABLED=1
-          go build -v -o ayandict.exe ./cmd/ayandict
+          go build -v -o ayandict.exe
           if (-not (Test-Path "ayandict.exe")) {
             Write-Error "Build failed — ayandict.exe not created"
             exit 1
