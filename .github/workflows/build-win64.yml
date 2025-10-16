@@ -28,7 +28,8 @@ jobs:
 
           $qtDir = "$QtRoot\$QtVersion\$QtArch"
           if (-not (Test-Path $qtDir)) {
-            Write-Error "❌ Qt install failed — $qtDir not found"
+            ls "$QtRoot\$QtVersion"
+            Write-Error "Qt install failed — $qtDir not found"
             exit 1
           }
 
@@ -37,7 +38,7 @@ jobs:
           echo "CGO_LDFLAGS=-L$qtDir\lib" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo "Path=$qtDir\bin;$env:Path" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-          Write-Host "✅ Installed Qt to $qtDir"
+          Write-Host "Installed Qt to $qtDir"
 
       # Install and configure Go
       - name: Set up Go
