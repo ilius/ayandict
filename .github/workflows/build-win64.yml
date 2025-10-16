@@ -47,7 +47,8 @@ jobs:
 
           echo "QT6_DIR=$qtDir" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo "CGO_CFLAGS=-I$qtDir\include" | Out-File -FilePath $env:GITHUB_ENV -Append
-          echo "CGO_LDFLAGS=-L$qtDir\lib" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "CGO_LDFLAGS=-L$qtDir\lib Qt6Core.lib Qt6Gui.lib Qt6Widgets.lib Qt6Gui.lib Qt6WinExtras.lib" | Out-File -FilePath $env:GITHUB_ENV -Append
+
           echo "Path=$qtDir\bin;$env:Path" | Out-File -FilePath $env:GITHUB_ENV -Append
 
           Write-Host "Installed Qt to $qtDir"
@@ -62,7 +63,7 @@ jobs:
         shell: pwsh
         run: |
           go env
-          go build -v -o ayandict.exe
+          go build -v -x -o ayandict.exe
           if (-not (Test-Path "ayandict.exe")) {
             ls
             Write-Error "Build failed — ayandict.exe not created"
