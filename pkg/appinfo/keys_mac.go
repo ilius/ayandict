@@ -1,16 +1,44 @@
-//go:build darwin
-// +build darwin
+//go:build darwin || mackeybindings
+// +build darwin mackeybindings
 
 package appinfo
 
-var KeyBindings = [][3]string{
-	{"Space", "query is not focused", "Change keyboard focus to query entry"},
-	{"Escape", "query is focused", "Focus leaves the query entry"},
-	{"Escape", "query is not focused", "Clear the query and results"},
-	{"+ or =", "", "Zoom in"},
-	{"–", "", "Zoom out"},
-	{"Command + Left or Option + Left", "", "Go back in history"},
-	{"Command + Right or Option + Right", "", "Go forward in history"},
-	{"Command + Q", "", "Quit / exit application"},
-	{"F1", "", "Show About window"},
+func init() {
+	KeyBindings = [][3]string{
+		{" Space ", "  query is not focused  ", "Focus query entry"},
+		{"Esc", "query is focused", "Unfocus query entry"},
+		{"Esc", "query is not focused", "Clear query and results"},
+		{"＋  or  ＝", "", "Zoom in"},
+		{"－", "", "Zoom out"},
+		{"⌘ ←    or    ⌥ ←", "", "Go back in history"},
+		{"⌘ →    or    ⌥ →", "", "Go forward in history"},
+		{"⌘ Ｑ", "", "Quit / exit application"},
+		{"F1", "", "Show About window"},
+	}
 }
+
+// ⌘      Command, Cmd
+// ⌃      Control, Ctl, Ctrl
+// ⌥      Option, Opt, (PC) Alt
+// ⇧      Shift
+// ⇪      Caps lock
+// ↩️      Return, Carriage Return
+// ↵      Return, Carriage Return
+// ⏎      Return, Carriage Return
+// ⌤      Enter
+// ⌫      Delete, Backspace
+// ⌦      Forward Delete
+// ⎋      Escape, Esc
+// →      Right arrow
+// ←      Left arrow
+// ↑      Up arrow
+// ↓      Down arrow
+// ⇞      Page Up, PgUp
+// ⇟      Page Down, PgDn
+// ↖️      Home
+// ↘️      End
+// ⌧      Clear
+// ⇥      Tab, Tab Right, Horizontal Tab
+// ⇤      Shift Tab, Tab Left, Back-tab
+// ␢      Space, Blank
+// ␣      Space, Blank

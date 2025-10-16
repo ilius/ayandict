@@ -129,8 +129,8 @@ func showKeyBindings(parent *qt.QWidget, icon *qt.QIcon) {
 	layout.SetHorizontalSpacing(0)
 
 	layout.SetColumnStretch(0, 0)
-	layout.SetColumnStretch(1, 1)
-	layout.SetColumnStretch(2, 0)
+	layout.SetColumnStretch(1, 0)
+	layout.SetColumnStretch(2, 1)
 
 	layout.AddWidget4(qt.NewQLabel3("Key").QWidget, 0, 0, qt.AlignCenter)
 	layout.AddWidget4(qt.NewQLabel3("while").QWidget, 0, 1, qt.AlignCenter)
