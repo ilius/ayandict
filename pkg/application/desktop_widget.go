@@ -51,9 +51,9 @@ type DektopWidget struct {
 }
 
 func (w *DektopWidget) init() {
-	w.OnMousePressEvent(w.onDragMousePress)
-	w.OnMouseMoveEvent(w.onDragMouseMove)
-	w.OnMouseReleaseEvent(w.onDragMouseRelease)
+	w.OnMousePressEvent(w.onMousePress)
+	w.OnMouseMoveEvent(w.onMouseMove)
+	w.OnMouseReleaseEvent(w.onMouseRelease)
 
 	go func() {
 		time.Sleep(200 * time.Millisecond)
@@ -78,7 +78,7 @@ func (w *DektopWidget) popupMenu(event *qt.QMouseEvent) {
 	menu.Popup(event.Pos())
 }
 
-func (w *DektopWidget) onDragMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+func (w *DektopWidget) onMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	switch event.Button() {
 	case qt.LeftButton:
 		w.dragPos = event.Pos()
@@ -90,7 +90,7 @@ func (w *DektopWidget) onDragMousePress(super func(*qt.QMouseEvent), event *qt.Q
 	}
 }
 
-func (w *DektopWidget) onDragMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+func (w *DektopWidget) onMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	// event.Button() == qt.NoButton
 	if w.dragPos == nil {
 		super(event)
@@ -109,7 +109,7 @@ func absInt(x int) int {
 	return x
 }
 
-func (w *DektopWidget) onDragMouseRelease(super func(event *qt.QMouseEvent), event *qt.QMouseEvent) {
+func (w *DektopWidget) onMouseRelease(super func(event *qt.QMouseEvent), event *qt.QMouseEvent) {
 	if event.Button() != qt.LeftButton {
 		super(event)
 		return
