@@ -15,6 +15,17 @@ jobs:
       - name: Install aqtinstall
         run: pip install -q aqtinstall
 
+      - name: Setup MSVC Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Set Go CGO env
+        run: |
+          echo "CGO_ENABLED=1" >> $env:GITHUB_ENV
+          echo "CC=cl.exe" >> $env:GITHUB_ENV
+          echo "CXX=cl.exe" >> $env:GITHUB_ENV
+
       - name: Install Qt 6 (MSVC 2022)
         shell: pwsh
         run: |
@@ -49,7 +60,7 @@ jobs:
       - name: Build Go binary
         shell: pwsh
         run: |
-          go env -w CGO_ENABLED=1
+          go env
           go build -v -o ayandict.exe
           if (-not (Test-Path "ayandict.exe")) {
             Write-Error "Build failed — ayandict.exe not created"
