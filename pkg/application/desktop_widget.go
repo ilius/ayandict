@@ -75,7 +75,7 @@ func (w *DektopWidget) popupMenu(event *qt.QMouseEvent) {
 		menu.AddAction(action)
 	}
 	// menu.SetFont(app.systemDefaultFont)
-	menu.Popup(event.Pos())
+	menu.Popup(event.GlobalPos())
 }
 
 func (w *DektopWidget) onMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
