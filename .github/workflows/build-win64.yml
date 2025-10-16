@@ -12,7 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Install Python + aqtinstall to fetch Qt binaries
       - name: Install aqtinstall
         run: pip install -q aqtinstall
 
@@ -22,11 +21,12 @@ jobs:
           $QtRoot = "C:\Qt"
           $QtVersion = "6.10.0"
           $QtArch = "win64_msvc2022_64"
+          $QtDirName = "msvc2022_64"
 
           # Install base Qt + tools (no module flags, 6.10 already includes them)
           python -m aqt install-qt windows desktop $QtVersion $QtArch --outputdir $QtRoot
 
-          $qtDir = "$QtRoot\$QtVersion\$QtArch"
+          $qtDir = "$QtRoot\$QtVersion\$QtDirName"
           if (-not (Test-Path $qtDir)) {
             ls "$QtRoot\$QtVersion"
             Write-Error "Qt install failed — $qtDir not found"
@@ -40,7 +40,6 @@ jobs:
 
           Write-Host "Installed Qt to $qtDir"
 
-      # Install and configure Go
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -53,10 +52,10 @@ jobs:
           go env -w CGO_ENABLED=1
           go build -v -o ayandict.exe ./cmd/ayandict
           if (-not (Test-Path "ayandict.exe")) {
-            Write-Error "❌ Build failed — ayandict.exe not created"
+            Write-Error "Build failed — ayandict.exe not created"
             exit 1
           }
-          Write-Host "✅ Build succeeded"
+          Write-Host "Build succeeded"
 
       # Bundle Qt DLLs and plugins using windeployqt
       - name: Bundle Qt dependencies
@@ -65,14 +64,14 @@ jobs:
           New-Item -ItemType Directory -Force -Path dist | Out-Null
           Copy-Item ayandict.exe dist/
           & "$env:QT6_DIR\bin\windeployqt.exe" dist\ayandict.exe --release
-          Write-Host "✅ Qt DLLs bundled into dist/"
+          Write-Host "Qt DLLs bundled into dist/"
 
       # Compress the portable folder into a zip file
       - name: Create zip archive
         shell: pwsh
         run: |
           Compress-Archive -Path dist\* -DestinationPath ayandict-win64.zip
-          Write-Host "✅ Created ayandict-win64.zip"
+          Write-Host "Created ayandict-win64.zip"
 
       # Upload the zipped portable build as an artifact
       - name: Upload artifact
