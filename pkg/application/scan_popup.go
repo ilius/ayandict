@@ -181,11 +181,14 @@ func (p *ScanPopup) moveToMainWindow() {
 }
 
 func (p *ScanPopup) onKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
-	if event.Key() == escape {
+	switch event.Key() {
+	case escape:
 		p.popup.Close()
-		return
+	case int(qt.Key_Return), int(qt.Key_Enter):
+		p.moveToMainWindow()
+	default:
+		super(event)
 	}
-	super(event)
 }
 
 func (p *ScanPopup) onDragMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
