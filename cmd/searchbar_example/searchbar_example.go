@@ -6,6 +6,11 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
+type CursorAndCharFormat struct {
+	Cursor *qt.QTextCursor
+	Format *qt.QTextCharFormat
+}
+
 type SearchableQTextBrowser struct {
 	Browser     *qt.QTextBrowser
 	Widget      *qt.QWidget
@@ -13,15 +18,16 @@ type SearchableQTextBrowser struct {
 	searchEntry *qt.QLineEdit
 	searchFrame *qt.QFrame
 	docCursor   *qt.QTextCursor
+	lastFormats []CursorAndCharFormat
 }
 
-func (st *SearchableQTextBrowser) init() {
-	mainFrame := st.frame
+func (view *SearchableQTextBrowser) init() {
+	mainFrame := view.frame
 	mainLayout := qt.NewQVBoxLayout2()
 	mainFrame.SetLayout(mainLayout.Layout())
-	textBrowser := st.Browser
-	searchFrame := st.searchFrame
-	searchEntry := st.searchEntry
+	textBrowser := view.Browser
+	searchFrame := view.searchFrame
+	searchEntry := view.searchEntry
 
 	// default ContentsMargins:
 	// QFrame: 0, QVBoxLayout: 11, QTextBrowser: 1
@@ -31,11 +37,11 @@ func (st *SearchableQTextBrowser) init() {
 	searchFrame.SetLayout(searchLayout.Layout())
 
 	searchEntry.SetPlaceholderText("Find text...")
-	searchEntry.OnReturnPressed(st.findNext)
-	searchEntry.OnTextChanged(st.highlightAll)
+	searchEntry.OnReturnPressed(view.findNext)
+	searchEntry.OnTextChanged(view.highlightAll)
 
 	findButton := qt.NewQPushButton3("Find Next")
-	findButton.OnClicked(st.findNext)
+	findButton.OnClicked(view.findNext)
 
 	searchLayout.AddWidget2(searchEntry.QWidget, 1)
 	searchLayout.AddWidget2(findButton.QWidget, 0)
@@ -49,35 +55,31 @@ func (st *SearchableQTextBrowser) init() {
 	qt.NewQShortcut2(
 		qt.NewQKeySequence2("Ctrl+F"),
 		textBrowser.QObject,
-	).OnActivated(st.showBar)
+	).OnActivated(view.showBar)
 
 	qt.NewQShortcut2(
 		qt.NewQKeySequence2("Esc"),
 		textBrowser.QObject,
-	).OnActivated(st.hideBar)
+	).OnActivated(view.hideBar)
 }
 
-func (st *SearchableQTextBrowser) clearHighlights() {
-	doc := st.Browser.Document()
-	cursor := qt.NewQTextCursor2(doc)
-	cursor.BeginEditBlock()
-	format := qt.NewQTextCharFormat()
-	cursor.Select(qt.QTextCursor__Document)
-	cursor.SetCharFormat(format)
-	cursor.EndEditBlock()
+func (view *SearchableQTextBrowser) clearHighlights() {
+	for _, cc := range view.lastFormats {
+		cc.Cursor.SetCharFormat(cc.Format)
+	}
+	view.lastFormats = nil
 }
 
-func (st *SearchableQTextBrowser) highlightAll(query string) {
-	st.clearHighlights()
+func (view *SearchableQTextBrowser) highlightAll(query string) {
+	view.clearHighlights()
 	if query == "" {
 		return
 	}
 
-	doc := st.Browser.Document()
-	cursor := qt.NewQTextCursor2(doc)
-	palette := st.Browser.Palette()
+	doc := view.Browser.Document()
+	palette := view.Browser.Palette()
 
-	// Theme-aware colors
+	// Colors from theme
 	allBg := palette.ColorWithCr(qt.QPalette__Highlight)
 	allBg.SetAlphaF(0.8)
 
@@ -90,19 +92,33 @@ func (st *SearchableQTextBrowser) highlightAll(query string) {
 	formatCurrent.SetForeground(qt.NewQBrush3(currentFg))
 	formatCurrent.SetFontWeight(int(qt.QFont__Bold))
 
-	// Highlight all matches
+	// First clear any previous highlight format only (non-destructive)
+	cursor := qt.NewQTextCursor2(doc)
+
+	// Apply new highlights
 	cursor = qt.NewQTextCursor2(doc)
+
+	lastFormats := []CursorAndCharFormat{}
 	for {
 		cursor = doc.Find2(query, cursor)
 		if cursor.IsNull() {
 			break
 		}
+		lastFormats = append(lastFormats, CursorAndCharFormat{
+			Cursor: cursor,
+			Format: cursor.CharFormat(),
+		})
 		cursor.MergeCharFormat(formatAll)
 	}
+	view.lastFormats = lastFormats
 
-	// Highlight current match with bright text
-	activeCursor := st.Browser.TextCursor()
+	// Emphasize the current match
+	activeCursor := view.Browser.TextCursor()
 	if !activeCursor.IsNull() && activeCursor.HasSelection() {
+		lastFormats = append(lastFormats, CursorAndCharFormat{
+			Cursor: activeCursor,
+			Format: activeCursor.CharFormat(),
+		})
 		activeCursor.MergeCharFormat(formatCurrent)
 	}
 }
@@ -114,6 +130,7 @@ func (st *SearchableQTextBrowser) findNext() {
 	}
 
 	flags := qt.QTextDocument__FindFlag(0)
+	flags |= qt.QTextDocument__FindCaseSensitively // TODO: add a checkbox
 	found := st.Browser.Find2(query, flags)
 	if !found {
 		st.docCursor.MovePosition3(qt.QTextCursor__Start, qt.QTextCursor__MoveAnchor, 0)
@@ -122,6 +139,7 @@ func (st *SearchableQTextBrowser) findNext() {
 	}
 
 	st.highlightAll(query)
+	st.Browser.EnsureCursorVisible()
 }
 
 func (st *SearchableQTextBrowser) showBar() {
@@ -162,7 +180,7 @@ func main() {
 	browser := qt.NewQTextBrowser(nil)
 	stb := CreateTextBrowserSearchBar(browser)
 
-	browser.SetPlainText(string(textB))
+	browser.SetHtml(string(textB))
 
 	window := qt.NewQWidget(nil)
 	window.SetWindowTitle("QTextBrowser Search Example")

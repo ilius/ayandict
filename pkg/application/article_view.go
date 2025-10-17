@@ -34,6 +34,11 @@ var (
 	audioUrlRE   = regexp.MustCompile(`href="[^<>"]+\.mp3"`)
 )
 
+type CursorAndCharFormat struct {
+	Cursor *qt.QTextCursor
+	Format *qt.QTextCharFormat
+}
+
 type ArticleView struct {
 	frame   *qt.QFrame
 	Widget  *qt.QWidget // same as frame, used from outside
@@ -42,6 +47,7 @@ type ArticleView struct {
 	searchEntry *qt.QLineEdit
 	searchFrame *qt.QFrame
 	docCursor   *qt.QTextCursor
+	lastFormats []CursorAndCharFormat
 
 	dpi     float64
 	doQuery func(string)
@@ -511,13 +517,10 @@ func (view *ArticleView) onKeyPressEvent(event *qt.QKeyEvent) {
 }
 
 func (view *ArticleView) clearHighlights() {
-	doc := view.Browser.Document()
-	cursor := qt.NewQTextCursor2(doc)
-	cursor.BeginEditBlock()
-	format := qt.NewQTextCharFormat()
-	cursor.Select(qt.QTextCursor__Document)
-	cursor.SetCharFormat(format)
-	cursor.EndEditBlock()
+	for _, cc := range view.lastFormats {
+		cc.Cursor.SetCharFormat(cc.Format)
+	}
+	view.lastFormats = nil
 }
 
 func (view *ArticleView) highlightAll(query string) {
@@ -527,10 +530,9 @@ func (view *ArticleView) highlightAll(query string) {
 	}
 
 	doc := view.Browser.Document()
-	cursor := qt.NewQTextCursor2(doc)
 	palette := view.Browser.Palette()
 
-	// Theme-aware colors
+	// Colors from theme
 	allBg := palette.ColorWithCr(qt.QPalette__Highlight)
 	allBg.SetAlphaF(0.8)
 
@@ -543,19 +545,33 @@ func (view *ArticleView) highlightAll(query string) {
 	formatCurrent.SetForeground(qt.NewQBrush3(currentFg))
 	formatCurrent.SetFontWeight(int(qt.QFont__Bold))
 
-	// Highlight all matches
+	// First clear any previous highlight format only (non-destructive)
+	cursor := qt.NewQTextCursor2(doc)
+
+	// Apply new highlights
 	cursor = qt.NewQTextCursor2(doc)
+
+	lastFormats := []CursorAndCharFormat{}
 	for {
 		cursor = doc.Find2(query, cursor)
 		if cursor.IsNull() {
 			break
 		}
+		lastFormats = append(lastFormats, CursorAndCharFormat{
+			Cursor: cursor,
+			Format: cursor.CharFormat(),
+		})
 		cursor.MergeCharFormat(formatAll)
 	}
+	view.lastFormats = lastFormats
 
-	// Highlight current match with bright text
+	// Emphasize the current match
 	activeCursor := view.Browser.TextCursor()
 	if !activeCursor.IsNull() && activeCursor.HasSelection() {
+		lastFormats = append(lastFormats, CursorAndCharFormat{
+			Cursor: activeCursor,
+			Format: activeCursor.CharFormat(),
+		})
 		activeCursor.MergeCharFormat(formatCurrent)
 	}
 }
