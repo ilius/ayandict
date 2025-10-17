@@ -64,6 +64,7 @@ type ScanPopup struct {
 func (p *ScanPopup) Run() {
 	p.doQuery(p.query)
 	p.popup.Show()
+	p.popup.ActivateWindow()
 }
 
 func (p *ScanPopup) init() {
