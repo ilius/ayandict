@@ -109,6 +109,18 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 			if event.Modifiers()&altCtrlModifier > 0 {
 				app.goForwardInHistory()
 			}
+		case int(qt.Key_Up):
+			if event.Modifiers()&qt.AltModifier > 0 {
+				app.resultList.GoPrevious()
+			} else {
+				super(event)
+			}
+		case int(qt.Key_Down):
+			if event.Modifiers()&qt.AltModifier > 0 {
+				app.resultList.GoNext()
+			} else {
+				super(event)
+			}
 		default:
 			super(event)
 		}
@@ -139,6 +151,18 @@ func (app *Application) setupArticleViewKeyPressEvent() {
 		case int(qt.Key_Right):
 			if event.Modifiers()&altCtrlModifier > 0 {
 				app.goForwardInHistory()
+			}
+		case int(qt.Key_Up):
+			if event.Modifiers()&qt.AltModifier > 0 {
+				app.resultList.GoPrevious()
+			} else {
+				super(event)
+			}
+		case int(qt.Key_Down):
+			if event.Modifiers()&qt.AltModifier > 0 {
+				app.resultList.GoNext()
+			} else {
+				super(event)
 			}
 		default:
 			super(event)

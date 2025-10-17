@@ -19,6 +19,9 @@ func init() {
 		{"⌘ ←    or    ⌥ ←", "", "Go back in history"},
 		{"⌘ →    or    ⌥ →", "", "Go forward in history"},
 
+		{"⌥ ↓", "", "Goto next result"},
+		{"⌥ ↑", "", "Goto previous result"},
+
 		{"⌘ Ｑ", "", "Quit / exit application"},
 		{"F1", "", "Show About window"},
 		{"Enter", "Scan popup", "Query in main window"},

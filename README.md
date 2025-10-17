@@ -145,6 +145,8 @@ There are tons of web pages that let you download various usable dictionaries, b
 - **Space**: (while query entry is not focused) change keyboard focus to query entry
 - **Alt + Left** or **Ctrl + Left**: Go back in history (tab "Recent")
 - **Alt + Right** or **Ctrl + Right**: Go forward in history (selected term in tab "Recent")
+- **Alt + Down**: Goto next result
+- **Alt + Up**: Goto previous result
 - **Ctrl + Q**: Quit / exit application
 - **F1**: Show About window
 

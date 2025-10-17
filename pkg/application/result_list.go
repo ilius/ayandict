@@ -101,3 +101,19 @@ func (w *ResultListWidget) Clear() {
 	w.QListWidget.Clear()
 	w.results = nil
 }
+
+func (w *ResultListWidget) GoNext() {
+	row := w.QListWidget.CurrentRow() + 1
+	if row >= len(w.results) {
+		return
+	}
+	w.SetCurrentRow(row)
+}
+
+func (w *ResultListWidget) GoPrevious() {
+	row := w.QListWidget.CurrentRow() - 1
+	if row < 0 {
+		return
+	}
+	w.SetCurrentRow(row)
+}

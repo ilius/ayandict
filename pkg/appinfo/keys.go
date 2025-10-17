@@ -15,6 +15,9 @@ var KeyBindings = [][3]string{
 	{"Alt﹢Left ｜ Ctrl﹢Left", "", "Go back in history"},
 	{"Alt﹢Right ｜ Ctrl﹢Right", "", "Go forward in history"},
 
+	{"Alt﹢Down", "", "Goto next result"},
+	{"Alt﹢Up", "", "Goto previous result"},
+
 	{"Ctrl﹢Ｑ", "", "Quit / exit application"},
 	{"F1", "", "Show About window"},
 	{"Enter", "Scan popup", "Query in main window"},
