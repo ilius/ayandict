@@ -89,7 +89,7 @@ func (p *ScanPopup) init() {
 	p.headerLabel.SetMouseTracking(true)
 
 	p.articleView = NewArticleView(p.doQuery)
-	p.articleView.SetFont(font)
+	p.articleView.Widget.SetFont(font)
 	p.articleView.SetupCustomHandlers()
 
 	pos := p.pos
@@ -107,7 +107,7 @@ func (p *ScanPopup) init() {
 
 	popup.OnKeyPressEvent(p.onKeyPress)
 	p.headerLabel.OnKeyPressEvent(p.onKeyPress)
-	p.articleView.OnKeyPressEvent(p.onKeyPress)
+	p.articleView.Browser.OnKeyPressEvent(p.onKeyPress)
 
 	for _, widget := range []HasOnMouseEvents{
 		p.headerLabel,
@@ -148,7 +148,7 @@ func (p *ScanPopup) init() {
 
 	popupLayout.AddLayout(headerBox.QLayout)
 	// headerBox.AddWidget(favoriteButton.QWidget)
-	popupLayout.AddWidget2(p.articleView.QWidget, 10)
+	popupLayout.AddWidget2(p.articleView.Widget, 10)
 }
 
 func (p *ScanPopup) doQuery(query string) {

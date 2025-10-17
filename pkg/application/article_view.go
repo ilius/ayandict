@@ -30,9 +30,11 @@ const (
 )
 
 var dummyParagRE = regexp.MustCompile(`<p [^<>]*><br />(</p>|$)`)
+var audioUrlRE = regexp.MustCompile(`href="[^<>"]+\.mp3"`)
 
 type ArticleView struct {
-	*qt.QTextBrowser
+	Browser *qt.QTextBrowser
+	Widget  *qt.QWidget
 
 	dpi     float64
 	doQuery func(string)
@@ -45,20 +47,21 @@ type ArticleView struct {
 }
 
 func NewArticleView(doQuery func(string)) *ArticleView {
-	widget := qt.NewQTextBrowser(nil)
+	browser := qt.NewQTextBrowser(nil)
 	// widget := webengine.NewQWebEngineView(nil)
-	widget.SetReadOnly(true)
-	widget.SetOpenExternalLinks(true)
-	widget.SetOpenLinks(false)
+	browser.SetReadOnly(true)
+	browser.SetOpenExternalLinks(true)
+	browser.SetOpenLinks(false)
 	dpi := qt.QGuiApplication_PrimaryScreen().PhysicalDotsPerInch()
 	if dpi <= 0 {
 		panic("failed to get DPI")
 	}
 	view := &ArticleView{
-		QTextBrowser: widget,
-		dpi:          dpi,
+		Browser: browser,
+		Widget:  browser.QWidget,
+		dpi:     dpi,
 	}
-	widget.OnKeyPressEvent(func(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
+	browser.OnKeyPressEvent(func(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
 		view.onKeyPressEvent(event)
 		super(event)
 	})
@@ -66,7 +69,13 @@ func NewArticleView(doQuery func(string)) *ArticleView {
 	return view
 }
 
-var audioUrlRE = regexp.MustCompile(`href="[^<>"]+\.mp3"`)
+func (view *ArticleView) SetHtml(s string) {
+	view.Browser.SetHtml(s)
+}
+
+func (view *ArticleView) SetSearchPaths(p []string) {
+	view.Browser.SetSearchPaths(p)
+}
 
 func (view *ArticleView) playAudioMPV(urlStr string) bool {
 	path, err := exec.LookPath("mpv")
@@ -166,7 +175,7 @@ func (view *ArticleView) SetResult(res common.SearchResultIface) {
 	if definitionStyleString != "" {
 		text2 = definitionStyleString + text2
 	}
-	view.SetHtml(text2)
+	view.Browser.SetHtml(text2)
 	if conf.Audio && conf.AudioAutoPlay > 0 {
 		go view.autoPlay(text, conf.AudioAutoPlay)
 	}
@@ -199,7 +208,7 @@ func (view *ArticleView) createContextMenuWithSelection(menu *qt.QMenu, selected
 }
 
 func (view *ArticleView) createContextMenuNoSelection(menu *qt.QMenu, pos *qt.QPoint) {
-	cursor := view.CursorForPosition(pos)
+	cursor := view.Browser.CursorForPosition(pos)
 	cursor.Select(qt.QTextCursor__WordUnderCursor) // it doesn't actually select the word in GUI
 
 	cursorUrl := view.findLinkOnCursor(cursor)
@@ -219,9 +228,9 @@ func (view *ArticleView) createContextMenuNoSelection(menu *qt.QMenu, pos *qt.QP
 }
 
 func (view *ArticleView) createContextMenu(pos *qt.QPoint) *qt.QMenu {
-	menu := qt.NewQMenu(view.QTextBrowser.QWidget)
+	menu := qt.NewQMenu(view.Browser.QWidget)
 
-	selected := view.TextCursor().SelectedText()
+	selected := view.Browser.TextCursor().SelectedText()
 
 	if selected == "" {
 		view.createContextMenuNoSelection(menu, pos)
@@ -231,13 +240,13 @@ func (view *ArticleView) createContextMenu(pos *qt.QPoint) *qt.QMenu {
 
 	menu.AddActionWithText("Copy All (HTML)").OnTriggered(func() {
 		qt.QGuiApplication_Clipboard().SetText2(
-			view.ToHtml(),
+			view.Browser.ToHtml(),
 			qt.QClipboard__Clipboard,
 		)
 	})
 	menu.AddActionWithText("Copy All (Plaintext)").OnTriggered(func() {
 		qt.QGuiApplication_Clipboard().SetText2(
-			view.ToPlainText(),
+			view.Browser.ToPlainText(),
 			qt.QClipboard__Clipboard,
 		)
 	})
@@ -246,7 +255,7 @@ func (view *ArticleView) createContextMenu(pos *qt.QPoint) *qt.QMenu {
 }
 
 func (view *ArticleView) selectedHTML() string {
-	text := view.TextCursor().Selection().ToHtml()
+	text := view.Browser.TextCursor().Selection().ToHtml()
 	body := strings.Index(text, "<body>")
 	if body >= 0 {
 		text = text[body+6:]
@@ -269,7 +278,7 @@ func (view *ArticleView) selectedHTML() string {
 }
 
 func (view *ArticleView) ZoomIn() {
-	doc := view.Document()
+	doc := view.Browser.Document()
 	font := doc.DefaultFont()
 	points := fontPointSize(font, view.dpi)
 	if points <= 0 {
@@ -280,7 +289,7 @@ func (view *ArticleView) ZoomIn() {
 }
 
 func (view *ArticleView) ZoomOut() {
-	doc := view.Document()
+	doc := view.Browser.Document()
 	font := doc.DefaultFont()
 	points := fontPointSize(font, view.dpi)
 	if points <= 0 {
@@ -317,7 +326,7 @@ func (view *ArticleView) findLinkOnCursor(cursor *qt.QTextCursor) string {
 }
 
 func (view *ArticleView) setupAnchorClicked() {
-	view.OnAnchorClicked(func(qUrl *qt.QUrl) {
+	view.Browser.OnAnchorClicked(func(qUrl *qt.QUrl) {
 		host := qUrl.Host()
 		if qUrl.Scheme() == "bword" {
 			if host != "" {
@@ -356,10 +365,10 @@ func (view *ArticleView) setupAnchorClicked() {
 }
 
 func (view *ArticleView) setupMouseReleaseEvent() {
-	view.OnMouseReleaseEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+	view.Browser.OnMouseReleaseEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 		switch event.Button() {
 		case qt.MiddleButton:
-			selected := view.TextCursor().SelectedText()
+			selected := view.Browser.TextCursor().SelectedText()
 			if selected != "" {
 				view.doQuery(strings.Trim(selected, queryForceTrimChars))
 			}
@@ -370,7 +379,7 @@ func (view *ArticleView) setupMouseReleaseEvent() {
 }
 
 func (view *ArticleView) setupWheelEvent() {
-	view.OnWheelEvent(func(super func(*qt.QWheelEvent), event *qt.QWheelEvent) {
+	view.Browser.OnWheelEvent(func(super func(*qt.QWheelEvent), event *qt.QWheelEvent) {
 		if event.Modifiers()&qt.ControlModifier == 0 {
 			super(event)
 			return
@@ -397,11 +406,11 @@ func (view *ArticleView) SetupCustomHandlers() {
 	mediaPlayer := multimedia.NewQMediaPlayer()
 	view.mediaPlayer = mediaPlayer
 
-	copyAction := qt.NewQAction5("Copy", view.QObject)
-	view.AddAction(copyAction)
+	copyAction := qt.NewQAction5("Copy", view.Browser.QObject)
+	view.Browser.AddAction(copyAction)
 	copyAction.SetShortcut(qt.NewQKeySequence7("Ctrl+C", qt.QKeySequence__PortableText))
 	copyAction.OnTriggered(func() {
-		text := view.TextCursor().SelectedText()
+		text := view.Browser.TextCursor().SelectedText()
 		if text == "" {
 			return
 		}
@@ -419,7 +428,7 @@ func (view *ArticleView) SetupCustomHandlers() {
 	// and read it when Query is selected from context menu
 	// may not be pretty or concurrent-safe! but seems to work!
 
-	view.OnContextMenuEvent(view.onContextMenuEvent)
+	view.Browser.OnContextMenuEvent(view.onContextMenuEvent)
 	view.setupMouseReleaseEvent()
 	view.setupWheelEvent()
 }
@@ -428,12 +437,12 @@ func (view *ArticleView) onKeyPressEvent(event *qt.QKeyEvent) {
 	switch event.Key() {
 	case int(qt.Key_Up):
 		if conf.ArticleArrowKeys {
-			view.VerticalScrollBar().TriggerAction(qt.QAbstractSlider__SliderSingleStepSub)
+			view.Browser.VerticalScrollBar().TriggerAction(qt.QAbstractSlider__SliderSingleStepSub)
 			return
 		}
 	case int(qt.Key_Down):
 		if conf.ArticleArrowKeys {
-			view.VerticalScrollBar().TriggerAction(qt.QAbstractSlider__SliderSingleStepAdd)
+			view.Browser.VerticalScrollBar().TriggerAction(qt.QAbstractSlider__SliderSingleStepAdd)
 			return
 		}
 	}

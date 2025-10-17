@@ -89,7 +89,7 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 		case int(qt.Key_F1):
 			app.aboutClicked()
 		case int(qt.Key_PageUp), int(qt.Key_PageDown):
-			qt.QCoreApplication_SendEvent(app.articleView.QObject, event.QEvent)
+			qt.QCoreApplication_SendEvent(app.articleView.Browser.QObject, event.QEvent)
 		case int(qt.Key_Q):
 			if event.Modifiers()&qt.ControlModifier > 0 {
 				app.Exit()
@@ -109,7 +109,7 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 }
 
 func (app *Application) setupArticleViewKeyPressEvent() {
-	app.articleView.OnKeyPressEvent(func(super func(event *qt.QKeyEvent), event *qt.QKeyEvent) {
+	app.articleView.Browser.OnKeyPressEvent(func(super func(event *qt.QKeyEvent), event *qt.QKeyEvent) {
 		switch event.Key() {
 		case int(qt.Key_Space): // " "
 			app.entry.SetFocusWithReason(qt.ShortcutFocusReason)

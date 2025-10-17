@@ -387,7 +387,7 @@ func (app *Application) Run() {
 	leftMainLayout.AddSpacing(basePxHalf)
 	leftMainLayout.AddWidget3(headerBox, 0, 0)
 	leftMainLayout.AddSpacing(basePxHalf)
-	leftMainLayout.AddWidget3(app.articleView.QWidget, 0, 0)
+	leftMainLayout.AddWidget3(app.articleView.Widget, 0, 0)
 	leftMainLayout.AddSpacing(basePxHalf)
 	leftMainLayout.AddLayout(buttonBox.Layout())
 
