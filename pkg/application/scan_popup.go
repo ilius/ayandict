@@ -150,6 +150,7 @@ func (p *ScanPopup) init() {
 }
 
 func (p *ScanPopup) doQuery(query string) {
+	p.query = query
 	results := dictmgr.LookupHTML(query, conf, p.mode, resultFlags, 0)
 	if len(results) == 0 {
 		slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", 0, "query", query)
