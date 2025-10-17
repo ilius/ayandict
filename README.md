@@ -134,12 +134,15 @@ There are tons of web pages that let you download various usable dictionaries, b
 
 # Keyboard bindings/shortcuts
 
-- **Space**: (while query entry is not focused) change keyboard focus to query entry
-- **Escape**:
-  - While query entry is focused: focus leaves the entry
-  - While query entry is not focused: clears the query and results
 - **`+`** or **`=`**: Zoom in (article/definition/translation)
 - **`-`**: Zoom out (article/definition/translation)
+- **Ctrl + F**: Search in article text
+- **Ctrl﹢G**: Goto next match (via Ctrl﹢F)
+- **Escape**:
+  - While search bar is visible: hide search bar
+  - While query entry is focused: focus leaves the entry
+  - None of the above: clears the query and results
+- **Space**: (while query entry is not focused) change keyboard focus to query entry
 - **Alt + Left** or **Ctrl + Left**: Go back in history (tab "Recent")
 - **Alt + Right** or **Ctrl + Right**: Go forward in history (selected term in tab "Recent")
 - **Ctrl + Q**: Quit / exit application

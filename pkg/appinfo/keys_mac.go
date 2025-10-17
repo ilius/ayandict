@@ -5,13 +5,20 @@ package appinfo
 
 func init() {
 	KeyBindings = [][3]string{
-		{" Space ", "  query is not focused  ", "Focus query entry"},
-		{"Esc", "query is focused", "Unfocus query entry"},
-		{"Esc", "query is not focused", "Clear query and results"},
 		{"＋  or  ＝", "", "Zoom in"},
 		{"－", "", "Zoom out"},
+		{"⌘ F", "", "Search in article text"},
+		{"⌘ G", "", "Goto next match (via ⌘ F)"},
+
+		{"Esc", "search bar is visible", "Hide search bar"},
+		{"Esc", "query is focused", "Unfocus query entry"},
+		{"Esc", "none of two above", "Clear query and results"},
+
+		{" Space ", "  query is not focused  ", "Focus query entry"},
+
 		{"⌘ ←    or    ⌥ ←", "", "Go back in history"},
 		{"⌘ →    or    ⌥ →", "", "Go forward in history"},
+
 		{"⌘ Ｑ", "", "Quit / exit application"},
 		{"F1", "", "Show About window"},
 		{"Enter", "Scan popup", "Query in main window"},

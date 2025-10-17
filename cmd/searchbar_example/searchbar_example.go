@@ -7,18 +7,25 @@ import (
 )
 
 type SearchableQTextBrowser struct {
-	Layout      *qt.QVBoxLayout
 	Browser     *qt.QTextBrowser
+	Widget      *qt.QWidget
+	frame       *qt.QFrame
 	searchEntry *qt.QLineEdit
 	searchFrame *qt.QFrame
 	docCursor   *qt.QTextCursor
 }
 
 func (st *SearchableQTextBrowser) init() {
-	mainLayout := st.Layout
+	mainFrame := st.frame
+	mainLayout := qt.NewQVBoxLayout2()
+	mainFrame.SetLayout(mainLayout.Layout())
 	textBrowser := st.Browser
 	searchFrame := st.searchFrame
 	searchEntry := st.searchEntry
+
+	// default ContentsMargins:
+	// QFrame: 0, QVBoxLayout: 11, QTextBrowser: 1
+	mainLayout.SetContentsMargins(0, 0, 0, 0)
 
 	searchLayout := qt.NewQHBoxLayout2()
 	searchFrame.SetLayout(searchLayout.Layout())
@@ -131,8 +138,10 @@ func (st *SearchableQTextBrowser) hideBar() {
 }
 
 func CreateTextBrowserSearchBar(browser *qt.QTextBrowser) *SearchableQTextBrowser {
+	frame := qt.NewQFrame2()
 	st := &SearchableQTextBrowser{
-		Layout:      qt.NewQVBoxLayout2(),
+		frame:       frame,
+		Widget:      frame.QWidget,
 		Browser:     browser,
 		searchEntry: qt.NewQLineEdit(nil),
 		searchFrame: qt.NewQFrame(nil),
@@ -158,7 +167,9 @@ func main() {
 	window := qt.NewQWidget(nil)
 	window.SetWindowTitle("QTextBrowser Search Example")
 	window.Resize(600, 400)
-	window.SetLayout(stb.Layout.Layout())
+	layout := qt.NewQVBoxLayout2()
+	window.SetLayout(layout.Layout())
+	layout.AddWidget(stb.Widget)
 
 	window.Show()
 	_ = qt.QApplication_Exec()

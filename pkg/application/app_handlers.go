@@ -75,6 +75,13 @@ func (app *Application) setupHandlers() {
 	// slog.Error("test error", "s", "hello", "n", 2, "b", true)
 }
 
+func (app *Application) onEscape() {
+	if app.articleView.OnEscape() {
+		return
+	}
+	app.resetQuery()
+}
+
 func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 	widget.OnKeyPressEvent(func(super func(event *qt.QKeyEvent), event *qt.QKeyEvent) {
 		switch event.Key() {
@@ -85,7 +92,7 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 		case int(qt.Key_Minus): // "-"
 			app.articleView.ZoomOut()
 		case escape: // event.Text()="\x1b"
-			app.resetQuery()
+			app.onEscape()
 		case int(qt.Key_F1):
 			app.aboutClicked()
 		case int(qt.Key_PageUp), int(qt.Key_PageDown):
@@ -118,7 +125,7 @@ func (app *Application) setupArticleViewKeyPressEvent() {
 		case int(qt.Key_Minus): // "-"
 			app.articleView.ZoomOut()
 		case escape: // event.Text()="\x1b"
-			app.resetQuery()
+			app.onEscape()
 		case int(qt.Key_F1):
 			app.aboutClicked()
 		case int(qt.Key_Q):
