@@ -55,6 +55,18 @@ func fontPixelSize(font *qt.QFont, screen *qt.QScreen) float64 {
 	return points * dpi / 72.0
 }
 
+func linedLabel(text string, right int, bottom int) *qt.QWidget {
+	label := qt.NewQLabel3(text)
+	frame := qt.NewQFrame2()
+	frame.SetFrameShape(qt.QFrame__Box)    // The border shape
+	frame.SetFrameShadow(qt.QFrame__Plain) // Flat (not sunken/raised)
+	frame.SetContentsMargins(1, 1, right, bottom)
+	frameLayout := qt.NewQHBoxLayout(frame.QWidget)
+	frameLayout.AddWidget3(label.QWidget, 1, qt.AlignCenter)
+	frameLayout.SetContentsMargins(3, 0, 3, 0)
+	return frame.QWidget
+}
+
 // func posStr(pos *qt.QPoint) string {
 // 	if pos == nil {
 // 		return "nil"
