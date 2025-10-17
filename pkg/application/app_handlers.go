@@ -82,6 +82,17 @@ func (app *Application) onEscape() {
 	app.resetQuery()
 }
 
+func (app *Application) sendKeyEventToArticleView(event *qt.QKeyEvent) {
+	// despite this, this still crashes if event has modifier
+	defer func() {
+		r := recover()
+		if r != nil {
+			slog.Error("error sending event", "r", r)
+		}
+	}()
+	qt.QCoreApplication_SendEvent(app.articleView.Browser.QObject, event.QEvent)
+}
+
 func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 	widget.OnKeyPressEvent(func(super func(event *qt.QKeyEvent), event *qt.QKeyEvent) {
 		switch event.Key() {
@@ -96,7 +107,11 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 		case int(qt.Key_F1):
 			app.aboutClicked()
 		case int(qt.Key_PageUp), int(qt.Key_PageDown):
-			qt.QCoreApplication_SendEvent(app.articleView.Browser.QObject, event.QEvent)
+			if event.Modifiers() == 0 {
+				app.sendKeyEventToArticleView(event)
+			} else {
+				super(event)
+			}
 		case int(qt.Key_Q):
 			if event.Modifiers()&qt.ControlModifier > 0 {
 				app.Exit()
