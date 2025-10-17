@@ -12,6 +12,8 @@ const (
 
 var LOCAL_SOCKET_NAME = APP_NAME + "-" + userId()
 
+const WEBSITE = "https://github.com/ilius/ayandict"
+
 const ABOUT = `A simple cross-platform desktop dictionary application based on Qt framework and written in Go that uses StarDict dictionary format.
 
 Copyleft © 2025 Saeed Rasooli

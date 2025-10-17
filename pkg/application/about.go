@@ -93,6 +93,9 @@ func aboutClickedWidget(widget *qt.QWidget, icon *qt.QIcon) {
 	buttonBox.AddButton2("Keyboard Shortcuts", qt.QDialogButtonBox__AcceptRole).OnClicked(func() {
 		showKeyBindings(widget, icon)
 	})
+	buttonBox.AddButton2("Website", qt.QDialogButtonBox__AcceptRole).OnClicked(func() {
+		qt.QDesktopServices_OpenUrl(qt.NewQUrl3(appinfo.WEBSITE))
+	})
 	closeButton := buttonBox.AddButton2("  Close  ", qt.QDialogButtonBox__AcceptRole)
 	closeButton.OnClicked(func() {
 		widget.Close()
