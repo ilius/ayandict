@@ -105,7 +105,7 @@ func (p *ScanPopup) init() {
 		popup.Move(pos.X(), pos.Y()+int(fontPixelSize(systemFont, screen)))
 	}
 
-	popup.OnKeyPressEvent(p.onPopupKeyPress)
+	popup.OnKeyPressEvent(p.onKeyPress)
 
 	for _, widget := range []HasOnMouseEvents{
 		p.headerLabel,
@@ -180,7 +180,7 @@ func (p *ScanPopup) moveToMainWindow() {
 	p.showInMain(p.query)
 }
 
-func (p *ScanPopup) onPopupKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
+func (p *ScanPopup) onKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
 	if event.Key() == escape {
 		p.popup.Close()
 		return
