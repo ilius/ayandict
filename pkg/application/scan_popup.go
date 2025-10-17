@@ -188,7 +188,11 @@ func (p *ScanPopup) onKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
 	case escape:
 		p.popup.Close()
 	case int(qt.Key_Return), int(qt.Key_Enter):
-		p.moveToMainWindow()
+		if p.articleView.Searching() {
+			super(event)
+		} else {
+			p.moveToMainWindow()
+		}
 	default:
 		super(event)
 	}

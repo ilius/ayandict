@@ -82,6 +82,10 @@ func NewArticleView(doQuery func(string)) *ArticleView {
 	return view
 }
 
+func (view *ArticleView) Searching() bool {
+	return view.searchFrame.IsVisible()
+}
+
 func (view *ArticleView) init() {
 	mainFrame := view.frame
 	mainLayout := qt.NewQVBoxLayout2()
@@ -581,7 +585,7 @@ func (view *ArticleView) showBar() {
 }
 
 func (view *ArticleView) hideBar() bool {
-	if !view.searchFrame.IsVisible() {
+	if !view.Searching() {
 		return false
 	}
 	view.searchFrame.SetVisible(false)
