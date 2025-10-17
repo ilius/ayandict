@@ -106,6 +106,8 @@ func (p *ScanPopup) init() {
 	}
 
 	popup.OnKeyPressEvent(p.onKeyPress)
+	p.headerLabel.OnKeyPressEvent(p.onKeyPress)
+	p.articleView.OnKeyPressEvent(p.onKeyPress)
 
 	for _, widget := range []HasOnMouseEvents{
 		p.headerLabel,
