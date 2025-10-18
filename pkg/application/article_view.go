@@ -103,8 +103,10 @@ func (view *ArticleView) init() {
 	// default ContentsMargins:
 	// QFrame: 0, QVBoxLayout: 11, QTextBrowser: 1
 	mainLayout.SetContentsMargins(0, 0, 0, 0)
+	mainLayout.SetSpacing(10)
 
 	searchLayout := qt.NewQHBoxLayout2()
+	searchLayout.SetContentsMargins(0, 0, 0, 0)
 	searchFrame.SetLayout(searchLayout.Layout())
 
 	searchEntry.SetPlaceholderText("Find text...")
