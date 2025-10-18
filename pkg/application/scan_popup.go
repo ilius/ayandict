@@ -122,12 +122,12 @@ func (p *ScanPopup) init() {
 
 	headerBox := qt.NewQHBoxLayout2()
 
-	closeButton := qt.NewQPushButton3("Close")
+	closeButton := qt.NewQPushButton3(" close ")
 	closeButton.SetFont(font)
 	closeButton.OnClicked(func() {
 		_ = popup.Close()
 	})
-	mainButton := qt.NewQPushButton3("Main")
+	mainButton := qt.NewQPushButton3(" main ")
 	mainButton.SetFont(font)
 	mainButton.OnClicked(p.moveToMainWindow)
 
@@ -141,6 +141,21 @@ func (p *ScanPopup) init() {
 	headerButtonBox.AddWidget(closeButton.QWidget)
 	headerButtonBox.AddWidget(mainButton.QWidget)
 	headerButtonBox.AddStretch()
+
+	popupLayout.SetContentsMargins(5, 5, 5, 5)
+	headerBox.SetContentsMargins(0, 0, 0, 0)
+	headerButtonBox.SetContentsMargins(0, 0, 0, 0)
+	headerButtonBox.SetSpacing(0)
+
+	// buttons have no ContentsMargins by default
+	// setting "margin: 0px;" stylesheet mimimizes both the height and width
+	// margin: top, right, bottom, left
+	// const smallButtonSS = "margin: 0px 5px 0px 5px;"
+	const smallButtonSS = "margin: 0px;"
+	closeButton.SetStyleSheet(smallButtonSS)
+	mainButton.SetStyleSheet(smallButtonSS)
+	// closeButton.SetContentsMargins(5, 0, 5, 0)
+	// mainButton.SetContentsMargins(5, 0, 5, 0)
 
 	headerBox.AddWidget2(p.headerLabel.QWidget, 10)
 	headerBox.AddStretch()
