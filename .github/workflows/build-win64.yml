@@ -78,6 +78,7 @@ jobs:
         shell: pwsh
         run: |
           go env
+          . ".github\scripts\Measure-Memory.ps1"
 
           Get-CimInstance Win32_OperatingSystem | Select-Object TotalVisibleMemorySize, FreePhysicalMemory |
           ForEach-Object {
@@ -87,19 +88,7 @@ jobs:
                   Used_GB  = "{0:N2}" -f (($_.TotalVisibleMemorySize - $_.FreePhysicalMemory) / 1MB)
               }
           }
-          function Measure-Memory {
-              param([string]$Command)
-
-              $proc = Start-Process powershell -ArgumentList "-NoProfile -Command $Command" -PassThru -Wait
-              $p = Get-Process -Id $proc.Id -ErrorAction SilentlyContinue
-              if ($p) {
-                  "{0:N2} MB peak working set" -f ($p.PeakWorkingSet64 / 1MB)
-              } else {
-                  "Process exited before measurement."
-              }
-          }
-
-          Measure-Memory "go build -v -x -o ayandict.exe"
+          Measure-Memory go build -v -x
           if (-not (Test-Path "ayandict.exe")) {
             ls
             Write-Error "Build failed — ayandict.exe not created"
