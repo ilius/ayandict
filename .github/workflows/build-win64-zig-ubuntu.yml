@@ -1,0 +1,130 @@
+name: Cross-Compile Windows (Zig + Qt6)
+
+on:
+  push:
+    branches: ["build-windows*"]
+  pull_request:
+    branches: ["v3"]
+
+# To get latest supported QT_VERSION for windows: aqt list-qt windows desktop
+# But the latest supported QT_VERSION for MinGW64 is 6.6.3
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GO_VERSION: "1.24.7"
+      QT_VERSION: "6.10.0"
+      QT_ARCH: win64_llvm_mingw
+      QT_DIR_NAME: llvm-mingw_64
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          set -x
+          sudo apt update -y
+          sudo apt install -y python3-pip zip
+          pip install -q aqtinstall
+          sudo snap install --beta zig --classic
+
+      - name: Install Qt for Windows (MinGW)
+        run: |
+          set -x
+          QT_DIR="$HOME/Qt/$QT_VERSION/$QT_DIR_NAME"
+          echo "QT_DIR=$QT_DIR" >> $GITHUB_ENV
+          echo "PATH=$QT_DIR/bin:$PATH" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=$QT_DIR/lib/pkgconfig" >> $GITHUB_ENV
+
+          mkdir -p $HOME/Qt
+          echo "Installing Qt $QT_VERSION ($QT_ARCH) for cross-compilation..."
+          python3 -m aqt install-qt windows desktop $QT_VERSION $QT_ARCH --outputdir $HOME/Qt
+          # ?? --base https://download.qt.io
+          ls -l $QT_DIR/..
+          # ls -l $QT_DIR
+          # ls -l $QT_DIR/lib
+          # ls -l $QT_DIR/include
+          ls -l $QT_DIR/lib/pkgconfig
+          # pkg-config --list-all | grep Qt6
+
+          echo '#include "QtCore/qabstractanimation.h"' > $QT_DIR/include/QAbstractAnimation
+
+          cd $QT_DIR/include/
+          ls -l QtCore/QAbstractAnimation
+          find . -ls | grep -i QAbstractAnimation
+          # ln -s QtCore/qabstractanimation.h QAbstractAnimation.h
+
+
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Configure CGo + Zig environment
+        run: |
+          set -x
+          echo "CC=zig cc -target x86_64-windows-gnu" >> $GITHUB_ENV
+          echo "CXX=zig c++ -target x86_64-windows-gnu" >> $GITHUB_ENV
+          echo "GOOS=windows" >> $GITHUB_ENV
+          echo "GOARCH=amd64" >> $GITHUB_ENV
+
+          echo "ZIG_VERSION=$(zig version)" && zig version
+
+          echo "CGO_ENABLED=1" >> $GITHUB_ENV
+
+          CGO_CFLAGS="-fPIC -ferror-limit=0 \
+          -I$QT_DIR/include \
+          -I$QT_DIR/include/QtCore \
+          -I$QT_DIR/include/QtCore/private \
+          -I$QT_DIR/include/QtGui \
+          -I$QT_DIR/include/QtGui/private \
+          -I$QT_DIR/include/QtWidgets \
+          -I$QT_DIR/include/QtWidgets/private \
+          -I$QT_DIR/include/QtNetwork \
+          -I$QT_DIR/include/QtNetwork/private \
+          -I$QT_DIR/include/QtMultimedia \
+          -I$QT_DIR/include/QtMultimedia/private \
+          -I$QT_DIR/include/QtSvg \
+          -I$QT_DIR/include/QtSvg/private"
+
+          # Libraries (static)
+          CGO_LDFLAGS="-L$QT_DIR/lib \
+            -lQt6Core -lQt6Gui -lQt6Widgets -lQt6Network -lQt6Multimedia \
+            -lQt6Svg -lQt6PrintSupport -lQt6WinExtras \
+            -lstdc++ -lm -lwinpthread -static"
+
+          echo "CGO_CFLAGS=$CGO_CFLAGS" >> $GITHUB_ENV
+          echo "CGO_LDFLAGS=$CGO_LDFLAGS" >> $GITHUB_ENV
+
+      - name: Build Windows executable
+        run: |
+          set -x
+          echo "=== Building ayandict.exe with Zig for Windows ==="
+          head -n3 /proc/meminfo
+          echo "=========== Env ============"
+          go env
+          /usr/bin/time -v go build -x -v -work -ldflags="-v" -o ayandict.exe || true
+          if [ ! -f ayandict.exe ]; then
+            echo "Build failed — ayandict.exe not created"
+            exit 1
+          fi
+          ls -l ayandict.exe
+          echo "Build succeeded — ayandict.exe created"
+
+      # Package artifact (no windeployqt since we're cross-compiling)
+      - name: Package binary
+        run: |
+          set -x
+          mkdir -p dist
+          cp ayandict.exe dist/
+          cp $QT_DIR/bin/Qt6*.dll dist/ || true
+          zip -r ayandict-win64.zip dist
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ayandict-win64-${{ github.sha }}
+          path: ayandict-win64.zip
+          retention-days: 7
