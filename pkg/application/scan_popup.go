@@ -80,6 +80,7 @@ func (p *ScanPopup) init() {
 		slog.Info("ScanPopup: normal (bordered), platform does not support moving window")
 	}
 	popup.SetWindowFlags(flags)
+	popup.SetAttribute(qt.WA_DeleteOnClose)
 	popup.SetWindowIcon(p.icon)
 	popup.SetFont(font)
 
