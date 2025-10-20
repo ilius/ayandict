@@ -145,7 +145,11 @@ func (p *ScanPopup) init() {
 	// )
 
 	headerBox := qt.NewQHBoxLayout2()
-	headerBox.AddStretch()
+	{
+		label := qt.NewQLabel2()
+		label.SetCursor(qt.NewQCursor2(qt.DragMoveCursor))
+		headerBox.AddWidget2(label.QWidget, 1)
+	}
 	headerBox.AddWidget(nextButton.QWidget)
 	headerBox.AddWidget(prevButton.QWidget)
 	headerBox.AddWidget(mainButton.QWidget)
