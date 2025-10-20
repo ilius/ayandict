@@ -108,7 +108,6 @@ func (p *ScanPopup) init() {
 	}
 
 	popup.OnKeyPressEvent(p.onKeyPress)
-	p.articleView.Browser.OnKeyPressEvent(p.onKeyPress)
 
 	for _, widget := range []HasOnMouseEvents{
 		popup,
@@ -117,6 +116,11 @@ func (p *ScanPopup) init() {
 		widget.OnMouseMoveEvent(p.onDragMouseMove)
 		widget.OnMouseReleaseEvent(p.onDragMouseRelease)
 	}
+
+	p.articleView.Browser.OnMousePressEvent(func(super func(ev *qt.QMouseEvent), ev *qt.QMouseEvent) {
+		p.popup.ActivateWindow()
+		super(ev)
+	})
 
 	popupLayout := qt.NewQVBoxLayout(popup)
 
@@ -258,6 +262,7 @@ func (p *ScanPopup) onDragMousePress(super func(*qt.QMouseEvent), event *qt.QMou
 		return
 	}
 	p.dragPos = event.Pos()
+	p.popup.ActivateWindow()
 }
 
 func (p *ScanPopup) onDragMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
