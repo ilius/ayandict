@@ -54,7 +54,6 @@ type ScanPopup struct {
 	addHistory func(query string)
 
 	// set by init method:
-	headerLabel *HeaderLabel
 	articleView *ArticleView
 
 	// dragPos: position of mouse relative to window, when drag starts
@@ -84,10 +83,6 @@ func (p *ScanPopup) init() {
 	popup.SetWindowIcon(p.icon)
 	popup.SetFont(font)
 
-	p.headerLabel = NewHeaderLabel(p.doQuery)
-	p.headerLabel.SetFont(font)
-	p.headerLabel.SetMouseTracking(true)
-
 	p.articleView = NewArticleView(p.doQuery)
 	p.articleView.Widget.SetFont(font)
 	p.articleView.SetupCustomHandlers()
@@ -106,11 +101,9 @@ func (p *ScanPopup) init() {
 	}
 
 	popup.OnKeyPressEvent(p.onKeyPress)
-	p.headerLabel.OnKeyPressEvent(p.onKeyPress)
 	p.articleView.Browser.OnKeyPressEvent(p.onKeyPress)
 
 	for _, widget := range []HasOnMouseEvents{
-		p.headerLabel,
 		popup,
 	} {
 		widget.OnMousePressEvent(p.onDragMousePress)
@@ -119,8 +112,6 @@ func (p *ScanPopup) init() {
 	}
 
 	popupLayout := qt.NewQVBoxLayout(popup)
-
-	headerBox := qt.NewQHBoxLayout2()
 
 	closeButton := qt.NewQPushButton3(" close ")
 	closeButton.SetFont(font)
@@ -137,13 +128,13 @@ func (p *ScanPopup) init() {
 	// 	"Remove this term from favorites",
 	// )
 
-	headerButtonBox := qt.NewQVBoxLayout2()
-	headerButtonBox.AddWidget(closeButton.QWidget)
-	headerButtonBox.AddWidget(mainButton.QWidget)
+	headerButtonBox := qt.NewQHBoxLayout2()
 	headerButtonBox.AddStretch()
+	headerButtonBox.AddWidget(mainButton.QWidget)
+	headerButtonBox.AddWidget(closeButton.QWidget)
 
-	popupLayout.SetContentsMargins(5, 5, 5, 5)
-	headerBox.SetContentsMargins(0, 0, 0, 0)
+	popupLayout.SetContentsMargins(5, 0, 5, 5)
+	popupLayout.SetSpacing(0)
 	headerButtonBox.SetContentsMargins(0, 0, 0, 0)
 	headerButtonBox.SetSpacing(0)
 
@@ -157,12 +148,7 @@ func (p *ScanPopup) init() {
 	// closeButton.SetContentsMargins(5, 0, 5, 0)
 	// mainButton.SetContentsMargins(5, 0, 5, 0)
 
-	headerBox.AddWidget2(p.headerLabel.QWidget, 10)
-	headerBox.AddStretch()
-	headerBox.AddLayout(headerButtonBox.QLayout)
-
-	popupLayout.AddLayout(headerBox.QLayout)
-	// headerBox.AddWidget(favoriteButton.QWidget)
+	popupLayout.AddLayout(headerButtonBox.QLayout)
 	popupLayout.AddWidget2(p.articleView.Widget, 10)
 }
 
@@ -183,8 +169,7 @@ func (p *ScanPopup) doQuery(query string) {
 	if conf.ScanPopupMinScore > int(res.Score())/2 {
 		return
 	}
-	p.articleView.SetResult(res)
-	p.headerLabel.SetResult(res)
+	p.articleView.SetResultWithHeader(res)
 	p.popup.SetWindowTitle(res.Terms()[0])
 	// favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(res.Terms()[0]))
 	p.autoResize()

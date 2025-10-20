@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
+	"github.com/ilius/ayandict/v3/pkg/headerlib"
 	"github.com/ilius/ayandict/v3/pkg/mp3duration"
 	common "github.com/ilius/go-dict-commons"
 	qt "github.com/mappu/miqt/qt6"
@@ -246,6 +247,27 @@ func (view *ArticleView) SetResult(res common.SearchResultIface) {
 		text2 = definitionStyleString + text2
 	}
 	view.Browser.SetHtml(text2)
+	if conf.Audio && conf.AudioAutoPlay > 0 {
+		go view.autoPlay(text, conf.AudioAutoPlay)
+	}
+}
+
+func (view *ArticleView) SetResultWithHeader(res common.SearchResultIface) {
+	header, err := headerlib.GetHeader(headerTpl, res)
+	if err != nil {
+		slog.Error("error formatting header label: " + err.Error())
+		return
+	}
+	view.dictName = res.DictName()
+	text := strings.Join(
+		res.DefinitionsHTML(),
+		"\n<br/>\n",
+	)
+	text2 := text
+	if definitionStyleString != "" {
+		text2 = definitionStyleString + text2
+	}
+	view.Browser.SetHtml(header + text2)
 	if conf.Audio && conf.AudioAutoPlay > 0 {
 		go view.autoPlay(text, conf.AudioAutoPlay)
 	}
