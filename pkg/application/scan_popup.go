@@ -6,6 +6,7 @@ import (
 
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/qplatform"
+	commons "github.com/ilius/go-dict-commons"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -55,6 +56,12 @@ type ScanPopup struct {
 
 	// set by init method:
 	articleView *ArticleView
+
+	// set by doQuery
+	results []commons.SearchResultIface
+
+	// set by doQuery, gotoNextResult, gotoPrevResult
+	resultIndex int
 
 	// dragPos: position of mouse relative to window, when drag starts
 	dragPos *qt.QPoint
@@ -122,6 +129,21 @@ func (p *ScanPopup) init() {
 	mainButton.SetFont(font)
 	mainButton.OnClicked(p.moveToMainWindow)
 
+	nextButton := qt.NewQPushButton3(" next ")
+	nextButton.SetFont(font)
+	nextButton.OnClicked(p.gotoNextResult)
+
+	prevButton := qt.NewQPushButton3(" prev ")
+	prevButton.SetFont(font)
+	prevButton.OnClicked(p.gotoPrevResult)
+
+	// favoriteButton := qt.NewQPushButton3("favorite")
+	// favoriteButton.SetFont(font)
+	// favoriteButton.SetCheckable(true)
+	// favoriteButton.OnToggled(func(checked bool) {
+	// 	// p.favoritesWidget.SetFavorite(term, checked)
+	// })
+
 	// favoriteButton := NewFavoriteButton(app.favoriteButtonClicked)
 	// favoriteButton.SetToolTips(
 	// 	"Add this term to favorites",
@@ -130,6 +152,8 @@ func (p *ScanPopup) init() {
 
 	headerButtonBox := qt.NewQHBoxLayout2()
 	headerButtonBox.AddStretch()
+	headerButtonBox.AddWidget(nextButton.QWidget)
+	headerButtonBox.AddWidget(prevButton.QWidget)
 	headerButtonBox.AddWidget(mainButton.QWidget)
 	headerButtonBox.AddWidget(closeButton.QWidget)
 
@@ -145,6 +169,8 @@ func (p *ScanPopup) init() {
 	const smallButtonSS = "margin: 0px;"
 	closeButton.SetStyleSheet(smallButtonSS)
 	mainButton.SetStyleSheet(smallButtonSS)
+	nextButton.SetStyleSheet(smallButtonSS)
+	prevButton.SetStyleSheet(smallButtonSS)
 	// closeButton.SetContentsMargins(5, 0, 5, 0)
 	// mainButton.SetContentsMargins(5, 0, 5, 0)
 
@@ -164,6 +190,8 @@ func (p *ScanPopup) doQuery(query string) {
 		p.popup.SetWindowTitle(query)
 		return
 	}
+	p.results = results
+	p.resultIndex = 0
 	res := results[0]
 	slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", res.Score()/2, "query", query)
 	if conf.ScanPopupMinScore > int(res.Score())/2 {
@@ -176,6 +204,32 @@ func (p *ScanPopup) doQuery(query string) {
 	if conf.ScanPopupHistory {
 		p.addHistory(query)
 	}
+}
+
+func (p *ScanPopup) gotoNextResult() {
+	index := p.resultIndex + 1
+	if index > len(p.results)-1 {
+		return
+	}
+	res := p.results[index]
+	p.resultIndex = index
+	p.articleView.SetResultWithHeader(res)
+	// if conf.ScanPopupHistory {
+	// 	p.addHistory(res.Terms()[0])
+	// }
+}
+
+func (p *ScanPopup) gotoPrevResult() {
+	index := p.resultIndex - 1
+	if index < 0 {
+		return
+	}
+	res := p.results[index]
+	p.resultIndex = index
+	p.articleView.SetResultWithHeader(res)
+	// if conf.ScanPopupHistory {
+	// 	p.addHistory(res.Terms()[0])
+	// }
 }
 
 func (p *ScanPopup) moveToMainWindow() {
