@@ -12,13 +12,6 @@ import (
 
 type QCloseEventFunc = func(super func(*qt.QCloseEvent), event *qt.QCloseEvent)
 
-type HasOnMouseEvents interface {
-	OnMousePressEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent))
-	OnMouseMoveEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent))
-	OnMouseReleaseEvent(func(super func(*qt.QMouseEvent), event *qt.QMouseEvent))
-	ObjectName() string
-}
-
 func NewScanPopup(
 	query string,
 	mode dictmgr.SearchMode,
@@ -109,16 +102,12 @@ func (p *ScanPopup) init() {
 
 	popup.OnKeyPressEvent(p.onKeyPress)
 
-	for _, widget := range []HasOnMouseEvents{
-		popup,
-	} {
-		widget.OnMousePressEvent(p.onDragMousePress)
-		widget.OnMouseMoveEvent(p.onDragMouseMove)
-		widget.OnMouseReleaseEvent(p.onDragMouseRelease)
-	}
+	popup.OnMousePressEvent(p.onMousePress)
+	popup.OnMouseMoveEvent(p.onMouseMove)
+	popup.OnMouseReleaseEvent(p.onMouseRelease)
 
 	p.articleView.Browser.OnMousePressEvent(func(super func(ev *qt.QMouseEvent), ev *qt.QMouseEvent) {
-		p.popup.ActivateWindow()
+		popup.ActivateWindow()
 		super(ev)
 	})
 
@@ -256,7 +245,7 @@ func (p *ScanPopup) onKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
 	}
 }
 
-func (p *ScanPopup) onDragMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+func (p *ScanPopup) onMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	if event.Button() != qt.LeftButton {
 		super(event)
 		return
@@ -265,7 +254,7 @@ func (p *ScanPopup) onDragMousePress(super func(*qt.QMouseEvent), event *qt.QMou
 	p.popup.ActivateWindow()
 }
 
-func (p *ScanPopup) onDragMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+func (p *ScanPopup) onMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	if p.dragPos == nil {
 		super(event)
 		return
@@ -276,7 +265,7 @@ func (p *ScanPopup) onDragMouseMove(super func(*qt.QMouseEvent), event *qt.QMous
 	)
 }
 
-func (p *ScanPopup) onDragMouseRelease(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+func (p *ScanPopup) onMouseRelease(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	p.dragPos = nil
 	super(event)
 }
