@@ -150,17 +150,17 @@ func (p *ScanPopup) init() {
 	// 	"Remove this term from favorites",
 	// )
 
-	headerButtonBox := qt.NewQHBoxLayout2()
-	headerButtonBox.AddStretch()
-	headerButtonBox.AddWidget(nextButton.QWidget)
-	headerButtonBox.AddWidget(prevButton.QWidget)
-	headerButtonBox.AddWidget(mainButton.QWidget)
-	headerButtonBox.AddWidget(closeButton.QWidget)
+	headerBox := qt.NewQHBoxLayout2()
+	headerBox.AddStretch()
+	headerBox.AddWidget(nextButton.QWidget)
+	headerBox.AddWidget(prevButton.QWidget)
+	headerBox.AddWidget(mainButton.QWidget)
+	headerBox.AddWidget(closeButton.QWidget)
 
 	popupLayout.SetContentsMargins(5, 0, 5, 5)
 	popupLayout.SetSpacing(0)
-	headerButtonBox.SetContentsMargins(0, 0, 0, 0)
-	headerButtonBox.SetSpacing(0)
+	headerBox.SetContentsMargins(0, 0, 0, 0)
+	headerBox.SetSpacing(0)
 
 	// buttons have no ContentsMargins by default
 	// setting "margin: 0px;" stylesheet mimimizes both the height and width
@@ -174,7 +174,7 @@ func (p *ScanPopup) init() {
 	// closeButton.SetContentsMargins(5, 0, 5, 0)
 	// mainButton.SetContentsMargins(5, 0, 5, 0)
 
-	popupLayout.AddLayout(headerButtonBox.QLayout)
+	popupLayout.AddLayout(headerBox.QLayout)
 	popupLayout.AddWidget2(p.articleView.Widget, 10)
 }
 
