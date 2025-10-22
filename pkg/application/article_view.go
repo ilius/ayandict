@@ -290,11 +290,11 @@ func (view *ArticleView) SetResult(res common.SearchResultIface) {
 	}
 }
 
-func (view *ArticleView) SetPopupResult(res common.SearchResultIface) {
+func (view *ArticleView) SetPopupResult(res common.SearchResultIface) *qt.QTimer {
 	header, err := headerlib.GetHeader(headerTpl, res)
 	if err != nil {
 		slog.Error("error formatting header label: " + err.Error())
-		return
+		return nil
 	}
 	view.dictName = res.DictName()
 	text := strings.Join(
@@ -306,10 +306,7 @@ func (view *ArticleView) SetPopupResult(res common.SearchResultIface) {
 		text2 = definitionStyleString + text2
 	}
 	view.Browser.SetHtml(header + text2)
-	timer := view.autoPlayOnResult(res, text)
-	if timer != nil {
-		timer.Start(0)
-	}
+	return view.autoPlayOnResult(res, text)
 }
 
 func (view *ArticleView) onContextMenuEvent(_ func(event *qt.QContextMenuEvent), event *qt.QContextMenuEvent) {

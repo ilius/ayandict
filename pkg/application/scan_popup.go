@@ -62,8 +62,6 @@ type ScanPopup struct {
 
 func (p *ScanPopup) Run() {
 	p.doQuery(p.query)
-	p.popup.Show()
-	p.popup.ActivateWindow()
 }
 
 func (p *ScanPopup) init() {
@@ -195,12 +193,18 @@ func (p *ScanPopup) doQuery(query string) {
 	if conf.ScanPopupMinScore > int(res.Score())/2 {
 		return
 	}
-	p.articleView.SetPopupResult(res)
+	playTimer := p.articleView.SetPopupResult(res)
 	p.popup.SetWindowTitle(res.Terms()[0])
 	// favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(res.Terms()[0]))
 	p.autoResize()
 	if conf.ScanPopupHistory {
 		p.addHistory(query)
+	}
+	p.popup.Show()
+	p.popup.ActivateWindow()
+	if playTimer != nil {
+		qt.QCoreApplication_ProcessEvents()
+		playTimer.Start(0)
 	}
 }
 
@@ -211,10 +215,13 @@ func (p *ScanPopup) gotoNextResult() {
 	}
 	res := p.results[index]
 	p.resultIndex = index
-	p.articleView.SetPopupResult(res)
+	playTimer := p.articleView.SetPopupResult(res)
 	// if conf.ScanPopupHistory {
 	// 	p.addHistory(res.Terms()[0])
 	// }
+	if playTimer != nil {
+		playTimer.Start(0)
+	}
 }
 
 func (p *ScanPopup) gotoPrevResult() {
@@ -224,10 +231,13 @@ func (p *ScanPopup) gotoPrevResult() {
 	}
 	res := p.results[index]
 	p.resultIndex = index
-	p.articleView.SetPopupResult(res)
+	playTimer := p.articleView.SetPopupResult(res)
 	// if conf.ScanPopupHistory {
 	// 	p.addHistory(res.Terms()[0])
 	// }
+	if playTimer != nil {
+		playTimer.Start(0)
+	}
 }
 
 func (p *ScanPopup) moveToMainWindow() {
