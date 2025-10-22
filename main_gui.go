@@ -12,7 +12,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/logging"
-	"github.com/ilius/ayandict/v3/pkg/server"
+	"github.com/ilius/ayandict/v3/pkg/webserver"
 )
 
 func runServerOnly(createConfig bool) {
@@ -30,7 +30,7 @@ func runServerOnly(createConfig bool) {
 		slog.Warn("Web is not enabled, set web_enable = true in " + config.Path())
 	}
 	dictmgr.InitDicts(conf)
-	server.StartServer(conf.LocalServerPorts[0])
+	webserver.StartServer(conf.LocalServerPorts[0])
 }
 
 func main() {

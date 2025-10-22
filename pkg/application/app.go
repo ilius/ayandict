@@ -18,7 +18,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/logging"
 	"github.com/ilius/ayandict/v3/pkg/qlocalserver"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
-	"github.com/ilius/ayandict/v3/pkg/server"
+	"github.com/ilius/ayandict/v3/pkg/webserver"
 	qt "github.com/mappu/miqt/qt6"
 	"github.com/mappu/miqt/qt6/network"
 )
@@ -153,7 +153,7 @@ func (app *Application) Run() {
 			slog.Error("another instance is running")
 			return
 		}
-		go server.StartServer(conf.LocalServerPorts[0])
+		go webserver.StartServer(conf.LocalServerPorts[0])
 	}
 	if !qlocalserver.StartLocalSocketServer(
 		conf,

@@ -10,7 +10,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/logging"
-	"github.com/ilius/ayandict/v3/pkg/server"
+	"github.com/ilius/ayandict/v3/pkg/webserver"
 )
 
 func main() {
@@ -53,5 +53,5 @@ func main() {
 	}
 
 	dictmgr.InitDicts(conf)
-	server.StartServer(conf.LocalServerPorts[0])
+	webserver.StartServer(conf.LocalServerPorts[0])
 }
