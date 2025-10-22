@@ -153,6 +153,11 @@ func (p *ScanPopup) init() {
 	headerBox.AddWidget(mainButton.QWidget)
 	headerBox.AddWidget(closeButton.QWidget)
 
+	nextButton.SetFocusPolicy(qt.NoFocus)
+	prevButton.SetFocusPolicy(qt.NoFocus)
+	mainButton.SetFocusPolicy(qt.NoFocus)
+	closeButton.SetFocusPolicy(qt.NoFocus)
+
 	popupLayout.SetContentsMargins(5, 0, 5, 5)
 	popupLayout.SetSpacing(0)
 	headerBox.SetContentsMargins(0, 0, 0, 0)
