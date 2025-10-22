@@ -52,7 +52,9 @@ func showKeyBindings(parent *qt.QWidget, icon *qt.QIcon) {
 	buttonBox.AddButton2(
 		"  Close  ",
 		qt.QDialogButtonBox__AcceptRole,
-	).OnClicked(func() { dialog.Close() })
+	).OnClicked(func() {
+		_ = dialog.Close()
+	})
 
 	mainBox := qt.NewQVBoxLayout2()
 	mainBox.AddLayout2(layout.Layout(), 1)

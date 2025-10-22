@@ -27,9 +27,7 @@ func NewDictFlagsCheckboxes(hide func()) *DictFlagsCheckboxes {
 
 	hbox.AddSpacing(30) // TODO: parameterize
 	hideButton := qt.NewQPushButton3("Hide")
-	hideButton.OnClicked(func() {
-		hide()
-	})
+	hideButton.OnClicked(hide)
 	hbox.AddWidget(hideButton.QWidget)
 
 	return w

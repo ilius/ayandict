@@ -79,12 +79,8 @@ func NewDictManager(
 	okButton := buttonBox.AddButton2("OK", qt.QDialogButtonBox__AcceptRole)
 	cancelButton := buttonBox.AddButton2("Cancel", qt.QDialogButtonBox__RejectRole)
 
-	okButton.OnClicked(func() {
-		window.Accept()
-	})
-	cancelButton.OnClicked(func() {
-		window.Reject()
-	})
+	okButton.OnClicked(window.Accept)
+	cancelButton.OnClicked(window.Reject)
 
 	dictMgr := &DictManager{
 		Dialog:      window,
@@ -269,9 +265,7 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 	extraOptionsWidget.SetLayout(extraOptionsVBox.Layout())
 	extraOptionsWidget.Hide()
 
-	flagsCBWidget := NewDictFlagsCheckboxes(func() {
-		extraOptionsWidget.Hide()
-	})
+	flagsCBWidget := NewDictFlagsCheckboxes(extraOptionsWidget.Hide)
 	extraOptionsVBox.AddWidget(flagsCBWidget.QWidget)
 
 	volumeHBox := qt.NewQHBoxLayout2()

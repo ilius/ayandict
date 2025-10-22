@@ -98,7 +98,7 @@ func aboutClickedWidget(widget *qt.QWidget, icon *qt.QIcon) {
 	})
 	closeButton := buttonBox.AddButton2("  Close  ", qt.QDialogButtonBox__AcceptRole)
 	closeButton.OnClicked(func() {
-		widget.Close()
+		_ = widget.Close()
 	})
 	// closeButton.SetDefault(true)
 
