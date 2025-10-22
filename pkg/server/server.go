@@ -15,6 +15,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/headerlib"
+	"github.com/ilius/ayandict/v3/pkg/jsonapi"
 	"github.com/ilius/ayandict/v3/pkg/logging"
 	"github.com/ilius/ayandict/v3/web"
 	common "github.com/ilius/go-dict-commons"
@@ -45,20 +46,6 @@ const resultFlags = uint32(common.ResultFlag_FixAudio |
 	common.ResultFlag_FixFileSrc |
 	common.ResultFlag_Web)
 
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
-type Result struct {
-	DictName        string   `json:"dictName"`
-	Terms           []string `json:"terms"`
-	DefinitionsHTML []string `json:"definitionsHTML"`
-	EntryIndex      uint64   `json:"entryIndex"`
-	Score           uint8    `json:"score"`
-	HeaderHTML      string   `json:"header_html"`
-	// ResourceDir string
-}
-
 func writeMsg(w http.ResponseWriter, msg string) {
 	_, err := w.Write([]byte(msg))
 	if err != nil {
@@ -72,15 +59,15 @@ func getAppName(w http.ResponseWriter, _ *http.Request) {
 
 func badRequest(w http.ResponseWriter, msg string) {
 	jsonEncoder := json.NewEncoder(w)
-	err := jsonEncoder.Encode(ErrorResponse{Error: msg})
+	err := jsonEncoder.Encode(jsonapi.ErrorResponse{Error: msg})
 	if err != nil {
 		logger.Error("error in jsonEncoder.Encode", "err", err)
 	}
 	w.WriteHeader(http.StatusBadRequest)
 }
 
-func encodeResults(w http.ResponseWriter, raw_results []common.SearchResultIface) []Result {
-	results := make([]Result, len(raw_results))
+func encodeResults(w http.ResponseWriter, raw_results []common.SearchResultIface) []jsonapi.Result {
+	results := make([]jsonapi.Result, len(raw_results))
 	for i, res := range raw_results {
 		header, err := headerlib.GetHeader(headerTpl, res)
 		if err != nil {
@@ -88,7 +75,7 @@ func encodeResults(w http.ResponseWriter, raw_results []common.SearchResultIface
 			w.WriteHeader(http.StatusInternalServerError)
 			return nil
 		}
-		results[i] = Result{
+		results[i] = jsonapi.Result{
 			DictName:        res.DictName(),
 			Terms:           res.Terms(),
 			DefinitionsHTML: res.DefinitionsHTML(),
@@ -149,7 +136,7 @@ func api_query(w http.ResponseWriter, r *http.Request) {
 	err := jsonEncoder.Encode(results)
 	if err != nil {
 		logger.Error("error in jsonEncoder.Encode", "err", err)
-		err2 := jsonEncoder.Encode(ErrorResponse{Error: err.Error()})
+		err2 := jsonEncoder.Encode(jsonapi.ErrorResponse{Error: err.Error()})
 		if err2 != nil {
 			logger.Error("error in jsonEncoder.Encode", "err2", err2)
 		}
@@ -163,7 +150,7 @@ func api_random(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	entry := dictmgr.RandomEntry(conf, resultFlags)
-	err := jsonEncoder.Encode(Result{
+	err := jsonEncoder.Encode(jsonapi.Result{
 		DictName:        entry.DictName(),
 		Terms:           entry.Terms(),
 		DefinitionsHTML: entry.DefinitionsHTML(),
@@ -172,7 +159,7 @@ func api_random(w http.ResponseWriter, _ *http.Request) {
 	})
 	if err != nil {
 		logger.Error("error in jsonEncoder.Encode", "err", err)
-		err2 := jsonEncoder.Encode(ErrorResponse{Error: err.Error()})
+		err2 := jsonEncoder.Encode(jsonapi.ErrorResponse{Error: err.Error()})
 		if err2 != nil {
 			logger.Error("error in jsonEncoder.Encode", "err2", err2)
 		}

@@ -8,6 +8,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/headerlib"
+	"github.com/ilius/ayandict/v3/pkg/jsonapi"
 	common "github.com/ilius/go-dict-commons"
 	"github.com/mappu/miqt/qt6/network"
 )
@@ -24,20 +25,6 @@ const sockerResultFlags = uint32(
 		common.ResultFlag_FixFileSrc |
 		common.ResultFlag_Web,
 )
-
-type SocketError struct {
-	Error string `json:"error"`
-}
-
-type SocketResult struct {
-	DictName        string   `json:"dictName"`
-	Terms           []string `json:"terms"`
-	DefinitionsHTML []string `json:"definitionsHTML"`
-	EntryIndex      uint64   `json:"entryIndex"`
-	Score           uint8    `json:"score"`
-	HeaderHTML      string   `json:"header_html"`
-	// ResourceDir string
-}
 
 func (app *Application) startLocalSocketServer() bool {
 	server := network.NewQLocalServer()
@@ -66,14 +53,14 @@ func (app *Application) startLocalSocketServer() bool {
 	return true
 }
 
-func encodeSocketResults(raw_results []common.SearchResultIface) ([]SocketResult, error) {
-	results := make([]SocketResult, len(raw_results))
+func encodeSocketResults(raw_results []common.SearchResultIface) ([]jsonapi.Result, error) {
+	results := make([]jsonapi.Result, len(raw_results))
 	for i, res := range raw_results {
 		header, err := headerlib.GetHeader(headerTpl, res)
 		if err != nil {
 			return nil, err
 		}
-		results[i] = SocketResult{
+		results[i] = jsonapi.Result{
 			DictName:        res.DictName(),
 			Terms:           res.Terms(),
 			DefinitionsHTML: res.DefinitionsHTML(),
@@ -90,7 +77,7 @@ func socketQuery(conn *network.QLocalSocket, cmd string) {
 	defer conn.Flush()
 	sendError := func(msg string) {
 		slog.Error("error in socketQuery", "err", msg)
-		data, err := json.Marshal(SocketError{Error: msg})
+		data, err := json.Marshal(jsonapi.ErrorResponse{Error: msg})
 		if err != nil {
 			slog.Error("error in json.Marshal", "err", err)
 		} else {
