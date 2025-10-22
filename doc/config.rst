@@ -224,7 +224,13 @@ Default value: ``1``
 --------------------------------
 Wait time between multiple audio files on auto-play
 
-Default value: ``"500ms"``
+Default value: ``"800ms"``
+
+``audio_auto_play_min_socre``
+-----------------------------
+Minimum score for audio auto-play
+
+Default value: ``100``
 
 ``audio_volume``
 ----------------

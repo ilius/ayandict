@@ -148,11 +148,11 @@ func (view *ArticleView) SetSearchPaths(p []string) {
 	view.Browser.SetSearchPaths(p)
 }
 
-func (view *ArticleView) playAudioMPV(urlStr string) bool {
+func (view *ArticleView) playAudioMPV(urlStr string) {
 	path, err := exec.LookPath("mpv")
 	if err != nil {
 		slog.Error("error in LookPath", "err", err)
-		return false
+		return
 	}
 	args := []string{
 		path,
@@ -162,28 +162,46 @@ func (view *ArticleView) playAudioMPV(urlStr string) bool {
 	volume := dictmgr.AudioVolume(view.dictName) * conf.AudioVolume / 100
 	args = append(args, "--volume="+strconv.FormatInt(int64(volume), 10))
 	cmd := exec.Cmd{
-		Path:   path,
-		Args:   args,
-		Stdout: os.Stdout,
+		Path: path,
+		Args: args,
+		// Stdout: os.Stdout, // messes up terminal input (blocks echoing)
 		Stderr: os.Stderr,
 	}
 	err = cmd.Start()
 	if err != nil {
 		slog.Error("error in mpv: Start", "err", err)
-		return false
+		return
 	}
-	return true
+	cmd.Wait()
 }
 
-func (view *ArticleView) playAudio(qUrl *qt.QUrl) {
+// we want to change volume based on view.dictName
+// for our use case, it's okay to create a new QAudioOutput every time
+func (view *ArticleView) getAudioOutput() *multimedia.QAudioOutput {
+	audioOutput := multimedia.NewQAudioOutput()
+	audioOutput.SetVolume(
+		float32(dictmgr.AudioVolume(view.dictName)) * float32(conf.AudioVolume) / 10000,
+	)
+	return audioOutput
+}
+
+// must not block for long, or Qt will freeze
+// player.Play does not wait for audio to finish
+// but this still slows down search-on-type
+// that's one reason I added conf.AudioAutoPlayMinScore
+// that and also playing audio for unfinished word was annoying
+func (view *ArticleView) playAudio(audioOutput *multimedia.QAudioOutput, qUrl *qt.QUrl) {
 	urlStr := qUrl.ToLocalFile()
 	slog.Info("Playing audio", "url", urlStr)
-	if conf.AudioMPV && view.playAudioMPV(urlStr) {
+	if conf.AudioMPV {
+		go view.playAudioMPV(urlStr)
 		return
 	}
 	player := view.mediaPlayer
 	player.SetSource(qUrl)
-	player.Play()
+	player.SetAudioOutput(audioOutput)
+	player.Play() // does not block
+	// player.OnPlaybackStateChanged is called when playing audio is finished
 }
 
 func (view *ArticleView) autoPlay(text string, count int) {
@@ -191,6 +209,7 @@ func (view *ArticleView) autoPlay(text string, count int) {
 		return
 	}
 	defer view.autoPlayMutex.Unlock()
+	audioOutput := view.getAudioOutput()
 	matches := audioUrlRE.FindAllString(text, count)
 	lastIndex := len(matches) - 1
 	for index, match := range matches {
@@ -211,7 +230,7 @@ func (view *ArticleView) autoPlay(text string, count int) {
 				isRemote = false
 			}
 		}
-		view.playAudio(qUrl)
+		view.playAudio(audioOutput, qUrl)
 		// slog.Info("Duration:", player.Duration())
 		// player.Duration() is always zero
 		if isRemote {
@@ -236,6 +255,24 @@ func (view *ArticleView) autoPlay(text string, count int) {
 	}
 }
 
+func (view *ArticleView) autoPlayOnResult(res common.SearchResultIface, text string) {
+	if !conf.Audio {
+		return
+	}
+	if conf.AudioAutoPlay <= 0 {
+		return
+	}
+	if res.Score()/2 < conf.AudioAutoPlayMinScore {
+		return
+	}
+	timer := qt.NewQTimer()
+	timer.SetSingleShot(true)
+	timer.OnTimeout(func() {
+		view.autoPlay(text, conf.AudioAutoPlay)
+	})
+	timer.Start(0)
+}
+
 func (view *ArticleView) SetResult(res common.SearchResultIface) {
 	view.dictName = res.DictName()
 	text := strings.Join(
@@ -247,9 +284,7 @@ func (view *ArticleView) SetResult(res common.SearchResultIface) {
 		text2 = definitionStyleString + text2
 	}
 	view.Browser.SetHtml(text2)
-	if conf.Audio && conf.AudioAutoPlay > 0 {
-		go view.autoPlay(text, conf.AudioAutoPlay)
-	}
+	view.autoPlayOnResult(res, text)
 }
 
 func (view *ArticleView) SetResultWithHeader(res common.SearchResultIface) {
@@ -268,9 +303,7 @@ func (view *ArticleView) SetResultWithHeader(res common.SearchResultIface) {
 		text2 = definitionStyleString + text2
 	}
 	view.Browser.SetHtml(header + text2)
-	if conf.Audio && conf.AudioAutoPlay > 0 {
-		go view.autoPlay(text, conf.AudioAutoPlay)
-	}
+	view.autoPlayOnResult(res, text)
 }
 
 func (view *ArticleView) onContextMenuEvent(_ func(event *qt.QContextMenuEvent), event *qt.QContextMenuEvent) {
@@ -436,7 +469,8 @@ func (view *ArticleView) setupAnchorClicked() {
 		case "file":
 			switch filepath.Ext(path) {
 			case ".mp3", ".wav", ".ogg":
-				view.playAudio(qUrl)
+				audioOutput := view.getAudioOutput()
+				view.playAudio(audioOutput, qUrl)
 				return
 			}
 		case "http", "https":
@@ -448,7 +482,8 @@ func (view *ArticleView) setupAnchorClicked() {
 				} else {
 					qUrl = qUrlLocal
 				}
-				view.playAudio(qUrl)
+				audioOutput := view.getAudioOutput()
+				view.playAudio(audioOutput, qUrl)
 				return
 			}
 		}

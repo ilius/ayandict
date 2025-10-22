@@ -106,6 +106,8 @@ type Config struct {
 
 	AudioAutoPlayWaitBetween time.Duration `toml:"audio_auto_play_wait_between" doc:"Wait time between multiple audio files on auto-play"`
 
+	AudioAutoPlayMinScore uint8 `toml:"audio_auto_play_min_socre" doc:"Minimum score for audio auto-play"`
+
 	AudioVolume int `toml:"audio_volume" doc:"Volume for playing audio, 0 to 100 (% multiplied by dict-specofic volume)"`
 
 	EmbedExternalStylesheet bool `toml:"embed_external_stylesheet" doc:"Embed external stylesheet/css in article"`
@@ -226,9 +228,9 @@ func Default() *Config {
 
 		AudioDownloadTimeout: 1000 * time.Millisecond,
 
-		AudioAutoPlay: 1,
-
-		AudioAutoPlayWaitBetween: 500 * time.Millisecond,
+		AudioAutoPlay:            1,
+		AudioAutoPlayWaitBetween: 800 * time.Millisecond,
+		AudioAutoPlayMinScore:    100,
 
 		AudioVolume: 70,
 
