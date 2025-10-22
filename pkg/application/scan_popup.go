@@ -12,6 +12,8 @@ import (
 
 type QCloseEventFunc = func(super func(*qt.QCloseEvent), event *qt.QCloseEvent)
 
+var aboutToDragCursor = qt.PointingHandCursor
+
 func NewScanPopup(
 	query string,
 	mode dictmgr.SearchMode,
@@ -58,6 +60,9 @@ type ScanPopup struct {
 
 	// dragPos: position of mouse relative to window, when drag starts
 	dragPos *qt.QPoint
+
+	// header label that you use to drag
+	dragLabel *qt.QLabel
 }
 
 func (p *ScanPopup) Run() {
@@ -145,7 +150,8 @@ func (p *ScanPopup) init() {
 	headerBox := qt.NewQHBoxLayout2()
 	{
 		label := qt.NewQLabel2()
-		label.SetCursor(qt.NewQCursor2(qt.DragMoveCursor))
+		p.dragLabel = label
+		label.SetCursor(qt.NewQCursor2(aboutToDragCursor))
 		headerBox.AddWidget2(label.QWidget, 1)
 	}
 	headerBox.AddWidget(nextButton.QWidget)
@@ -272,6 +278,7 @@ func (p *ScanPopup) onMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEv
 	}
 	p.dragPos = event.Pos()
 	p.popup.ActivateWindow()
+	p.dragLabel.SetCursor(qt.NewQCursor2(qt.DragMoveCursor))
 }
 
 func (p *ScanPopup) onMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
@@ -287,6 +294,7 @@ func (p *ScanPopup) onMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEve
 
 func (p *ScanPopup) onMouseRelease(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	p.dragPos = nil
+	p.dragLabel.SetCursor(qt.NewQCursor2(aboutToDragCursor))
 	super(event)
 }
 
