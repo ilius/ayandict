@@ -32,7 +32,7 @@ const (
 
 var (
 	dummyParagRE = regexp.MustCompile(`<p [^<>]*><br />(</p>|$)`)
-	audioUrlRE   = regexp.MustCompile(`href="[^<>"]+\.(mp3|spx)"`)
+	audioUrlRE   = regexp.MustCompile(`href="[^<>"]+\.(mp3|spx|wav|ogg|oga|opus)"`)
 )
 
 type CursorAndCharFormat struct {
