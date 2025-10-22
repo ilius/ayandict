@@ -172,7 +172,7 @@ func (view *ArticleView) playAudioMPV(urlStr string) {
 		slog.Error("error in mpv: Start", "err", err)
 		return
 	}
-	cmd.Wait()
+	// err = cmd.Wait()
 }
 
 // we want to change volume based on view.dictName
@@ -607,11 +607,8 @@ func (view *ArticleView) highlightAll(query string) {
 	formatCurrent.SetForeground(qt.NewQBrush3(currentFg))
 	formatCurrent.SetFontWeight(int(qt.QFont__Bold))
 
-	// First clear any previous highlight format only (non-destructive)
-	cursor := qt.NewQTextCursor2(doc)
-
 	// Apply new highlights
-	cursor = qt.NewQTextCursor2(doc)
+	cursor := qt.NewQTextCursor2(doc)
 
 	lastFormats := []CursorAndCharFormat{}
 	for {

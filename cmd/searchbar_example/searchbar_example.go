@@ -92,11 +92,8 @@ func (view *SearchableQTextBrowser) highlightAll(query string) {
 	formatCurrent.SetForeground(qt.NewQBrush3(currentFg))
 	formatCurrent.SetFontWeight(int(qt.QFont__Bold))
 
-	// First clear any previous highlight format only (non-destructive)
-	cursor := qt.NewQTextCursor2(doc)
-
 	// Apply new highlights
-	cursor = qt.NewQTextCursor2(doc)
+	cursor := qt.NewQTextCursor2(doc)
 
 	lastFormats := []CursorAndCharFormat{}
 	for {

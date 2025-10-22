@@ -23,9 +23,9 @@ var (
 	DictSettingsMap = map[string]*DictionarySettings{}
 )
 
-var sqldictOpen = func([]string, map[string]int) []common.Dictionary {
-	return nil
-}
+// var sqldictOpen = func([]string, map[string]int) []common.Dictionary {
+// 	return nil
+// }
 
 func init() {
 	stardict.ErrorHandler = func(err error) {
@@ -128,7 +128,10 @@ func createDirectories(conf *config.Config) {
 		_, err := os.Stat(dirPath)
 		if err != nil && os.IsNotExist(err) {
 			slog.Info("Creating directory", "path", dirPath)
-			os.MkdirAll(dirPath, 0o755)
+			err = os.MkdirAll(dirPath, 0o755)
+			if err != nil {
+				slog.Error("error creating directiry", "err", err, "path", dirPath)
+			}
 		}
 	}
 }
