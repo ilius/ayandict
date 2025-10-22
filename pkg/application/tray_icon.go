@@ -10,7 +10,7 @@ func (app *Application) setupTrayIcon(icon *qt.QIcon) {
 	trayIcon := qt.NewQSystemTrayIcon2(icon)
 	app.trayIcon = trayIcon
 	trayIcon.OnActivated(func(reason qt.QSystemTrayIcon__ActivationReason) {
-		app.onStatusIconClick()
+		app.statusIconActivate()
 	})
 	trayIcon.OnMessageClicked(func() {
 		slog.Info("trayIcon.OnMessageClicked")

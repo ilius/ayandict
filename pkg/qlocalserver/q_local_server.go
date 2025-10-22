@@ -1,11 +1,13 @@
-package application
+package qlocalserver
 
 import (
 	"encoding/json"
+	"html/template"
 	"log/slog"
 	"strings"
 
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
+	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/headerlib"
 	"github.com/ilius/ayandict/v3/pkg/jsonapi"
@@ -26,7 +28,17 @@ const sockerResultFlags = uint32(
 		common.ResultFlag_Web,
 )
 
-func (app *Application) startLocalSocketServer() bool {
+var headerTpl *template.Template
+
+func SetHeaderTemplate(tpl *template.Template) {
+	headerTpl = tpl
+}
+
+func StartLocalSocketServer(
+	conf *config.Config,
+	scanPopup func(query string),
+	statusIconActivate func(),
+) bool {
 	server := network.NewQLocalServer()
 	if !server.Listen(appinfo.LOCAL_SOCKET_NAME) {
 		return false
@@ -39,12 +51,12 @@ func (app *Application) startLocalSocketServer() bool {
 			if strings.HasPrefix(cmd, s_scanPopup) {
 				if conf.ScanPopupAPI {
 					query := cmd[len(s_scanPopup):]
-					app.scanPopup(query)
+					scanPopup(query)
 				}
 			} else if cmd == s_statusIconActivate {
-				app.onStatusIconClick()
+				statusIconActivate()
 			} else if strings.HasPrefix(cmd, s_query) {
-				socketQuery(conn, cmd[len(s_query):])
+				apiQuery(conf, conn, cmd[len(s_query):])
 			} else {
 				slog.Warn("server: unsupported command", "cmd", cmd)
 			}
@@ -53,7 +65,7 @@ func (app *Application) startLocalSocketServer() bool {
 	return true
 }
 
-func encodeSocketResults(raw_results []common.SearchResultIface) ([]jsonapi.Result, error) {
+func encodeResults(raw_results []common.SearchResultIface) ([]jsonapi.Result, error) {
 	results := make([]jsonapi.Result, len(raw_results))
 	for i, res := range raw_results {
 		header, err := headerlib.GetHeader(headerTpl, res)
@@ -73,7 +85,7 @@ func encodeSocketResults(raw_results []common.SearchResultIface) ([]jsonapi.Resu
 	return results, nil
 }
 
-func socketQuery(conn *network.QLocalSocket, cmd string) {
+func apiQuery(conf *config.Config, conn *network.QLocalSocket, cmd string) {
 	defer conn.Flush()
 	sendError := func(msg string) {
 		slog.Error("error in socketQuery", "err", msg)
@@ -97,7 +109,7 @@ func socketQuery(conn *network.QLocalSocket, cmd string) {
 	query := parts[1]
 	raw_results := dictmgr.LookupHTML(query, conf, mode, sockerResultFlags, s_limit)
 	// pass resultFlags to LookupHTML
-	results, err := encodeSocketResults(raw_results)
+	results, err := encodeResults(raw_results)
 	if err != nil {
 		sendError(err.Error())
 		return

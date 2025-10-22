@@ -119,7 +119,7 @@ func (w *DektopWidget) onMouseRelease(super func(event *qt.QMouseEvent), event *
 		dx := absInt(pos.X() - w.dragPosGlobal.X())
 		dy := absInt(pos.Y() - w.dragPosGlobal.Y())
 		if dx < 2 && dy < 2 {
-			w.app.onStatusIconClick()
+			w.app.statusIconActivate()
 		}
 		w.dragPosGlobal = nil
 	}

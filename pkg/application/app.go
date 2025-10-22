@@ -16,6 +16,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/qdictmgr"
 	"github.com/ilius/ayandict/v3/pkg/logging"
+	"github.com/ilius/ayandict/v3/pkg/qlocalserver"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
 	"github.com/ilius/ayandict/v3/pkg/server"
 	qt "github.com/mappu/miqt/qt6"
@@ -154,7 +155,11 @@ func (app *Application) Run() {
 		}
 		go server.StartServer(conf.LocalServerPorts[0])
 	}
-	if !app.startLocalSocketServer() {
+	if !qlocalserver.StartLocalSocketServer(
+		conf,
+		app.scanPopup,
+		app.statusIconActivate,
+	) {
 		slog.Error("another instance is running, or dead socket (/tmp/ayandict*)")
 		return
 	}
@@ -544,7 +549,7 @@ func (app *Application) updateMiscButtonsPadding() {
 	app.randomFavoriteButton.SetStyleSheet(stylesheet)
 }
 
-func (app *Application) onStatusIconClick() {
+func (app *Application) statusIconActivate() {
 	window := app.window
 	if window.IsActiveWindow() {
 		window.Hide()

@@ -9,6 +9,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/qdictmgr"
 	"github.com/ilius/ayandict/v3/pkg/headerlib"
+	"github.com/ilius/ayandict/v3/pkg/qlocalserver"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -58,6 +59,7 @@ func LoadConfig() bool {
 			slog.Error("error loading header template: " + err.Error())
 		} else {
 			headerTpl = tpl
+			qlocalserver.SetHeaderTemplate(tpl)
 		}
 	}
 	return true

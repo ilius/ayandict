@@ -25,14 +25,14 @@ func (app *Application) onScanPopupCloseEvent(super func(*qt.QCloseEvent), event
 	app.scanPopupCount.Add(-1)
 }
 
-func (app *Application) scanPopup(query string) *ScanPopup {
+func (app *Application) scanPopup(query string) {
 	if conf.ScanPopupMaxCount > 0 && app.scanPopupCount.Load() >= conf.ScanPopupMaxCount {
-		return nil
+		return
 	}
 	query = strings.TrimSpace(query)
 	query = strings.Trim(query, punctuation)
 	if query == "" {
-		return nil
+		return
 	}
 	mode, valid := dictmgr.SearchModeByName(conf.ScanPopupMode)
 	if !valid {
@@ -51,7 +51,6 @@ func (app *Application) scanPopup(query string) *ScanPopup {
 		app.onScanPopupCloseEvent,
 	)
 	p.Run()
-	return p
 }
 
 func (app *Application) showWindowAndQuery(query string) {
