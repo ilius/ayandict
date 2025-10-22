@@ -287,7 +287,7 @@ func (view *ArticleView) SetResult(res common.SearchResultIface) {
 	view.autoPlayOnResult(res, text)
 }
 
-func (view *ArticleView) SetResultWithHeader(res common.SearchResultIface) {
+func (view *ArticleView) SetPopupResult(res common.SearchResultIface) {
 	header, err := headerlib.GetHeader(headerTpl, res)
 	if err != nil {
 		slog.Error("error formatting header label: " + err.Error())

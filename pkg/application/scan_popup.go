@@ -195,7 +195,7 @@ func (p *ScanPopup) doQuery(query string) {
 	if conf.ScanPopupMinScore > int(res.Score())/2 {
 		return
 	}
-	p.articleView.SetResultWithHeader(res)
+	p.articleView.SetPopupResult(res)
 	p.popup.SetWindowTitle(res.Terms()[0])
 	// favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(res.Terms()[0]))
 	p.autoResize()
@@ -211,7 +211,7 @@ func (p *ScanPopup) gotoNextResult() {
 	}
 	res := p.results[index]
 	p.resultIndex = index
-	p.articleView.SetResultWithHeader(res)
+	p.articleView.SetPopupResult(res)
 	// if conf.ScanPopupHistory {
 	// 	p.addHistory(res.Terms()[0])
 	// }
@@ -224,7 +224,7 @@ func (p *ScanPopup) gotoPrevResult() {
 	}
 	res := p.results[index]
 	p.resultIndex = index
-	p.articleView.SetResultWithHeader(res)
+	p.articleView.SetPopupResult(res)
 	// if conf.ScanPopupHistory {
 	// 	p.addHistory(res.Terms()[0])
 	// }
