@@ -471,14 +471,14 @@ func (view *ArticleView) setupAnchorClicked() {
 			return
 		case "file":
 			switch filepath.Ext(path) {
-			case ".mp3", ".wav", ".ogg":
+			case ".mp3", ".spx", ".wav", ".ogg", ".oga", ".opus":
 				audioOutput := view.getAudioOutput()
 				view.playAudio(audioOutput, qUrl)
 				return
 			}
 		case "http", "https":
 			switch filepath.Ext(path) {
-			case ".mp3", ".wav", ".ogg":
+			case ".mp3", ".spx", ".wav", ".ogg", ".oga", ".opus":
 				qUrlLocal, err := audioCache.Get(qUrl.ToString()) // qt.QUrl__None
 				if err != nil {
 					slog.Error("error", "err", err)
