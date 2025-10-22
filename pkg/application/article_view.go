@@ -255,14 +255,11 @@ func (view *ArticleView) autoPlay(text string, count int) {
 	}
 }
 
-func (view *ArticleView) autoPlayOnResult(res common.SearchResultIface, text string) *qt.QTimer {
+func (view *ArticleView) autoPlayOnResult(text string) *qt.QTimer {
 	if !conf.Audio {
 		return nil
 	}
 	if conf.AudioAutoPlay <= 0 {
-		return nil
-	}
-	if res.Score()/2 < conf.AudioAutoPlayMinScore {
 		return nil
 	}
 	timer := qt.NewQTimer()
@@ -284,9 +281,11 @@ func (view *ArticleView) SetResult(res common.SearchResultIface) {
 		text2 = definitionStyleString + text2
 	}
 	view.Browser.SetHtml(text2)
-	timer := view.autoPlayOnResult(res, text)
-	if timer != nil {
-		timer.Start(0)
+	if res.Score()/2 >= conf.AudioAutoPlayMinScore {
+		timer := view.autoPlayOnResult(text)
+		if timer != nil {
+			timer.Start(0)
+		}
 	}
 }
 
@@ -306,7 +305,7 @@ func (view *ArticleView) SetPopupResult(res common.SearchResultIface) *qt.QTimer
 		text2 = definitionStyleString + text2
 	}
 	view.Browser.SetHtml(header + text2)
-	return view.autoPlayOnResult(res, text)
+	return view.autoPlayOnResult(text)
 }
 
 func (view *ArticleView) onContextMenuEvent(_ func(event *qt.QContextMenuEvent), event *qt.QContextMenuEvent) {
