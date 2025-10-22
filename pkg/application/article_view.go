@@ -63,7 +63,7 @@ func NewArticleView(app *Application) *ArticleView {
 	}
 }
 
-var audioUrlRE = regexp.MustCompile(`href="[^<>"]+\.mp3"`)
+var audioUrlRE = regexp.MustCompile(`href="[^<>"]+\.(mp3|spx|wav|ogg|oga|opus)"`)
 
 func (view *ArticleView) playAudioMPV(urlStr string) bool {
 	path, err := exec.LookPath("mpv")
