@@ -375,16 +375,6 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 		dm.setItem(index, dictName, ds)
 	}
 
-	qs := dm.settings
-	qsettings.RestoreTableColumnsWidth(
-		qs,
-		table,
-		QS_dictManager,
-	)
-	table.HorizontalHeader().OnSectionResized(func(logicalIndex int, oldSize int, newSize int) {
-		qsettings.SaveTableColumnsWidth(table, QS_dictManager)
-	})
-
 	qsettings.SetupDialogGeometrySave(dm.Dialog, QS_dictManager)
 }
 

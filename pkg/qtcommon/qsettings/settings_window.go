@@ -41,6 +41,6 @@ func (s *WindowSettings) Load(fname string) {
 	}
 	err = json.Unmarshal(b, s)
 	if err != nil {
-		slog.Error("error decoding window settings", "err", err, "path", fpath)
+		slog.Error("error decoding window settings", "err", err, "path", fpath, "text", string(b))
 	}
 }
