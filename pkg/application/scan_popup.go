@@ -186,8 +186,19 @@ func (p *ScanPopup) init() {
 	// closeButton.SetContentsMargins(5, 0, 5, 0)
 	// mainButton.SetContentsMargins(5, 0, 5, 0)
 
-	popupLayout.AddLayout(headerBox.QLayout)
+	popupLayout.AddWidget(p.outlineHeaderLayout(headerBox.QLayout))
 	popupLayout.AddWidget2(p.articleView.Widget, 10)
+}
+
+func (p *ScanPopup) outlineHeaderLayout(layout *qt.QLayout) *qt.QWidget {
+	frame := qt.NewQFrame2()
+	frame.SetFrameShape(qt.QFrame__Box)
+	frame.SetFrameShadow(qt.QFrame__Sunken)
+	frame.SetContentsMargins(1, 1, 1, 1)
+	frameLayout := qt.NewQHBoxLayout(frame.QWidget)
+	frameLayout.AddLayout2(layout, 1)
+	frameLayout.SetContentsMargins(0, 0, 0, 0)
+	return frame.QWidget
 }
 
 func (p *ScanPopup) onQueryNoResult(message string, args ...any) {
