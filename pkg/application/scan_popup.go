@@ -185,16 +185,21 @@ func (p *ScanPopup) init() {
 	popupLayout.AddWidget2(p.articleView.Widget, 10)
 }
 
+func (p *ScanPopup) showAndActivate() {
+	p.popup.Show()
+	p.popup.ActivateWindow()
+}
+
 func (p *ScanPopup) doQuery(query string) {
 	p.query = query
 	results := dictmgr.LookupHTML(query, conf, p.mode, resultFlags, 0)
 	if len(results) == 0 {
 		slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", 0, "query", query)
-		if conf.ScanPopupMinScore > 0 {
-			return
+		if conf.ScanPopupMinScore == 0 {
+			p.articleView.SetHtml(fmt.Sprintf("No results for %#v", query))
+			p.popup.SetWindowTitle(query)
 		}
-		p.articleView.SetHtml(fmt.Sprintf("No results for %#v", query))
-		p.popup.SetWindowTitle(query)
+		p.showAndActivate()
 		return
 	}
 	p.results = results
@@ -202,6 +207,7 @@ func (p *ScanPopup) doQuery(query string) {
 	res := results[0]
 	slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", res.Score()/2, "query", query)
 	if conf.ScanPopupMinScore > int(res.Score())/2 {
+		p.showAndActivate()
 		return
 	}
 	playTimer := p.articleView.SetPopupResult(res)
@@ -211,8 +217,7 @@ func (p *ScanPopup) doQuery(query string) {
 	if conf.ScanPopupHistory {
 		p.addHistory(query)
 	}
-	p.popup.Show()
-	p.popup.ActivateWindow()
+	p.showAndActivate()
 	if playTimer != nil {
 		qt.QCoreApplication_ProcessEvents()
 		playTimer.Start(0)

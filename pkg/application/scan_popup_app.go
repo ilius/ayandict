@@ -26,6 +26,7 @@ func (app *Application) onScanPopupCloseEvent(super func(*qt.QCloseEvent), event
 }
 
 func (app *Application) scanPopup(query string) {
+	slog.Debug("app.scanPopup", "query", query, "count", app.scanPopupCount.Load())
 	if conf.ScanPopupMaxCount > 0 && app.scanPopupCount.Load() >= conf.ScanPopupMaxCount {
 		return
 	}
