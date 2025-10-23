@@ -51,6 +51,8 @@ type ScanPopup struct {
 
 	// set by init method:
 	articleView *ArticleView
+	nextButton  *qt.QPushButton
+	prevButton  *qt.QPushButton
 
 	// set by doQuery
 	results []commons.SearchResultIface
@@ -129,10 +131,12 @@ func (p *ScanPopup) init() {
 	nextButton := qt.NewQPushButton3(" next ")
 	nextButton.SetFont(font)
 	nextButton.OnClicked(p.gotoNextResult)
+	p.nextButton = nextButton
 
 	prevButton := qt.NewQPushButton3(" prev ")
 	prevButton.SetFont(font)
 	prevButton.OnClicked(p.gotoPrevResult)
+	p.prevButton = prevButton
 
 	// favoriteButton := qt.NewQPushButton3("favorite")
 	// favoriteButton.SetFont(font)
@@ -199,9 +203,13 @@ func (p *ScanPopup) doQuery(query string) {
 			p.articleView.SetHtml(fmt.Sprintf("No results for %#v", query))
 			p.popup.SetWindowTitle(query)
 		}
+		p.nextButton.Hide()
+		p.prevButton.Hide()
 		p.showAndActivate()
 		return
 	}
+	p.nextButton.Show()
+	p.prevButton.Show()
 	p.results = results
 	p.resultIndex = 0
 	res := results[0]
