@@ -485,13 +485,13 @@ func (app *Application) Run() {
 	if conf.RandomFavoritePopupIntervalSeconds > 0 {
 		timer := qt.NewQTimer()
 		timer.SetSingleShot(true)
-		interval := 1000 * conf.RandomFavoritePopupIntervalSeconds
+		onClose := func() {
+			timer.Start(1000 * conf.RandomFavoritePopupIntervalSeconds)
+		}
 		timer.OnTimeout(func() {
-			app.randomFavoritePopup(func() {
-				timer.Start(interval)
-			})
+			app.randomFavoritePopup(onClose)
 		})
-		timer.Start(interval)
+		onClose()
 	}
 
 	_ = qt.QApplication_Exec()
