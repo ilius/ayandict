@@ -3,6 +3,7 @@ package application
 import (
 	"fmt"
 	"log/slog"
+	"os"
 
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/qplatform"
@@ -90,14 +91,11 @@ func (p *ScanPopup) init() {
 	font := configFontWithFactor(conf.ScanPopupFontSizeFactor)
 
 	popup := p.popup
-	flags := qt.WindowStaysOnTopHint | qt.Tool
+	flags := qt.WindowStaysOnTopHint | qt.Tool | qt.FramelessWindowHint
 	if qplatform.CanMoveWindow() {
-		flags |= qt.FramelessWindowHint
 		if conf.ScanPopupBypassWindowManager {
 			flags |= qt.BypassWindowManagerHint
 		}
-	} else {
-		slog.Info("ScanPopup: normal (bordered), platform does not support moving window")
 	}
 	popup.SetWindowFlags(flags)
 	popup.SetAttribute(qt.WA_DeleteOnClose)
@@ -301,6 +299,10 @@ func (p *ScanPopup) onKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
 func (p *ScanPopup) onMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	if event.Button() != qt.LeftButton {
 		super(event)
+		return
+	}
+	if os.Getenv("WAYLAND_DISPLAY") != "" {
+		p.popup.WindowHandle().StartSystemMove()
 		return
 	}
 	p.dragPos = event.Pos()
