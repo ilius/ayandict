@@ -189,43 +189,45 @@ func (p *ScanPopup) init() {
 	popupLayout.AddWidget2(p.articleView.Widget, 10)
 }
 
-func (p *ScanPopup) showAndActivate() {
+func (p *ScanPopup) onQueryNoResult(message string, args ...any) {
+	p.articleView.SetHtml(fmt.Sprintf(message, args...))
+	p.nextButton.Hide()
+	p.prevButton.Hide()
 	p.popup.Show()
 	p.popup.ActivateWindow()
 }
 
 func (p *ScanPopup) doQuery(query string) {
 	p.query = query
+	p.popup.SetWindowTitle(query)
+
 	results := dictmgr.LookupHTML(query, conf, p.mode, resultFlags, 0)
 	if len(results) == 0 {
 		slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", 0, "query", query)
-		if conf.ScanPopupMinScore == 0 {
-			p.articleView.SetHtml(fmt.Sprintf("No results for %#v", query))
-			p.popup.SetWindowTitle(query)
-		}
-		p.nextButton.Hide()
-		p.prevButton.Hide()
-		p.showAndActivate()
+		p.onQueryNoResult("No results for %#v", query)
 		return
 	}
-	p.nextButton.Show()
-	p.prevButton.Show()
 	p.results = results
 	p.resultIndex = 0
 	res := results[0]
 	slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", res.Score()/2, "query", query)
 	if conf.ScanPopupMinScore > int(res.Score())/2 {
-		p.showAndActivate()
+		p.onQueryNoResult(
+			"Top result for %#v has score of %%%v",
+			query, res.Score()/2,
+		)
 		return
 	}
+	p.nextButton.Show()
+	p.prevButton.Show()
 	playTimer := p.articleView.SetPopupResult(res)
-	p.popup.SetWindowTitle(res.Terms()[0])
 	// favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(res.Terms()[0]))
 	p.autoResize()
 	if conf.ScanPopupHistory {
 		p.addHistory(query)
 	}
-	p.showAndActivate()
+	p.popup.Show()
+	p.popup.ActivateWindow()
 	if playTimer != nil {
 		qt.QCoreApplication_ProcessEvents()
 		playTimer.Start(0)
