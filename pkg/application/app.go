@@ -157,6 +157,7 @@ func (app *Application) Run() {
 	}
 	if !qlocalserver.StartLocalSocketServer(
 		conf,
+		app.ShowWindowAndQuery,
 		app.scanPopup,
 		app.statusIconActivate,
 	) {

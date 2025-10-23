@@ -16,10 +16,11 @@ import (
 )
 
 const (
-	s_scanPopup          = "scanpopup:"
-	s_statusIconActivate = "statusicon:activate"
-	s_query              = "query:"
-	s_limit              = 10
+	s_scanPopup          = "scanpopup:"          // open Scan Popup window with given query
+	s_statusIconActivate = "statusicon:activate" // simulate clicking on status/tray icon
+	s_query              = "query:"              // query and send results in json over socket
+	s_mainquery          = "mainquery:"          // open main win with given query
+	query_limit          = 10                    // max result counts for query json API (query:)
 )
 
 const sockerResultFlags = uint32(
@@ -36,6 +37,7 @@ func SetHeaderTemplate(tpl *template.Template) {
 
 func StartLocalSocketServer(
 	conf *config.Config,
+	queryMain func(query string),
 	scanPopup func(query string),
 	statusIconActivate func(),
 ) bool {
@@ -55,6 +57,8 @@ func StartLocalSocketServer(
 				}
 			} else if cmd == s_statusIconActivate {
 				statusIconActivate()
+			} else if strings.HasPrefix(cmd, s_mainquery) {
+				queryMain(cmd[len(s_mainquery):])
 			} else if strings.HasPrefix(cmd, s_query) {
 				apiQuery(conf, conn, cmd[len(s_query):])
 			} else {
@@ -107,7 +111,7 @@ func apiQuery(conf *config.Config, conn *network.QLocalSocket, cmd string) {
 		return
 	}
 	query := parts[1]
-	raw_results := dictmgr.LookupHTML(query, conf, mode, sockerResultFlags, s_limit)
+	raw_results := dictmgr.LookupHTML(query, conf, mode, sockerResultFlags, query_limit)
 	// pass resultFlags to LookupHTML
 	results, err := encodeResults(raw_results)
 	if err != nil {
