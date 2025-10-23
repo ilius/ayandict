@@ -14,40 +14,42 @@ type QCloseEventFunc = func(super func(*qt.QCloseEvent), event *qt.QCloseEvent)
 
 var aboutToDragCursor = qt.PointingHandCursor
 
+type ScanPopupAppInterface interface {
+	OnScanPopupShow()
+	ShowWindowAndQuery(query string)
+	AddHistoryAndFrequency(query string)
+}
+
 func NewScanPopup(
 	query string,
 	mode dictmgr.SearchMode,
-	pos *qt.QPoint,
-	icon *qt.QIcon,
-	showInMain func(query string),
-	addHistory func(query string),
 	onCloseEvent QCloseEventFunc,
+	appIface ScanPopupAppInterface,
 ) *ScanPopup {
 	popup := qt.NewQWidget2()
 	popup.OnCloseEvent(onCloseEvent)
 
 	p := &ScanPopup{
-		query:      query,
-		mode:       mode,
-		pos:        pos,
-		icon:       icon,
-		popup:      popup,
-		showInMain: showInMain,
-		addHistory: addHistory,
+		query: query,
+		mode:  mode,
+		popup: popup,
+		app:   appIface,
 	}
 	p.init()
+	p.popup.OnShowEvent(func(super func(*qt.QShowEvent), e *qt.QShowEvent) {
+		appIface.OnScanPopupShow()
+		super(e)
+	})
 	return p
 }
 
 type ScanPopup struct {
 	// set by factory func:
-	query      string             // used in doMainQueryNoArg and Run
-	mode       dictmgr.SearchMode // used in doQuery
-	pos        *qt.QPoint
-	icon       *qt.QIcon
-	popup      *qt.QWidget
-	showInMain func(query string)
-	addHistory func(query string)
+	query string             // used in doMainQueryNoArg and Run
+	mode  dictmgr.SearchMode // used in doQuery
+	app   ScanPopupAppInterface
+
+	popup *qt.QWidget
 
 	// set by init method:
 	articleView *ArticleView
@@ -67,7 +69,20 @@ type ScanPopup struct {
 	dragLabel *qt.QLabel
 }
 
-func (p *ScanPopup) Run() {
+func (p *ScanPopup) Run(pos *qt.QPoint, icon *qt.QIcon) {
+	if pos == nil {
+		screen := qt.QGuiApplication_Screens()[0]
+		ss := screen.Size()
+		p.popup.Move(
+			(ss.Width()-conf.ScanPopupWidth)/2,
+			(ss.Height()-conf.ScanPopupHeight)/2,
+		)
+	} else {
+		screen := qt.QGuiApplication_ScreenAt(pos)
+		p.popup.Move(pos.X(), pos.Y()+int(fontPixelSize(systemFont, screen)))
+	}
+	p.popup.SetWindowIcon(icon)
+
 	p.doQuery(p.query)
 }
 
@@ -86,25 +101,11 @@ func (p *ScanPopup) init() {
 	}
 	popup.SetWindowFlags(flags)
 	popup.SetAttribute(qt.WA_DeleteOnClose)
-	popup.SetWindowIcon(p.icon)
 	popup.SetFont(font)
 
 	p.articleView = NewArticleView(p.doQuery)
 	p.articleView.Widget.SetFont(font)
 	p.articleView.SetupCustomHandlers()
-
-	pos := p.pos
-	if pos == nil {
-		screen := qt.QGuiApplication_Screens()[0]
-		ss := screen.Size()
-		popup.Move(
-			(ss.Width()-conf.ScanPopupWidth)/2,
-			(ss.Height()-conf.ScanPopupHeight)/2,
-		)
-	} else {
-		screen := qt.QGuiApplication_ScreenAt(pos)
-		popup.Move(pos.X(), pos.Y()+int(fontPixelSize(systemFont, screen)))
-	}
 
 	popup.OnKeyPressEvent(p.onKeyPress)
 
@@ -224,7 +225,7 @@ func (p *ScanPopup) doQuery(query string) {
 	// favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(res.Terms()[0]))
 	p.autoResize()
 	if conf.ScanPopupHistory {
-		p.addHistory(query)
+		p.app.AddHistoryAndFrequency(query)
 	}
 	p.popup.Show()
 	p.popup.ActivateWindow()
@@ -268,7 +269,7 @@ func (p *ScanPopup) gotoPrevResult() {
 
 func (p *ScanPopup) moveToMainWindow() {
 	p.popup.Close()
-	p.showInMain(p.query)
+	p.app.ShowWindowAndQuery(p.query)
 }
 
 func (p *ScanPopup) onKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {

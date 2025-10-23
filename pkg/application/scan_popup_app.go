@@ -25,6 +25,20 @@ func (app *Application) onScanPopupCloseEvent(super func(*qt.QCloseEvent), event
 	app.scanPopupCount.Add(-1)
 }
 
+func (app *Application) OnScanPopupShow() {
+	app.scanPopupCount.Add(1)
+}
+
+func (app *Application) ShowWindowAndQuery(query string) {
+	app.window.ShowNormal()
+	app.window.ActivateWindow()
+	app.doQuery(query)
+}
+
+func (app *Application) AddHistoryAndFrequency(query string) {
+	app.queryArgs.AddHistoryAndFrequency(query)
+}
+
 func (app *Application) scanPopup(query string) {
 	slog.Debug("app.scanPopup", "query", query, "count", app.scanPopupCount.Load())
 	if conf.ScanPopupMaxCount > 0 && app.scanPopupCount.Load() >= conf.ScanPopupMaxCount {
@@ -40,24 +54,13 @@ func (app *Application) scanPopup(query string) {
 		slog.Error("invalid scan_popup_mode", "value", conf.ScanPopupMode)
 	}
 
-	app.scanPopupCount.Add(1)
-
 	p := NewScanPopup(
 		query,
 		mode,
-		qt.QCursor_Pos(),
-		app.icon,
-		app.showWindowAndQuery,
-		app.queryArgs.AddHistoryAndFrequency,
 		app.onScanPopupCloseEvent,
+		app,
 	)
-	p.Run()
-}
-
-func (app *Application) showWindowAndQuery(query string) {
-	app.window.ShowNormal()
-	app.window.ActivateWindow()
-	app.doQuery(query)
+	p.Run(qt.QCursor_Pos(), app.icon)
 }
 
 func (app *Application) randomFavoritePopup(onClose func()) {
@@ -69,7 +72,6 @@ func (app *Application) randomFavoritePopup(onClose func()) {
 	if conf.ScanPopupMaxCount > 0 && app.scanPopupCount.Load() >= conf.ScanPopupMaxCount {
 		return
 	}
-	app.scanPopupCount.Add(1)
 
 	onCloseNew := func(super func(event *qt.QCloseEvent), event *qt.QCloseEvent) {
 		app.scanPopupCount.Add(-1)
@@ -79,11 +81,8 @@ func (app *Application) randomFavoritePopup(onClose func()) {
 	p := NewScanPopup(
 		term,
 		dictmgr.SearchModeStartWith,
-		nil, // on center of primary screen
-		app.icon,
-		app.showWindowAndQuery,
-		app.queryArgs.AddHistoryAndFrequency,
 		onCloseNew,
+		app,
 	)
-	p.Run()
+	p.Run(nil, app.icon) // on center of primary screen
 }
