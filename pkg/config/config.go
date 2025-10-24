@@ -210,7 +210,7 @@ func Default() *Config {
 
 		StartHidden: false,
 
-		DesktopWidgetClickTime: 100,
+		DesktopWidgetClickTime: 101,
 
 		ScanPopupClipboard: false,
 		ScanPopupSelection: false,
