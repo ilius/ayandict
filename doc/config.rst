@@ -118,9 +118,9 @@ Hide main window on startup (if tray icon is available)
 
 Default value: ``false``
 
-``dektop_widget``
------------------
-Dektop Widget: enable
+``desktop_widget``
+------------------
+Desktop Widget: enable
 
 Default value: ``false``
 

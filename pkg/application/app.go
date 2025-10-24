@@ -210,9 +210,9 @@ func (app *Application) Run() {
 	})
 
 	if !qt.QSystemTrayIcon_IsSystemTrayAvailable() {
-		if !conf.DektopWidget {
+		if !conf.DesktopWidget {
 			slog.Warn("system tray is not available, enabling desktop widget")
-			conf.DektopWidget = true
+			conf.DesktopWidget = true
 		}
 	}
 	{
@@ -476,7 +476,7 @@ func (app *Application) Run() {
 
 	app.setupScanPopup()
 
-	if conf.DektopWidget {
+	if conf.DesktopWidget {
 		app.setupDekstopWidget()
 	}
 	if !(conf.StartHidden && app.trayIcon != nil && app.trayIcon.IsVisible()) {
