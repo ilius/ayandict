@@ -77,6 +77,14 @@ func (w *DektopWidget) popupMenu(event *qt.QMouseEvent) {
 
 func (w *DektopWidget) onMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	switch event.Button() {
+	case qt.RightButton:
+		w.popupMenu(event)
+	case qt.MiddleButton:
+		w.dragPos = event.Pos()
+		w.dragPosGlobal = event.GlobalPos()
+		if !qplatform.CanMoveWindow() {
+			w.WindowHandle().StartSystemMove()
+		}
 	case qt.LeftButton:
 		w.dragPos = event.Pos()
 		w.dragPosGlobal = event.GlobalPos()
@@ -96,8 +104,6 @@ func (w *DektopWidget) onMousePress(super func(*qt.QMouseEvent), event *qt.QMous
 			})
 			timer.Start(clickTimeMS)
 		}
-	case qt.RightButton:
-		w.popupMenu(event)
 	default:
 		super(event)
 	}
