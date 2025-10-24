@@ -78,7 +78,7 @@ type Config struct {
 	StartHidden bool `toml:"start_hidden" doc:"Hide main window on startup (if tray icon is available)"`
 
 	DesktopWidget bool `toml:"desktop_widget" doc:"Desktop Widget: enable"`
-	// DesktopWidgetBypassWindowManager bool `toml:"desktop_widget_bypass_window_manager" doc:"Dektop Widget: bypass window manager"`
+	// DesktopWidgetBypassWindowManager bool `toml:"desktop_widget_bypass_window_manager" doc:"Desktop Widget: bypass window manager"`
 
 	ScanPopupClipboard bool   `toml:"scan_popup_clipboard" doc:"Scan Popup: activate on copy to clipboard"`
 	ScanPopupSelection bool   `toml:"scan_popup_selection" doc:"Scan Popup: activate on selection"`

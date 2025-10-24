@@ -75,7 +75,7 @@ type Application struct {
 
 	statusIconActions []*qt.QAction
 
-	desktopWidget *DektopWidget
+	desktopWidget *DesktopWidget
 
 	trayIcon          *qt.QSystemTrayIcon
 	trayScanSelection *qt.QAction

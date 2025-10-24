@@ -16,7 +16,7 @@ const punctuation = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~“”،؛؟۔￼"
 // so we trim them on right-click -> Query action or on middle-click action
 const queryForceTrimChars = "‘’،؛"
 
-const clickTimeMS = 90 // used for DektopWidget on Wayland
+const clickTimeMS = 90 // used for DesktopWidget on Wayland
 
 const (
 	QS_mainSplitter   = "main_splitter"

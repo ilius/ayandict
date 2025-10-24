@@ -26,7 +26,7 @@ func (app *Application) setupDekstopWidget() {
 	label.SetPixmap(pixmap)
 	layout.AddWidget(label.QWidget)
 
-	w := &DektopWidget{
+	w := &DesktopWidget{
 		QWidget: widget,
 		app:     app,
 	}
@@ -35,7 +35,7 @@ func (app *Application) setupDekstopWidget() {
 	w.Show()
 }
 
-type DektopWidget struct {
+type DesktopWidget struct {
 	*qt.QWidget
 
 	app *Application
@@ -47,7 +47,7 @@ type DektopWidget struct {
 	dragPosGlobal *qt.QPoint
 }
 
-func (w *DektopWidget) init() {
+func (w *DesktopWidget) init() {
 	w.OnMousePressEvent(w.onMousePress)
 	w.OnMouseMoveEvent(w.onMouseMove)
 	w.OnMouseReleaseEvent(w.onMouseRelease)
@@ -66,7 +66,7 @@ func (w *DektopWidget) init() {
 	// timer.Start(200)
 }
 
-func (w *DektopWidget) popupMenu(event *qt.QMouseEvent) {
+func (w *DesktopWidget) popupMenu(event *qt.QMouseEvent) {
 	menu := qt.NewQMenu2()
 	for _, action := range w.app.statusIconActions {
 		menu.AddAction(action)
@@ -75,7 +75,7 @@ func (w *DektopWidget) popupMenu(event *qt.QMouseEvent) {
 	menu.Popup(event.GlobalPos())
 }
 
-func (w *DektopWidget) onMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+func (w *DesktopWidget) onMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	switch event.Button() {
 	case qt.RightButton:
 		w.popupMenu(event)
@@ -109,7 +109,7 @@ func (w *DektopWidget) onMousePress(super func(*qt.QMouseEvent), event *qt.QMous
 	}
 }
 
-func (w *DektopWidget) onMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+func (w *DesktopWidget) onMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	// event.Button() == qt.NoButton
 	if w.dragPos == nil {
 		super(event)
@@ -128,7 +128,7 @@ func absInt(x int) int {
 	return x
 }
 
-func (w *DektopWidget) onMouseRelease(super func(event *qt.QMouseEvent), event *qt.QMouseEvent) {
+func (w *DesktopWidget) onMouseRelease(super func(event *qt.QMouseEvent), event *qt.QMouseEvent) {
 	if event.Button() != qt.LeftButton {
 		super(event)
 		return

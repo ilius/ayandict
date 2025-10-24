@@ -9,7 +9,7 @@ import (
 func NewDekstopWidget(
 	onActivate func(event *qt.QMouseEvent),
 	actions []*qt.QAction,
-) *DektopWidget {
+) *DesktopWidget {
 	slog.Info("setupDekstopWidget")
 	pixmap, err := loadPNGPixmap("ayandict-64px.png")
 	if err != nil {
@@ -23,7 +23,7 @@ func NewDekstopWidget(
 	// widget.SetWindowFlags(qt.WindowStaysOnBottomHint |
 	// 	qt.WindowStaysOnBottomHint |
 	// 	qt.WindowDoesNotAcceptFocus)
-	// if conf.DektopWidgetBypassWindowManager {
+	// if conf.DesktopWidgetBypassWindowManager {
 	// 	flag |= qt.BypassWindowManagerHint
 	// }
 	// widget.SetAttribute2(qt.WA_ShowWithoutActivating, true)
@@ -35,7 +35,7 @@ func NewDekstopWidget(
 	label.SetPixmap(pixmap)
 	layout.AddWidget(label.QWidget)
 
-	w := &DektopWidget{
+	w := &DesktopWidget{
 		QWidget:    widget,
 		onActivate: onActivate,
 		actions:    actions,
@@ -44,7 +44,7 @@ func NewDekstopWidget(
 	return w
 }
 
-type DektopWidget struct {
+type DesktopWidget struct {
 	*qt.QWidget
 
 	// set by factory:
@@ -58,7 +58,7 @@ type DektopWidget struct {
 	dragPosGlobal *qt.QPoint
 }
 
-func (w *DektopWidget) init() {
+func (w *DesktopWidget) init() {
 	w.OnMousePressEvent(w.onDragMousePress)
 	w.OnMouseMoveEvent(w.onDragMouseMove)
 	w.OnMouseReleaseEvent(w.onDragMouseRelease)
@@ -72,7 +72,7 @@ func (w *DektopWidget) init() {
 	// timer.Start(200)
 }
 
-func (w *DektopWidget) popupMenu(event *qt.QMouseEvent) {
+func (w *DesktopWidget) popupMenu(event *qt.QMouseEvent) {
 	if len(w.actions) == 0 {
 		return
 	}
@@ -84,7 +84,7 @@ func (w *DektopWidget) popupMenu(event *qt.QMouseEvent) {
 	menu.Popup(event.Pos())
 }
 
-func (w *DektopWidget) onDragMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+func (w *DesktopWidget) onDragMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	switch event.Button() {
 	case qt.LeftButton:
 		w.dragPos = event.Pos()
@@ -96,7 +96,7 @@ func (w *DektopWidget) onDragMousePress(super func(*qt.QMouseEvent), event *qt.Q
 	}
 }
 
-func (w *DektopWidget) onDragMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
+func (w *DesktopWidget) onDragMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	if w.dragPos == nil || event.Button() != qt.LeftButton {
 		super(event)
 		return
@@ -114,7 +114,7 @@ func absInt(x int) int {
 	return x
 }
 
-func (w *DektopWidget) onDragMouseRelease(super func(event *qt.QMouseEvent), event *qt.QMouseEvent) {
+func (w *DesktopWidget) onDragMouseRelease(super func(event *qt.QMouseEvent), event *qt.QMouseEvent) {
 	if event.Button() != qt.LeftButton {
 		super(event)
 		return
