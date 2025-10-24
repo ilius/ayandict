@@ -164,13 +164,13 @@ Default value: ``0``
 --------------------
 Scan Popup: window width
 
-Default value: ``800``
+Default value: ``700``
 
 ``scan_popup_height``
 ---------------------
 Scan Popup: window height
 
-Default value: ``600``
+Default value: ``400``
 
 ``scan_popup_max_count``
 ------------------------

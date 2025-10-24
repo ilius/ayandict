@@ -217,8 +217,8 @@ func Default() *Config {
 		ScanPopupAPI:       true,
 		ScanPopupMode:      "fuzzy",
 		ScanPopupMinScore:  0,
-		ScanPopupWidth:     800,
-		ScanPopupHeight:    600,
+		ScanPopupWidth:     700,
+		ScanPopupHeight:    400,
 		ScanPopupMaxCount:  3,
 		ScanPopupHistory:   true,
 
