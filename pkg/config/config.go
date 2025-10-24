@@ -80,6 +80,8 @@ type Config struct {
 	DesktopWidget bool `toml:"desktop_widget" doc:"Desktop Widget: enable"`
 	// DesktopWidgetBypassWindowManager bool `toml:"desktop_widget_bypass_window_manager" doc:"Desktop Widget: bypass window manager"`
 
+	DesktopWidgetClickTime int `toml:"desktop_widget_click_time" doc:"Dektop Widget: max click time in millisecond"`
+
 	ScanPopupClipboard bool   `toml:"scan_popup_clipboard" doc:"Scan Popup: activate on copy to clipboard"`
 	ScanPopupSelection bool   `toml:"scan_popup_selection" doc:"Scan Popup: activate on selection"`
 	ScanPopupAPI       bool   `toml:"scan_popup_api" doc:"Scan Popup: activate via API (socket/pipe)"`
@@ -207,6 +209,8 @@ func Default() *Config {
 		RandomFavoriteSearchMode: "wordMatch",
 
 		StartHidden: false,
+
+		DesktopWidgetClickTime: 100,
 
 		ScanPopupClipboard: false,
 		ScanPopupSelection: false,

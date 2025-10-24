@@ -90,9 +90,9 @@ func (w *DesktopWidget) onMousePress(super func(*qt.QMouseEvent), event *qt.QMou
 		w.dragPosGlobal = event.GlobalPos()
 		// On Wayland, we have to use QWindow.StartSystemMove
 		// But then MouseReleaseEvent is never triggered and we can't detect a "click"
-		// That's why we use a QTimer: after 90ms we check if w.dragPosGlobal is the same
-		// pointer, then MouseRelease didn't happen, so we assume user is trying to drag-move
-		// the window rather than clicking (unless user is a very slow clicker!)
+		// That's why we use a QTimer: after 100ms (can change this time with config)
+		// we check if w.dragPosGlobal is the same pointer, then MouseRelease didn't
+		// happen, so we assume user is trying to drag-move the window rather than clicking
 		if !qplatform.CanMoveWindow() {
 			posGlobal := w.dragPosGlobal
 			timer := qt.NewQTimer()
@@ -102,7 +102,7 @@ func (w *DesktopWidget) onMousePress(super func(*qt.QMouseEvent), event *qt.QMou
 					w.WindowHandle().StartSystemMove()
 				}
 			})
-			timer.Start(clickTimeMS)
+			timer.Start(conf.DesktopWidgetClickTime)
 		}
 	default:
 		super(event)

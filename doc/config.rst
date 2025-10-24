@@ -124,6 +124,12 @@ Desktop Widget: enable
 
 Default value: ``false``
 
+``desktop_widget_click_time``
+-----------------------------
+Dektop Widget: max click time in millisecond
+
+Default value: ``100``
+
 ``scan_popup_clipboard``
 ------------------------
 Scan Popup: activate on copy to clipboard
