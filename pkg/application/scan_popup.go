@@ -3,7 +3,6 @@ package application
 import (
 	"fmt"
 	"log/slog"
-	"os"
 
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/qplatform"
@@ -301,13 +300,13 @@ func (p *ScanPopup) onMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEv
 		super(event)
 		return
 	}
-	if os.Getenv("WAYLAND_DISPLAY") != "" {
-		p.popup.WindowHandle().StartSystemMove()
-		return
-	}
-	p.dragPos = event.Pos()
 	p.popup.ActivateWindow()
-	p.dragLabel.SetCursor(qt.NewQCursor2(qt.DragMoveCursor))
+	if qplatform.CanMoveWindow() {
+		p.dragPos = event.Pos()
+		p.dragLabel.SetCursor(qt.NewQCursor2(qt.DragMoveCursor))
+	} else {
+		p.popup.WindowHandle().StartSystemMove()
+	}
 }
 
 func (p *ScanPopup) onMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {

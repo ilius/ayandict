@@ -17,10 +17,7 @@ func (app *Application) setupDekstopWidget() {
 	}
 	widget := qt.NewQWidget2()
 
-	flags := qt.WindowStaysOnBottomHint | qt.Window
-	if qplatform.CanMoveWindow() {
-		flags |= qt.FramelessWindowHint
-	}
+	flags := qt.WindowStaysOnBottomHint | qt.Window | qt.FramelessWindowHint
 	widget.SetWindowFlags(flags)
 
 	layout := qt.NewQHBoxLayout(widget)
@@ -83,6 +80,22 @@ func (w *DektopWidget) onMousePress(super func(*qt.QMouseEvent), event *qt.QMous
 	case qt.LeftButton:
 		w.dragPos = event.Pos()
 		w.dragPosGlobal = event.GlobalPos()
+		// On Wayland, we have to use QWindow.StartSystemMove
+		// But then MouseReleaseEvent is never triggered and we can't detect a "click"
+		// That's why we use a QTimer: after 90ms we check if w.dragPosGlobal is the same
+		// pointer, then MouseRelease didn't happen, so we assume user is trying to drag-move
+		// the window rather than clicking (unless user is a very slow clicker!)
+		if !qplatform.CanMoveWindow() {
+			posGlobal := w.dragPosGlobal
+			timer := qt.NewQTimer()
+			timer.SetSingleShot(true)
+			timer.OnTimeout(func() {
+				if w.dragPosGlobal == posGlobal {
+					w.WindowHandle().StartSystemMove()
+				}
+			})
+			timer.Start(clickTimeMS)
+		}
 	case qt.RightButton:
 		w.popupMenu(event)
 	default:
