@@ -7,6 +7,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/internal/dicts"
 	"github.com/ilius/ayandict/v3/pkg/mysoundex"
 	common "github.com/ilius/go-dict-commons"
+	"github.com/ilius/go-dict-commons/search_utils"
 )
 
 var soundexSearcher *mysoundex.SoundexSearcher
@@ -28,6 +29,11 @@ func LookupSoundexHTML(
 	results := []common.SearchResultIface{}
 	workerCount := conf.SearchWorkerCount
 	timeout := conf.SearchTimeout
+	args := &search_utils.ScoreFuzzyArgs{
+		Query:          query,
+		QueryRunes:     []rune(query),
+		QueryWordCount: 1,
+	}
 	for _, word := range soundexSearcher.Lookup(query) {
 		for _, dic := range dicts.DictList {
 			if dic.Disabled() || !dic.Loaded() {
@@ -43,10 +49,18 @@ func LookupSoundexHTML(
 				if delta < 0 {
 					delta = -delta
 				}
-				if delta > 20 {
-					delta = 20
+				if delta > 10 {
+					delta = 10
 				}
-				resLow.F_Score = 200 - 2*uint8(delta)
+				score := search_utils.ScoreFuzzy(
+					resLow.F_Terms,
+					args,
+					nil,
+				)
+				if score == 0 {
+					score = score + 10 - uint8(delta)
+				}
+				resLow.F_Score = score
 				results = append(results, NewSearchResult(resLow, dic, conf, resultFlags))
 			}
 		}
