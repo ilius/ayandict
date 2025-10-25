@@ -14,6 +14,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/application/frequency"
 	"github.com/ilius/ayandict/v3/pkg/application/qfavorites"
 	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/qdictmgr"
 	"github.com/ilius/ayandict/v3/pkg/logging"
 	"github.com/ilius/ayandict/v3/pkg/qlocalserver"
@@ -23,12 +24,24 @@ import (
 	"github.com/mappu/miqt/qt6/network"
 )
 
+const s_Soundex = "Soundex"
+
 var searchModes = []string{
 	"Fuzzy",
 	"Start with",
 	"Regex",
 	"Glob",
 	"Word Match",
+	// s_Soundex, added if config is set
+}
+
+var searchModeByDesc = map[string]dictmgr.SearchMode{
+	"Fuzzy":      dictmgr.SearchModeFuzzy,
+	"Start with": dictmgr.SearchModeStartWith,
+	"Regex":      dictmgr.SearchModeRegex,
+	"Glob":       dictmgr.SearchModeGlob,
+	"Word Match": dictmgr.SearchModeWordMatch,
+	s_Soundex:    dictmgr.SearchModeSoundex,
 }
 
 var systemFont *qt.QFont
@@ -236,6 +249,9 @@ func (app *Application) Run() {
 	searchModeCombo := qt.NewQComboBox2()
 	app.searchModeCombo = searchModeCombo
 	app.searchModeCombo.AddItems(searchModes)
+	if conf.SoundexWordsFile != "" {
+		app.searchModeCombo.AddItem(s_Soundex)
+	}
 
 	okButton := qt.NewQPushButton3(" OK ")
 

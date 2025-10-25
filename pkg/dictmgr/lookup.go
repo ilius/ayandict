@@ -18,6 +18,7 @@ const (
 	SearchModeRegex
 	SearchModeGlob
 	SearchModeWordMatch
+	SearchModeSoundex
 )
 
 func SearchModeByName(name string) (SearchMode, bool) {
@@ -32,6 +33,8 @@ func SearchModeByName(name string) (SearchMode, bool) {
 		return SearchModeGlob, true
 	case "wordMatch":
 		return SearchModeWordMatch, true
+	case "soundex":
+		return SearchModeSoundex, true
 	}
 	return SearchMode(0), false
 }
@@ -122,6 +125,9 @@ func LookupHTML(
 	resultFlags uint32,
 	limit int,
 ) []common.SearchResultIface {
+	if mode == SearchModeSoundex {
+		return LookupSoundexHTML(query, conf, resultFlags, limit)
+	}
 	results := []common.SearchResultIface{}
 	for _, dic := range dicts.DictList {
 		if dic.Disabled() || !dic.Loaded() {

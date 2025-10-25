@@ -4,14 +4,15 @@ go 1.24
 
 require (
 	github.com/BurntSushi/toml v1.5.0
-	github.com/ilius/go-dict-commons v0.6.0
-	github.com/ilius/go-stardict/v2 v2.5.1
+	github.com/ilius/go-dict-commons v0.6.1
+	github.com/ilius/go-stardict/v2 v2.5.2
 	github.com/ilius/is/v2 v2.3.2
 	github.com/mappu/miqt v0.11.2
+	github.com/xrash/smetrics v0.0.0-20250705151800-55b8f293f342
 )
 
 require github.com/ilius/glob v0.0.0-20250212111036-4c41f838a304 // indirect
 
 // replace github.com/ilius/go-stardict/v2 => ../go-stardict
-// replace github.com/ilius/go-dict-sql => ../go-dict-sql
 // replace github.com/ilius/go-dict-commons => ../go-dict-commons
+// replace github.com/ilius/go-dict-sql => ../go-dict-sql

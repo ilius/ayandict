@@ -51,6 +51,8 @@ type Config struct {
 
 	ArticleStyle string `toml:"article_style" doc:"Path to article stylesheet file (.css)"`
 
+	SoundexWordsFile string `toml:"soundex_words_file" doc:"Soundex words file"`
+
 	FontFamily string `toml:"font_family" doc:"Application font family"`
 	FontSize   int    `toml:"font_size" doc:"Application font size"`
 

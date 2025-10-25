@@ -58,19 +58,20 @@ func (queryArgs *QueryArgs) onQuery(query string, isAuto bool) {
 		return
 	}
 	t := time.Now()
-	mode := dictmgr.SearchModeFuzzy
-	switch queryArgs.ModeCombo.CurrentIndex() {
-	case 1: // StartWith
-		mode = dictmgr.SearchModeStartWith
-	case 2: // Regex
-		if isAuto && !conf.SearchOnTypeOnRegex {
+	modeDesc := queryArgs.ModeCombo.CurrentText()
+	mode, ok := searchModeByDesc[modeDesc]
+	if !ok {
+		slog.Error("invalid serarch mode", "modeDesc", modeDesc)
+	}
+	if isAuto {
+		switch mode {
+		case dictmgr.SearchModeRegex:
+			if !conf.SearchOnTypeOnRegex {
+				return
+			}
+		case dictmgr.SearchModeSoundex:
 			return
 		}
-		mode = dictmgr.SearchModeRegex
-	case 3: // Glob
-		mode = dictmgr.SearchModeGlob
-	case 4: // WordMatch
-		mode = dictmgr.SearchModeWordMatch
 	}
 	results := dictmgr.LookupHTML(query, conf, mode, resultFlags, 0)
 	slog.Debug("LookupHTML running time", "dt", time.Since(t), "query", query)

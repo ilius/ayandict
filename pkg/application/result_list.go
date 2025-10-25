@@ -55,6 +55,10 @@ func (w *ResultListWidget) SetResults(results []common.SearchResultIface) {
 	w.QListWidget.Clear()
 	w.results = results
 	for _, res := range results {
+		if res == nil {
+			slog.Warn("ResultListWidget: SetResults: res == nil")
+			continue
+		}
 		terms := res.Terms()
 		var text string
 		switch len(terms) {

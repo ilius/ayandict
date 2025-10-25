@@ -16,6 +16,12 @@ Path to article stylesheet file (.css)
 
 Default value: ``""``
 
+``soundex_words_file``
+----------------------
+Soundex words file
+
+Default value: ``""``
+
 ``font_family``
 ---------------
 Application font family

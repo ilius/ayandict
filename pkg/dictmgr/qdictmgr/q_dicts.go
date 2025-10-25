@@ -2,7 +2,9 @@ package qdictmgr
 
 import (
 	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/internal/dicts"
+	"github.com/ilius/ayandict/v3/pkg/mysoundex"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -27,6 +29,11 @@ func InitDicts(conf *config.Config, popup bool) {
 	if popup {
 		popupLabel := loadingDictsPopup(conf)
 		defer popupLabel.Delete()
+	}
+	if conf.SoundexWordsFile != "" {
+		ss := mysoundex.NewSoundexSearcher(conf.SoundexWordsFile)
+		dictmgr.SetSoundexSearcher(ss)
+		go ss.Load()
 	}
 	dicts.InitDicts(conf)
 }
