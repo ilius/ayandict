@@ -21,7 +21,7 @@ func showKeyBindings(parent *qt.QWidget, icon *qt.QIcon) {
 	layout.SetColumnStretch(2, 1)
 
 	layout.AddWidget4(qt.NewQLabel3("Key").QWidget, 0, 0, qt.AlignCenter)
-	layout.AddWidget4(qt.NewQLabel3("while").QWidget, 0, 1, qt.AlignCenter)
+	layout.AddWidget4(qt.NewQLabel3("[while]").QWidget, 0, 1, qt.AlignCenter)
 	layout.AddWidget4(qt.NewQLabel3("Action").QWidget, 0, 2, qt.AlignCenter)
 
 	for rowI, data := range appinfo.KeyBindings {
