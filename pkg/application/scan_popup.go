@@ -152,6 +152,8 @@ func (p *ScanPopup) init() {
 	headerBox := qt.NewQHBoxLayout2()
 	{
 		label := qt.NewQLabel2()
+		label.SetAutoFillBackground(true)
+		label.SetBackgroundRole(qt.QPalette__ToolTipBase)
 		p.dragLabel = label
 		label.SetCursor(qt.NewQCursor2(aboutToDragCursor))
 		headerBox.AddWidget2(label.QWidget, 1)
