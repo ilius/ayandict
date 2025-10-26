@@ -28,5 +28,5 @@ set -x
 if which socat 2>/dev/null ; then
     echo scanpopup:$(clip_get primary) | socat - UNIX-CONNECT:/tmp/ayandict-$UID
 else
-    echo scanpopup:$(clip_get primary) | nc -U /tmp/ayandict-$UID
+    echo scanpopup:$(clip_get primary) | nc -U /tmp/ayandict-$UID -q 2
 fi
