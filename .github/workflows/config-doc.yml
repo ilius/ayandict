@@ -19,7 +19,7 @@ jobs:
           go-version: 1.22
 
       - name: Generate config doc
-        run: ./scripts/doc-gen
+        run: ./cmd/doc-gen
 
       - name: Check for changes
         run: ./.github/scripts/no-diff.sh
