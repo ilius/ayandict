@@ -1,11 +1,8 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
 name: Mac Build
 
 on:
   push:
-    branches: ["v3", "release-macos"]
+    branches: ["v3", "build-mac*"]
   pull_request:
     branches: ["v3"]
 
