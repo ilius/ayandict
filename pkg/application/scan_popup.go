@@ -136,6 +136,13 @@ func (p *ScanPopup) init() {
 	prevButton.OnClicked(p.gotoPrevResult)
 	p.prevButton = prevButton
 
+	if conf.ScanPopupHeaderIcons {
+		closeButton.SetText(" ❌ ")
+		mainButton.SetText(" 📖 ")
+		nextButton.SetText("  ↓  ")
+		prevButton.SetText("  ↑  ")
+	}
+
 	closeButton.SetToolTip("Close (Esc)")
 	mainButton.SetToolTip("Open in main window (Enter)")
 	nextButton.SetToolTip("Next result")

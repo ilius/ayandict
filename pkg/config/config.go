@@ -84,15 +84,16 @@ type Config struct {
 
 	DesktopWidgetClickTime int `toml:"desktop_widget_click_time" doc:"Dektop Widget: max click time in millisecond"`
 
-	ScanPopupClipboard bool   `toml:"scan_popup_clipboard" doc:"Scan Popup: activate on copy to clipboard"`
-	ScanPopupSelection bool   `toml:"scan_popup_selection" doc:"Scan Popup: activate on selection"`
-	ScanPopupAPI       bool   `toml:"scan_popup_api" doc:"Scan Popup: activate via API (socket/pipe)"`
-	ScanPopupMode      string `toml:"scan_popup_mode" doc:"Scan Popup: search mode"`
-	ScanPopupMinScore  int    `toml:"scan_popup_min_score" doc:"Scan Popup: minimum score (0 to 100)"`
-	ScanPopupWidth     int    `toml:"scan_popup_width" doc:"Scan Popup: window width"`
-	ScanPopupHeight    int    `toml:"scan_popup_height" doc:"Scan Popup: window height"`
-	ScanPopupMaxCount  int32  `toml:"scan_popup_max_count" doc:"Scan Popup: max number of windows"`
-	ScanPopupHistory   bool   `toml:"scan_popup_history" doc:"Scan Popup: add to history"`
+	ScanPopupClipboard   bool   `toml:"scan_popup_clipboard" doc:"Scan Popup: activate on copy to clipboard"`
+	ScanPopupSelection   bool   `toml:"scan_popup_selection" doc:"Scan Popup: activate on selection"`
+	ScanPopupAPI         bool   `toml:"scan_popup_api" doc:"Scan Popup: activate via API (socket/pipe)"`
+	ScanPopupMode        string `toml:"scan_popup_mode" doc:"Scan Popup: search mode"`
+	ScanPopupMinScore    int    `toml:"scan_popup_min_score" doc:"Scan Popup: minimum score (0 to 100)"`
+	ScanPopupWidth       int    `toml:"scan_popup_width" doc:"Scan Popup: window width"`
+	ScanPopupHeight      int    `toml:"scan_popup_height" doc:"Scan Popup: window height"`
+	ScanPopupMaxCount    int32  `toml:"scan_popup_max_count" doc:"Scan Popup: max number of windows"`
+	ScanPopupHistory     bool   `toml:"scan_popup_history" doc:"Scan Popup: add to history"`
+	ScanPopupHeaderIcons bool   `toml:"scan_popup_header_icons" doc:"Scan Popup: use icons for header buttons"`
 
 	ScanPopupFontSizeFactor float64 `toml:"scan_popup_font_size_factor" doc:"Scan Popup: font size factor (relative to app)"`
 
@@ -215,15 +216,16 @@ func Default() *Config {
 		DesktopWidget:          true,
 		DesktopWidgetClickTime: 100,
 
-		ScanPopupClipboard: false,
-		ScanPopupSelection: false,
-		ScanPopupAPI:       true,
-		ScanPopupMode:      "fuzzy",
-		ScanPopupMinScore:  0,
-		ScanPopupWidth:     700,
-		ScanPopupHeight:    400,
-		ScanPopupMaxCount:  3,
-		ScanPopupHistory:   true,
+		ScanPopupClipboard:   false,
+		ScanPopupSelection:   false,
+		ScanPopupAPI:         true,
+		ScanPopupMode:        "fuzzy",
+		ScanPopupMinScore:    0,
+		ScanPopupWidth:       700,
+		ScanPopupHeight:      400,
+		ScanPopupMaxCount:    3,
+		ScanPopupHistory:     true,
+		ScanPopupHeaderIcons: false,
 
 		ScanPopupFontSizeFactor: 0.8,
 

@@ -190,6 +190,12 @@ Scan Popup: add to history
 
 Default value: ``true``
 
+``scan_popup_header_icons``
+---------------------------
+Scan Popup: use icons for header buttons
+
+Default value: ``false``
+
 ``scan_popup_font_size_factor``
 -------------------------------
 Scan Popup: font size factor (relative to app)
