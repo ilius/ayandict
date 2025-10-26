@@ -1,4 +1,4 @@
-name: Mac Build
+name: Mac Build (Static Qt)
 
 on:
   push:
@@ -39,30 +39,141 @@ jobs:
       - name: Show kernel info
         run: uname -a
 
-      - name: Install Qt6
+      - name: Install dependencies
         env:
           HOMEBREW_NO_AUTO_UPDATE: 1
-        run: brew install gcc cmake ninja openssl@3 zlib qt6 pkg-config sevenzip
+        run: |
+          brew install brotli gcc cmake ninja openssl@3 harfbuzz libpng pcre2 zlib pkg-config sevenzip
+
+      # Caches the static Qt build to avoid recompiling every time
+      - name: Cache static Qt6
+        id: cache-qt
+        uses: actions/cache@v4
+        with:
+          path: /Users/runner/Qt/6.6.3-static
+          # v4 patches Qt 6.6.3 to emit pkg-config metadata for static builds.
+          key: qt6.6.3-static-macos-v4-no-zstd-pkgconfig
+
+      - name: Build Qt statically (if cache miss)
+        if: steps.cache-qt.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p /Users/runner/Qt
+          cd /Users/runner/Qt
+          curl -LO https://download.qt.io/archive/qt/6.6/6.6.3/single/qt-everywhere-src-6.6.3.tar.xz
+          tar xf qt-everywhere-src-6.6.3.tar.xz
+          cd qt-everywhere-src-6.6.3
+
+          # Qt 6.6 normally generates pkg-config files only for shared builds,
+          # while MIQT requires them through its #cgo pkg-config directives.
+          sed -i '' \
+            '/^[[:space:]]*if(NOT BUILD_SHARED_LIBS)$/,/^[[:space:]]*endif()$/d' \
+            qtbase/cmake/QtPkgConfigHelpers.cmake
+
+          ./configure \
+            -prefix /Users/runner/Qt/6.6.3-static \
+            -release \
+            -static \
+            -static-runtime \
+            -opensource \
+            -confirm-license \
+            -nomake examples \
+            -nomake tests \
+            -no-opengl \
+            -no-dbus \
+            -no-gtk \
+            -no-feature-zstd \
+            -skip qtwebengine -skip qtquick3d -skip qtgraphs -skip qtquick3dphysics \
+            -skip qtdeclarative -skip qtquicktimeline -skip qtdoc -skip qtlocation \
+            -skip qtlottie -skip qtmqtt -skip qtopcua -skip qtquickeffectmaker \
+            -skip qtvirtualkeyboard -skip qtwebview \
+            -- \
+            -DCMAKE_POLICY_DEFAULT_CMP0177=NEW \
+            -DFEATURE_pkg_config=ON
+
+          cmake --build . --parallel "$(sysctl -n hw.logicalcpu)"
+          cmake --install .
+
+      - name: Verify static Qt
+        env:
+          PKG_CONFIG_PATH: /Users/runner/Qt/6.6.3-static/lib/pkgconfig
+        run: |
+          ls -l /Users/runner/Qt/6.6.3-static/lib
+          file /Users/runner/Qt/6.6.3-static/lib/libQt6Core.a
+          pkg-config --modversion Qt6Widgets Qt6Network Qt6MultimediaWidgets
+          pkg-config --cflags Qt6Widgets Qt6Network Qt6MultimediaWidgets
+          pkg-config --libs --static Qt6Widgets Qt6Network Qt6MultimediaWidgets
 
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
           go-version: 1.24
 
-      - name: Build
-        run: CGO_ENABLED=1 CGO_CXXFLAGS=-std=c++17 go build -ldflags '-s -w' -trimpath
+      - name: Build Go project (linking static Qt)
+        env:
+          PKG_CONFIG_PATH: /Users/runner/Qt/6.6.3-static/lib/pkgconfig
+        run: |
+          export CGO_ENABLED=1
+          qt_include=/Users/runner/Qt/6.6.3-static/include
+          export CGO_CPPFLAGS="\
+            -I$qt_include \
+            -I$qt_include/QtCore \
+            -I$qt_include/QtGui \
+            -I$qt_include/QtWidgets \
+            -I$qt_include/QtNetwork \
+            -I$qt_include/QtMultimedia \
+            -I$qt_include/QtMultimediaWidgets"
+          export CGO_CXXFLAGS="-std=c++17"
+          qt_static_libs="$(pkg-config --libs --static Qt6Widgets Qt6Network Qt6MultimediaWidgets)"
+          # Static Qt keeps some qrc object files in its archives without a
+          # normal link-time reference. Load every member while resolving Qt,
+          # then restore the default archive behavior for other libraries.
+          qt_archive_scope="-Wl,-all_load"
+          image_libs="$(brew --prefix libpng)/lib/libpng.a -lz"
+          regex_libs="$(brew --prefix pcre2)/lib/libpcre2-16.a"
+          compression_libs="$(brew --prefix brotli)/lib/libbrotlidec.a $(brew --prefix brotli)/lib/libbrotlicommon.a"
+          # Keep HarfBuzz static while retaining its transitive dependencies
+          # (for example graphite2) from its pkg-config metadata.
+          font_libs="$(pkg-config --libs --static harfbuzz)"
+          font_libs="$(brew --prefix harfbuzz)/lib/libharfbuzz.a ${font_libs//-lharfbuzz/}"
+          macos_frameworks="\
+            -framework AppKit \
+            -framework AudioToolbox \
+            -framework AVFoundation \
+            -framework CoreAudio \
+            -framework CoreFoundation \
+            -framework CoreGraphics \
+            -framework CoreMedia \
+            -framework CoreServices \
+            -framework CoreText \
+            -framework CoreVideo \
+            -framework Foundation \
+            -framework GSS \
+            -framework ImageIO \
+            -framework IOKit \
+            -framework IOSurface \
+            -framework Metal \
+            -framework OpenGL \
+            -framework QuartzCore \
+            -framework Security \
+            -framework SystemConfiguration \
+            -framework UniformTypeIdentifiers \
+            -framework VideoToolbox"
+          # The pkg-config files generated by the Qt 6.6 patch above do not
+          # include static-only private dependencies or Apple frameworks.
+          export CGO_LDFLAGS="$qt_archive_scope $qt_static_libs $image_libs $regex_libs $font_libs $compression_libs $macos_frameworks -lbz2 -liconv -lc++ -Wl,-noall_load"
+          go build -ldflags '-s -w' -trimpath
 
       - name: Compress binary with 7zip
         run: 7zz a ayandict.7z ayandict
 
       - name: Set output vars
         id: vars
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: CLICK HERE TO DOWNLOAD BINARY
         uses: actions/upload-artifact@v7
         with:
-          name: ayandict-mac-arm64-${{ steps.vars.outputs.sha_short }}
+          name: ayandict-mac-arm64-static-${{ steps.vars.outputs.sha_short }}
           if-no-files-found: error
           retention-days: 7
           path: ayandict.7z
