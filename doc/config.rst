@@ -128,7 +128,7 @@ Default value: ``false``
 ------------------
 Desktop Widget: enable
 
-Default value: ``false``
+Default value: ``true``
 
 ``desktop_widget_click_time``
 -----------------------------
