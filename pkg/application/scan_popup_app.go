@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
+	"github.com/ilius/ayandict/v3/pkg/qplatform"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -27,6 +28,24 @@ func (app *Application) onScanPopupCloseEvent(super func(*qt.QCloseEvent), event
 
 func (app *Application) OnScanPopupShow() {
 	app.scanPopupCount.Add(1)
+}
+
+func (app *Application) PreparePopup(popup *qt.QWidget) {
+	if qplatform.CanMoveWindow() {
+		return
+	}
+	if app.desktopWidget != nil {
+		app.desktopWidget.Show()
+		app.desktopWidget.ActivateWindow()
+		app.desktopWidget.Raise()
+		popup.CreateWinId() // forces creation of QWindow
+		handle := popup.WindowHandle()
+		if handle == nil {
+			slog.Warn("popup handle is nil")
+		} else {
+			handle.SetParent(app.desktopWidget.WindowHandle())
+		}
+	}
 }
 
 func (app *Application) ShowWindowAndQuery(query string) {

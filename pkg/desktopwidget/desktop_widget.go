@@ -3,6 +3,7 @@ package desktopwidget
 import (
 	"log/slog"
 
+	"github.com/ilius/ayandict/v3/pkg/qplatform"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -17,9 +18,11 @@ func NewDekstopWidget(
 		return nil
 	}
 	widget := qt.NewQWidget2()
-	widget.SetWindowFlags(qt.FramelessWindowHint |
-		qt.Tool |
-		qt.WindowStaysOnBottomHint)
+	flags := qt.FramelessWindowHint | qt.Tool
+	if qplatform.CanMoveWindow() {
+		flags |= qt.WindowStaysOnBottomHint
+	}
+	widget.SetWindowFlags(flags)
 	// widget.SetWindowFlags(qt.WindowStaysOnBottomHint |
 	// 	qt.WindowStaysOnBottomHint |
 	// 	qt.WindowDoesNotAcceptFocus)

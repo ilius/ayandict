@@ -15,6 +15,7 @@ type QCloseEventFunc = func(super func(*qt.QCloseEvent), event *qt.QCloseEvent)
 var aboutToDragCursor = qt.PointingHandCursor
 
 type ScanPopupAppInterface interface {
+	PreparePopup(popup *qt.QWidget)
 	OnScanPopupShow()
 	ShowWindowAndQuery(query string)
 	AddHistoryAndFrequency(query string)
@@ -95,6 +96,8 @@ func (p *ScanPopup) init() {
 		if conf.ScanPopupBypassWindowManager {
 			flags |= qt.BypassWindowManagerHint
 		}
+	} else {
+		flags = qt.WindowStaysOnTopHint | qt.ToolTip | qt.FramelessWindowHint
 	}
 	popup.SetWindowFlags(flags)
 	popup.SetAttribute(qt.WA_DeleteOnClose)
@@ -204,6 +207,7 @@ func (p *ScanPopup) onQueryNoResult(message string, args ...any) {
 	p.articleView.SetHtml(fmt.Sprintf(message, args...))
 	p.nextButton.Hide()
 	p.prevButton.Hide()
+	p.app.PreparePopup(p.popup)
 	p.popup.Show()
 	p.popup.ActivateWindow()
 }
@@ -237,6 +241,7 @@ func (p *ScanPopup) doQuery(query string) {
 	if conf.ScanPopupHistory {
 		p.app.AddHistoryAndFrequency(query)
 	}
+	p.app.PreparePopup(p.popup)
 	p.popup.Show()
 	p.popup.ActivateWindow()
 	if playTimer != nil {
