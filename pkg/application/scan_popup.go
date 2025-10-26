@@ -136,6 +136,11 @@ func (p *ScanPopup) init() {
 	prevButton.OnClicked(p.gotoPrevResult)
 	p.prevButton = prevButton
 
+	closeButton.SetToolTip("Close (Esc)")
+	mainButton.SetToolTip("Open in main window (Enter)")
+	nextButton.SetToolTip("Next result")
+	prevButton.SetToolTip("Previous result")
+
 	// favoriteButton := qt.NewQPushButton3("favorite")
 	// favoriteButton.SetFont(font)
 	// favoriteButton.SetCheckable(true)
