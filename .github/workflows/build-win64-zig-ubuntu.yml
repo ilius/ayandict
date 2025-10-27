@@ -63,11 +63,12 @@ jobs:
           ls -l $QT_DIR/lib/pkgconfig
           # pkg-config --list-all | grep Qt6
 
-          echo '#include "QtCore/qabstractanimation.h"' > $QT_DIR/include/QAbstractAnimation
+          # echo '#include "QtCore/qabstractanimation.h"' > $QT_DIR/include/QAbstractAnimation
 
-          cd $QT_DIR/include/
-          ls -l QtCore/QAbstractAnimation
-          find . -ls | grep -i QAbstractAnimation
+          cd $QT_DIR/include/QtCore
+          ln -s qabstractanimation.h  QAbstractAnimation.h
+          # ls -l QtCore/QAbstractAnimation
+          # find . -ls | grep -i QAbstractAnimation
           # ln -s QtCore/qabstractanimation.h QAbstractAnimation.h
 
 
