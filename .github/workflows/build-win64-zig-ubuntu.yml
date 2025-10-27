@@ -122,7 +122,11 @@ jobs:
           head -n3 /proc/meminfo
           echo "=========== Env ============"
           go env
-          /usr/bin/time -v go build -x -v -work -ldflags="-v -s -w -H windowsgui" -o ayandict.exe || true
+          /usr/bin/time -v \
+            go build -x -v -work \
+            -ldflags="-v -s -w -H windowsgui" \
+            -o ayandict.exe \
+            >build.log 2>&1
           if [ ! -f ayandict.exe ]; then
             echo "Build failed — ayandict.exe not created"
             exit 1
@@ -139,9 +143,15 @@ jobs:
           cp $QT_DIR/bin/Qt6*.dll dist/ || true
           zip -r ayandict-win64.zip dist
 
-      - name: Upload build artifact
+      - name: CLICK HERE TO DOWNLOAD BINARY
         uses: actions/upload-artifact@v4
         with:
           name: ayandict-win64-${{ github.sha }}
           path: ayandict-win64.zip
+          retention-days: 7
+
+      - name: Upload build output/error log
+        uses: actions/upload-artifact@v4
+        with:
+          path: build.log
           retention-days: 7
