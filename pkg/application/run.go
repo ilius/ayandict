@@ -10,6 +10,7 @@ import (
 )
 
 func Run() {
+	qt.QGuiApplication_SetDesktopFileName(appinfo.APP_NAME)
 	app := &Application{
 		QApplication: qt.NewQApplication(os.Args),
 		window:       qt.NewQMainWindow(nil),
