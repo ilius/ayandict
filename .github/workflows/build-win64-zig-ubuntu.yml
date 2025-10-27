@@ -5,6 +5,13 @@ on:
     branches: ["build-windows*"]
   pull_request:
     branches: ["v3"]
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 
 # To get latest supported QT_VERSION for windows: aqt list-qt windows desktop
 # But the latest supported QT_VERSION for MinGW64 is 6.6.3
@@ -21,6 +28,13 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+
+      # Enable tmate debugging of manually-triggered workflows if the input option was provided
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        # if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        with:
+          detached: true
 
       - name: Install tools
         run: |
