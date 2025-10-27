@@ -95,8 +95,11 @@ jobs:
             -lQt6Svg -lQt6PrintSupport -lQt6WinExtras \
             -lstdc++ -lm -lwinpthread -static"
 
+          CGO_CXXFLAGS='-Wno-ignored-attributes' # Clang 18 recommendation
+
           echo "CGO_CFLAGS=$CGO_CFLAGS" >> $GITHUB_ENV
           echo "CGO_LDFLAGS=$CGO_LDFLAGS" >> $GITHUB_ENV
+          echo "CGO_CXXFLAGS=$CGO_CXXFLAGS" >> $GITHUB_ENV
 
       - name: Build Windows executable
         run: |
@@ -105,7 +108,7 @@ jobs:
           head -n3 /proc/meminfo
           echo "=========== Env ============"
           go env
-          /usr/bin/time -v go build -x -v -work -ldflags="-v" -o ayandict.exe || true
+          /usr/bin/time -v go build -x -v -work -ldflags="-v -s -w -H windowsgui" -o ayandict.exe || true
           if [ ! -f ayandict.exe ]; then
             echo "Build failed — ayandict.exe not created"
             exit 1
