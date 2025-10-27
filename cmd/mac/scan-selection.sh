@@ -2,7 +2,7 @@
 # Capture selected text on macOS and send it to AyanDict
 # via UNIX socket for Scan Popup
 
-set -euo pipefail
+set -o errexit -o pipefail -o nounset
 
 SOCKET="/tmp/ayandict-$UID"
 

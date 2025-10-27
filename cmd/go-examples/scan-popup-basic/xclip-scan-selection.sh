@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o errexit -o pipefail -o nounset
 
 DIR=$(dirname $0)
 cd $DIR

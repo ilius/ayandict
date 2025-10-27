@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o errexit -o pipefail -o nounset
 
 # Get clipboard or primary text regardless of Wayland/X11
 clip_get() {
