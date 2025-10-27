@@ -10,6 +10,7 @@ import (
 )
 
 func Run() {
+	qt.QCoreApplication_SetApplicationName(appinfo.APP_DESC)
 	qt.QGuiApplication_SetDesktopFileName(appinfo.APP_NAME)
 	app := &Application{
 		QApplication: qt.NewQApplication(os.Args),
@@ -18,7 +19,6 @@ func Run() {
 	logging.ShowErrorDialog = showErrorMessage
 	app.style = qt.QApplication_Style()
 	app.bottomBoxStyleOpt = qt.NewQStyleOptionButton()
-	qt.QCoreApplication_SetApplicationName(appinfo.APP_DESC)
 
 	if cacheDir == "" {
 		slog.Error("cacheDir is empty")
