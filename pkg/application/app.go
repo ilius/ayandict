@@ -576,7 +576,7 @@ func (app *Application) statusIconActivate() {
 	}
 }
 
-func (app *Application) aboutClicked() {
+func (app *Application) ShowAbout() {
 	window := qt.NewQDialog(app.window.QWidget)
 	aboutClickedWidget(window.QWidget, app.icon)
 	window.ShowNormal()

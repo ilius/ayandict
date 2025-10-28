@@ -20,7 +20,7 @@ func (app *Application) setupHandlers() {
 	app.setupKeyPressEvent(app.resultList.QListWidget)
 	app.setupKeyPressEvent(app.historyView.QListWidget)
 
-	app.setupArticleViewKeyPressEvent()
+	app.articleView.OnKeyPressEvent(app.onArticleViewKeyPressEvent)
 
 	app.articleView.SetupCustomHandlers()
 	app.historyView.SetupCustomHandlers()
@@ -105,7 +105,7 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 		case escape: // event.Text()="\x1b"
 			app.onEscape()
 		case int(qt.Key_F1):
-			app.aboutClicked()
+			app.ShowAbout()
 		case int(qt.Key_PageUp), int(qt.Key_PageDown):
 			if event.Modifiers() == 0 {
 				app.sendKeyEventToArticleView(event)
@@ -142,47 +142,41 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 	})
 }
 
-func (app *Application) setupArticleViewKeyPressEvent() {
-	app.articleView.Browser.OnKeyPressEvent(func(super func(event *qt.QKeyEvent), event *qt.QKeyEvent) {
-		switch event.Key() {
-		case int(qt.Key_Space): // " "
-			app.entry.SetFocusWithReason(qt.ShortcutFocusReason)
-		case int(qt.Key_Plus), int(qt.Key_Equal): // "+", "="
-			app.articleView.ZoomIn()
-		case int(qt.Key_Minus): // "-"
-			app.articleView.ZoomOut()
-		case escape: // event.Text()="\x1b"
-			app.onEscape()
-		case int(qt.Key_F1):
-			app.aboutClicked()
-		case int(qt.Key_Q):
-			if event.Modifiers()&qt.ControlModifier > 0 {
-				app.Exit()
-			}
-		case int(qt.Key_Left):
-			if event.Modifiers()&altCtrlModifier > 0 {
-				app.goBackInHistory()
-			}
-		case int(qt.Key_Right):
-			if event.Modifiers()&altCtrlModifier > 0 {
-				app.goForwardInHistory()
-			}
-		case int(qt.Key_Up):
-			if event.Modifiers()&qt.AltModifier > 0 {
-				app.resultList.GoPrevious()
-			} else {
-				super(event)
-			}
-		case int(qt.Key_Down):
-			if event.Modifiers()&qt.AltModifier > 0 {
-				app.resultList.GoNext()
-			} else {
-				super(event)
-			}
-		default:
+func (app *Application) onArticleViewKeyPressEvent(super func(event *qt.QKeyEvent), event *qt.QKeyEvent) {
+	switch event.Key() {
+	case int(qt.Key_Space): // " "
+		app.entry.SetFocusWithReason(qt.ShortcutFocusReason)
+	case escape: // event.Text()="\x1b"
+		app.onEscape()
+	case int(qt.Key_F1):
+		app.ShowAbout()
+	case int(qt.Key_Q):
+		if event.Modifiers()&qt.ControlModifier > 0 {
+			app.Exit()
+		}
+	case int(qt.Key_Left):
+		if event.Modifiers()&altCtrlModifier > 0 {
+			app.goBackInHistory()
+		}
+	case int(qt.Key_Right):
+		if event.Modifiers()&altCtrlModifier > 0 {
+			app.goForwardInHistory()
+		}
+	case int(qt.Key_Up):
+		if event.Modifiers()&qt.AltModifier > 0 {
+			app.resultList.GoPrevious()
+		} else {
 			super(event)
 		}
-	})
+	case int(qt.Key_Down):
+		if event.Modifiers()&qt.AltModifier > 0 {
+			app.resultList.GoNext()
+		} else {
+			super(event)
+		}
+	default:
+		super(event)
+	}
 }
 
 func (app *Application) goBackInHistory() {

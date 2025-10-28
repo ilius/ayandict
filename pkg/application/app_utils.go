@@ -32,7 +32,7 @@ func (app *Application) makeAboutButton(conf *config.Config) *qt.QPushButton {
 		aboutButtonLabel = "\u200c"
 	}
 	aboutButton := app.newIconTextButton(aboutButtonLabel, qt.QStyle__SP_MessageBoxInformation)
-	aboutButton.OnClicked(app.aboutClicked)
+	aboutButton.OnClicked(app.ShowAbout)
 	return aboutButton
 }
 

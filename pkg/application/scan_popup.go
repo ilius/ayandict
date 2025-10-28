@@ -18,6 +18,7 @@ type ScanPopupAppInterface interface {
 	OnScanPopupShow()
 	ShowWindowAndQuery(query string)
 	AddHistoryAndFrequency(query string)
+	ShowAbout()
 }
 
 func NewScanPopup(
@@ -103,6 +104,7 @@ func (p *ScanPopup) init() {
 	p.articleView = NewArticleView(p.doQuery)
 	p.articleView.Widget.SetFont(font)
 	p.articleView.SetupCustomHandlers()
+	p.articleView.OnKeyPressEvent(p.onArticleViewKeyPressEvent)
 
 	popup.OnKeyPressEvent(p.onKeyPress)
 
@@ -145,8 +147,8 @@ func (p *ScanPopup) init() {
 
 	closeButton.SetToolTip("Close (Esc)")
 	mainButton.SetToolTip("Open in main window (Enter)")
-	nextButton.SetToolTip("Next result")
-	prevButton.SetToolTip("Previous result")
+	nextButton.SetToolTip("Next result (Alt+Down)")
+	prevButton.SetToolTip("Previous result (Alt+Up)")
 
 	// favoriteButton := qt.NewQPushButton3("favorite")
 	// favoriteButton.SetFont(font)
@@ -304,6 +306,28 @@ func (p *ScanPopup) onKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
 		} else {
 			p.moveToMainWindow()
 		}
+	default:
+		super(event)
+	}
+}
+
+func (p *ScanPopup) onArticleViewKeyPressEvent(super func(event *qt.QKeyEvent), event *qt.QKeyEvent) {
+	switch event.Key() {
+	case int(qt.Key_Up):
+		if event.Modifiers()&qt.AltModifier > 0 {
+			p.gotoPrevResult()
+		} else {
+			super(event)
+		}
+	case int(qt.Key_Down):
+		if event.Modifiers()&qt.AltModifier > 0 {
+			p.gotoNextResult()
+		} else {
+			super(event)
+		}
+	case int(qt.Key_F1):
+		p.popup.Close()
+		p.app.ShowAbout()
 	default:
 		super(event)
 	}

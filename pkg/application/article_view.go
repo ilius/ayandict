@@ -45,6 +45,8 @@ type ArticleView struct {
 	Widget  *qt.QWidget // same as frame, used from outside
 	Browser *qt.QTextBrowser
 
+	onKeyPressEventCustom func(super func(*qt.QKeyEvent), event *qt.QKeyEvent)
+
 	searchEntry *qt.QLineEdit
 	searchFrame *qt.QFrame
 	docCursor   *qt.QTextCursor
@@ -82,7 +84,18 @@ func NewArticleView(doQuery func(string)) *ArticleView {
 	}
 	view.init()
 	browser.OnKeyPressEvent(func(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
-		view.onKeyPressEvent(event)
+		switch event.Key() {
+		case int(qt.Key_Plus), int(qt.Key_Equal): // "+", "="
+			view.ZoomIn()
+			return
+		case int(qt.Key_Minus): // "-"
+			view.ZoomOut()
+			return
+		}
+		if view.onKeyPressEventCustom != nil {
+			view.onKeyPressEventCustom(super, event)
+			return
+		}
 		super(event)
 	})
 	view.doQuery = doQuery
@@ -562,19 +575,11 @@ func (view *ArticleView) SetupCustomHandlers() {
 	view.setupWheelEvent()
 }
 
-func (view *ArticleView) onKeyPressEvent(event *qt.QKeyEvent) {
-	switch event.Key() {
-	case int(qt.Key_Up):
-		if conf.ArticleArrowKeys {
-			view.Browser.VerticalScrollBar().TriggerAction(qt.QAbstractSlider__SliderSingleStepSub)
-			return
-		}
-	case int(qt.Key_Down):
-		if conf.ArticleArrowKeys {
-			view.Browser.VerticalScrollBar().TriggerAction(qt.QAbstractSlider__SliderSingleStepAdd)
-			return
-		}
+func (view *ArticleView) OnKeyPressEvent(f func(super func(*qt.QKeyEvent), event *qt.QKeyEvent)) {
+	if view.onKeyPressEventCustom != nil {
+		panic("ArticleView.OnKeyPressEvent is called twice")
 	}
+	view.onKeyPressEventCustom = f
 }
 
 func (view *ArticleView) clearHighlights() {
