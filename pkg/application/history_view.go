@@ -23,12 +23,14 @@ func NewHistoryView(
 	doQuery func(query string),
 ) *HistoryView {
 	widget := qt.NewQListWidget(nil)
-	return &HistoryView{
+	h := &HistoryView{
 		storage:     storage,
 		maxSize:     maxSize,
 		QListWidget: widget,
 		doQuery:     doQuery,
 	}
+	h.setupCustomHandlers()
+	return h
 }
 
 func (h *HistoryView) Load() error {
@@ -89,7 +91,7 @@ func (h *HistoryView) ClearHistory() {
 	h.Save()
 }
 
-func (h *HistoryView) SetupCustomHandlers() {
+func (h *HistoryView) setupCustomHandlers() {
 	doQuery := h.doQuery
 	if doQuery == nil {
 		panic("doQuery is not set")

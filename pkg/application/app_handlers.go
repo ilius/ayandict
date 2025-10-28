@@ -22,9 +22,6 @@ func (app *Application) setupHandlers() {
 
 	app.articleView.OnKeyPressEvent(app.onArticleViewKeyPressEvent)
 
-	app.articleView.SetupCustomHandlers()
-	app.historyView.SetupCustomHandlers()
-
 	entry := app.entry
 	queryArgs := app.queryArgs
 	frequencyTable := app.frequencyTable

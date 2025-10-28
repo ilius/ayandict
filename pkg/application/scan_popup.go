@@ -103,7 +103,6 @@ func (p *ScanPopup) init() {
 
 	p.articleView = NewArticleView(p.doQuery)
 	p.articleView.Widget.SetFont(font)
-	p.articleView.SetupCustomHandlers()
 	p.articleView.OnKeyPressEvent(p.onArticleViewKeyPressEvent)
 
 	popup.OnKeyPressEvent(p.onKeyPress)

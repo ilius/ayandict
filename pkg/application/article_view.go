@@ -99,6 +99,7 @@ func NewArticleView(doQuery func(string)) *ArticleView {
 		super(event)
 	})
 	view.doQuery = doQuery
+	view.setupCustomHandlers()
 	return view
 }
 
@@ -539,7 +540,7 @@ func (view *ArticleView) setupWheelEvent() {
 }
 
 // TODO: break down
-func (view *ArticleView) SetupCustomHandlers() {
+func (view *ArticleView) setupCustomHandlers() {
 	doQuery := view.doQuery
 	if doQuery == nil {
 		panic("doQuery is not set")
