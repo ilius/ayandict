@@ -89,8 +89,7 @@ jobs:
 
           echo "CGO_ENABLED=1" >> $GITHUB_ENV
 
-          CGO_CFLAGS="-fPIC -ferror-limit=0 \
-          -I$QT_DIR/include \
+          QT_CFLAGS="-I$QT_DIR/include \
           -I$QT_DIR/include/QtCore \
           -I$QT_DIR/include/QtCore/private \
           -I$QT_DIR/include/QtGui \
@@ -104,17 +103,19 @@ jobs:
           -I$QT_DIR/include/QtSvg \
           -I$QT_DIR/include/QtSvg/private"
 
+          CGO_CFLAGS="-fPIC -ferror-limit=0 $QT_CFLAGS"
+
+          CGO_CXXFLAGS="-Wno-ignored-attributes $QT_CFLAGS"
+
           # Libraries (static)
           CGO_LDFLAGS="-L$QT_DIR/lib \
             -lQt6Core -lQt6Gui -lQt6Widgets -lQt6Network -lQt6Multimedia \
             -lQt6Svg -lQt6PrintSupport -lQt6WinExtras \
             -lstdc++ -lm -lwinpthread -static"
 
-          CGO_CXXFLAGS='-Wno-ignored-attributes' # Clang 18 recommendation
-
           echo "CGO_CFLAGS=$CGO_CFLAGS" >> $GITHUB_ENV
-          echo "CGO_LDFLAGS=$CGO_LDFLAGS" >> $GITHUB_ENV
           echo "CGO_CXXFLAGS=$CGO_CXXFLAGS" >> $GITHUB_ENV
+          echo "CGO_LDFLAGS=$CGO_LDFLAGS" >> $GITHUB_ENV
 
       - name: Build Windows executable
         run: |
