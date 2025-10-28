@@ -8,13 +8,13 @@ clip_get() {
             echo "wl-paste command not found. Make sure wl-clipboard package is installed" >&2
             return 1
         fi
-        wl-paste --primary
+        wl-paste
     elif [ -n "$DISPLAY" ]; then
         if ! command -v xclip >/dev/null 2>&1; then
             echo "xclip command not found. Make sure xclip package is installed" >&2
             return 1
         fi
-        xclip -selection primary -o
+        xclip -selection clipboard -o
     else
         echo "Unknown display server." >&2
         return 1
