@@ -47,6 +47,8 @@ type ArticleView struct {
 
 	onKeyPressEventCustom func(super func(*qt.QKeyEvent), event *qt.QKeyEvent)
 
+	hasCustomMousePressEvent bool
+
 	searchEntry *qt.QLineEdit
 	searchFrame *qt.QFrame
 	docCursor   *qt.QTextCursor
@@ -576,11 +578,19 @@ func (view *ArticleView) setupCustomHandlers() {
 	view.setupWheelEvent()
 }
 
-func (view *ArticleView) OnKeyPressEvent(f func(super func(*qt.QKeyEvent), event *qt.QKeyEvent)) {
+func (view *ArticleView) OnKeyPressEvent(fn func(super func(*qt.QKeyEvent), event *qt.QKeyEvent)) {
 	if view.onKeyPressEventCustom != nil {
 		panic("ArticleView.OnKeyPressEvent is called twice")
 	}
-	view.onKeyPressEventCustom = f
+	view.onKeyPressEventCustom = fn
+}
+
+func (view *ArticleView) OnMousePressEvent(fn func(super func(ev *qt.QMouseEvent), ev *qt.QMouseEvent)) {
+	if view.hasCustomMousePressEvent {
+		panic("ArticleView.OnMousePressEvent called twice")
+	}
+	view.hasCustomMousePressEvent = true
+	view.Browser.OnMousePressEvent(fn)
 }
 
 func (view *ArticleView) clearHighlights() {

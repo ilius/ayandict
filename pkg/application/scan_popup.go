@@ -111,7 +111,7 @@ func (p *ScanPopup) init() {
 	popup.OnMouseMoveEvent(p.onMouseMove)
 	popup.OnMouseReleaseEvent(p.onMouseRelease)
 
-	p.articleView.Browser.OnMousePressEvent(func(super func(ev *qt.QMouseEvent), ev *qt.QMouseEvent) {
+	p.articleView.OnMousePressEvent(func(super func(ev *qt.QMouseEvent), ev *qt.QMouseEvent) {
 		popup.ActivateWindow()
 		super(ev)
 	})
