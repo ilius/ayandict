@@ -33,7 +33,7 @@ func addTabWithIcon(
 }
 
 func aboutClickedWidget(widget *qt.QWidget, icon *qt.QIcon) {
-	widget.SetWindowTitle("About AyanDict")
+	widget.SetWindowTitle("About " + appinfo.APP_DESC)
 	widget.Resize(700, 500)
 	widget.SetWindowIcon(icon)
 
@@ -53,7 +53,8 @@ func aboutClickedWidget(widget *qt.QWidget, icon *qt.QIcon) {
 	}
 
 	topLabel := qt.NewQLabel3(fmt.Sprintf(
-		"AyanDict version %s\nUsing Qt %v and Go %v",
+		"%s version %s\nUsing Qt %v and Go %v",
+		appinfo.APP_DESC,
 		appinfo.VERSION,
 		qt.QLibraryInfo_Version().ToString(),
 		runtime.Version()[2:],

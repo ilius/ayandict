@@ -13,7 +13,9 @@ import (
 func platformConfigDir() string {
 	return filepath.Join(
 		os.Getenv(S_HOME),
-		"Library/Preferences/AyanDict",
+		"Library",
+		"Preferences",
+		appinfo.APP_DESC,
 	)
 }
 
