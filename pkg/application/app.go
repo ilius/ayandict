@@ -174,7 +174,11 @@ func (app *Application) Run() {
 		app.scanPopup,
 		app.statusIconActivate,
 	) {
-		slog.Error("another instance is running, or dead socket (/tmp/ayandict*)")
+		slog.Error(
+			"another instance is running, or dead socket (in /tmp)",
+			"filename",
+			appinfo.LOCAL_SOCKET_NAME,
+		)
 		return
 	}
 	defer func() {
@@ -229,7 +233,7 @@ func (app *Application) Run() {
 		}
 	}
 	{
-		icon, err := loadPNGIcon("ayandict-64px.png")
+		icon, err := loadPNGIcon(iconPixName)
 		if err != nil {
 			slog.Error("failed to load window icon", "err", err)
 			panic(err)

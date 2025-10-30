@@ -41,7 +41,7 @@ func aboutClickedWidget(widget *qt.QWidget, icon *qt.QIcon) {
 	topHBoxLayout := qt.NewQHBoxLayout(topHBox.QWidget)
 
 	{
-		pixmap, err := loadPNGPixmap("ayandict-64px.png")
+		pixmap, err := loadPNGPixmap(iconPixName)
 		if err != nil {
 			slog.Error("failed to load icon image", "err", err)
 		} else {

@@ -6,12 +6,14 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
+const iconPixName = "ayandict-64px.png"
+
 func NewDekstopWidget(
 	onActivate func(event *qt.QMouseEvent),
 	actions []*qt.QAction,
 ) *DesktopWidget {
 	slog.Info("setupDekstopWidget")
-	pixmap, err := loadPNGPixmap("ayandict-64px.png")
+	pixmap, err := loadPNGPixmap(iconPixName)
 	if err != nil {
 		slog.Error("failed to load icon image", "err", err)
 		return nil

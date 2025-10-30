@@ -10,7 +10,7 @@ import (
 
 func (app *Application) setupDekstopWidget() {
 	slog.Info("setupDekstopWidget")
-	pixmap, err := loadPNGPixmap("ayandict-64px.png")
+	pixmap, err := loadPNGPixmap(iconPixName)
 	if err != nil {
 		slog.Error("failed to load icon image", "err", err)
 		return
