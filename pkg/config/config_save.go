@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"fmt"
 	"log/slog"
 	"os"
 	"runtime"
@@ -38,8 +39,11 @@ func Save(conf *Config) error {
 }
 
 func EnsureExists(conf *Config) error {
-	_, err := os.Stat(Path())
+	stat, err := os.Stat(Path())
 	if err == nil {
+		if stat.IsDir() {
+			return fmt.Errorf("config file is a directory")
+		}
 		return nil
 	}
 	if !os.IsNotExist(err) {

@@ -117,7 +117,7 @@ func (app *Application) ReloadConfig() {
 func OpenConfig() {
 	err := config.EnsureExists(conf)
 	if err != nil {
-		slog.Error("error checking/creating config file: " + err.Error())
+		slog.Error("error checking/creating config file: "+err.Error(), "path", config.Path())
 	}
 	url := qt.NewQUrl()
 	url.SetScheme("file")
