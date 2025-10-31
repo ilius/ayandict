@@ -190,6 +190,12 @@ Scan Popup: add to history
 
 Default value: ``true``
 
+``scan_popup_header_template``
+------------------------------
+Scan Popup: HTML template for header (dict name and score)
+
+Default value: ``"{{.DictName}} [Score: %{{.Score}}]"``
+
 ``scan_popup_header_icons``
 ---------------------------
 Scan Popup: use icons for header buttons

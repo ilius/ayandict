@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+	"html"
 	"log/slog"
 	"os"
 	"os/exec"
@@ -13,7 +14,6 @@ import (
 	"time"
 
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
-	"github.com/ilius/ayandict/v3/pkg/headerlib"
 	"github.com/ilius/ayandict/v3/pkg/mp3duration"
 	common "github.com/ilius/go-dict-commons"
 	qt "github.com/mappu/miqt/qt6"
@@ -305,11 +305,19 @@ func (view *ArticleView) SetResult(res common.SearchResultIface) {
 	}
 }
 
-func (view *ArticleView) SetPopupResult(res common.SearchResultIface) *qt.QTimer {
-	header, err := headerlib.GetHeader(headerTpl, res)
-	if err != nil {
-		slog.Error("error formatting header label: " + err.Error())
-		return nil
+func (view *ArticleView) SetPopupResult(
+	res common.SearchResultIface,
+	headerStyle string,
+) *qt.QTimer {
+	var header string
+	if dictmgr.DictShowTerms(res.DictName()) {
+		terms := res.Terms()
+		termsJoined := html.EscapeString(strings.Join(terms, " | "))
+		header = fmt.Sprintf(
+			`<div %s>%s</div>`,
+			headerStyle,
+			termsJoined,
+		)
 	}
 	view.dictName = res.DictName()
 	text := strings.Join(

@@ -1,11 +1,15 @@
 package application
 
 import (
+	"bytes"
 	"fmt"
+	"html/template"
 	"log/slog"
 
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/qplatform"
+	"github.com/ilius/ayandict/v3/pkg/wordwrap"
+	common "github.com/ilius/go-dict-commons"
 	commons "github.com/ilius/go-dict-commons"
 	qt "github.com/mappu/miqt/qt6"
 )
@@ -53,9 +57,10 @@ type ScanPopup struct {
 	popup *qt.QWidget
 
 	// set by init method:
-	articleView *ArticleView
-	nextButton  *qt.QPushButton
-	prevButton  *qt.QPushButton
+	headerTemplate *template.Template
+	articleView    *ArticleView
+	nextButton     *qt.QPushButton
+	prevButton     *qt.QPushButton
 
 	// set by doQuery
 	results []commons.SearchResultIface
@@ -67,7 +72,7 @@ type ScanPopup struct {
 	dragPos *qt.QPoint
 
 	// header label that you use to drag
-	dragLabel *qt.QLabel
+	headerLabel *qt.QLabel
 }
 
 func (p *ScanPopup) Run(pos *qt.QPoint, icon *qt.QIcon) {
@@ -100,6 +105,17 @@ func (p *ScanPopup) init() {
 	popup.SetWindowFlags(flags)
 	popup.SetAttribute(qt.WA_DeleteOnClose)
 	popup.SetFont(font)
+
+	headerTemplate := template.New("popupheader").Funcs(template.FuncMap{
+		"wrapterms": func(terms []string, limit int) [][]string {
+			return wordwrap.WordWrapByWords(terms, limit, " ", " ")
+		},
+	})
+	headerTemplate, err := headerTemplate.Parse(conf.ScanPopupHeaderTemplate)
+	if err != nil {
+		slog.Error("error parsing scan popup template", "err", err)
+	}
+	p.headerTemplate = headerTemplate
 
 	p.articleView = NewArticleView(p.doQuery)
 	p.articleView.Widget.SetFont(font)
@@ -163,11 +179,16 @@ func (p *ScanPopup) init() {
 	// )
 
 	headerBox := qt.NewQHBoxLayout2()
+	headerBox.AddSpacing(10)
 	{
 		label := qt.NewQLabel2()
 		label.SetAutoFillBackground(true)
 		label.SetBackgroundRole(qt.QPalette__ToolTipBase)
-		p.dragLabel = label
+		label.OnMousePressEvent(p.onMousePress)
+		label.OnMouseMoveEvent(p.onMouseMove)
+		label.OnMouseReleaseEvent(p.onMouseRelease)
+		// label.SetFont(font)
+		p.headerLabel = label
 		label.SetCursor(qt.NewQCursor2(aboutToDragCursor))
 		headerBox.AddWidget2(label.QWidget, 1)
 	}
@@ -221,6 +242,33 @@ func (p *ScanPopup) onQueryNoResult(message string, args ...any) {
 	p.popup.ActivateWindow()
 }
 
+type ScanPopupHeaderTemplateInput struct {
+	DictName string
+	Score    uint8
+}
+
+func (p *ScanPopup) setResult(res common.SearchResultIface) *qt.QTimer {
+	if p.headerTemplate == nil {
+		slog.Error("popup header template is not set")
+		return nil
+	}
+	headerBuf := bytes.NewBuffer(nil)
+	dictName := res.DictName()
+	err := p.headerTemplate.Execute(headerBuf, ScanPopupHeaderTemplateInput{
+		DictName: dictName,
+		Score:    res.Score() >> 1,
+	})
+	if err != nil {
+		slog.Error("error encoding popup header", "err", err)
+		return nil
+	}
+	p.headerLabel.SetText(headerBuf.String())
+	return p.articleView.SetPopupResult(
+		res,
+		`style="font-size:large;font-weight:bold;"`,
+	)
+}
+
 func (p *ScanPopup) doQuery(query string) {
 	p.query = query
 	p.popup.SetWindowTitle(query)
@@ -244,7 +292,7 @@ func (p *ScanPopup) doQuery(query string) {
 	}
 	p.nextButton.Show()
 	p.prevButton.Show()
-	playTimer := p.articleView.SetPopupResult(res)
+	playTimer := p.setResult(res)
 	// favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(res.Terms()[0]))
 	p.autoResize()
 	if conf.ScanPopupHistory {
@@ -265,7 +313,7 @@ func (p *ScanPopup) gotoNextResult() {
 	}
 	res := p.results[index]
 	p.resultIndex = index
-	playTimer := p.articleView.SetPopupResult(res)
+	playTimer := p.setResult(res)
 	// if conf.ScanPopupHistory {
 	// 	p.addHistory(res.Terms()[0])
 	// }
@@ -281,7 +329,7 @@ func (p *ScanPopup) gotoPrevResult() {
 	}
 	res := p.results[index]
 	p.resultIndex = index
-	playTimer := p.articleView.SetPopupResult(res)
+	playTimer := p.setResult(res)
 	// if conf.ScanPopupHistory {
 	// 	p.addHistory(res.Terms()[0])
 	// }
@@ -340,7 +388,7 @@ func (p *ScanPopup) onMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEv
 	p.popup.ActivateWindow()
 	if qplatform.CanMoveWindow() {
 		p.dragPos = event.Pos()
-		p.dragLabel.SetCursor(qt.NewQCursor2(qt.DragMoveCursor))
+		p.headerLabel.SetCursor(qt.NewQCursor2(qt.DragMoveCursor))
 	} else {
 		p.popup.WindowHandle().StartSystemMove()
 	}
@@ -359,7 +407,7 @@ func (p *ScanPopup) onMouseMove(super func(*qt.QMouseEvent), event *qt.QMouseEve
 
 func (p *ScanPopup) onMouseRelease(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	p.dragPos = nil
-	p.dragLabel.SetCursor(qt.NewQCursor2(aboutToDragCursor))
+	p.headerLabel.SetCursor(qt.NewQCursor2(aboutToDragCursor))
 	super(event)
 }
 
