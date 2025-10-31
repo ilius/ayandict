@@ -194,7 +194,7 @@ Default value: ``true``
 ---------------------------
 Scan Popup: use icons for header buttons
 
-Default value: ``false``
+Default value: ``true``
 
 ``scan_popup_font_size_factor``
 -------------------------------

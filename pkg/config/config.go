@@ -225,7 +225,7 @@ func Default() *Config {
 		ScanPopupHeight:      400,
 		ScanPopupMaxCount:    3,
 		ScanPopupHistory:     true,
-		ScanPopupHeaderIcons: false,
+		ScanPopupHeaderIcons: true,
 
 		ScanPopupFontSizeFactor: 0.8,
 
