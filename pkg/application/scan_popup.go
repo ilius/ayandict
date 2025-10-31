@@ -8,7 +8,6 @@ import (
 
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/qplatform"
-	"github.com/ilius/ayandict/v3/pkg/wordwrap"
 	common "github.com/ilius/go-dict-commons"
 	commons "github.com/ilius/go-dict-commons"
 	qt "github.com/mappu/miqt/qt6"
@@ -106,11 +105,7 @@ func (p *ScanPopup) init() {
 	popup.SetAttribute(qt.WA_DeleteOnClose)
 	popup.SetFont(font)
 
-	headerTemplate := template.New("popupheader").Funcs(template.FuncMap{
-		"wrapterms": func(terms []string, limit int) [][]string {
-			return wordwrap.WordWrapByWords(terms, limit, " ", " ")
-		},
-	})
+	headerTemplate := template.New("popupheader")
 	headerTemplate, err := headerTemplate.Parse(conf.ScanPopupHeaderTemplate)
 	if err != nil {
 		slog.Error("error parsing scan popup template", "err", err)
