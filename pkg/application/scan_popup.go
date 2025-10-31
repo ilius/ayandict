@@ -387,7 +387,7 @@ func (p *ScanPopup) onMousePress(super func(*qt.QMouseEvent), event *qt.QMouseEv
 	}
 	p.popup.ActivateWindow()
 	if qplatform.CanMoveWindow() {
-		p.dragPos = event.Pos()
+		p.dragPos = event.WindowPos().ToPoint()
 		p.headerLabel.SetCursor(qt.NewQCursor2(qt.DragMoveCursor))
 	} else {
 		p.popup.WindowHandle().StartSystemMove()
