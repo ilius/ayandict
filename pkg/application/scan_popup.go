@@ -265,7 +265,7 @@ func (p *ScanPopup) setResult(res common.SearchResultIface) *qt.QTimer {
 	p.headerLabel.SetText(headerBuf.String())
 	return p.articleView.SetPopupResult(
 		res,
-		`style="font-size:large;font-weight:bold;"`,
+		conf.ScanPopupTermsStyle,
 	)
 }
 

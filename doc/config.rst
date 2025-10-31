@@ -196,6 +196,12 @@ Scan Popup: HTML template for header (dict name and score)
 
 Default value: ``"{{.DictName}} [Score: %{{.Score}}]"``
 
+``scan_popup_terms_style``
+--------------------------
+Scan Popup: CSS style string for terms
+
+Default value: ``"style=\"font-size:large;font-weight:bold;\""``
+
 ``scan_popup_header_icons``
 ---------------------------
 Scan Popup: use icons for header buttons

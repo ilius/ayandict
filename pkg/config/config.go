@@ -95,6 +95,7 @@ type Config struct {
 	ScanPopupHistory   bool   `toml:"scan_popup_history" doc:"Scan Popup: add to history"`
 
 	ScanPopupHeaderTemplate string `toml:"scan_popup_header_template" doc:"Scan Popup: HTML template for header (dict name and score)"`
+	ScanPopupTermsStyle     string `toml:"scan_popup_terms_style" doc:"Scan Popup: CSS style string for terms"`
 
 	ScanPopupHeaderIcons bool `toml:"scan_popup_header_icons" doc:"Scan Popup: use icons for header buttons"`
 
@@ -229,6 +230,7 @@ func Default() *Config {
 		ScanPopupMaxCount:       3,
 		ScanPopupHistory:        true,
 		ScanPopupHeaderTemplate: `{{.DictName}} [Score: %{{.Score}}]`,
+		ScanPopupTermsStyle:     `style="font-size:large;font-weight:bold;"`,
 		ScanPopupHeaderIcons:    true,
 
 		ScanPopupFontSizeFactor: 0.8,
