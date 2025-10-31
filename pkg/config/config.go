@@ -94,10 +94,9 @@ type Config struct {
 	ScanPopupMaxCount  int32  `toml:"scan_popup_max_count" doc:"Scan Popup: max number of windows"`
 	ScanPopupHistory   bool   `toml:"scan_popup_history" doc:"Scan Popup: add to history"`
 
+	ScanPopupHeaderIcons    bool   `toml:"scan_popup_header_icons" doc:"Scan Popup: use icons for header buttons"`
 	ScanPopupHeaderTemplate string `toml:"scan_popup_header_template" doc:"Scan Popup: HTML template for header (dict name and score)"`
 	ScanPopupTermsStyle     string `toml:"scan_popup_terms_style" doc:"Scan Popup: CSS style string for terms"`
-
-	ScanPopupHeaderIcons bool `toml:"scan_popup_header_icons" doc:"Scan Popup: use icons for header buttons"`
 
 	ScanPopupFontSizeFactor float64 `toml:"scan_popup_font_size_factor" doc:"Scan Popup: font size factor (relative to app)"`
 
@@ -220,18 +219,19 @@ func Default() *Config {
 		DesktopWidget:          true,
 		DesktopWidgetClickTime: 100,
 
-		ScanPopupClipboard:      false,
-		ScanPopupSelection:      false,
-		ScanPopupAPI:            true,
-		ScanPopupMode:           "fuzzy",
-		ScanPopupMinScore:       0,
-		ScanPopupWidth:          700,
-		ScanPopupHeight:         400,
-		ScanPopupMaxCount:       3,
-		ScanPopupHistory:        true,
+		ScanPopupClipboard: false,
+		ScanPopupSelection: false,
+		ScanPopupAPI:       true,
+		ScanPopupMode:      "fuzzy",
+		ScanPopupMinScore:  0,
+		ScanPopupWidth:     700,
+		ScanPopupHeight:    400,
+		ScanPopupMaxCount:  3,
+		ScanPopupHistory:   true,
+
+		ScanPopupHeaderIcons:    true,
 		ScanPopupHeaderTemplate: `{{.DictName}} [Score: %{{.Score}}]`,
 		ScanPopupTermsStyle:     `style="font-size:large;font-weight:bold;"`,
-		ScanPopupHeaderIcons:    true,
 
 		ScanPopupFontSizeFactor: 0.8,
 

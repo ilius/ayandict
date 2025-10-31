@@ -190,6 +190,12 @@ Scan Popup: add to history
 
 Default value: ``true``
 
+``scan_popup_header_icons``
+---------------------------
+Scan Popup: use icons for header buttons
+
+Default value: ``true``
+
 ``scan_popup_header_template``
 ------------------------------
 Scan Popup: HTML template for header (dict name and score)
@@ -201,12 +207,6 @@ Default value: ``"{{.DictName}} [Score: %{{.Score}}]"``
 Scan Popup: CSS style string for terms
 
 Default value: ``"style=\"font-size:large;font-weight:bold;\""``
-
-``scan_popup_header_icons``
----------------------------
-Scan Popup: use icons for header buttons
-
-Default value: ``true``
 
 ``scan_popup_font_size_factor``
 -------------------------------
