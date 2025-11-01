@@ -32,7 +32,7 @@ func (app *Application) OnScanPopupShow() {
 func (app *Application) ShowWindowAndQuery(query string) {
 	app.window.ShowNormal()
 	app.window.ActivateWindow()
-	app.doQuery(query)
+	app.Query(query)
 }
 
 func (app *Application) AddHistoryAndFrequency(query string) {

@@ -28,7 +28,7 @@ func (app *Application) setupHandlers() {
 
 	frequencyTable.OnItemActivated(func(item *qt.QTableWidgetItem) {
 		key := frequencyTable.Keys[item.Row()]
-		app.doQuery(key)
+		app.Query(key)
 		newRow := frequencyTable.KeyMap[key]
 		column := item.Column()
 		// slog.Info("frequencyTable.OnItemActivated", "newRow", newRow, "column", column)
@@ -38,7 +38,7 @@ func (app *Application) setupHandlers() {
 		frequencyTable.SetCurrentCell(newRow, column)
 	})
 	app.favoritesWidget.OnItemActivated(func(item *qt.QListWidgetItem) {
-		app.doQuery(item.Text())
+		app.Query(item.Text())
 	})
 
 	app.reloadDictsButton.OnClicked(func() {

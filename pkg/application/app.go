@@ -109,7 +109,7 @@ func (app *Application) init() {
 	app.mainWindowSettingsChan = make(chan time.Time, 100)
 }
 
-func (app *Application) doQuery(query string) {
+func (app *Application) Query(query string) {
 	app.queryArgs.onQuery(query, false)
 	app.entry.SetText(query)
 }
@@ -288,7 +288,7 @@ func (app *Application) Run() {
 	queryBoxLayout.AddWidget(app.queryFavoriteButton.QWidget)
 	queryBoxLayout.AddWidget(okButton.QWidget)
 
-	headerLabel := NewHeaderLabel(app.doQuery)
+	headerLabel := NewHeaderLabel(app.Query)
 	app.headerLabel = headerLabel
 	app.headerLabel.SetAlignment(qt.AlignLeft)
 
@@ -304,13 +304,13 @@ func (app *Application) Run() {
 	headerBoxLayout.AddSpacing(int(basePx * 1.5))
 	headerBox.SetSizePolicy2(expanding, qt.QSizePolicy__Minimum)
 
-	articleView := NewArticleView(app.doQuery)
+	articleView := NewArticleView(app.Query)
 	app.articleView = articleView
 
 	historyView := NewHistoryView(
 		activityStorage,
 		conf.HistoryMaxSize,
-		app.doQuery,
+		app.Query,
 	)
 	app.historyView = historyView
 	if !conf.HistoryDisable {
