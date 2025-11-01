@@ -88,7 +88,7 @@ func (p *ScanPopup) Run(pos *qt.QPoint, icon *qt.QIcon) {
 	}
 	p.popup.SetWindowIcon(icon)
 
-	p.doQuery(p.query)
+	p.Query(p.query)
 }
 
 func (p *ScanPopup) init() {
@@ -112,7 +112,7 @@ func (p *ScanPopup) init() {
 	}
 	p.headerTemplate = headerTemplate
 
-	p.articleView = NewArticleView(p.doQuery)
+	p.articleView = NewArticleView(p.Query)
 	p.articleView.Widget.SetFont(font)
 	p.articleView.OnKeyPressEvent(p.onArticleViewKeyPressEvent)
 
@@ -264,7 +264,7 @@ func (p *ScanPopup) setResult(res common.SearchResultIface) *qt.QTimer {
 	)
 }
 
-func (p *ScanPopup) doQuery(query string) {
+func (p *ScanPopup) Query(query string) {
 	p.query = query
 	p.popup.SetWindowTitle(query)
 
