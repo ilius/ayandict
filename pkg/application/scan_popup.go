@@ -112,7 +112,7 @@ func (p *ScanPopup) init() {
 	}
 	p.headerTemplate = headerTemplate
 
-	p.articleView = NewArticleView(p.Query)
+	p.articleView = NewArticleView(p)
 	p.articleView.Widget.SetFont(font)
 	p.articleView.OnKeyPressEvent(p.onArticleViewKeyPressEvent)
 

@@ -304,7 +304,7 @@ func (app *Application) Run() {
 	headerBoxLayout.AddSpacing(int(basePx * 1.5))
 	headerBox.SetSizePolicy2(expanding, qt.QSizePolicy__Minimum)
 
-	articleView := NewArticleView(app.Query)
+	articleView := NewArticleView(app)
 	app.articleView = articleView
 
 	historyView := NewHistoryView(

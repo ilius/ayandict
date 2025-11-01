@@ -40,6 +40,10 @@ type CursorAndCharFormat struct {
 	Format *qt.QTextCharFormat
 }
 
+type ArticleViewOwner interface {
+	Query(string)
+}
+
 type ArticleView struct {
 	frame   *qt.QFrame
 	Widget  *qt.QWidget // same as frame, used from outside
@@ -54,8 +58,8 @@ type ArticleView struct {
 	docCursor   *qt.QTextCursor
 	lastFormats []CursorAndCharFormat
 
-	dpi     float64
-	doQuery func(string)
+	dpi   float64
+	owner ArticleViewOwner
 
 	mediaPlayer *multimedia.QMediaPlayer
 
@@ -64,7 +68,7 @@ type ArticleView struct {
 	dictName string
 }
 
-func NewArticleView(doQuery func(string)) *ArticleView {
+func NewArticleView(owner ArticleViewOwner) *ArticleView {
 	browser := qt.NewQTextBrowser(nil)
 	// widget := webengine.NewQWebEngineView(nil)
 	browser.SetReadOnly(true)
@@ -100,7 +104,7 @@ func NewArticleView(doQuery func(string)) *ArticleView {
 		}
 		super(event)
 	})
-	view.doQuery = doQuery
+	view.owner = owner
 	view.setupCustomHandlers()
 	return view
 }
@@ -348,7 +352,7 @@ func (view *ArticleView) createContextMenuWithSelection(menu *qt.QMenu, selected
 		label = "Query: " + selected
 	}
 	menu.AddActionWithText(label).OnTriggered(func() {
-		view.doQuery(selected)
+		view.owner.Query(selected)
 	})
 	menu.AddActionWithText("Copy Selection").OnTriggered(func() {
 		qt.QGuiApplication_Clipboard().SetText2(strings.TrimSpace(selected), qt.QClipboard__Clipboard)
@@ -373,7 +377,7 @@ func (view *ArticleView) createContextMenuNoSelection(menu *qt.QMenu, pos *qt.QP
 	if cursorWord != "" {
 		slog.Debug("Right-clicked on word", "word", fmt.Sprintf("%#v", cursorWord))
 		menu.AddActionWithText("Query: " + cursorWord).OnTriggered(func() {
-			view.doQuery(cursorWord)
+			view.owner.Query(cursorWord)
 		})
 	}
 }
@@ -481,7 +485,7 @@ func (view *ArticleView) setupAnchorClicked() {
 		host := qUrl.Host()
 		if qUrl.Scheme() == "bword" {
 			if host != "" {
-				view.doQuery(host)
+				view.owner.Query(host)
 			} else {
 				slog.Debug("AnchorClicked", "url", qUrl.ToString())
 			}
@@ -490,7 +494,7 @@ func (view *ArticleView) setupAnchorClicked() {
 		path := qUrl.Path()
 		switch qUrl.Scheme() {
 		case "":
-			view.doQuery(path)
+			view.owner.Query(path)
 			return
 		case "file":
 			switch filepath.Ext(path) {
@@ -523,7 +527,7 @@ func (view *ArticleView) setupMouseReleaseEvent() {
 		case qt.MiddleButton:
 			selected := view.Browser.TextCursor().SelectedText()
 			if selected != "" {
-				view.doQuery(strings.Trim(selected, queryForceTrimChars))
+				view.owner.Query(strings.Trim(selected, queryForceTrimChars))
 			}
 			return
 		}
@@ -551,9 +555,8 @@ func (view *ArticleView) setupWheelEvent() {
 
 // TODO: break down
 func (view *ArticleView) setupCustomHandlers() {
-	doQuery := view.doQuery
-	if doQuery == nil {
-		panic("doQuery is not set")
+	if view.owner == nil {
+		panic("view.owner is not set")
 	}
 
 	mediaPlayer := multimedia.NewQMediaPlayer()
