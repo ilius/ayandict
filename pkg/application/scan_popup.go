@@ -19,6 +19,7 @@ var aboutToDragCursor = qt.PointingHandCursor
 
 type ScanPopupAppInterface interface {
 	OnScanPopupShow()
+	OnScanPopupClose(super func(*qt.QCloseEvent), event *qt.QCloseEvent)
 	ShowWindowAndQuery(query string)
 	AddHistoryAndFrequency(query string)
 	ShowAbout()
@@ -45,6 +46,16 @@ func NewScanPopup(
 		super(e)
 	})
 	return p
+}
+
+func (p *ScanPopup) QueryPopup(query string) {
+	p2 := NewScanPopup(
+		query,
+		p.mode,
+		p.app.OnScanPopupClose,
+		p.app,
+	)
+	p2.Run(qt.QCursor_Pos(), p.popup.WindowIcon())
 }
 
 type ScanPopup struct {
@@ -89,6 +100,10 @@ func (p *ScanPopup) Run(pos *qt.QPoint, icon *qt.QIcon) {
 	p.popup.SetWindowIcon(icon)
 
 	p.Query(p.query)
+}
+
+func (app *ScanPopup) IsPopup() bool {
+	return true
 }
 
 func (p *ScanPopup) init() {

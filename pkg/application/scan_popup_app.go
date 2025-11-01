@@ -21,7 +21,7 @@ func (app *Application) setupScanPopup() {
 	})
 }
 
-func (app *Application) onScanPopupCloseEvent(super func(*qt.QCloseEvent), event *qt.QCloseEvent) {
+func (app *Application) OnScanPopupClose(super func(*qt.QCloseEvent), event *qt.QCloseEvent) {
 	app.scanPopupCount.Add(-1)
 }
 
@@ -57,7 +57,7 @@ func (app *Application) QueryPopup(query string) {
 	p := NewScanPopup(
 		query,
 		mode,
-		app.onScanPopupCloseEvent,
+		app.OnScanPopupClose,
 		app,
 	)
 	p.Run(qt.QCursor_Pos(), app.icon)

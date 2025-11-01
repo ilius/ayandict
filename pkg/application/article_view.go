@@ -42,6 +42,8 @@ type CursorAndCharFormat struct {
 
 type ArticleViewOwner interface {
 	Query(string)
+	IsPopup() bool
+	QueryPopup(query string)
 }
 
 type ArticleView struct {
@@ -347,13 +349,24 @@ func (view *ArticleView) createContextMenuWithSelection(menu *qt.QMenu, selected
 	if trimmed != "" {
 		selected = trimmed
 	}
-	label := "Query Selection"
-	if len(selected) < 20 {
-		label = "Query: " + selected
+	{
+		label := "Query Selection"
+		if len(selected) < 20 {
+			label = "Query: " + selected
+		}
+		menu.AddActionWithText(label).OnTriggered(func() {
+			view.owner.Query(selected)
+		})
 	}
-	menu.AddActionWithText(label).OnTriggered(func() {
-		view.owner.Query(selected)
-	})
+	{
+		label := "Popup Selection"
+		if len(selected) < 20 {
+			label = "Popup: " + selected
+		}
+		menu.AddActionWithText(label).OnTriggered(func() {
+			view.owner.QueryPopup(selected)
+		})
+	}
 	menu.AddActionWithText("Copy Selection").OnTriggered(func() {
 		qt.QGuiApplication_Clipboard().SetText2(strings.TrimSpace(selected), qt.QClipboard__Clipboard)
 	})
@@ -379,6 +392,10 @@ func (view *ArticleView) createContextMenuNoSelection(menu *qt.QMenu, pos *qt.QP
 		menu.AddActionWithText("Query: " + cursorWord).OnTriggered(func() {
 			view.owner.Query(cursorWord)
 		})
+		menu.AddActionWithText("Popup: " + cursorWord).OnTriggered(func() {
+			view.owner.QueryPopup(cursorWord)
+		})
+
 	}
 }
 

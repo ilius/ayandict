@@ -109,6 +109,10 @@ func (app *Application) init() {
 	app.mainWindowSettingsChan = make(chan time.Time, 100)
 }
 
+func (app *Application) IsPopup() bool {
+	return false
+}
+
 func (app *Application) Query(query string) {
 	app.queryArgs.onQuery(query, false)
 	app.entry.SetText(query)
