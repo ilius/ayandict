@@ -171,7 +171,7 @@ func (app *Application) Run() {
 	if !qlocalserver.StartLocalSocketServer(
 		conf,
 		app.ShowWindowAndQuery,
-		app.scanPopup,
+		app.QueryPopup,
 		app.statusIconActivate,
 	) {
 		slog.Error(

@@ -17,7 +17,7 @@ func (app *Application) setupScanPopup() {
 		if mode == qt.QClipboard__Selection && !conf.ScanPopupSelection {
 			return
 		}
-		app.scanPopup(clipboard.TextWithMode(mode))
+		app.QueryPopup(clipboard.TextWithMode(mode))
 	})
 }
 
@@ -39,8 +39,8 @@ func (app *Application) AddHistoryAndFrequency(query string) {
 	app.queryArgs.AddHistoryAndFrequency(query)
 }
 
-func (app *Application) scanPopup(query string) {
-	slog.Debug("app.scanPopup", "query", query, "count", app.scanPopupCount.Load())
+func (app *Application) QueryPopup(query string) {
+	slog.Debug("app.QueryPopup", "query", query, "count", app.scanPopupCount.Load())
 	if conf.ScanPopupMaxCount > 0 && app.scanPopupCount.Load() >= conf.ScanPopupMaxCount {
 		return
 	}
