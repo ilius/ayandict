@@ -54,11 +54,11 @@ type Config struct {
 	SoundexWordsFile string `toml:"soundex_words_file" doc:"Soundex words file"`
 
 	FontFamily string `toml:"font_family" doc:"Application font family"`
-	FontSize   int    `toml:"font_size" doc:"Application font size"`
+	FontSize   uint16 `toml:"font_size" doc:"Application font size"`
 
-	SearchOnType          bool `toml:"search_on_type" doc:"Enable/disable search-on-type"`
-	SearchOnTypeMinLength int  `toml:"search_on_type_min_length" doc:"Minimum query length for search-on-type"`
-	SearchOnTypeOnRegex   bool `toml:"search_on_type_on_regex" doc:"Enable/disable search-on-type in Regex mode"`
+	SearchOnType          bool   `toml:"search_on_type" doc:"Enable/disable search-on-type"`
+	SearchOnTypeMinLength uint16 `toml:"search_on_type_min_length" doc:"Minimum query length for search-on-type"`
+	SearchOnTypeOnRegex   bool   `toml:"search_on_type_on_regex" doc:"Enable/disable search-on-type in Regex mode"`
 
 	HeaderTemplate string `toml:"header_template" doc:"HTML template for header (dict name + entry terms)"`
 	HeaderWordWrap bool   `toml:"header_word_wrap" doc:"Enable word-wrapping for header (dict name + entry terms)"`
@@ -73,7 +73,7 @@ type Config struct {
 
 	FavoritesAutoSave bool `toml:"favorites_auto_save" doc:"Auto-save Favorites on every new record"`
 
-	MaxResultsTotal int `toml:"max_results_total" doc:"Maximum number of search results"`
+	MaxResultsTotal uint16 `toml:"max_results_total" doc:"Maximum number of search results"`
 
 	RandomFavoriteSearchMode string `toml:"random_favorite_search_mode" doc:"Search mode for Random Favorite"`
 
@@ -88,7 +88,7 @@ type Config struct {
 	ScanPopupSelection bool   `toml:"scan_popup_selection" doc:"Scan Popup: activate on selection"`
 	ScanPopupAPI       bool   `toml:"scan_popup_api" doc:"Scan Popup: activate via API (socket/pipe)"`
 	ScanPopupMode      string `toml:"scan_popup_mode" doc:"Scan Popup: search mode"`
-	ScanPopupMinScore  int    `toml:"scan_popup_min_score" doc:"Scan Popup: minimum score (0 to 100)"`
+	ScanPopupMinScore  uint8  `toml:"scan_popup_min_score" doc:"Scan Popup: minimum score (0 to 100)"`
 	ScanPopupWidth     int    `toml:"scan_popup_width" doc:"Scan Popup: window width"`
 	ScanPopupHeight    int    `toml:"scan_popup_height" doc:"Scan Popup: window height"`
 	ScanPopupMaxCount  int32  `toml:"scan_popup_max_count" doc:"Scan Popup: max number of windows"`

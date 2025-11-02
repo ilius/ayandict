@@ -68,7 +68,7 @@ func LookupSoundexHTML(
 	slog.Info("LookupSoundexHTML: got results", "query", query, "count", len(results))
 	sortResults(results)
 	if limit == 0 {
-		limit = conf.MaxResultsTotal
+		limit = int(conf.MaxResultsTotal)
 	}
 	if len(results) > limit {
 		results = results[:limit]

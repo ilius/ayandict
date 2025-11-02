@@ -293,7 +293,7 @@ func (p *ScanPopup) Query(query string) {
 	p.resultIndex = 0
 	res := results[0]
 	slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", res.Score()/2, "query", query)
-	if conf.ScanPopupMinScore > int(res.Score())/2 {
+	if conf.ScanPopupMinScore > res.Score()/2 {
 		p.onQueryNoResult(
 			"Top result for %#v has score of %%%v",
 			query, res.Score()/2,

@@ -26,7 +26,7 @@ func ConfigFont() *qt.QFont {
 		font.SetFamily(conf.FontFamily)
 	}
 	if conf.FontSize > 0 {
-		font.SetPixelSize(conf.FontSize)
+		font.SetPixelSize(int(conf.FontSize))
 	}
 	return font
 }

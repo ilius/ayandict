@@ -215,7 +215,7 @@ func (app *Application) onEntryKeyPress(super func(*qt.QKeyEvent), event *qt.QKe
 	if conf.SearchOnType && key < escape {
 		if int(event.Modifiers())&searchOnTypeNotModifierMask == 0 {
 			text := app.entry.Text()
-			if len(text) >= conf.SearchOnTypeMinLength {
+			if len(text) >= int(conf.SearchOnTypeMinLength) {
 				app.queryArgs.onQuery(text, true)
 			}
 			return

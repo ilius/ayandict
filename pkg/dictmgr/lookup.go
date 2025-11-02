@@ -138,7 +138,7 @@ func LookupHTML(
 		}
 	}
 	if limit == 0 {
-		limit = conf.MaxResultsTotal
+		limit = int(conf.MaxResultsTotal)
 	}
 	if len(results) <= limit {
 		sortResults(results)
