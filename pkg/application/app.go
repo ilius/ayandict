@@ -162,7 +162,10 @@ func (app *Application) Exit() {
 func (app *Application) Run() {
 	app.init()
 
-	logging.SetupLoggerAfterConfigLoad(false, conf)
+	logging.SetupLoggerAfterConfigLoad(
+		os.Getenv("NO_COLOR") != "",
+		conf,
+	)
 
 	slog.Info("Run", "WebEnable", conf.WebEnable)
 	if conf.WebEnable {
