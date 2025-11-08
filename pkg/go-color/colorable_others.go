@@ -1,7 +1,7 @@
 //go:build !windows || appengine
 // +build !windows appengine
 
-package colorable
+package color
 
 import (
 	"io"

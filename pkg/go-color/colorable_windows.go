@@ -1,7 +1,7 @@
 //go:build windows
 // +build windows
 
-package colorable
+package color
 
 import (
 	"bytes"
