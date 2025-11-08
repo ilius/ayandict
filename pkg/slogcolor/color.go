@@ -87,30 +87,6 @@ func NewColor(value ...Attribute) *Color {
 	return c
 }
 
-// Unset resets all escape attributes and clears the output. Usually should
-// be called after Set().
-func Unset() {
-	fmt.Fprintf(Output, "%s[%dm", escape, Reset)
-}
-
-// Set sets the SGR sequence.
-func (c *Color) Set() *Color {
-	if c.isNoColorSet() {
-		return c
-	}
-
-	fmt.Fprint(Output, c.format())
-	return c
-}
-
-func (c *Color) unset() {
-	if c.isNoColorSet() {
-		return
-	}
-
-	Unset()
-}
-
 // Add is used to chain SGR parameters. Use as many as parameters to combine
 // and create custom color objects. Example: Add(FgRed, Underline).
 func (c *Color) Add(value ...Attribute) *Color {
@@ -180,10 +156,6 @@ func (c *Color) isNoColorSet() bool {
 	return false
 }
 
-func boolPtr(v bool) *bool {
-	return &v
-}
-
 func getCachedColor(p Attribute) *Color {
 	colorsCacheMu.Lock()
 	defer colorsCacheMu.Unlock()
@@ -206,9 +178,4 @@ func colorString(format string, p Attribute) string {
 // foreground.
 func HiWhiteString(format string) string {
 	return colorString(format, FgHiWhite)
-}
-
-// sprintln is a helper function to format a string with fmt.Sprintln and trim the trailing newline.
-func sprintln(a ...interface{}) string {
-	return strings.TrimSuffix(fmt.Sprintln(a...), "\n")
 }

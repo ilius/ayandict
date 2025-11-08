@@ -7,7 +7,6 @@ import (
 	"log/slog"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"strings"
 	"sync"
 )
@@ -83,14 +82,6 @@ func (h *Handler) Handle(_ context.Context, r slog.Record) error {
 			}
 			lineStr := fmt.Sprintf(":%d", f.Line)
 			formatted := fmt.Sprintf("%s ", filename+lineStr)
-			if h.opts.SrcFileLength > 0 {
-				maxFilenameLen := h.opts.SrcFileLength - len(lineStr) - 1
-				if len(filename) > maxFilenameLen {
-					filename = filename[:maxFilenameLen] // Truncate if too long
-				}
-				lenStr := strconv.Itoa(h.opts.SrcFileLength)
-				formatted = fmt.Sprintf("%-"+lenStr+"s", filename+lineStr)
-			}
 			fmt.Fprint(bf, formatted)
 		}
 	}
@@ -106,15 +97,6 @@ func (h *Handler) Handle(_ context.Context, r slog.Record) error {
 
 	fmt.Fprint(bf, h.opts.MsgPrefix)
 	formattedMessage := r.Message
-	if h.opts.MsgLength > 0 && len(attrs) > 0 {
-		if len(formattedMessage) > h.opts.MsgLength {
-			formattedMessage = formattedMessage[:h.opts.MsgLength-1] + "…" // Truncate and add ellipsis if too long
-		} else {
-			// Pad with spaces if too short
-			lenStr := strconv.Itoa(h.opts.MsgLength)
-			formattedMessage = fmt.Sprintf("%-"+lenStr+"s", formattedMessage)
-		}
-	}
 	if h.opts.MsgColor == nil {
 		h.opts.MsgColor = NewColor() // set to empty otherwise we have a null pointer
 	}
