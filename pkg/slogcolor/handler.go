@@ -67,23 +67,12 @@ func (h *Handler) Handle(_ context.Context, r slog.Record) error {
 	}
 	fmt.Fprint(bf, " ")
 
-	if h.opts.SrcFileMode != Nop {
-		if r.PC != 0 {
-			f, _ := runtime.CallersFrames([]uintptr{r.PC}).Next()
-
-			var filename string
-			switch h.opts.SrcFileMode {
-			case Nop:
-				break
-			case ShortFile:
-				filename = filepath.Base(f.File)
-			case LongFile:
-				filename = f.File
-			}
-			lineStr := fmt.Sprintf(":%d", f.Line)
-			formatted := fmt.Sprintf("%s ", filename+lineStr)
-			fmt.Fprint(bf, formatted)
-		}
+	if r.PC != 0 {
+		f, _ := runtime.CallersFrames([]uintptr{r.PC}).Next()
+		filename := filepath.Base(f.File)
+		lineStr := fmt.Sprintf(":%d", f.Line)
+		formatted := fmt.Sprintf("%s ", filename+lineStr)
+		fmt.Fprint(bf, formatted)
 	}
 
 	// we need the attributes here, as we can print a longer string if there are no

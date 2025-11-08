@@ -9,9 +9,8 @@ import (
 
 func TestNewHandlerColor(t *testing.T) {
 	handler := NewHandler(os.Stdout, &Options{
-		Level:       slog.LevelDebug,
-		TimeFormat:  time.DateTime,
-		SrcFileMode: ShortFile,
+		Level:      slog.LevelDebug,
+		TimeFormat: time.DateTime,
 		// MsgPrefix:     color.HiWhiteString("| "),
 		MsgColor: NewColor(),
 	})
@@ -24,9 +23,8 @@ func TestNewHandlerColor(t *testing.T) {
 
 func TestNewHandlerNoColor(t *testing.T) {
 	handler := NewHandler(os.Stdout, &Options{
-		Level:       slog.LevelDebug,
-		TimeFormat:  time.DateTime,
-		SrcFileMode: ShortFile,
+		Level:      slog.LevelDebug,
+		TimeFormat: time.DateTime,
 		// MsgPrefix:     color.HiWhiteString("| "),
 		MsgColor: NewColor(),
 		NoColor:  true,

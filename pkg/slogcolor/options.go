@@ -6,12 +6,11 @@ import (
 )
 
 var DefaultOptions *Options = &Options{
-	Level:       slog.LevelInfo,
-	TimeFormat:  time.DateTime,
-	SrcFileMode: ShortFile,
-	MsgPrefix:   HiWhiteString("| "),
-	MsgColor:    NewColor(),
-	NoColor:     false,
+	Level:      slog.LevelInfo,
+	TimeFormat: time.DateTime,
+	MsgPrefix:  HiWhiteString("| "),
+	MsgColor:   NewColor(),
+	NoColor:    false,
 }
 
 type Options struct {
@@ -22,9 +21,6 @@ type Options struct {
 
 	// TimeFormat is the time format.
 	TimeFormat string
-
-	// SrcFileMode is the source file mode.
-	SrcFileMode SourceFileMode
 
 	// MsgPrefix to show prefix before message, default: white colored "| ".
 	MsgPrefix string

@@ -26,9 +26,8 @@ func SetupGUILogger(noColor bool, level slog.Level) {
 
 func NewColoredHandler(noColor bool, level slog.Level) slog.Handler {
 	return slogcolor.NewHandler(os.Stdout, &slogcolor.Options{
-		Level:       level,
-		TimeFormat:  time.DateTime,
-		SrcFileMode: slogcolor.ShortFile,
+		Level:      level,
+		TimeFormat: time.DateTime,
 		// MsgPrefix:     color.HiWhiteString("| "),
 		MsgColor: slogcolor.NewColor(),
 		NoColor:  noColor,
