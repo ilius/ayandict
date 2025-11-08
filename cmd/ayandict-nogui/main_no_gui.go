@@ -38,7 +38,7 @@ func main() {
 		panic(err)
 	}
 
-	noColor := os.Getenv("NO_COLOLR") != ""
+	noColor := os.Getenv("NO_COLOR") != ""
 	handler := logging.NewColoredHandler(noColor, logging.DefaultLevel)
 	slog.SetDefault(slog.New(handler))
 

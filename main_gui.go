@@ -62,7 +62,7 @@ func main() {
 	}
 
 	// slog uses stdout
-	noColor := os.Getenv("NO_COLOLR") != ""
+	noColor := os.Getenv("NO_COLOR") != ""
 
 	// to fix issues on MacOS and *BSD
 	// ensure that all UI-related code is executed on the main thread
