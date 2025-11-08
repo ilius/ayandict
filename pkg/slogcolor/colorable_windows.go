@@ -1,7 +1,7 @@
 //go:build windows
 // +build windows
 
-package color
+package slogcolor
 
 import (
 	"bytes"
@@ -712,7 +712,7 @@ loop:
 						if (n-30)&4 != 0 {
 							attr |= foregroundBlue
 						}
-					case n == 38: // set foreground color.
+					case n == 38: // set foreground color
 						if i < len(token)-2 && (token[i+1] == "5" || token[i+1] == "05") {
 							if n256, err := strconv.Atoi(token[i+2]); err == nil {
 								if n256foreAttr == nil {
@@ -740,7 +740,7 @@ loop:
 						} else {
 							attr = attr & (w.oldattr & backgroundMask)
 						}
-					case n == 39: // reset foreground color.
+					case n == 39: // reset foreground color
 						attr &= backgroundMask
 						attr |= w.oldattr & foregroundMask
 					case 40 <= n && n <= 47:
@@ -754,7 +754,7 @@ loop:
 						if (n-40)&4 != 0 {
 							attr |= backgroundBlue
 						}
-					case n == 48: // set background color.
+					case n == 48: // set background color
 						if i < len(token)-2 && token[i+1] == "5" {
 							if n256, err := strconv.Atoi(token[i+2]); err == nil {
 								if n256backAttr == nil {
@@ -782,7 +782,7 @@ loop:
 						} else {
 							attr = attr & (w.oldattr & foregroundMask)
 						}
-					case n == 49: // reset foreground color.
+					case n == 49: // reset foreground color
 						attr &= foregroundMask
 						attr |= w.oldattr & backgroundMask
 					case 90 <= n && n <= 97:

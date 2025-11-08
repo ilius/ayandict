@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/ilius/ayandict/v3/pkg/config"
-	"github.com/ilius/ayandict/v3/pkg/go-color"
 	"github.com/ilius/ayandict/v3/pkg/slogcolor"
 )
 
@@ -33,7 +32,7 @@ func NewColoredHandler(noColor bool, level slog.Level) slog.Handler {
 		SrcFileLength: 0,
 		// MsgPrefix:     color.HiWhiteString("| "),
 		MsgLength: 0,
-		MsgColor:  color.New(),
+		MsgColor:  slogcolor.NewColor(),
 		NoColor:   noColor,
 	})
 }

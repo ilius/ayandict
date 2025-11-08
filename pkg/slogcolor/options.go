@@ -3,8 +3,6 @@ package slogcolor
 import (
 	"log/slog"
 	"time"
-
-	"github.com/ilius/ayandict/v3/pkg/go-color"
 )
 
 var DefaultOptions *Options = &Options{
@@ -12,9 +10,9 @@ var DefaultOptions *Options = &Options{
 	TimeFormat:    time.DateTime,
 	SrcFileMode:   ShortFile,
 	SrcFileLength: 0,
-	MsgPrefix:     color.HiWhiteString("| "),
+	MsgPrefix:     HiWhiteString("| "),
 	MsgLength:     0,
-	MsgColor:      color.New(),
+	MsgColor:      NewColor(),
 	NoColor:       false,
 }
 
@@ -38,7 +36,7 @@ type Options struct {
 	MsgPrefix string
 
 	// MsgColor is the color of the message, default to empty.
-	MsgColor *color.Color
+	MsgColor *Color
 
 	// MsgLength to show fixed length message to line up the log output, default 0
 	// shows complete message.

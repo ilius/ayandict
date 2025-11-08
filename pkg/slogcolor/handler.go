@@ -10,8 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-
-	"github.com/ilius/ayandict/v3/pkg/go-color"
 )
 
 type Handler struct {
@@ -54,19 +52,19 @@ func (h *Handler) Handle(_ context.Context, r slog.Record) error {
 	bf.Reset()
 
 	if !r.Time.IsZero() {
-		fmt.Fprint(bf, color.New(color.Faint).Sprint(r.Time.Format(h.opts.TimeFormat)))
+		fmt.Fprint(bf, NewColor(Faint).Sprint(r.Time.Format(h.opts.TimeFormat)))
 		fmt.Fprint(bf, " ")
 	}
 
 	switch r.Level {
 	case slog.LevelDebug:
-		fmt.Fprint(bf, color.New(color.BgCyan, color.FgHiWhite).Sprint("DEBUG"))
+		fmt.Fprint(bf, NewColor(BgCyan, FgHiWhite).Sprint("DEBUG"))
 	case slog.LevelInfo:
-		fmt.Fprint(bf, color.New(color.BgGreen, color.FgHiWhite).Sprint("INFO"))
+		fmt.Fprint(bf, NewColor(BgGreen, FgHiWhite).Sprint("INFO"))
 	case slog.LevelWarn:
-		fmt.Fprint(bf, color.New(color.BgYellow, color.FgHiWhite).Sprint("WARN"))
+		fmt.Fprint(bf, NewColor(BgYellow, FgHiWhite).Sprint("WARN"))
 	case slog.LevelError:
-		fmt.Fprint(bf, color.New(color.BgRed, color.FgHiWhite).Sprint("ERROR"))
+		fmt.Fprint(bf, NewColor(BgRed, FgHiWhite).Sprint("ERROR"))
 	}
 	fmt.Fprint(bf, " ")
 
@@ -118,23 +116,23 @@ func (h *Handler) Handle(_ context.Context, r slog.Record) error {
 		}
 	}
 	if h.opts.MsgColor == nil {
-		h.opts.MsgColor = color.New() // set to empty otherwise we have a null pointer
+		h.opts.MsgColor = NewColor() // set to empty otherwise we have a null pointer
 	}
 	fmt.Fprintf(bf, "%s", h.opts.MsgColor.Sprint(formattedMessage))
 
 	for _, a := range attrs {
 		fmt.Fprint(bf, " ")
 		for i, g := range h.groups {
-			fmt.Fprint(bf, color.New(color.FgCyan).Sprint(g))
+			fmt.Fprint(bf, NewColor(FgCyan).Sprint(g))
 			if i != len(h.groups) {
-				fmt.Fprint(bf, color.New(color.FgCyan).Sprint("."))
+				fmt.Fprint(bf, NewColor(FgCyan).Sprint("."))
 			}
 		}
 
 		if strings.Contains(a.Key, "err") {
-			fmt.Fprint(bf, color.New(color.FgRed).Sprintf("%s=", a.Key)+a.Value.String())
+			fmt.Fprint(bf, NewColor(FgRed).Sprintf("%s=", a.Key)+a.Value.String())
 		} else {
-			fmt.Fprint(bf, color.New(color.FgCyan).Sprintf("%s=", a.Key)+a.Value.String())
+			fmt.Fprint(bf, NewColor(FgCyan).Sprintf("%s=", a.Key)+a.Value.String())
 		}
 	}
 

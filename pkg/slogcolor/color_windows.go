@@ -1,7 +1,7 @@
 //go:build windows
 // +build windows
 
-package color
+package slogcolor
 
 func init() {
 	// Opt-in for ansi color support for current process.

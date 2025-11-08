@@ -1,4 +1,4 @@
-package color
+package slogcolor
 
 import (
 	"fmt"
@@ -77,8 +77,8 @@ const (
 	BgCyan
 )
 
-// New returns a newly created color object.
-func New(value ...Attribute) *Color {
+// NewColor returns a newly created color object.
+func NewColor(value ...Attribute) *Color {
 	c := &Color{
 		params: make([]Attribute, 0),
 	}
@@ -112,7 +112,7 @@ func (c *Color) unset() {
 }
 
 // Add is used to chain SGR parameters. Use as many as parameters to combine
-// and create custom color objects. Example: Add(color.FgRed, color.Underline).
+// and create custom color objects. Example: Add(FgRed, Underline).
 func (c *Color) Add(value ...Attribute) *Color {
 	c.params = append(c.params, value...)
 	return c
@@ -130,10 +130,10 @@ func (c *Color) Sprintf(format string, a ...interface{}) string {
 
 // SprintFunc returns a new function that returns colorized strings for the
 // given arguments with fmt.Sprint(). Useful to put into or mix into other
-// string. Windows users should use this in conjunction with color.Output, example:
+// string. Windows users should use this in conjunction with Output, example:
 //
 //	put := New(FgYellow).SprintFunc()
-//	fmt.Fprintf(color.Output, "This is a %s", put("warning"))
+//	fmt.Fprintf(Output, "This is a %s", put("warning"))
 func (c *Color) SprintFunc() func(a ...interface{}) string {
 	return func(a ...interface{}) string {
 		return c.wrap(fmt.Sprint(a...))
@@ -190,7 +190,7 @@ func getCachedColor(p Attribute) *Color {
 
 	c, ok := colorsCache[p]
 	if !ok {
-		c = New(p)
+		c = NewColor(p)
 		colorsCache[p] = c
 	}
 
