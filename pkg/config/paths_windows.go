@@ -36,3 +36,7 @@ func GetCacheDir() string {
 	}
 	return filepath.Join(localAppData, appinfo.APP_DESC, "Cache")
 }
+
+func GetStateDir() string {
+	return filepath.Join(platformConfigDir(), "State")
+}

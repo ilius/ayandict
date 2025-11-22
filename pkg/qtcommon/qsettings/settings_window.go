@@ -5,8 +5,6 @@ import (
 	"log/slog"
 	"os"
 	"path"
-
-	"github.com/ilius/ayandict/v3/pkg/config"
 )
 
 type WindowSettings struct {
@@ -18,7 +16,7 @@ type WindowSettings struct {
 }
 
 func (s *WindowSettings) Save(fname string) {
-	fpath := path.Join(config.GetConfigDir(), fname+".json")
+	fpath := path.Join(stateDir, fname+".json")
 	b, err := json.Marshal(s)
 	if err != nil {
 		slog.Error("error encoding window settings", "err", err, "path", fpath)
@@ -31,7 +29,7 @@ func (s *WindowSettings) Save(fname string) {
 }
 
 func (s *WindowSettings) Load(fname string) {
-	fpath := path.Join(config.GetConfigDir(), fname+".json")
+	fpath := path.Join(stateDir, fname+".json")
 	b, err := os.ReadFile(fpath)
 	if err != nil {
 		if !os.IsNotExist(err) {

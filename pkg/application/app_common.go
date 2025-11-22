@@ -1,6 +1,7 @@
 package application
 
 import (
+	"github.com/ilius/ayandict/v3/pkg/config"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -26,3 +27,5 @@ const (
 
 	searchOnTypeNotModifierMask = int(qt.AltModifier) | int(qt.MetaModifier)
 )
+
+var stateDir = config.GetStateDir()

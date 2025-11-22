@@ -20,5 +20,19 @@ func platformConfigDir() string {
 }
 
 func GetCacheDir() string {
-	return filepath.Join(os.Getenv(S_HOME), "Library", "Caches", appinfo.APP_DESC)
+	return filepath.Join(
+		os.Getenv(S_HOME),
+		"Library",
+		"Caches",
+		appinfo.APP_DESC,
+	)
+}
+
+func GetStateDir() string {
+	return filepath.Join(
+		os.Getenv(S_HOME),
+		"Library",
+		"Application Support",
+		appinfo.APP_DESC,
+	)
 }

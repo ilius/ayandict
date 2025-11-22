@@ -34,6 +34,11 @@ func Run() {
 			slog.Error("error in MkdirAll: " + err.Error())
 		}
 	}
-
+	{
+		err := os.MkdirAll(stateDir, 0o755)
+		if err != nil {
+			slog.Error("error in MkdirAll: " + err.Error())
+		}
+	}
 	app.Run()
 }

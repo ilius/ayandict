@@ -7,13 +7,12 @@ import (
 	"path"
 	"time"
 
-	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
 	"github.com/ilius/ayandict/v3/pkg/qtutils"
 	qt "github.com/mappu/miqt/qt6"
 )
 
-var mainWindowPath = path.Join(config.GetConfigDir(), qsettings.QS_mainwindow+".json")
+var mainWindowPath = path.Join(stateDir, qsettings.QS_mainwindow+".json")
 
 type MainWindowSettings struct {
 	X            int  `json:"x"`

@@ -16,8 +16,10 @@ const (
 	QS_columnwidth = "columnwidth"
 )
 
+var stateDir = config.GetStateDir()
+
 func saveJson(value any, mainKey string) {
-	fpath := path.Join(config.GetConfigDir(), mainKey+".json")
+	fpath := path.Join(stateDir, mainKey+".json")
 	b, err := json.Marshal(value)
 	if err != nil {
 		slog.Error("error encoding splitter sizes", "value", value)
@@ -31,7 +33,7 @@ func saveJson(value any, mainKey string) {
 }
 
 func loadJsonIntSlice(mainKey string) []int {
-	fpath := path.Join(config.GetConfigDir(), mainKey+".json")
+	fpath := path.Join(stateDir, mainKey+".json")
 	b, err := os.ReadFile(fpath)
 	if err != nil {
 		if !os.IsNotExist(err) {
