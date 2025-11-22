@@ -12,6 +12,11 @@ import (
 func Run() {
 	qt.QCoreApplication_SetApplicationName(appinfo.APP_DESC)
 	qt.QGuiApplication_SetDesktopFileName(appinfo.APP_NAME)
+
+	// following line changes window title to "AyanDict — ayandict" on Linux
+	// (not tested on Mac or Windows)
+	// qt.QGuiApplication_SetApplicationDisplayName(appinfo.APP_NAME)
+
 	app := &Application{
 		QApplication: qt.NewQApplication(os.Args),
 		window:       qt.NewQMainWindow(nil),
