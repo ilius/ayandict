@@ -12,10 +12,19 @@ import (
 
 var qs_columnwidth = *qt.NewQAnyStringView3(QS_columnwidth)
 
-func SaveDialogGeometry(dialog *qt.QDialog, mainKey string) {
+// we need this because passing dialog.QWidget to SetupWindowGeometrySave causes:
+// panic: miqt: can only override virtual methods for directly constructed types [recovered]
+type windowSaveInterface interface {
+	OnMoveEvent(func(super func(*qt.QMoveEvent), event *qt.QMoveEvent))
+	OnResizeEvent(func(super func(*qt.QResizeEvent), event *qt.QResizeEvent))
+	Pos() *qt.QPoint
+	Size() *qt.QSize
+}
+
+func SaveWindowGeometry(window windowSaveInterface, mainKey string) {
 	// slog.Info("Saving main window geometry")
-	pos := dialog.Pos()
-	size := dialog.Size()
+	pos := window.Pos()
+	size := window.Size()
 	// what is window.SaveState()
 	s := &WindowSettings{
 		X:      pos.X(),
@@ -88,19 +97,19 @@ func SetupSplitterSizesSave(splitter *qt.QSplitter, mainKey string) {
 	})
 }
 
-func SetupDialogGeometrySave(
-	dialog *qt.QDialog,
+func SetupWindowGeometrySave(
+	window windowSaveInterface,
 	mainKey string,
 ) {
 	ch := make(chan time.Time, 100)
 
-	dialog.OnMoveEvent(func(super func(*qt.QMoveEvent), event *qt.QMoveEvent) {
+	window.OnMoveEvent(func(super func(*qt.QMoveEvent), event *qt.QMoveEvent) {
 		ch <- time.Now()
 	})
-	dialog.OnResizeEvent(func(super func(*qt.QResizeEvent), event *qt.QResizeEvent) {
+	window.OnResizeEvent(func(super func(*qt.QResizeEvent), event *qt.QResizeEvent) {
 		ch <- time.Now()
 	})
 	go ActionSaveLoop(ch, func() {
-		SaveDialogGeometry(dialog, mainKey)
+		SaveWindowGeometry(window, mainKey)
 	})
 }

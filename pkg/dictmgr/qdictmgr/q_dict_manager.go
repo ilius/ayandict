@@ -369,7 +369,7 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 		dm.setItem(index, dictName, ds)
 	}
 
-	qsettings.SetupDialogGeometrySave(dm.Dialog, QS_dictManager)
+	qsettings.SetupWindowGeometrySave(dm.Dialog, QS_dictManager)
 }
 
 // updates global var dictSettingsMap

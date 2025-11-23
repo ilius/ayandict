@@ -5,8 +5,11 @@ import (
 	"time"
 
 	"github.com/ilius/ayandict/v3/pkg/qplatform"
+	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
 	qt "github.com/mappu/miqt/qt6"
 )
+
+const dekstopWidgetSettingsName = "dekstop_widget"
 
 func (app *Application) setupDekstopWidget() {
 	slog.Info("setupDekstopWidget")
@@ -51,6 +54,10 @@ func (w *DesktopWidget) init() {
 	w.OnMousePressEvent(w.onMousePress)
 	w.OnMouseMoveEvent(w.onMouseMove)
 	w.OnMouseReleaseEvent(w.onMouseRelease)
+
+	qsettings.RestoreWindowGeometry(w.QWidget, dekstopWidgetSettingsName)
+
+	qsettings.SetupWindowGeometrySave(w, dekstopWidgetSettingsName)
 
 	go func() {
 		time.Sleep(200 * time.Millisecond)
