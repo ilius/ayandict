@@ -71,6 +71,7 @@ type ScanPopup struct {
 	articleView    *ArticleView
 	nextButton     *qt.QPushButton
 	prevButton     *qt.QPushButton
+	// favoriteButton *qt.QPushButton
 
 	// set by doQuery
 	results []commons.SearchResultIface
@@ -144,54 +145,49 @@ func (p *ScanPopup) init() {
 
 	popupLayout := qt.NewQVBoxLayout(popup)
 
-	closeButton := qt.NewQPushButton3(" close ")
-	closeButton.SetFont(font)
-	closeButton.OnClicked(func() {
-		_ = popup.Close()
-	})
-	mainButton := qt.NewQPushButton3(" main ")
-	mainButton.SetFont(font)
-	mainButton.OnClicked(p.moveToMainWindow)
-
 	nextButton := qt.NewQPushButton3(" next ")
-	nextButton.SetFont(font)
 	nextButton.OnClicked(p.gotoNextResult)
+	nextButton.SetToolTip("Next result (Alt+Down)")
 	p.nextButton = nextButton
 
 	prevButton := qt.NewQPushButton3(" prev ")
-	prevButton.SetFont(font)
 	prevButton.OnClicked(p.gotoPrevResult)
+	prevButton.SetToolTip("Previous result (Alt+Up)")
 	p.prevButton = prevButton
 
-	if conf.ScanPopupHeaderIcons {
-		closeButton.SetText(" ❌ ")
-		mainButton.SetText(" 📖 ")
-		nextButton.SetText("  ↓  ")
-		prevButton.SetText("  ↑  ")
-	}
-
-	closeButton.SetSizePolicy2(qt.QSizePolicy__Minimum, qt.QSizePolicy__Expanding)
-	mainButton.SetSizePolicy2(qt.QSizePolicy__Minimum, qt.QSizePolicy__Expanding)
-	nextButton.SetSizePolicy2(qt.QSizePolicy__Minimum, qt.QSizePolicy__Expanding)
-	prevButton.SetSizePolicy2(qt.QSizePolicy__Minimum, qt.QSizePolicy__Expanding)
-
-	closeButton.SetToolTip("Close (Esc)")
+	mainButton := qt.NewQPushButton3(" main ")
+	mainButton.OnClicked(p.moveToMainWindow)
 	mainButton.SetToolTip("Open in main window (Enter)")
-	nextButton.SetToolTip("Next result (Alt+Down)")
-	prevButton.SetToolTip("Previous result (Alt+Up)")
 
 	// favoriteButton := qt.NewQPushButton3("favorite")
-	// favoriteButton.SetFont(font)
 	// favoriteButton.SetCheckable(true)
 	// favoriteButton.OnToggled(func(checked bool) {
 	// 	// p.favoritesWidget.SetFavorite(term, checked)
 	// })
+	// favoriteButton.SetToolTip("Favorite")
 
 	// favoriteButton := NewFavoriteButton(app.favoriteButtonClicked)
 	// favoriteButton.SetToolTips(
 	// 	"Add this term to favorites",
 	// 	"Remove this term from favorites",
 	// )
+	// favoriteButton := qt.NewQPushButton3(" fav ")
+	// // favButton.OnClicked(p.favariteClicked)
+	// p.favoriteButton = favoriteButton
+
+	closeButton := qt.NewQPushButton3(" close ")
+	closeButton.OnClicked(func() {
+		_ = popup.Close()
+	})
+	closeButton.SetToolTip("Close (Esc)")
+
+	if conf.ScanPopupHeaderIcons {
+		nextButton.SetText("↓")
+		prevButton.SetText("↑")
+		mainButton.SetText("📖")
+		// favoriteButton.SetText("⭐")
+		closeButton.SetText("❌")
+	}
 
 	headerBox := qt.NewQHBoxLayout2()
 	headerBox.AddSpacing(10)
@@ -207,32 +203,35 @@ func (p *ScanPopup) init() {
 		label.SetCursor(qt.NewQCursor2(aboutToDragCursor))
 		headerBox.AddWidget2(label.QWidget, 1)
 	}
-	headerBox.AddWidget(nextButton.QWidget)
-	headerBox.AddWidget(prevButton.QWidget)
-	headerBox.AddWidget(mainButton.QWidget)
-	headerBox.AddWidget(closeButton.QWidget)
-
-	nextButton.SetFocusPolicy(qt.NoFocus)
-	prevButton.SetFocusPolicy(qt.NoFocus)
-	mainButton.SetFocusPolicy(qt.NoFocus)
-	closeButton.SetFocusPolicy(qt.NoFocus)
-
-	popupLayout.SetContentsMargins(5, 0, 5, 5)
-	popupLayout.SetSpacing(0)
-	headerBox.SetContentsMargins(0, 0, 0, 0)
-	headerBox.SetSpacing(0)
 
 	// buttons have no ContentsMargins by default
 	// setting "margin: 0px;" stylesheet mimimizes both the height and width
 	// margin: top, right, bottom, left
 	// const smallButtonSS = "margin: 0px 5px 0px 5px;"
 	const smallButtonSS = "margin: 0px;"
-	closeButton.SetStyleSheet(smallButtonSS)
-	mainButton.SetStyleSheet(smallButtonSS)
-	nextButton.SetStyleSheet(smallButtonSS)
-	prevButton.SetStyleSheet(smallButtonSS)
-	// closeButton.SetContentsMargins(5, 0, 5, 0)
-	// mainButton.SetContentsMargins(5, 0, 5, 0)
+
+	for _, button := range []*qt.QPushButton{
+		nextButton,
+		prevButton,
+		mainButton,
+		// favoriteButton,
+		closeButton,
+	} {
+		button.SetSizePolicy2(qt.QSizePolicy__Minimum, qt.QSizePolicy__Expanding)
+		button.OnResizeEvent(func(super func(*qt.QResizeEvent), event *qt.QResizeEvent) {
+			super(event)
+			button.SetFixedWidth(button.Height())
+		})
+		button.SetFont(font)
+		button.SetStyleSheet(smallButtonSS)
+		button.SetFocusPolicy(qt.NoFocus)
+		headerBox.AddWidget(button.QWidget)
+	}
+
+	popupLayout.SetContentsMargins(5, 0, 5, 5)
+	popupLayout.SetSpacing(0)
+	headerBox.SetContentsMargins(0, 0, 0, 0)
+	headerBox.SetSpacing(0)
 
 	popupLayout.AddWidget(p.outlineHeaderLayout(headerBox.QLayout))
 	popupLayout.AddWidget2(p.articleView.Widget, 10)
@@ -308,7 +307,7 @@ func (p *ScanPopup) Query(query string) {
 	p.nextButton.Show()
 	p.prevButton.Show()
 	playTimer := p.setResult(res)
-	// favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(res.Terms()[0]))
+	// p.favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(res.Terms()[0]))
 	p.autoResize()
 	if conf.ScanPopupHistory {
 		p.app.AddHistoryAndFrequency(query)
