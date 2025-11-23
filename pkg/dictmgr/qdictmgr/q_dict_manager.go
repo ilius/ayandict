@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/ilius/ayandict/v3/pkg/appinfo"
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/internal/dicts"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon"
@@ -44,8 +43,6 @@ type DictManager struct {
 
 	toolbar   *qt.QToolBar
 	buttonBox *qt.QDialogButtonBox
-
-	settings *qt.QSettings
 }
 
 func makeDictInfoMap(infos []common.Dictionary) map[string]common.Dictionary {
@@ -68,7 +65,6 @@ func NewDictManager(
 
 	infoMap := makeDictInfoMap(dicts.DictList)
 
-	qs := qt.NewQSettings8("ilius", appinfo.APP_NAME, window.QObject)
 	qsettings.RestoreWindowGeometry(window.QWidget, QS_dictManager)
 
 	table := qt.NewQTableWidget2()
@@ -96,7 +92,6 @@ func NewDictManager(
 		app:       app,
 		toolbar:   toolbar,
 		buttonBox: buttonBox,
-		settings:  qs,
 	}
 	dictMgr.prepareWidgets(conf)
 	return dictMgr
