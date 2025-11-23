@@ -170,6 +170,11 @@ func (p *ScanPopup) init() {
 		prevButton.SetText("  ↑  ")
 	}
 
+	closeButton.SetSizePolicy2(qt.QSizePolicy__Minimum, qt.QSizePolicy__Expanding)
+	mainButton.SetSizePolicy2(qt.QSizePolicy__Minimum, qt.QSizePolicy__Expanding)
+	nextButton.SetSizePolicy2(qt.QSizePolicy__Minimum, qt.QSizePolicy__Expanding)
+	prevButton.SetSizePolicy2(qt.QSizePolicy__Minimum, qt.QSizePolicy__Expanding)
+
 	closeButton.SetToolTip("Close (Esc)")
 	mainButton.SetToolTip("Open in main window (Enter)")
 	nextButton.SetToolTip("Next result (Alt+Down)")
