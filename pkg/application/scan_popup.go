@@ -22,6 +22,8 @@ type ScanPopupAppInterface interface {
 	OnScanPopupClose(super func(*qt.QCloseEvent), event *qt.QCloseEvent)
 	ShowWindowAndQuery(query string)
 	AddHistoryAndFrequency(query string)
+	HasFavorite(term string) bool
+	SetFavoriteFromPopup(term string, favorite bool)
 	ShowAbout()
 }
 
@@ -71,7 +73,7 @@ type ScanPopup struct {
 	articleView    *ArticleView
 	nextButton     *qt.QPushButton
 	prevButton     *qt.QPushButton
-	// favoriteButton *qt.QPushButton
+	favoriteButton *FavoriteButton
 
 	// set by doQuery
 	results []commons.SearchResultIface
@@ -155,6 +157,15 @@ func (p *ScanPopup) init() {
 	prevButton.SetToolTip("Previous result (Alt+Up)")
 	p.prevButton = prevButton
 
+	favoriteButton := NewFavoriteButton(
+		p.favoriteButtonClicked,
+	)
+	favoriteButton.SetToolTips(
+		"Add this term to favorites",
+		"Remove this term from favorites",
+	)
+	p.favoriteButton = favoriteButton
+
 	mainButton := qt.NewQPushButton3(" main ")
 	mainButton.OnClicked(p.moveToMainWindow)
 	mainButton.SetToolTip("Open in main window (Enter)")
@@ -166,15 +177,6 @@ func (p *ScanPopup) init() {
 	// })
 	// favoriteButton.SetToolTip("Favorite")
 
-	// favoriteButton := NewFavoriteButton(app.favoriteButtonClicked)
-	// favoriteButton.SetToolTips(
-	// 	"Add this term to favorites",
-	// 	"Remove this term from favorites",
-	// )
-	// favoriteButton := qt.NewQPushButton3(" fav ")
-	// // favButton.OnClicked(p.favariteClicked)
-	// p.favoriteButton = favoriteButton
-
 	closeButton := qt.NewQPushButton3(" close ")
 	closeButton.OnClicked(func() {
 		_ = popup.Close()
@@ -185,7 +187,6 @@ func (p *ScanPopup) init() {
 		nextButton.SetText("↓")
 		prevButton.SetText("↑")
 		mainButton.SetText("📖")
-		// favoriteButton.SetText("⭐")
 		closeButton.SetText("❌")
 	}
 
@@ -213,19 +214,26 @@ func (p *ScanPopup) init() {
 	for _, button := range []*qt.QPushButton{
 		nextButton,
 		prevButton,
+		favoriteButton.QPushButton,
 		mainButton,
-		// favoriteButton,
 		closeButton,
 	} {
 		button.SetSizePolicy2(qt.QSizePolicy__Minimum, qt.QSizePolicy__Expanding)
-		button.OnResizeEvent(func(super func(*qt.QResizeEvent), event *qt.QResizeEvent) {
-			super(event)
-			button.SetFixedWidth(button.Height())
-		})
 		button.SetFont(font)
 		button.SetStyleSheet(smallButtonSS)
 		button.SetFocusPolicy(qt.NoFocus)
 		headerBox.AddWidget(button.QWidget)
+	}
+	for _, button := range []*qt.QPushButton{
+		nextButton,
+		prevButton,
+		mainButton,
+		closeButton,
+	} {
+		button.OnResizeEvent(func(super func(*qt.QResizeEvent), event *qt.QResizeEvent) {
+			super(event)
+			button.SetFixedWidth(event.Size().Height())
+		})
 	}
 
 	popupLayout.SetContentsMargins(5, 0, 5, 5)
@@ -235,6 +243,13 @@ func (p *ScanPopup) init() {
 
 	popupLayout.AddWidget(p.outlineHeaderLayout(headerBox.QLayout))
 	popupLayout.AddWidget2(p.articleView.Widget, 10)
+}
+
+func (p *ScanPopup) favoriteButtonClicked(checked bool) {
+	p.app.SetFavoriteFromPopup(
+		p.results[p.resultIndex].Terms()[0],
+		checked,
+	)
 }
 
 func (p *ScanPopup) outlineHeaderLayout(layout *qt.QLayout) *qt.QWidget {
@@ -277,6 +292,7 @@ func (p *ScanPopup) setResult(res common.SearchResultIface) *qt.QTimer {
 		return nil
 	}
 	p.headerLabel.SetText(headerBuf.String())
+	p.favoriteButton.SetChecked(p.app.HasFavorite(res.Terms()[0]))
 	return p.articleView.SetPopupResult(
 		res,
 		conf.ScanPopupTermsStyle,
@@ -307,7 +323,6 @@ func (p *ScanPopup) Query(query string) {
 	p.nextButton.Show()
 	p.prevButton.Show()
 	playTimer := p.setResult(res)
-	// p.favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(res.Terms()[0]))
 	p.autoResize()
 	if conf.ScanPopupHistory {
 		p.app.AddHistoryAndFrequency(query)
