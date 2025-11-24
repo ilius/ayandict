@@ -230,7 +230,7 @@ func Default() *Config {
 		ScanPopupHistory:   true,
 
 		ScanPopupHeaderIcons:    true,
-		ScanPopupHeaderTemplate: `{{.DictName}} [Score: %{{.Score}}]`,
+		ScanPopupHeaderTemplate: `<span style='font-weight:200;'>{{.DictName}} [Score: %{{.Score}}]</span>`,
 		ScanPopupTermsStyle:     `style="font-size:large;font-weight:bold;"`,
 
 		ScanPopupFontSizeFactor: 0.8,

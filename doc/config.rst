@@ -200,7 +200,7 @@ Default value: ``true``
 ------------------------------
 Scan Popup: HTML template for header (dict name and score)
 
-Default value: ``"{{.DictName}} [Score: %{{.Score}}]"``
+Default value: ``"<span style='font-weight:200;'>{{.DictName}} [Score: %{{.Score}}]</span>"``
 
 ``scan_popup_terms_style``
 --------------------------
