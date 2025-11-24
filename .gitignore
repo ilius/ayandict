@@ -2,9 +2,9 @@
 ayandict
 ayandict-v*
 *.log
-cmd/desktop-widget/desktop-widget
-cmd/scan-popup-basic/scan-popup-basic
-cmd/searchbar_example/searchbar_example
+cmd/go-examples/desktop-widget/desktop-widget
+cmd/go-examples/scan-popup-basic/scan-popup-basic
+cmd/go-examples/searchbar_example/searchbar_example
 qtbox
 pkg/config/doc-gen/doc-gen
 *.exe
