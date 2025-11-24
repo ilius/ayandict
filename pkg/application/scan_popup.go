@@ -224,16 +224,18 @@ func (p *ScanPopup) init() {
 		button.SetFocusPolicy(qt.NoFocus)
 		headerBox.AddWidget(button.QWidget)
 	}
-	for _, button := range []*qt.QPushButton{
-		nextButton,
-		prevButton,
-		mainButton,
-		closeButton,
-	} {
-		button.OnResizeEvent(func(super func(*qt.QResizeEvent), event *qt.QResizeEvent) {
-			super(event)
-			button.SetFixedWidth(event.Size().Height())
-		})
+	if conf.ScanPopupHeaderIcons {
+		for _, button := range []*qt.QPushButton{
+			nextButton,
+			prevButton,
+			mainButton,
+			closeButton,
+		} {
+			button.OnResizeEvent(func(super func(*qt.QResizeEvent), event *qt.QResizeEvent) {
+				super(event)
+				button.SetFixedWidth(event.Size().Height())
+			})
+		}
 	}
 
 	popupLayout.SetContentsMargins(5, 0, 5, 5)
