@@ -498,8 +498,7 @@ func (app *Application) Run() {
 	// setting up handlers
 	app.setupHandlers()
 
-	qs := qt.NewQSettings8("ilius", appinfo.APP_NAME, window.QObject)
-	app.setupSettings(qs, mainSplitter)
+	app.setupSettings(mainSplitter)
 
 	app.setupScanPopup()
 
@@ -525,7 +524,7 @@ func (app *Application) Run() {
 	_ = qt.QApplication_Exec()
 }
 
-func (app *Application) setupSettings(qs *qt.QSettings, mainSplitter *qt.QSplitter) {
+func (app *Application) setupSettings(mainSplitter *qt.QSplitter) {
 	app.searchModeCombo.OnCurrentIndexChanged(func(i int) {
 		text := app.entry.Text()
 		if text != "" {
@@ -540,7 +539,6 @@ func (app *Application) setupSettings(qs *qt.QSettings, mainSplitter *qt.QSplitt
 
 	frequencyTable := app.frequencyTable
 	qsettings.RestoreTableColumnsWidth(
-		qs,
 		frequencyTable.QTableWidget,
 		QS_frequencyTable,
 	)
