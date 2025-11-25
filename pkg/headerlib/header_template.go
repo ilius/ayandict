@@ -6,10 +6,10 @@ import (
 	"html/template"
 	"strings"
 
+	commons "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	"github.com/ilius/ayandict/v2/pkg/wordwrap"
-	commons "github.com/ilius/go-dict-commons"
 )
 
 type HeaderTemplateInput struct {

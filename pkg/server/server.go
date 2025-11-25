@@ -11,13 +11,13 @@ import (
 	text_template "text/template"
 	"time"
 
+	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v2/pkg/appinfo"
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	"github.com/ilius/ayandict/v2/pkg/headerlib"
 	"github.com/ilius/ayandict/v2/pkg/logging"
 	"github.com/ilius/ayandict/v2/web"
-	common "github.com/ilius/go-dict-commons"
 )
 
 const (

@@ -18,9 +18,9 @@ import (
 	"strings"
 	"sync"
 
+	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/html"
-	common "github.com/ilius/go-dict-commons"
 )
 
 var (

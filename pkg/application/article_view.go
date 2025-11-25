@@ -11,9 +11,9 @@ import (
 	"sync"
 	"time"
 
+	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr"
 	"github.com/ilius/ayandict/v2/pkg/mp3duration"
-	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
 	"github.com/ilius/qt/multimedia"

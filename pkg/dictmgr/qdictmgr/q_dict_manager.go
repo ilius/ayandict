@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"strconv"
 
+	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v2/pkg/config"
 	"github.com/ilius/ayandict/v2/pkg/dictmgr/internal/dicts"
 	"github.com/ilius/ayandict/v2/pkg/qtcommon"
 	"github.com/ilius/ayandict/v2/pkg/qtcommon/qsettings"
-	common "github.com/ilius/go-dict-commons"
 	"github.com/ilius/qt/core"
 	"github.com/ilius/qt/gui"
 	"github.com/ilius/qt/widgets"
