@@ -4,8 +4,8 @@ import (
 	"fmt"
 	std_html "html"
 
+	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v3/pkg/config"
-	common "github.com/ilius/go-dict-commons"
 )
 
 func NewSearchResult(

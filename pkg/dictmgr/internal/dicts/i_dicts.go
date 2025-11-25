@@ -8,10 +8,10 @@ import (
 	"sort"
 	"time"
 
+	common "codeberg.org/ilius/go-dict-commons"
+	"codeberg.org/ilius/go-stardict/v2"
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/logging"
-	common "github.com/ilius/go-dict-commons"
-	"github.com/ilius/go-stardict/v2"
 )
 
 const dictsJsonFilename = "dicts.json"

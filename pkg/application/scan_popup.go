@@ -6,10 +6,10 @@ import (
 	"html/template"
 	"log/slog"
 
+	common "codeberg.org/ilius/go-dict-commons"
+	commons "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/qplatform"
-	common "github.com/ilius/go-dict-commons"
-	commons "github.com/ilius/go-dict-commons"
 	qt "github.com/mappu/miqt/qt6"
 )
 

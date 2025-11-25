@@ -6,12 +6,12 @@ import (
 	"log/slog"
 	"strings"
 
+	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/headerlib"
 	"github.com/ilius/ayandict/v3/pkg/jsonapi"
-	common "github.com/ilius/go-dict-commons"
 	"github.com/mappu/miqt/qt6/network"
 )
 

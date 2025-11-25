@@ -4,8 +4,8 @@ import (
 	"log/slog"
 	"strings"
 
+	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v3/pkg/headerlib"
-	common "github.com/ilius/go-dict-commons"
 	qt "github.com/mappu/miqt/qt6"
 )
 

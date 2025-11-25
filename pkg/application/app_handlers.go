@@ -5,10 +5,10 @@ import (
 	"log/slog"
 	"time"
 
+	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/qdictmgr"
-	common "github.com/ilius/go-dict-commons"
 	qt "github.com/mappu/miqt/qt6"
 )
 

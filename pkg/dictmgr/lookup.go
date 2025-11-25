@@ -5,9 +5,9 @@ import (
 	"sort"
 	"strings"
 
+	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/internal/dicts"
-	common "github.com/ilius/go-dict-commons"
 )
 
 type SearchMode uint8

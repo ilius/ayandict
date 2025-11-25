@@ -3,11 +3,11 @@ package dictmgr
 import (
 	"log/slog"
 
+	common "codeberg.org/ilius/go-dict-commons"
+	"codeberg.org/ilius/go-dict-commons/search_utils"
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/internal/dicts"
 	"github.com/ilius/ayandict/v3/pkg/mysoundex"
-	common "github.com/ilius/go-dict-commons"
-	"github.com/ilius/go-dict-commons/search_utils"
 )
 
 var soundexSearcher *mysoundex.SoundexSearcher

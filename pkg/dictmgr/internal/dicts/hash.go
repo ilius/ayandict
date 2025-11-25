@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	common "github.com/ilius/go-dict-commons"
+	common "codeberg.org/ilius/go-dict-commons"
 )
 
 func Hash(info common.Dictionary) string {

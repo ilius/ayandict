@@ -13,9 +13,9 @@ import (
 	"sync"
 	"time"
 
+	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/mp3duration"
-	common "github.com/ilius/go-dict-commons"
 	qt "github.com/mappu/miqt/qt6"
 	"github.com/mappu/miqt/qt6/multimedia" // not in latest tag
 )
