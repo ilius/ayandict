@@ -7,8 +7,6 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
-var qs_columnwidth = *qt.NewQAnyStringView3(QS_columnwidth)
-
 // we need this because passing dialog.QWidget to SetupWindowGeometrySave causes:
 // panic: miqt: can only override virtual methods for directly constructed types [recovered]
 type windowSaveInterface interface {
@@ -40,29 +38,6 @@ func RestoreWindowGeometry(window *qt.QWidget, mainKey string) {
 	if s.Maximized {
 		window.ShowMaximized()
 	}
-}
-
-func saveSplitterSizes(splitter *qt.QSplitter, mainKey string) {
-	// slog.Info("Saving splitter sizes")
-	saveJson(splitter.Sizes(), mainKey)
-}
-
-func RestoreSplitterSizes(splitter *qt.QSplitter, mainKey string) {
-	sizes := loadJsonIntSlice(mainKey)
-	if sizes == nil {
-		return
-	}
-	splitter.SetSizes(sizes)
-}
-
-func SetupSplitterSizesSave(splitter *qt.QSplitter, mainKey string) {
-	ch := make(chan time.Time, 100)
-	splitter.OnSplitterMoved(func(pos int, index int) {
-		ch <- time.Now()
-	})
-	go ActionSaveLoop(ch, func() {
-		saveSplitterSizes(splitter, mainKey)
-	})
 }
 
 func SetupWindowGeometrySave(
