@@ -167,19 +167,6 @@ func (app *Application) Run(skipRunning bool, query string) {
 		os.Getenv("NO_COLOR") != "",
 		conf,
 	)
-
-	if conf.WebEnable {
-		if ok, _ := findLocalWebServer(conf.LocalServerPorts); ok {
-			if !skipRunning {
-				slog.Error("another instance is running")
-			}
-			if query != "" {
-				qlocalserver.SendQueryToLocalServer(query)
-			}
-			return
-		}
-		go webserver.StartServer(conf.LocalServerPorts[0])
-	}
 	if !qlocalserver.StartLocalSocketServer(
 		conf,
 		app.ShowWindowAndQuery,
@@ -197,6 +184,18 @@ func (app *Application) Run(skipRunning bool, query string) {
 			qlocalserver.SendQueryToLocalServer(query)
 		}
 		return
+	}
+	if conf.WebEnable {
+		if ok, _ := findLocalWebServer(conf.LocalServerPorts); ok {
+			if !skipRunning {
+				slog.Error("another web instance is running")
+			}
+			if query != "" {
+				qlocalserver.SendQueryToLocalServer(query)
+			}
+			return
+		}
+		go webserver.StartServer(conf.LocalServerPorts[0])
 	}
 	defer func() {
 		if r := recover(); r != nil {
