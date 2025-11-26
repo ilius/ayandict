@@ -480,18 +480,18 @@ func (view *ArticleView) findLinkOnCursor(cursor *qt.QTextCursor) string {
 	}
 	start = strings.Index(text, "href=")
 	if start < 0 {
-		// slog.Info("findLinkOnCursor: did not find end href=")
+		slog.Warn("findLinkOnCursor: did not find end href=")
 		return ""
 	}
 	text = text[start+5:]
 	end := strings.Index(text[1:], text[:1])
 	if end < 0 {
-		// slog.Info("findLinkOnCursor: did not find end quote")
+		slog.Warn("findLinkOnCursor: did not find end quote")
 		return ""
 	}
 	urlStr, err := strconv.Unquote(text[:end+2])
 	if err != nil {
-		// slog.Error("error in Unquote", err)
+		slog.Error("findLinkOnCursor: error in Unquote", "err", err)
 		return ""
 	}
 	return urlStr

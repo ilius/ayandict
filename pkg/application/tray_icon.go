@@ -15,7 +15,7 @@ func (app *Application) setupTrayIcon(icon *qt.QIcon) {
 	trayIcon.OnMessageClicked(func() {
 		// Supposed to be called when user click on desktop notification (which we don't use)
 		// But it's not called on Xfce (because of xfce4-notifyd)
-		slog.Info("-------------- SystemTrayIcon: MessageClicked")
+		slog.Debug("-------------- SystemTrayIcon: MessageClicked")
 	})
 	app.statusIconActions = app.createStatusIconActions()
 	app.setTrayMenu()

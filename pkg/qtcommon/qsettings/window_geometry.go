@@ -17,7 +17,6 @@ type windowSaveInterface interface {
 }
 
 func SaveWindowGeometry(window windowSaveInterface, mainKey string) {
-	// slog.Info("Saving main window geometry")
 	pos := window.Pos()
 	size := window.Size()
 	// what is window.SaveState()

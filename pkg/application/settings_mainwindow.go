@@ -51,7 +51,7 @@ func (s *MainWindowSettings) Load() {
 }
 
 func (app *Application) saveMainWindowSettings() {
-	// slog.Info("Saving main window geometry")
+	// slog.Debug("Saving main window geometry")
 	pos := app.window.Pos()
 	size := app.window.Size()
 	// what is window.SaveState()

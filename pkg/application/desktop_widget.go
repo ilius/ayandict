@@ -12,7 +12,6 @@ import (
 const dekstopWidgetSettingsName = "dekstop_widget"
 
 func (app *Application) setupDekstopWidget() {
-	slog.Info("setupDekstopWidget")
 	pixmap, err := loadPNGPixmap(iconPixName)
 	if err != nil {
 		slog.Error("failed to load icon image", "err", err)
@@ -67,7 +66,7 @@ func (w *DesktopWidget) init() {
 	// timer := qt.NewQTimer()
 	// timer.SetSingleShot(true)
 	// timer.OnTimeout(func() {
-	// 	slog.Info("------ OnTimeout: Lower")
+	// 	slog.Debug("------ OnTimeout: Lower")
 	// 	w.Lower()
 	// })
 	// timer.Start(200)

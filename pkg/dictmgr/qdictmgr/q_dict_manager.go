@@ -272,7 +272,7 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 	extraOptionsVBox.AddLayout(volumeHBox.Layout())
 	volumeInput.OnValueChanged(func(value int) {
 		if selectedDictSettings == nil {
-			slog.Info("ConnectValueChanged: selectedDictSettings == nil")
+			slog.Warn("ConnectValueChanged: selectedDictSettings == nil")
 			return
 		}
 		selectedDictSettings.AudioVolume = value

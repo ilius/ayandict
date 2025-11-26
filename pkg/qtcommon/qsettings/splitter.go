@@ -17,7 +17,6 @@ func SetupSplitterSizesSave(splitter *qt.QSplitter, mainKey string) {
 }
 
 func saveSplitterSizes(splitter *qt.QSplitter, mainKey string) {
-	// slog.Info("Saving splitter sizes")
 	saveJson(splitter.Sizes(), mainKey)
 }
 
