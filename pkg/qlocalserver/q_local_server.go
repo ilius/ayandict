@@ -16,6 +16,11 @@ import (
 )
 
 const (
+	socket_connect_timeout = 200 // ms
+	socket_ping_timeout    = 200 // ms
+
+	s_ping               = "ping"
+	s_pong               = "pong"
 	s_scanPopup          = "scanpopup:"          // open Scan Popup window with given query
 	s_statusIconActivate = "statusicon:activate" // simulate clicking on status/tray icon
 	s_query              = "query:"              // query and send results in json over socket
@@ -50,7 +55,10 @@ func StartLocalSocketServer(
 		conn.OnReadyRead(func() {
 			cmd := strings.TrimSpace(string(conn.ReadAll()))
 			slog.Debug("LocalSocketServer: received:", "data", cmd)
-			if strings.HasPrefix(cmd, s_scanPopup) {
+			if cmd == s_ping {
+				conn.Write2([]byte(s_pong))
+				conn.Flush()
+			} else if strings.HasPrefix(cmd, s_scanPopup) {
 				if conf.ScanPopupAPI {
 					query := cmd[len(s_scanPopup):]
 					scanPopup(query)
@@ -126,17 +134,44 @@ func apiQuery(conf *config.Config, conn *network.QLocalSocket, cmd string) {
 	conn.Write2(data)
 }
 
-func SendQueryToLocalServer(query string) {
-	client := network.NewQLocalSocket()
-	slog.Info("connecting to server", "name", appinfo.LOCAL_SOCKET_NAME)
-	client.ConnectToServerWithName(appinfo.LOCAL_SOCKET_NAME)
-	slog.Info("waiting for connection")
-	if !client.WaitForConnectedWithMsecs(200) {
-		slog.Error("time out while waiting for connection")
-		return
+func PingLocalServer() bool {
+	socket := sendToLocalServer([]byte(s_ping))
+	if socket == nil {
+		return false
 	}
-	slog.Info("writing data", "query", query)
-	_ = client.Write2([]byte(s_mainquery + query))
+	if !socket.WaitForReadyRead(socket_ping_timeout) {
+		slog.Error("got no response from ping")
+		return false
+	}
+	data := socket.ReadAll()
+	dataStr := string(data)
+	if dataStr != s_pong {
+		slog.Error("got bad response from ping", "dataStr", dataStr, "data", data)
+		return false
+	}
+	slog.Debug("---- got response from ping", "dataStr", dataStr, "data", data)
+	return true
+}
+
+func SendQueryToLocalServer(query string) bool {
+	if sendToLocalServer([]byte(s_mainquery+query)) == nil {
+		slog.Error("Time out while waiting for connection")
+		return false
+	}
+	return true
+}
+
+func sendToLocalServer(data []byte) *network.QLocalSocket {
+	socket := network.NewQLocalSocket()
+	slog.Info("connecting to server", "name", appinfo.LOCAL_SOCKET_NAME)
+	socket.ConnectToServerWithName(appinfo.LOCAL_SOCKET_NAME)
+	slog.Info("waiting for connection")
+	if !socket.WaitForConnectedWithMsecs(socket_connect_timeout) {
+		return nil
+	}
+	slog.Info("writing data", "data", data)
+	_ = socket.Write2(data)
 	slog.Info("flushing")
-	client.Flush()
+	socket.Flush()
+	return socket
 }

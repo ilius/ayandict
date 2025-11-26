@@ -159,8 +159,8 @@ func (app *Application) Exit() {
 }
 
 // TODO: break down
-func (app *Application) Run(skipRunning bool, query string) {
-	slog.Info("Run", "query", query, "skipRunning", skipRunning, "WebEnable", conf.WebEnable)
+func (app *Application) Run(query string) {
+	slog.Info("Run", "query", query, "WebEnable", conf.WebEnable)
 	app.init()
 
 	logging.SetupLoggerAfterConfigLoad(
@@ -173,23 +173,20 @@ func (app *Application) Run(skipRunning bool, query string) {
 		app.QueryPopup,
 		app.statusIconActivate,
 	) {
-		if !skipRunning {
+		if qlocalserver.PingLocalServer() {
+			_ = qlocalserver.SendQueryToLocalServer(query)
+		} else {
 			slog.Error(
 				"another instance is running, or dead socket (in /tmp)",
 				"filename",
 				appinfo.LOCAL_SOCKET_NAME,
 			)
 		}
-		if query != "" {
-			qlocalserver.SendQueryToLocalServer(query)
-		}
 		return
 	}
 	if conf.WebEnable {
 		if ok, _ := findLocalWebServer(conf.LocalServerPorts); ok {
-			if !skipRunning {
-				slog.Error("another web instance is running")
-			}
+			slog.Error("another web instance is running")
 			if query != "" {
 				qlocalserver.SendQueryToLocalServer(query)
 			}
