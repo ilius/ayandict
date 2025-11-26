@@ -54,6 +54,16 @@ func main() {
 		false,
 		"Enable private mode: do not save activity (history, most frequest, favorites)",
 	)
+	skipRunningFlag := flag.Bool(
+		"skip-running",
+		false,
+		"Do not show error if AyanDict seems to be running (socket file exists)",
+	)
+	queryFlag := flag.String(
+		"query",
+		"",
+		"Open AyanDict with given query",
+	)
 	flag.Parse()
 
 	if *versionFlag {
@@ -78,5 +88,5 @@ func main() {
 		config.PrivateMode = true
 	}
 
-	application.Run()
+	application.Run(*skipRunningFlag, *queryFlag)
 }

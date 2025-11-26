@@ -9,7 +9,7 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
-func Run() {
+func Run(skipRunning bool, query string) {
 	qt.QCoreApplication_SetApplicationName(appinfo.APP_DESC)
 	qt.QGuiApplication_SetDesktopFileName(appinfo.APP_NAME)
 
@@ -40,5 +40,5 @@ func Run() {
 			slog.Error("error in MkdirAll: " + err.Error())
 		}
 	}
-	app.Run()
+	app.Run(skipRunning, query)
 }

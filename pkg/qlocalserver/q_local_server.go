@@ -125,3 +125,18 @@ func apiQuery(conf *config.Config, conn *network.QLocalSocket, cmd string) {
 	}
 	conn.Write2(data)
 }
+
+func SendQueryToLocalServer(query string) {
+	client := network.NewQLocalSocket()
+	slog.Info("connecting to server", "name", appinfo.LOCAL_SOCKET_NAME)
+	client.ConnectToServerWithName(appinfo.LOCAL_SOCKET_NAME)
+	slog.Info("waiting for connection")
+	if !client.WaitForConnectedWithMsecs(200) {
+		slog.Error("time out while waiting for connection")
+		return
+	}
+	slog.Info("writing data", "query", query)
+	_ = client.Write2([]byte(s_mainquery + query))
+	slog.Info("flushing")
+	client.Flush()
+}

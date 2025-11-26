@@ -159,7 +159,8 @@ func (app *Application) Exit() {
 }
 
 // TODO: break down
-func (app *Application) Run() {
+func (app *Application) Run(skipRunning bool, query string) {
+	slog.Info("Run", "query", query, "skipRunning", skipRunning, "WebEnable", conf.WebEnable)
 	app.init()
 
 	logging.SetupLoggerAfterConfigLoad(
@@ -167,10 +168,14 @@ func (app *Application) Run() {
 		conf,
 	)
 
-	slog.Info("Run", "WebEnable", conf.WebEnable)
 	if conf.WebEnable {
 		if ok, _ := findLocalWebServer(conf.LocalServerPorts); ok {
-			slog.Error("another instance is running")
+			if !skipRunning {
+				slog.Error("another instance is running")
+			}
+			if query != "" {
+				qlocalserver.SendQueryToLocalServer(query)
+			}
 			return
 		}
 		go webserver.StartServer(conf.LocalServerPorts[0])
@@ -181,11 +186,16 @@ func (app *Application) Run() {
 		app.QueryPopup,
 		app.statusIconActivate,
 	) {
-		slog.Error(
-			"another instance is running, or dead socket (in /tmp)",
-			"filename",
-			appinfo.LOCAL_SOCKET_NAME,
-		)
+		if !skipRunning {
+			slog.Error(
+				"another instance is running, or dead socket (in /tmp)",
+				"filename",
+				appinfo.LOCAL_SOCKET_NAME,
+			)
+		}
+		if query != "" {
+			qlocalserver.SendQueryToLocalServer(query)
+		}
 		return
 	}
 	defer func() {
@@ -505,7 +515,13 @@ func (app *Application) Run() {
 	if conf.DesktopWidget {
 		app.setupDekstopWidget()
 	}
-	if !(conf.StartHidden && app.trayIcon != nil && app.trayIcon.IsVisible()) {
+
+	hidden := conf.StartHidden && app.trayIcon != nil && app.trayIcon.IsVisible()
+	if query != "" {
+		app.Query(query)
+		hidden = false
+	}
+	if !hidden {
 		window.Show()
 	}
 
