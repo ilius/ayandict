@@ -1,7 +1,7 @@
 //go:build darwin
 // +build darwin
 
-package config
+package ospaths
 
 /*
 #cgo CFLAGS: -x objective-c
@@ -23,11 +23,8 @@ char* getDir(NSSearchPathDirectory dir) {
 import "C"
 
 import (
-	"os"
 	"path/filepath"
 	"unsafe"
-
-	"github.com/ilius/ayandict/v3/pkg/appinfo"
 )
 
 func foundationDir(dir C.NSSearchPathDirectory) string {
@@ -39,30 +36,30 @@ func foundationDir(dir C.NSSearchPathDirectory) string {
 	return C.GoString(cpath)
 }
 
-func platformConfigDir() string {
+func (p *Paths) ConfigDir() string {
 	lib := foundationDir(C.NSLibraryDirectory)
 	if lib == "" {
-		lib = filepath.Join(os.Getenv(S_HOME), "Library")
+		lib = filepath.Join(p.Home, "Library")
 	}
-	return filepath.Join(lib, "Preferences", appinfo.APP_DESC)
+	return filepath.Join(lib, "Preferences", p.AppNameCap)
 }
 
-func GetCacheDir() string {
+func (p *Paths) CacheDir() string {
 	parent := foundationDir(C.NSCachesDirectory)
 	if parent == "" {
-		parent = filepath.Join(os.Getenv(S_HOME), "Library", "Caches")
+		parent = filepath.Join(p.Home, "Library", "Caches")
 	}
-	return filepath.Join(parent, appinfo.APP_DESC)
+	return filepath.Join(parent, p.AppNameCap)
 }
 
-func GetStateDir() string {
+func (p *Paths) StateDir() string {
 	parent := foundationDir(C.NSApplicationSupportDirectory)
 	if parent == "" {
 		parent = filepath.Join(
-			os.Getenv(S_HOME),
+			p.Home,
 			"Library",
 			"Application Support",
 		)
 	}
-	return filepath.Join(parent, appinfo.APP_DESC)
+	return filepath.Join(parent, p.AppNameCap)
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	fmt.Println("Config:", config.GetConfigDir())
-	fmt.Println("Cache:", config.GetCacheDir())
-	fmt.Println("State:", config.GetStateDir())
+	fmt.Println("Config:", config.Paths.ConfigDir())
+	fmt.Println("Cache:", config.Paths.CacheDir())
+	fmt.Println("State:", config.Paths.StateDir())
 }

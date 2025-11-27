@@ -28,4 +28,4 @@ const (
 	searchOnTypeNotModifierMask = int(qt.AltModifier) | int(qt.MetaModifier)
 )
 
-var stateDir = config.GetStateDir()
+var stateDir = config.Paths.StateDir()

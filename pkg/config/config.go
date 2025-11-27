@@ -303,7 +303,7 @@ func GetConfigDir() string {
 	if os.Getenv("CONFIG_FILE") != "" {
 		return filepath.Dir(Path())
 	}
-	return platformConfigDir()
+	return Paths.ConfigDir()
 }
 
 func loadFile() ([]byte, error) {

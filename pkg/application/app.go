@@ -167,6 +167,12 @@ func (app *Application) Run(query string) {
 		os.Getenv("NO_COLOR") != "",
 		conf,
 	)
+	slog.Debug(
+		"Paths",
+		"configDir", config.GetConfigDir(),
+		"cacheDir", config.Paths.CacheDir(),
+		"stateDir", config.Paths.StateDir(),
+	)
 	if !qlocalserver.StartLocalSocketServer(
 		conf,
 		app.ShowWindowAndQuery,

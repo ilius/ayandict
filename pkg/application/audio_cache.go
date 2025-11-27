@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	cacheDir   = config.GetCacheDir()
+	cacheDir   = config.Paths.CacheDir()
 	audioCache = NewAudioCache()
 )
 

@@ -16,7 +16,7 @@ const (
 	QS_columnwidth = "columnwidth"
 )
 
-var stateDir = config.GetStateDir()
+var stateDir = config.Paths.StateDir()
 
 func saveJson(value any, mainKey string) {
 	fpath := path.Join(stateDir, mainKey+".json")

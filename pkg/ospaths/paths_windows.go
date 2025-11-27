@@ -1,28 +1,26 @@
 //go:build windows
 // +build windows
 
-package config
+package ospaths
 
 import (
 	"log/slog"
 	"os"
 	"path/filepath"
-
-	"github.com/ilius/ayandict/v3/pkg/appinfo"
 )
 
-func platformConfigDir() string {
+func (p *Paths) ConfigDir() string {
 	// HOMEDRIVE := os.Getenv("HOMEDRIVE")
 	// HOMEPATH := os.Getenv("HOMEPATH")
 	// homeDir := filepath.Join(HOMEDRIVE, HOMEPATH)
 	// user := os.Getenv("USERNAME")
 	// tmpDir := os.Getenv("TEMP")
 	appData := os.Getenv("APPDATA")
-	confDir := filepath.Join(appData, appinfo.APP_DESC)
+	confDir := filepath.Join(appData, p.AppDesc)
 	return confDir
 }
 
-func GetCacheDir() string {
+func (p *Paths) CacheDir() string {
 	localAppData := os.Getenv("LOCALAPPDATA")
 	if localAppData == "" {
 		// Windows Vista or older
@@ -34,9 +32,9 @@ func GetCacheDir() string {
 			return ""
 		}
 	}
-	return filepath.Join(localAppData, appinfo.APP_DESC, "Cache")
+	return filepath.Join(localAppData, p.AppDesc, "Cache")
 }
 
-func GetStateDir() string {
-	return filepath.Join(platformConfigDir(), "State")
+func (p *Paths) StateDir() string {
+	return filepath.Join(p.ConfigDir(), "State")
 }

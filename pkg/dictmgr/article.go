@@ -45,7 +45,7 @@ const (
 	playImageName = "audio-play.png"
 )
 
-var playImagePath = filepath.Join(config.GetCacheDir(), playImageName)
+var playImagePath = filepath.Join(config.Paths.CacheDir(), playImageName)
 
 type DictProcessor struct {
 	common.Dictionary
@@ -107,7 +107,7 @@ func (p *DictProcessor) fixResHttpURL(_url *url.URL) (bool, string) {
 	urlStr := _url.String()
 	fname := sha1sumStr(urlStr)
 	// slog.Info("fixResURL: http(s)", "url", _url, "fname", fname)
-	dpath := filepath.Join(config.GetCacheDir(), "res")
+	dpath := filepath.Join(config.Paths.CacheDir(), "res")
 	fpath := filepath.Join(dpath, fname)
 	_, err := os.Stat(fpath)
 	if err == nil {
@@ -186,7 +186,7 @@ func (p *DictProcessor) fixResDataURL(s string) (bool, string) {
 	_hash := sha1.New()
 	_hash.Write(data)
 	fname := hex.EncodeToString(_hash.Sum(nil)) + p.extFromMimeType(mimeType)
-	dpath := filepath.Join(config.GetCacheDir(), "res")
+	dpath := filepath.Join(config.Paths.CacheDir(), "res")
 	fpath := filepath.Join(dpath, fname)
 	_, err := os.Stat(fpath)
 	if err == nil {
