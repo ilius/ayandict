@@ -372,11 +372,13 @@ func (view *ArticleView) SetPopupResult(
 	var header string
 	if dictmgr.DictShowTerms(res.DictName()) {
 		terms := res.Terms()
+		extra := ""
 		if len(terms) > 2 {
+			extra = fmt.Sprintf(" (+%d)", len(terms)-2)
 			terms = terms[:2]
 		}
 		// termsJoined, _ := joinWithMaxLen(terms, " | ", maxTermsTextLength)
-		termsJoined := html.EscapeString(strings.Join(terms, " | "))
+		termsJoined := html.EscapeString(strings.Join(terms, " | ")) + extra
 		header = fmt.Sprintf(
 			`<div %s>%s</div>`,
 			headerStyle,
