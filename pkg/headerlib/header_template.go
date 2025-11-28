@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"html"
 	"html/template"
-	"strings"
 
 	commons "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v3/pkg/config"
@@ -34,17 +33,19 @@ func LoadHeaderTemplate(conf *config.Config) (*template.Template, error) {
 	return tpl, nil
 }
 
+const maxTermsTextLength = 200
+
 func GetHeader(
 	headerTpl *template.Template,
 	res commons.SearchResultIface,
 ) (string, error) {
 	terms := res.Terms()
-	termsJoined := html.EscapeString(strings.Join(terms, " | "))
+	terms, termsJoined := joinWithMaxLen(terms, " | ", maxTermsTextLength)
 	headerBuf := bytes.NewBuffer(nil)
 	dictName := res.DictName()
 	err := headerTpl.Execute(headerBuf, HeaderTemplateInput{
 		Terms:     terms,
-		Term:      termsJoined,
+		Term:      html.EscapeString(termsJoined),
 		DictName:  dictName,
 		Score:     res.Score() >> 1,
 		ShowTerms: dictmgr.DictShowTerms(dictName),
