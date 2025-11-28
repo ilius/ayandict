@@ -33,11 +33,10 @@ func LoadHeaderTemplate(conf *config.Config) (*template.Template, error) {
 	return tpl, nil
 }
 
-const maxTermsTextLength = 200
-
 func GetHeader(
 	headerTpl *template.Template,
 	res commons.SearchResultIface,
+	maxTermsTextLength int,
 ) (string, error) {
 	terms := res.Terms()
 	terms, termsJoined := joinWithMaxLen(terms, " | ", maxTermsTextLength)

@@ -69,7 +69,7 @@ func badRequest(w http.ResponseWriter, msg string) {
 func encodeResults(w http.ResponseWriter, raw_results []common.SearchResultIface) []jsonapi.Result {
 	results := make([]jsonapi.Result, len(raw_results))
 	for i, res := range raw_results {
-		header, err := headerlib.GetHeader(headerTpl, res)
+		header, err := headerlib.GetHeader(headerTpl, res, 200)
 		if err != nil {
 			logger.Error("Error formatting header label", "err", err)
 			w.WriteHeader(http.StatusInternalServerError)

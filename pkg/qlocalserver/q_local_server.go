@@ -80,7 +80,7 @@ func StartLocalSocketServer(
 func encodeResults(raw_results []common.SearchResultIface) ([]jsonapi.Result, error) {
 	results := make([]jsonapi.Result, len(raw_results))
 	for i, res := range raw_results {
-		header, err := headerlib.GetHeader(headerTpl, res)
+		header, err := headerlib.GetHeader(headerTpl, res, 200)
 		if err != nil {
 			return nil, err
 		}

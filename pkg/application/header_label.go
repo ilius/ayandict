@@ -57,7 +57,7 @@ func (label *HeaderLabel) SetText(text string) {
 
 func (label *HeaderLabel) SetResult(res common.SearchResultIface) {
 	label.result = res
-	header, err := headerlib.GetHeader(headerTpl, res)
+	header, err := headerlib.GetHeader(headerTpl, res, 200)
 	if err != nil {
 		slog.Error("error formatting header label: " + err.Error())
 		return
