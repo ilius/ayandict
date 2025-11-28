@@ -6,9 +6,9 @@ import (
 	"time"
 
 	common "codeberg.org/ilius/go-dict-commons"
-	"github.com/ilius/ayandict/v3/pkg/application/frequency"
 	"github.com/ilius/ayandict/v3/pkg/articleview"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
+	"github.com/ilius/ayandict/v3/pkg/frequencytable"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -27,7 +27,7 @@ type QueryArgs struct {
 	PostQuery      func(string)
 	Entry          *qt.QLineEdit
 	ModeCombo      *qt.QComboBox
-	FrequencyTable *frequency.FrequencyTable
+	FrequencyTable *frequencytable.FrequencyTable
 
 	DisableHistory bool // temporarily disable history
 }

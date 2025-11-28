@@ -1,4 +1,4 @@
-package frequency
+package frequencytable
 
 import (
 	"log/slog"

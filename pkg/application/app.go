@@ -11,13 +11,13 @@ import (
 
 	"github.com/ilius/ayandict/v3/pkg/activity"
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
-	"github.com/ilius/ayandict/v3/pkg/application/frequency"
 	"github.com/ilius/ayandict/v3/pkg/articleview"
 	"github.com/ilius/ayandict/v3/pkg/audiocache"
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/qdictmgr"
 	"github.com/ilius/ayandict/v3/pkg/favoritebutton"
+	"github.com/ilius/ayandict/v3/pkg/frequencytable"
 	"github.com/ilius/ayandict/v3/pkg/logging"
 	"github.com/ilius/ayandict/v3/pkg/qfavorites"
 	"github.com/ilius/ayandict/v3/pkg/qlocalserver"
@@ -72,7 +72,7 @@ type Application struct {
 	entry           *qt.QLineEdit
 	searchModeCombo *qt.QComboBox
 	favoritesWidget *qfavorites.FavoritesWidget
-	frequencyTable  *frequency.FrequencyTable
+	frequencyTable  *frequencytable.FrequencyTable
 
 	favoriteButton       *favoritebutton.FavoriteButton
 	queryFavoriteButton  *favoritebutton.FavoriteButton
@@ -231,7 +231,7 @@ func (app *Application) Run(query string) {
 
 	activityStorage := activity.NewActivityStorage(conf, config.GetConfigDir())
 
-	frequencyTable := frequency.NewFrequencyView(
+	frequencyTable := frequencytable.NewFrequencyView(
 		activityStorage,
 		conf.MostFrequentMaxSize,
 	)

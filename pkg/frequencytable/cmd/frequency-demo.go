@@ -5,8 +5,8 @@ import (
 	"runtime"
 
 	"github.com/ilius/ayandict/v3/pkg/activity"
-	"github.com/ilius/ayandict/v3/pkg/application/frequency"
 	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/frequencytable"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -23,7 +23,7 @@ func main() {
 
 	activityStorage := activity.NewActivityStorage(config.Default(), config.GetConfigDir())
 
-	view := frequency.NewFrequencyView(activityStorage, 6)
+	view := frequencytable.NewFrequencyView(activityStorage, 6)
 	view.SetHorizontalHeaderItem(0, qt.NewQTableWidgetItem2("Key"))
 	view.SetHorizontalHeaderItem(1, qt.NewQTableWidgetItem2("Count"))
 
