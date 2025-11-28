@@ -23,6 +23,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/qlocalserver"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
+	"github.com/ilius/ayandict/v3/pkg/webclient"
 	"github.com/ilius/ayandict/v3/pkg/webserver"
 	qt "github.com/mappu/miqt/qt6"
 	"github.com/mappu/miqt/qt6/network"
@@ -109,7 +110,7 @@ func (app *Application) init() {
 	if len(conf.LocalServerPorts) == 0 {
 		panic("config local_server_ports is empty")
 	}
-	client.Timeout = conf.LocalClientTimeout
+	webclient.Init(conf)
 	app.mainWindowSettingsChan = make(chan time.Time, 100)
 	app.audioCache = audiocache.NewAudioCache(conf)
 }
@@ -196,7 +197,7 @@ func (app *Application) Run(query string) {
 		return
 	}
 	if conf.WebEnable {
-		if ok, _ := findLocalWebServer(conf.LocalServerPorts); ok {
+		if ok, _ := webclient.FindLocalWebServer(conf.LocalServerPorts); ok {
 			slog.Error("another web instance is running")
 			if query != "" {
 				qlocalserver.SendQueryToLocalServer(query)

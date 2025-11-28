@@ -1,4 +1,4 @@
-package application
+package webclient
 
 import (
 	"io"
@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
+	"github.com/ilius/ayandict/v3/pkg/config"
 )
 
 const (
@@ -20,7 +21,11 @@ var client = &http.Client{
 	Timeout: 100 * time.Millisecond,
 }
 
-func findLocalWebServer(ports []string) (bool, string) {
+func Init(conf *config.Config) {
+	client.Timeout = conf.LocalClientTimeout
+}
+
+func FindLocalWebServer(ports []string) (bool, string) {
 	for _, port := range ports {
 		_url := &url.URL{
 			Scheme: "http",
