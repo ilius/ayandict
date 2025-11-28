@@ -7,12 +7,12 @@ import (
 
 func Test_joinWithMaxLen(t *testing.T) {
 	test := func(maxLen int, sep string, out string, strs ...string) {
-		usedStrs, actual := joinWithMaxLen(strs, sep, maxLen)
+		actual, usedCount := joinWithMaxLen(strs, sep, maxLen)
 		if actual != out {
 			t.Fatalf("expected %#v, actual %#v", out, actual)
 		}
-		if strings.Join(usedStrs, sep) != out {
-			t.Fatalf("bad usedStrs with %d items", len(usedStrs))
+		if strings.Join(strs[:usedCount], sep) != out {
+			t.Fatalf("bad usedStrs with %d items", usedCount)
 		}
 	}
 	test(0, "|", "a", "a")

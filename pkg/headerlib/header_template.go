@@ -39,11 +39,11 @@ func GetHeader(
 	maxTermsTextLength int,
 ) (string, error) {
 	terms := res.Terms()
-	terms, termsJoined := joinWithMaxLen(terms, " | ", maxTermsTextLength)
+	termsJoined, termsCount := joinWithMaxLen(terms, " | ", maxTermsTextLength)
 	headerBuf := bytes.NewBuffer(nil)
 	dictName := res.DictName()
 	err := headerTpl.Execute(headerBuf, HeaderTemplateInput{
-		Terms:     terms,
+		Terms:     terms[:termsCount],
 		Term:      html.EscapeString(termsJoined),
 		DictName:  dictName,
 		Score:     res.Score() >> 1,

@@ -1,11 +1,11 @@
 package headerlib
 
-func joinWithMaxLen(strs []string, sep string, maxLen int) ([]string, string) {
+func joinWithMaxLen(strs []string, sep string, maxLen int) (string, int) {
 	if len(strs) == 0 {
-		return strs, ""
+		return "", 0
 	}
 	if len(strs) == 1 {
-		return strs, strs[0]
+		return strs[0], 1
 	}
 	out := strs[0]
 	index := 1
@@ -17,5 +17,5 @@ func joinWithMaxLen(strs []string, sep string, maxLen int) ([]string, string) {
 		out = newOut
 		index++
 	}
-	return strs[:index], out
+	return out, index
 }
