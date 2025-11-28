@@ -1,8 +1,10 @@
-package application
+package favoritebutton
 
 import (
 	"log/slog"
 
+	"github.com/ilius/ayandict/v3/pkg/resources"
+	"github.com/ilius/ayandict/v3/pkg/resourceutil"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -35,6 +37,10 @@ func (b *FavoriteButton) SetToolTips(inactive string, active string) {
 	b.inactiveTooltip = inactive
 	b.activeTooltip = active
 	b.SetToolTip(inactive)
+}
+
+func loadPNGIcon(filename string) (*qt.QIcon, error) {
+	return resourceutil.LoadPNGIcon(resources.Res, filename)
 }
 
 func NewFavoriteButton(onClick func(bool)) *FavoriteButton {

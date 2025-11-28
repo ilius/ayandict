@@ -1,4 +1,4 @@
-package application
+package audiocache
 
 import (
 	"fmt"
@@ -13,12 +13,9 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
-var (
-	cacheDir   = config.Paths.CacheDir()
-	audioCache = NewAudioCache()
-)
+var cacheDir = config.Paths.CacheDir()
 
-func NewAudioCache() *AudioCache {
+func NewAudioCache(conf *config.Config) *AudioCache {
 	dir := ""
 	if cacheDir == "" {
 		slog.Error("cacheDir is empty")
@@ -27,8 +24,9 @@ func NewAudioCache() *AudioCache {
 	}
 
 	return &AudioCache{
-		m:   map[string]*qt.QUrl{},
-		dir: dir,
+		conf: conf,
+		m:    map[string]*qt.QUrl{},
+		dir:  dir,
 
 		downloader: &http.Client{
 			Timeout: conf.AudioDownloadTimeout,
@@ -37,6 +35,7 @@ func NewAudioCache() *AudioCache {
 }
 
 type AudioCache struct {
+	conf  *config.Config
 	m     map[string]*qt.QUrl
 	mlock sync.RWMutex
 	dir   string
@@ -45,7 +44,7 @@ type AudioCache struct {
 }
 
 func (c *AudioCache) ReloadConfig() {
-	c.downloader.Timeout = conf.AudioDownloadTimeout
+	c.downloader.Timeout = c.conf.AudioDownloadTimeout
 }
 
 func (c *AudioCache) download(urlStr string, fpath string) error {

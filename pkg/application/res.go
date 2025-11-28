@@ -1,34 +1,17 @@
 package application
 
 import (
-	"log/slog"
-
+	"github.com/ilius/ayandict/v3/pkg/resources"
+	"github.com/ilius/ayandict/v3/pkg/resourceutil"
 	qt "github.com/mappu/miqt/qt6"
 )
 
 func loadPNGIcon(filename string) (*qt.QIcon, error) {
-	data, err := res.ReadFile("res/" + filename)
-	if err != nil {
-		return nil, err
-	}
-	pixmap := qt.NewQPixmap()
-	pixmap.LoadFromDataWithData(data)
-	icon := qt.NewQIcon2(pixmap)
-	if icon == nil {
-		slog.Error("error loading png icon: icon is nil: " + filename)
-		panic("error loading png icon: icon is nil")
-	}
-	return icon, nil
+	return resourceutil.LoadPNGIcon(resources.Res, filename)
 }
 
 func loadPNGPixmap(filename string) (*qt.QPixmap, error) {
-	data, err := res.ReadFile("res/" + filename)
-	if err != nil {
-		return nil, err
-	}
-	pixmap := qt.NewQPixmap()
-	pixmap.LoadFromDataWithData(data)
-	return pixmap, nil
+	return resourceutil.LoadPNGPixmap(resources.Res, filename)
 }
 
 // func loadSVGIcon(filename string) *qt.QIcon {

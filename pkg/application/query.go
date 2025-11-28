@@ -7,6 +7,7 @@ import (
 
 	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v3/pkg/application/frequency"
+	"github.com/ilius/ayandict/v3/pkg/articleview"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	qt "github.com/mappu/miqt/qt6"
 )
@@ -18,7 +19,7 @@ const resultFlags = uint32(
 		common.ResultFlag_ColorMapping)
 
 type QueryArgs struct {
-	ArticleView    *ArticleView
+	ArticleView    *articleview.ArticleView
 	ResultsLabel   *qt.QLabel
 	ResultList     *ResultListWidget
 	HeaderLabel    *HeaderLabel

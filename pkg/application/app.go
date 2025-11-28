@@ -13,11 +13,15 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
 	"github.com/ilius/ayandict/v3/pkg/application/frequency"
 	"github.com/ilius/ayandict/v3/pkg/application/qfavorites"
+	"github.com/ilius/ayandict/v3/pkg/articleview"
+	"github.com/ilius/ayandict/v3/pkg/audiocache"
 	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/qdictmgr"
+	"github.com/ilius/ayandict/v3/pkg/favoritebutton"
 	"github.com/ilius/ayandict/v3/pkg/logging"
 	"github.com/ilius/ayandict/v3/pkg/qlocalserver"
+	"github.com/ilius/ayandict/v3/pkg/qtcommon"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
 	"github.com/ilius/ayandict/v3/pkg/webserver"
 	qt "github.com/mappu/miqt/qt6"
@@ -44,10 +48,10 @@ var searchModeByDesc = map[string]dictmgr.SearchMode{
 	s_Soundex:    dictmgr.SearchModeSoundex,
 }
 
-var systemFont *qt.QFont
-
 type Application struct {
 	*qt.QApplication
+
+	audioCache *audiocache.AudioCache
 
 	window *qt.QMainWindow
 	icon   *qt.QIcon
@@ -62,7 +66,7 @@ type Application struct {
 
 	queryArgs       *QueryArgs
 	headerLabel     *HeaderLabel
-	articleView     *ArticleView
+	articleView     *articleview.ArticleView
 	resultList      *ResultListWidget
 	historyView     *HistoryView
 	entry           *qt.QLineEdit
@@ -70,8 +74,8 @@ type Application struct {
 	favoritesWidget *qfavorites.FavoritesWidget
 	frequencyTable  *frequency.FrequencyTable
 
-	favoriteButton       *FavoriteButton
-	queryFavoriteButton  *FavoriteButton
+	favoriteButton       *favoritebutton.FavoriteButton
+	queryFavoriteButton  *favoritebutton.FavoriteButton
 	reloadDictsButton    *qt.QPushButton
 	closeDictsButton     *qt.QPushButton
 	openConfigButton     *qt.QPushButton
@@ -107,6 +111,7 @@ func (app *Application) init() {
 	}
 	client.Timeout = conf.LocalClientTimeout
 	app.mainWindowSettingsChan = make(chan time.Time, 100)
+	app.audioCache = audiocache.NewAudioCache(conf)
 }
 
 func (app *Application) IsPopup() bool {
@@ -278,14 +283,14 @@ func (app *Application) Run(query string) {
 
 	okButton := qt.NewQPushButton3(" OK ")
 
-	app.queryFavoriteButton = NewFavoriteButton(app.queryFavoriteButtonClicked)
+	app.queryFavoriteButton = favoritebutton.NewFavoriteButton(app.queryFavoriteButtonClicked)
 	app.queryFavoriteButton.SetToolTips(
 		"Add this query to favorites",
 		"Remove this query from favorites",
 	)
 
 	// favoriteButtonVBox := qt.NewQVBoxLayout()
-	app.favoriteButton = NewFavoriteButton(app.favoriteButtonClicked)
+	app.favoriteButton = favoritebutton.NewFavoriteButton(app.favoriteButtonClicked)
 
 	app.favoriteButton.SetToolTips(
 		"Add this term to favorites",
@@ -323,7 +328,7 @@ func (app *Application) Run(query string) {
 	headerBoxLayout.AddSpacing(int(basePx * 1.5))
 	headerBox.SetSizePolicy2(expanding, qt.QSizePolicy__Minimum)
 
-	articleView := NewArticleView(app)
+	articleView := articleview.NewArticleView(conf, app)
 	app.articleView = articleView
 
 	historyView := NewHistoryView(
@@ -496,9 +501,7 @@ func (app *Application) Run(query string) {
 
 	window.SetCentralWidget(mainSplitter.QWidget)
 
-	systemFont = qt.QApplication_Font()
-
-	qt.QApplication_SetFont(ConfigFont())
+	qt.QApplication_SetFont(qtcommon.ConfigFont(conf))
 
 	app.ReloadFont()
 
@@ -540,6 +543,10 @@ func (app *Application) Run(query string) {
 	}
 
 	_ = qt.QApplication_Exec()
+}
+
+func (app *Application) AudioCache() *audiocache.AudioCache {
+	return app.audioCache
 }
 
 func (app *Application) setupSettings(mainSplitter *qt.QSplitter) {

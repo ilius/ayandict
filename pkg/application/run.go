@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
+	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/logging"
 	qt "github.com/mappu/miqt/qt6"
 )
@@ -25,6 +26,7 @@ func Run(query string) {
 	app.style = qt.QApplication_Style()
 	app.bottomBoxStyleOpt = qt.NewQStyleOptionButton()
 
+	cacheDir := config.Paths.CacheDir()
 	if cacheDir == "" {
 		slog.Error("cacheDir is empty")
 	}

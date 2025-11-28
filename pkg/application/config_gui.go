@@ -10,6 +10,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/qdictmgr"
 	"github.com/ilius/ayandict/v3/pkg/headerlib"
 	"github.com/ilius/ayandict/v3/pkg/qlocalserver"
+	"github.com/ilius/ayandict/v3/pkg/qtcommon"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -19,23 +20,6 @@ var (
 
 	headerTpl *template.Template
 )
-
-func ConfigFont() *qt.QFont {
-	font := qt.NewQFont()
-	if conf.FontFamily != "" {
-		font.SetFamily(conf.FontFamily)
-	}
-	if conf.FontSize > 0 {
-		font.SetPixelSize(conf.FontSize)
-	}
-	return font
-}
-
-func configFontWithFactor(factor float64) *qt.QFont {
-	font := *ConfigFont()
-	font.SetPixelSize(int(float64(font.PixelSize()) * factor))
-	return &font
-}
 
 func LoadConfig() bool {
 	confMutex.Lock()
@@ -47,12 +31,6 @@ func LoadConfig() bool {
 	}
 	conf = newConf
 
-	{
-		err := readArticleStyle(conf.ArticleStyle)
-		if err != nil {
-			slog.Error("error reading srticle style: " + err.Error())
-		}
-	}
 	{
 		tpl, err := headerlib.LoadHeaderTemplate(conf)
 		if err != nil {
@@ -76,7 +54,7 @@ func shouldReloadDicts(currentList []string, newList []string) bool {
 }
 
 func (app *Application) ReloadFont() {
-	font := ConfigFont()
+	font := qtcommon.ConfigFont(conf)
 	// app.SetFont only applies to future widgets (DictManager for example)
 	qt.QApplication_SetFont(font)
 	for _, w := range qt.QApplication_AllWidgets() {
@@ -96,6 +74,7 @@ func (app *Application) ReloadConfig() {
 	if conf.FontFamily != fontFamily || conf.FontSize != fontSize {
 		app.ReloadFont()
 	}
+	app.articleView.LoadUserStyle()
 
 	if conf.Style != currentStyle {
 		app.ReloadUserStyle()
@@ -105,7 +84,7 @@ func (app *Application) ReloadConfig() {
 		app.dictManager = nil
 	}
 	app.headerLabel.ReloadConfig()
-	audioCache.ReloadConfig()
+	app.audioCache.ReloadConfig()
 
 	app.queryArgs.onQuery(app.entry.Text(), false)
 

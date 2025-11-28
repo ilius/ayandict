@@ -1,4 +1,4 @@
-package application
+package articleview
 
 import (
 	"fmt"
@@ -14,8 +14,12 @@ import (
 	"time"
 
 	common "codeberg.org/ilius/go-dict-commons"
+	"github.com/ilius/ayandict/v3/pkg/audiocache"
+	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/mp3duration"
+	"github.com/ilius/ayandict/v3/pkg/qtutils"
+	"github.com/ilius/ayandict/v3/pkg/utils"
 	qt "github.com/mappu/miqt/qt6"
 	"github.com/mappu/miqt/qt6/multimedia" // not in latest tag
 )
@@ -40,13 +44,29 @@ type CursorAndCharFormat struct {
 	Format *qt.QTextCharFormat
 }
 
+func filePathFromQUrl(qUrl *qt.QUrl) string {
+	fpath := qUrl.Path()
+	if fpath == "" {
+		return ""
+	}
+	if filepath.Separator == '\\' {
+		fpath = strings.TrimLeft(fpath, "/")
+	}
+	return fpath
+}
+
 type ArticleViewOwner interface {
 	Query(string)
 	IsPopup() bool
 	QueryPopup(query string)
+	AudioCache() *audiocache.AudioCache
 }
 
 type ArticleView struct {
+	conf *config.Config
+
+	audioCache *audiocache.AudioCache
+
 	frame   *qt.QFrame
 	Widget  *qt.QWidget // same as frame, used from outside
 	Browser *qt.QTextBrowser
@@ -60,6 +80,8 @@ type ArticleView struct {
 	docCursor   *qt.QTextCursor
 	lastFormats []CursorAndCharFormat
 
+	definitionStyleString string
+
 	dpi   float64
 	owner ArticleViewOwner
 
@@ -70,7 +92,7 @@ type ArticleView struct {
 	dictName string
 }
 
-func NewArticleView(owner ArticleViewOwner) *ArticleView {
+func NewArticleView(conf *config.Config, owner ArticleViewOwner) *ArticleView {
 	browser := qt.NewQTextBrowser(nil)
 	// widget := webengine.NewQWebEngineView(nil)
 	browser.SetReadOnly(true)
@@ -82,6 +104,8 @@ func NewArticleView(owner ArticleViewOwner) *ArticleView {
 	}
 	frame := qt.NewQFrame2()
 	view := &ArticleView{
+		audioCache:  owner.AudioCache(),
+		conf:        conf,
 		frame:       frame,
 		Widget:      frame.QWidget,
 		Browser:     browser,
@@ -108,7 +132,37 @@ func NewArticleView(owner ArticleViewOwner) *ArticleView {
 	})
 	view.owner = owner
 	view.setupCustomHandlers()
+	view.LoadUserStyle()
 	return view
+}
+
+func (view *ArticleView) AudioCache() *audiocache.AudioCache {
+	return view.audioCache
+}
+
+func (view *ArticleView) readArticleStyle(stylePath string) error {
+	if stylePath == "" {
+		return nil
+	}
+	configDir := config.GetConfigDir()
+	stylePath = utils.PathFromUnix(stylePath)
+	if !filepath.IsAbs(stylePath) {
+		stylePath = filepath.Join(configDir, stylePath)
+	}
+	_, err := os.Stat(stylePath)
+	if err != nil {
+		return err
+	}
+	styleBytes, err := os.ReadFile(stylePath)
+	if err != nil {
+		return err
+	}
+	view.definitionStyleString = "<style>" + string(styleBytes) + "</style>"
+	return nil
+}
+
+func (view *ArticleView) LoadUserStyle() {
+	view.readArticleStyle(view.conf.ArticleStyle)
 }
 
 func (view *ArticleView) Searching() bool {
@@ -181,7 +235,7 @@ func (view *ArticleView) playAudioMPV(urlStr string) {
 		"--no-video",
 		urlStr,
 	}
-	volume := dictmgr.AudioVolume(view.dictName) * conf.AudioVolume / 100
+	volume := dictmgr.AudioVolume(view.dictName) * view.conf.AudioVolume / 100
 	args = append(args, "--volume="+strconv.FormatInt(int64(volume), 10))
 	cmd := exec.Cmd{
 		Path: path,
@@ -202,7 +256,7 @@ func (view *ArticleView) playAudioMPV(urlStr string) {
 func (view *ArticleView) getAudioOutput() *multimedia.QAudioOutput {
 	audioOutput := multimedia.NewQAudioOutput()
 	audioOutput.SetVolume(
-		float32(dictmgr.AudioVolume(view.dictName)) * float32(conf.AudioVolume) / 10000,
+		float32(dictmgr.AudioVolume(view.dictName)) * float32(view.conf.AudioVolume) / 10000,
 	)
 	return audioOutput
 }
@@ -215,7 +269,7 @@ func (view *ArticleView) getAudioOutput() *multimedia.QAudioOutput {
 func (view *ArticleView) playAudio(audioOutput *multimedia.QAudioOutput, qUrl *qt.QUrl) {
 	urlStr := qUrl.ToLocalFile()
 	slog.Info("Playing audio", "url", urlStr)
-	if conf.AudioMPV {
+	if view.conf.AudioMPV {
 		go view.playAudioMPV(urlStr)
 		return
 	}
@@ -244,7 +298,7 @@ func (view *ArticleView) autoPlay(text string, count int) {
 		// slog.Info("Playing audio", urlStr)
 		isRemote := qUrl.Scheme() != "file"
 		if isRemote {
-			qUrlLocal, err := audioCache.Get(urlStr)
+			qUrlLocal, err := view.audioCache.Get(urlStr)
 			if err != nil {
 				slog.Error("error", "err", err)
 			} else {
@@ -270,7 +324,7 @@ func (view *ArticleView) autoPlay(text string, count int) {
 			continue
 		}
 		if index < lastIndex {
-			duration += conf.AudioAutoPlayWaitBetween
+			duration += view.conf.AudioAutoPlayWaitBetween
 		}
 		// slog.Info("Sleeping", duration)
 		time.Sleep(duration)
@@ -278,16 +332,16 @@ func (view *ArticleView) autoPlay(text string, count int) {
 }
 
 func (view *ArticleView) autoPlayOnResult(text string) *qt.QTimer {
-	if !conf.Audio {
+	if !view.conf.Audio {
 		return nil
 	}
-	if conf.AudioAutoPlay <= 0 {
+	if view.conf.AudioAutoPlay <= 0 {
 		return nil
 	}
 	timer := qt.NewQTimer()
 	timer.SetSingleShot(true)
 	timer.OnTimeout(func() {
-		view.autoPlay(text, conf.AudioAutoPlay)
+		view.autoPlay(text, view.conf.AudioAutoPlay)
 	})
 	return timer
 }
@@ -299,11 +353,11 @@ func (view *ArticleView) SetResult(res common.SearchResultIface) {
 		"\n<br/>\n",
 	)
 	text2 := text
-	if definitionStyleString != "" {
-		text2 = definitionStyleString + text2
+	if view.definitionStyleString != "" {
+		text2 = view.definitionStyleString + text2
 	}
 	view.Browser.SetHtml(text2)
-	if res.Score()/2 >= conf.AudioAutoPlayMinScore {
+	if res.Score()/2 >= view.conf.AudioAutoPlayMinScore {
 		timer := view.autoPlayOnResult(text)
 		if timer != nil {
 			timer.Start(0)
@@ -331,8 +385,8 @@ func (view *ArticleView) SetPopupResult(
 		"\n<br/>\n",
 	)
 	text2 := text
-	if definitionStyleString != "" {
-		text2 = definitionStyleString + text2
+	if view.definitionStyleString != "" {
+		text2 = view.definitionStyleString + text2
 	}
 	view.Browser.SetHtml(header + text2)
 	return view.autoPlayOnResult(text)
@@ -345,7 +399,7 @@ func (view *ArticleView) onContextMenuEvent(_ func(event *qt.QContextMenuEvent),
 }
 
 func (view *ArticleView) createContextMenuWithSelection(menu *qt.QMenu, selected string) {
-	trimmed := strings.Trim(selected, queryForceTrimChars)
+	trimmed := strings.Trim(selected, utils.QueryForceTrimChars)
 	if trimmed != "" {
 		selected = trimmed
 	}
@@ -386,7 +440,7 @@ func (view *ArticleView) createContextMenuNoSelection(menu *qt.QMenu, pos *qt.QP
 		})
 	}
 
-	cursorWord := strings.Trim(cursor.SelectedText(), punctuation)
+	cursorWord := strings.Trim(cursor.SelectedText(), utils.Punctuation)
 	if cursorWord != "" {
 		slog.Debug("Right-clicked on word", "word", fmt.Sprintf("%#v", cursorWord))
 		menu.AddActionWithText("Query: " + cursorWord).OnTriggered(func() {
@@ -452,22 +506,22 @@ func (view *ArticleView) selectedHTML() string {
 func (view *ArticleView) ZoomIn() {
 	doc := view.Browser.Document()
 	font := doc.DefaultFont()
-	points := fontPointSize(font, view.dpi)
+	points := qtutils.FontPointSize(font, view.dpi)
 	if points <= 0 {
 		return
 	}
-	font.SetPointSizeF(points * conf.ArticleZoomFactor)
+	font.SetPointSizeF(points * view.conf.ArticleZoomFactor)
 	doc.SetDefaultFont(font)
 }
 
 func (view *ArticleView) ZoomOut() {
 	doc := view.Browser.Document()
 	font := doc.DefaultFont()
-	points := fontPointSize(font, view.dpi)
+	points := qtutils.FontPointSize(font, view.dpi)
 	if points <= 0 {
 		return
 	}
-	font.SetPointSizeF(points / conf.ArticleZoomFactor)
+	font.SetPointSizeF(points / view.conf.ArticleZoomFactor)
 	doc.SetDefaultFont(font)
 }
 
@@ -523,7 +577,7 @@ func (view *ArticleView) setupAnchorClicked() {
 		case "http", "https":
 			switch filepath.Ext(path) {
 			case ".mp3", ".spx", ".wav", ".ogg", ".oga", ".opus":
-				qUrlLocal, err := audioCache.Get(qUrl.ToString()) // qt.QUrl__None
+				qUrlLocal, err := view.audioCache.Get(qUrl.ToString()) // qt.QUrl__None
 				if err != nil {
 					slog.Error("error", "err", err)
 				} else {
@@ -544,7 +598,7 @@ func (view *ArticleView) setupMouseReleaseEvent() {
 		case qt.MiddleButton:
 			selected := view.Browser.TextCursor().SelectedText()
 			if selected != "" {
-				view.owner.Query(strings.Trim(selected, queryForceTrimChars))
+				view.owner.Query(strings.Trim(selected, utils.QueryForceTrimChars))
 			}
 			return
 		}

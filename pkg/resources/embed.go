@@ -1,6 +1,6 @@
-package application
+package resources
 
 import "embed"
 
 //go:embed res/*.png
-var res embed.FS
+var Res embed.FS

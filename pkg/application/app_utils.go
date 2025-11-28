@@ -2,6 +2,7 @@ package application
 
 import (
 	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/qtutils"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -9,7 +10,7 @@ import (
 // I'm using it for spacing between widgets
 // kinda like "em" in html, but probably not exactly the same
 func (app *Application) baseFontPixelSize() float32 {
-	return float32(fontPixelSize(
+	return float32(qtutils.FontPixelSize(
 		qt.QApplication_Font(),
 		app.window.Screen(),
 	) * 0.66)

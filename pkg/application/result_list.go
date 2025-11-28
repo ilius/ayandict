@@ -6,12 +6,13 @@ import (
 	"strings"
 
 	common "codeberg.org/ilius/go-dict-commons"
+	"github.com/ilius/ayandict/v3/pkg/articleview"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	qt "github.com/mappu/miqt/qt6"
 )
 
 func NewResultListWidget(
-	articleView *ArticleView,
+	articleView *articleview.ArticleView,
 	headerLabel *HeaderLabel,
 	onResultDisplay func(terms []string),
 ) *ResultListWidget {
@@ -46,7 +47,7 @@ type ResultListWidget struct {
 	Active common.SearchResultIface
 
 	HeaderLabel *HeaderLabel
-	ArticleView *ArticleView
+	ArticleView *articleview.ArticleView
 
 	onResultDisplay func(terms []string)
 }

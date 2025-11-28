@@ -1,4 +1,4 @@
-package application
+package scanpopup
 
 import (
 	"bytes"
@@ -8,10 +8,22 @@ import (
 
 	common "codeberg.org/ilius/go-dict-commons"
 	commons "codeberg.org/ilius/go-dict-commons"
+	"github.com/ilius/ayandict/v3/pkg/articleview"
+	"github.com/ilius/ayandict/v3/pkg/audiocache"
+	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
+	"github.com/ilius/ayandict/v3/pkg/favoritebutton"
 	"github.com/ilius/ayandict/v3/pkg/qplatform"
+	"github.com/ilius/ayandict/v3/pkg/qtcommon"
+	"github.com/ilius/ayandict/v3/pkg/qtutils"
 	qt "github.com/mappu/miqt/qt6"
 )
+
+const resultFlags = uint32(
+	common.ResultFlag_FixAudio |
+		common.ResultFlag_FixFileSrc |
+		common.ResultFlag_FixWordLink |
+		common.ResultFlag_ColorMapping)
 
 type QCloseEventFunc = func(super func(*qt.QCloseEvent), event *qt.QCloseEvent)
 
@@ -25,9 +37,11 @@ type ScanPopupAppInterface interface {
 	HasFavorite(term string) bool
 	SetFavoriteFromPopup(term string, favorite bool)
 	ShowAbout()
+	AudioCache() *audiocache.AudioCache
 }
 
 func NewScanPopup(
+	conf *config.Config,
 	query string,
 	mode dictmgr.SearchMode,
 	onCloseEvent QCloseEventFunc,
@@ -37,6 +51,7 @@ func NewScanPopup(
 	popup.OnCloseEvent(onCloseEvent)
 
 	p := &ScanPopup{
+		conf:  conf,
 		query: query,
 		mode:  mode,
 		popup: popup,
@@ -52,6 +67,7 @@ func NewScanPopup(
 
 func (p *ScanPopup) QueryPopup(query string) {
 	p2 := NewScanPopup(
+		p.conf,
 		query,
 		p.mode,
 		p.app.OnScanPopupClose,
@@ -62,6 +78,7 @@ func (p *ScanPopup) QueryPopup(query string) {
 
 type ScanPopup struct {
 	// set by factory func:
+	conf  *config.Config
 	query string             // used in doMainQueryNoArg and Run
 	mode  dictmgr.SearchMode // used in doQuery
 	app   ScanPopupAppInterface
@@ -70,10 +87,10 @@ type ScanPopup struct {
 
 	// set by init method:
 	headerTemplate *template.Template
-	articleView    *ArticleView
+	articleView    *articleview.ArticleView
 	nextButton     *qt.QPushButton
 	prevButton     *qt.QPushButton
-	favoriteButton *FavoriteButton
+	favoriteButton *favoritebutton.FavoriteButton
 
 	// set by doQuery
 	results []commons.SearchResultIface
@@ -93,12 +110,13 @@ func (p *ScanPopup) Run(pos *qt.QPoint, icon *qt.QIcon) {
 		screen := qt.QGuiApplication_Screens()[0]
 		ss := screen.Size()
 		p.popup.Move(
-			(ss.Width()-conf.ScanPopupWidth)/2,
-			(ss.Height()-conf.ScanPopupHeight)/2,
+			(ss.Width()-p.conf.ScanPopupWidth)/2,
+			(ss.Height()-p.conf.ScanPopupHeight)/2,
 		)
 	} else {
+		systemFont := qt.QApplication_Font()
 		screen := qt.QGuiApplication_ScreenAt(pos)
-		p.popup.Move(pos.X(), pos.Y()+int(fontPixelSize(systemFont, screen)))
+		p.popup.Move(pos.X(), pos.Y()+int(qtutils.FontPixelSize(systemFont, screen)))
 	}
 	p.popup.SetWindowIcon(icon)
 
@@ -109,13 +127,19 @@ func (app *ScanPopup) IsPopup() bool {
 	return true
 }
 
+func (p *ScanPopup) configFontWithFactor(factor float64) *qt.QFont {
+	font := *qtcommon.ConfigFont(p.conf)
+	font.SetPixelSize(int(float64(font.PixelSize()) * factor))
+	return &font
+}
+
 func (p *ScanPopup) init() {
-	font := configFontWithFactor(conf.ScanPopupFontSizeFactor)
+	font := p.configFontWithFactor(p.conf.ScanPopupFontSizeFactor)
 
 	popup := p.popup
 	flags := qt.WindowStaysOnTopHint | qt.Tool | qt.FramelessWindowHint
 	if qplatform.CanMoveWindow() {
-		if conf.ScanPopupBypassWindowManager {
+		if p.conf.ScanPopupBypassWindowManager {
 			flags |= qt.BypassWindowManagerHint
 		}
 	}
@@ -124,13 +148,13 @@ func (p *ScanPopup) init() {
 	popup.SetFont(font)
 
 	headerTemplate := template.New("popupheader")
-	headerTemplate, err := headerTemplate.Parse(conf.ScanPopupHeaderTemplate)
+	headerTemplate, err := headerTemplate.Parse(p.conf.ScanPopupHeaderTemplate)
 	if err != nil {
 		slog.Error("error parsing scan popup template", "err", err)
 	}
 	p.headerTemplate = headerTemplate
 
-	p.articleView = NewArticleView(p)
+	p.articleView = articleview.NewArticleView(p.conf, p)
 	p.articleView.Widget.SetFont(font)
 	p.articleView.OnKeyPressEvent(p.onArticleViewKeyPressEvent)
 
@@ -157,7 +181,7 @@ func (p *ScanPopup) init() {
 	prevButton.SetToolTip("Previous result (Alt+Up)")
 	p.prevButton = prevButton
 
-	favoriteButton := NewFavoriteButton(
+	favoriteButton := favoritebutton.NewFavoriteButton(
 		p.favoriteButtonClicked,
 	)
 	favoriteButton.SetToolTips(
@@ -183,7 +207,7 @@ func (p *ScanPopup) init() {
 	})
 	closeButton.SetToolTip("Close (Esc)")
 
-	if conf.ScanPopupHeaderIcons {
+	if p.conf.ScanPopupHeaderIcons {
 		nextButton.SetText("↓")
 		prevButton.SetText("↑")
 		mainButton.SetText("📖")
@@ -224,7 +248,7 @@ func (p *ScanPopup) init() {
 		button.SetFocusPolicy(qt.NoFocus)
 		headerBox.AddWidget(button.QWidget)
 	}
-	if conf.ScanPopupHeaderIcons {
+	if p.conf.ScanPopupHeaderIcons {
 		for _, button := range []*qt.QPushButton{
 			nextButton,
 			prevButton,
@@ -245,6 +269,10 @@ func (p *ScanPopup) init() {
 
 	popupLayout.AddWidget(p.outlineHeaderLayout(headerBox.QLayout))
 	popupLayout.AddWidget2(p.articleView.Widget, 10)
+}
+
+func (p *ScanPopup) AudioCache() *audiocache.AudioCache {
+	return p.app.AudioCache()
 }
 
 func (p *ScanPopup) favoriteButtonClicked(checked bool) {
@@ -297,7 +325,7 @@ func (p *ScanPopup) setResult(res common.SearchResultIface) *qt.QTimer {
 	p.favoriteButton.SetChecked(p.app.HasFavorite(res.Terms()[0]))
 	return p.articleView.SetPopupResult(
 		res,
-		conf.ScanPopupTermsStyle,
+		p.conf.ScanPopupTermsStyle,
 	)
 }
 
@@ -305,17 +333,17 @@ func (p *ScanPopup) Query(query string) {
 	p.query = query
 	p.popup.SetWindowTitle(query)
 
-	results := dictmgr.LookupHTML(query, conf, p.mode, resultFlags, 0)
+	results := dictmgr.LookupHTML(query, p.conf, p.mode, resultFlags, 0)
 	if len(results) == 0 {
-		slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", 0, "query", query)
+		slog.Info("scan popup", "min_score", p.conf.ScanPopupMinScore, "score", 0, "query", query)
 		p.onQueryNoResult("No results for %#v", query)
 		return
 	}
 	p.results = results
 	p.resultIndex = 0
 	res := results[0]
-	slog.Info("scan popup", "min_score", conf.ScanPopupMinScore, "score", res.Score()/2, "query", query)
-	if conf.ScanPopupMinScore > int(res.Score())/2 {
+	slog.Info("scan popup", "min_score", p.conf.ScanPopupMinScore, "score", res.Score()/2, "query", query)
+	if p.conf.ScanPopupMinScore > int(res.Score())/2 {
 		p.onQueryNoResult(
 			"Top result for %#v has score of %%%v",
 			query, res.Score()/2,
@@ -326,7 +354,7 @@ func (p *ScanPopup) Query(query string) {
 	p.prevButton.Show()
 	playTimer := p.setResult(res)
 	p.autoResize()
-	if conf.ScanPopupHistory {
+	if p.conf.ScanPopupHistory {
 		p.app.AddHistoryAndFrequency(query)
 	}
 	p.popup.Show()
@@ -376,7 +404,7 @@ func (p *ScanPopup) moveToMainWindow() {
 
 func (p *ScanPopup) onKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
 	switch event.Key() {
-	case escape:
+	case int(qt.Key_Escape):
 		p.popup.Close()
 	case int(qt.Key_Return), int(qt.Key_Enter):
 		if p.articleView.Searching() {
@@ -443,5 +471,5 @@ func (p *ScanPopup) onMouseRelease(super func(*qt.QMouseEvent), event *qt.QMouse
 }
 
 func (p *ScanPopup) autoResize() {
-	p.popup.Resize(conf.ScanPopupWidth, conf.ScanPopupHeight)
+	p.popup.Resize(p.conf.ScanPopupWidth, p.conf.ScanPopupHeight)
 }

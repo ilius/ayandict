@@ -6,6 +6,7 @@ import (
 
 	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v3/pkg/headerlib"
+	"github.com/ilius/ayandict/v3/pkg/utils"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -80,7 +81,7 @@ func (label *HeaderLabel) createContextMenu(selection bool) *qt.QMenu {
 		menu.AddActionWithText("Query Selected").OnTriggered(func() {
 			text := label.SelectedText()
 			if text != "" {
-				label.doQuery(strings.Trim(text, queryForceTrimChars))
+				label.doQuery(strings.Trim(text, utils.QueryForceTrimChars))
 			}
 		})
 		menu.AddActionWithText("Copy Selected").OnTriggered(func() {

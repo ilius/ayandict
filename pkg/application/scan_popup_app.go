@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
+	"github.com/ilius/ayandict/v3/pkg/scanpopup"
+	"github.com/ilius/ayandict/v3/pkg/utils"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -45,7 +47,7 @@ func (app *Application) QueryPopup(query string) {
 		return
 	}
 	query = strings.TrimSpace(query)
-	query = strings.Trim(query, punctuation)
+	query = strings.Trim(query, utils.Punctuation)
 	if query == "" {
 		return
 	}
@@ -54,7 +56,8 @@ func (app *Application) QueryPopup(query string) {
 		slog.Error("invalid scan_popup_mode", "value", conf.ScanPopupMode)
 	}
 
-	p := NewScanPopup(
+	p := scanpopup.NewScanPopup(
+		conf,
 		query,
 		mode,
 		app.OnScanPopupClose,
@@ -78,7 +81,8 @@ func (app *Application) randomFavoritePopup(onClose func()) {
 		onClose()
 	}
 
-	p := NewScanPopup(
+	p := scanpopup.NewScanPopup(
+		conf,
 		term,
 		dictmgr.SearchModeStartWith,
 		onCloseNew,
