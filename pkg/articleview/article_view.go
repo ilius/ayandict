@@ -381,7 +381,7 @@ func (view *ArticleView) SetPopupResult(
 		// termsJoined, _ := joinWithMaxLen(terms, " | ", maxTermsTextLength)
 		termsJoined := html.EscapeString(strings.Join(terms, " | ")) + extra
 		header = fmt.Sprintf(
-			`<div %s>%s</div>`,
+			`<p %s>%s</p>`,
 			headerStyle,
 			termsJoined,
 		)
