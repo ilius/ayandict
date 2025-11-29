@@ -193,8 +193,9 @@ func (view *ArticleView) init() {
 	findButton := qt.NewQPushButton3("Find Next")
 	findButton.OnClicked(view.findNext)
 
+	searchLayout.AddWidget(qt.NewQLabel3("🔍").QWidget)
 	searchLayout.AddWidget2(searchEntry.QWidget, 1)
-	searchLayout.AddWidget2(findButton.QWidget, 0)
+	searchLayout.AddWidget(findButton.QWidget)
 
 	mainLayout.AddWidget3(textBrowser.QWidget, 1, 0)
 	mainLayout.AddWidget3(searchFrame.QWidget, 0, 0)
