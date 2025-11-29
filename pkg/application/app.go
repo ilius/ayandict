@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ilius/ayandict/v3/pkg/about"
 	"github.com/ilius/ayandict/v3/pkg/activity"
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
 	"github.com/ilius/ayandict/v3/pkg/articleview"
@@ -23,6 +24,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/qlocalserver"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
+	"github.com/ilius/ayandict/v3/pkg/utils"
 	"github.com/ilius/ayandict/v3/pkg/webclient"
 	"github.com/ilius/ayandict/v3/pkg/webserver"
 	qt "github.com/mappu/miqt/qt6"
@@ -258,7 +260,7 @@ func (app *Application) Run(query string) {
 		}
 	}
 	{
-		icon, err := loadPNGIcon(iconPixName)
+		icon, err := loadPNGIcon(utils.IconPixName)
 		if err != nil {
 			slog.Error("failed to load window icon", "err", err)
 			panic(err)
@@ -613,6 +615,6 @@ func (app *Application) statusIconActivate() {
 
 func (app *Application) ShowAbout() {
 	window := qt.NewQDialog(app.window.QWidget)
-	aboutClickedWidget(window.QWidget, app.icon)
+	about.ShowAbout(window.QWidget, app.icon)
 	window.ShowNormal()
 }

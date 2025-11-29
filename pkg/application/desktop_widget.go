@@ -6,13 +6,14 @@ import (
 
 	"github.com/ilius/ayandict/v3/pkg/qplatform"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
+	"github.com/ilius/ayandict/v3/pkg/utils"
 	qt "github.com/mappu/miqt/qt6"
 )
 
 const dekstopWidgetSettingsName = "dekstop_widget"
 
 func (app *Application) setupDekstopWidget() {
-	pixmap, err := loadPNGPixmap(iconPixName)
+	pixmap, err := loadPNGPixmap(utils.IconPixName)
 	if err != nil {
 		slog.Error("failed to load icon image", "err", err)
 		return

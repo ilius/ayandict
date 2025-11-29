@@ -1,4 +1,4 @@
-package application
+package about
 
 import (
 	"fmt"
@@ -6,6 +6,9 @@ import (
 	"runtime"
 
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
+	"github.com/ilius/ayandict/v3/pkg/resources"
+	"github.com/ilius/ayandict/v3/pkg/resourceutil"
+	"github.com/ilius/ayandict/v3/pkg/utils"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -21,7 +24,7 @@ func addTabWithIcon(
 		_ = tabWidget.AddTab(widget, label)
 		return
 	}
-	icon, err := loadPNGIcon(filename)
+	icon, err := resourceutil.LoadPNGIcon(resources.Res, filename)
 	if err != nil {
 		slog.Error("error loading icon", "filename", filename)
 	}
@@ -32,7 +35,7 @@ func addTabWithIcon(
 	_ = tabWidget.AddTab2(widget, icon, label)
 }
 
-func aboutClickedWidget(widget *qt.QWidget, icon *qt.QIcon) {
+func ShowAbout(widget *qt.QWidget, icon *qt.QIcon) {
 	widget.SetWindowTitle("About " + appinfo.APP_DESC)
 	widget.Resize(700, 500)
 	widget.SetWindowIcon(icon)
@@ -41,7 +44,7 @@ func aboutClickedWidget(widget *qt.QWidget, icon *qt.QIcon) {
 	topHBoxLayout := qt.NewQHBoxLayout(topHBox.QWidget)
 
 	{
-		pixmap, err := loadPNGPixmap(iconPixName)
+		pixmap, err := resourceutil.LoadPNGPixmap(resources.Res, utils.IconPixName)
 		if err != nil {
 			slog.Error("failed to load icon image", "err", err)
 		} else {
@@ -63,7 +66,7 @@ func aboutClickedWidget(widget *qt.QWidget, icon *qt.QIcon) {
 	topHBoxLayout.AddStretch()
 
 	tabWidget := qt.NewQTabWidget2()
-	tabWidget.SetSizePolicy2(expanding, expanding)
+	tabWidget.SetSizePolicy2(qt.QSizePolicy__Expanding, qt.QSizePolicy__Expanding)
 	tabWidget.SetIconSize(qt.NewQSize2(22, 22))
 
 	// tabWidget.SetTabPosition(qt.QTabWidget__West)

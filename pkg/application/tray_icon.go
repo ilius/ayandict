@@ -3,6 +3,7 @@ package application
 import (
 	"log/slog"
 
+	"github.com/ilius/ayandict/v3/pkg/about"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -34,7 +35,7 @@ func (app *Application) createStatusIconActions() []*qt.QAction {
 		action := qt.NewQAction2("About")
 		action.OnTriggered(func() {
 			widget := qt.NewQDialog(app.window.QWidget)
-			aboutClickedWidget(widget.QWidget, app.icon)
+			about.ShowAbout(widget.QWidget, app.icon)
 			widget.Show()
 		})
 		actions = append(actions, action)

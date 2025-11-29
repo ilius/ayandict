@@ -7,3 +7,5 @@ const Punctuation = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~“”،؛؟۔￼"
 // are also selected, specially non-ascii ones,
 // so we trim them on right-click -> Query action or on middle-click action
 const QueryForceTrimChars = "‘’،؛"
+
+const IconPixName = "ayandict-64px.png"

@@ -5,8 +5,6 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
-const iconPixName = "ayandict-64px.png"
-
 const expanding = qt.QSizePolicy__Expanding
 
 const altCtrlModifier = qt.AltModifier | qt.ControlModifier
