@@ -155,9 +155,9 @@ type Config struct {
 const defaultHeaderTemplate = `<b><font color='#55f'>{{.DictName}}</font></b>
 <font color='#777'> [Score: %{{.Score}}]</font>
 {{if .ShowTerms }}
-<div dir="ltr" style="font-size: xx-large;font-weight:bold;">
+<span dir="ltr" style="font-size: xx-large;font-weight:bold;">
 {{ index .Terms 0 }}
-</div>
+</span>
 {{range slice .Terms 1}}
 <span dir="ltr" style="font-size: large;font-weight:bold;">
 	<span style="color:#ff0000;font-weight:bold;"> │ </span>
