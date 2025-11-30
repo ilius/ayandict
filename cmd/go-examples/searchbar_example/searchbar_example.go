@@ -17,7 +17,6 @@ type SearchableQTextBrowser struct {
 	frame       *qt.QFrame
 	searchEntry *qt.QLineEdit
 	searchFrame *qt.QFrame
-	docCursor   *qt.QTextCursor
 	lastFormats []CursorAndCharFormat
 }
 
@@ -38,7 +37,7 @@ func (view *SearchableQTextBrowser) init() {
 
 	searchEntry.SetPlaceholderText("Find text...")
 	searchEntry.OnReturnPressed(view.findNext)
-	searchEntry.OnTextChanged(view.highlightAll)
+	searchEntry.OnTextChanged(view.onSearchEntryChange)
 
 	findButton := qt.NewQPushButton3("Find Next")
 	findButton.OnClicked(view.findNext)
@@ -63,9 +62,32 @@ func (view *SearchableQTextBrowser) init() {
 	).OnActivated(view.hideBar)
 }
 
+func (view *SearchableQTextBrowser) findAll(query string) []*qt.QTextCursor {
+	doc := view.Browser.Document()
+	cursor := qt.NewQTextCursor2(doc)
+	cursors := []*qt.QTextCursor{}
+	for {
+		cursor = doc.Find2(query, cursor)
+		if cursor.IsNull() {
+			break
+		}
+		cursors = append(cursors, cursor)
+	}
+	return cursors
+}
+
+func (view *SearchableQTextBrowser) onSearchEntryChange(query string) {
+	view.highlightAll(query)
+}
+
 func (view *SearchableQTextBrowser) clearHighlights() {
 	for _, cc := range view.lastFormats {
 		cc.Cursor.SetCharFormat(cc.Format)
+		cc.Cursor.ClearSelection()
+	}
+	activeCursor := view.Browser.TextCursor()
+	if !activeCursor.IsNull() {
+		activeCursor.ClearSelection()
 	}
 	view.lastFormats = nil
 }
@@ -76,7 +98,6 @@ func (view *SearchableQTextBrowser) highlightAll(query string) {
 		return
 	}
 
-	doc := view.Browser.Document()
 	palette := view.Browser.Palette()
 
 	// Colors from theme
@@ -93,77 +114,85 @@ func (view *SearchableQTextBrowser) highlightAll(query string) {
 	formatCurrent.SetFontWeight(int(qt.QFont__Bold))
 
 	// Apply new highlights
-	cursor := qt.NewQTextCursor2(doc)
+	activeCursor := view.Browser.TextCursor()
 
+	cursors := view.findAll(query)
 	lastFormats := []CursorAndCharFormat{}
-	for {
-		cursor = doc.Find2(query, cursor)
-		if cursor.IsNull() {
-			break
-		}
+	for _, cursor := range cursors {
 		lastFormats = append(lastFormats, CursorAndCharFormat{
 			Cursor: cursor,
 			Format: cursor.CharFormat(),
 		})
-		cursor.MergeCharFormat(formatAll)
 	}
-	view.lastFormats = lastFormats
-
-	// Emphasize the current match
-	activeCursor := view.Browser.TextCursor()
-	if !activeCursor.IsNull() && activeCursor.HasSelection() {
+	if !activeCursor.IsNull() {
 		lastFormats = append(lastFormats, CursorAndCharFormat{
 			Cursor: activeCursor,
 			Format: activeCursor.CharFormat(),
 		})
+	}
+	for _, cursor := range cursors {
+		cursor.MergeCharFormat(formatAll)
+	}
+	if !activeCursor.IsNull() && activeCursor.HasSelection() {
+		// Emphasize the current match
 		activeCursor.MergeCharFormat(formatCurrent)
 	}
+
+	view.lastFormats = lastFormats
 }
 
-func (st *SearchableQTextBrowser) findNext() {
-	query := st.searchEntry.Text()
+func (view *SearchableQTextBrowser) findNext() {
+	query := view.searchEntry.Text()
 	if query == "" {
 		return
 	}
 
 	flags := qt.QTextDocument__FindFlag(0)
 	flags |= qt.QTextDocument__FindCaseSensitively // TODO: add a checkbox
-	found := st.Browser.Find2(query, flags)
+	found := view.Browser.Find2(query, flags)
 	if !found {
-		st.docCursor.MovePosition3(qt.QTextCursor__Start, qt.QTextCursor__MoveAnchor, 0)
-		st.Browser.SetTextCursor(st.docCursor)
-		st.Browser.Find2(query, flags)
+		cursor := qt.NewQTextCursor2(view.Browser.Document())
+		cursor.MovePosition3(qt.QTextCursor__Start, qt.QTextCursor__MoveAnchor, 0)
+		view.Browser.SetTextCursor(cursor)
+		view.Browser.Find2(query, flags)
 	}
 
-	st.highlightAll(query)
-	st.Browser.EnsureCursorVisible()
+	view.highlightAll(query)
+	view.Browser.EnsureCursorVisible()
 }
 
-func (st *SearchableQTextBrowser) showBar() {
-	st.searchFrame.SetVisible(true)
-	st.searchEntry.SetFocus()
-	st.searchEntry.SelectAll()
-	st.highlightAll(st.searchEntry.Text())
+func (view *SearchableQTextBrowser) showBar() {
+	query := view.searchEntry.Text()
+
+	activeCursor := view.Browser.TextCursor()
+	if !activeCursor.IsNull() && activeCursor.HasSelection() {
+		query = activeCursor.SelectedText()
+		view.searchEntry.SetText(query)
+	}
+
+	view.searchFrame.SetVisible(true)
+	view.searchEntry.SetFocus()
+	view.searchEntry.SelectAll()
+	view.highlightAll(query)
 }
 
-func (st *SearchableQTextBrowser) hideBar() {
-	st.searchFrame.SetVisible(false)
-	st.clearHighlights()
-	st.Browser.SetFocus()
+func (view *SearchableQTextBrowser) hideBar() {
+	view.searchFrame.SetVisible(false)
+	view.clearHighlights()
+	view.Browser.SetFocus()
 }
 
 func CreateTextBrowserSearchBar(browser *qt.QTextBrowser) *SearchableQTextBrowser {
 	frame := qt.NewQFrame2()
-	st := &SearchableQTextBrowser{
+	view := &SearchableQTextBrowser{
 		frame:       frame,
 		Widget:      frame.QWidget,
 		Browser:     browser,
 		searchEntry: qt.NewQLineEdit(nil),
 		searchFrame: qt.NewQFrame(nil),
-		docCursor:   qt.NewQTextCursor2(browser.Document()),
 	}
-	st.init()
-	return st
+	view.init()
+	return view
 }
 
 func main() {
