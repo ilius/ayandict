@@ -162,7 +162,10 @@ func (view *ArticleView) readArticleStyle(stylePath string) error {
 }
 
 func (view *ArticleView) LoadUserStyle() {
-	view.readArticleStyle(view.conf.ArticleStyle)
+	err := view.readArticleStyle(view.conf.ArticleStyle)
+	if err != nil {
+		slog.Error("error in readArticleStyle", "err", err)
+	}
 }
 
 func (view *ArticleView) Searching() bool {
