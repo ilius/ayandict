@@ -191,8 +191,6 @@ func lower(b []byte) []byte {
 	return b
 }
 
-const escapedChars = "&'<>\"\r"
-
 // UnescapeString unescapes entities like "&lt;" to become "<". It unescapes a
 // larger range of entities than EscapeString escapes. For example, "&aacute;"
 // unescapes to "á", as does "&#225;" and "&xE1;".
