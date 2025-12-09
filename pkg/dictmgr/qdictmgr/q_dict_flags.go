@@ -1,6 +1,7 @@
 package qdictmgr
 
 import (
+	"fmt"
 	"log/slog"
 	"sync"
 
@@ -38,7 +39,7 @@ type DictFlagsCheckboxes struct {
 
 	hbox *qt.QHBoxLayout
 
-	checkList []*qt.QPushButton
+	checkList []*qt.QCheckBox
 
 	ds *dicts.DictionarySettings
 
@@ -55,15 +56,23 @@ func (w *DictFlagsCheckboxes) SetActiveDictSetting(ds *dicts.DictionarySettings)
 }
 
 func (w *DictFlagsCheckboxes) addCheckBox(label string, flag uint16) {
-	check := qt.NewQPushButton3(label)
-	check.SetCheckable(true)
+	check := qt.NewQCheckBox3(label)
 	check.SetChecked(true)
+	check.SetStyleSheet(fmt.Sprintf(`
+	QCheckBox {
+		spacing: 0.2em;
+	}
+	QCheckBox::indicator {
+		width: 1em;
+		height: 1em;
+	}
+	`))
 	w.hbox.AddWidget3(check.QWidget, 1, 0)
 	w.checkList = append(w.checkList, check)
 	w.checkConnectClicked(check, flag)
 }
 
-func (w *DictFlagsCheckboxes) checkConnectClicked(check *qt.QPushButton, flag uint16) {
+func (w *DictFlagsCheckboxes) checkConnectClicked(check *qt.QCheckBox, flag uint16) {
 	check.OnClicked(func() {
 		ds := w.ds
 		if ds == nil {
