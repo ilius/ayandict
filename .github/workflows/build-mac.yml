@@ -42,6 +42,7 @@ jobs:
       - name: Install Qt6
         run: |
           brew update >/dev/null
+          brew upgrade
           brew install gcc cmake ninja openssl@3 zlib qt6 pkg-config
 
       - name: Set up Go
