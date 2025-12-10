@@ -208,8 +208,8 @@ func (p *ScanPopup) init() {
 	closeButton.SetToolTip("Close (Esc)")
 
 	if p.conf.ScanPopupHeaderIcons {
-		nextButton.SetText("↓")
-		prevButton.SetText("↑")
+		nextButton.SetText("▾") // ▾▼↓⬇⮯🔽⬇️
+		prevButton.SetText("▴") // ▴▲↑⬆⮭🔼⬆️
 		mainButton.SetText("📖")
 		closeButton.SetText("❌")
 	}
