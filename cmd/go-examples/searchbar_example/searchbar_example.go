@@ -66,8 +66,10 @@ func (view *SearchableQTextBrowser) findAll(query string) []*qt.QTextCursor {
 	doc := view.Browser.Document()
 	cursor := qt.NewQTextCursor2(doc)
 	cursors := []*qt.QTextCursor{}
+	flags := qt.QTextDocument__FindFlag(0)
+	// flags |= qt.QTextDocument__FindCaseSensitively // TODO: add a checkbox
 	for {
-		cursor = doc.Find2(query, cursor)
+		cursor = doc.Find6(query, cursor, flags)
 		if cursor.IsNull() {
 			break
 		}
@@ -148,7 +150,7 @@ func (view *SearchableQTextBrowser) findNext() {
 	}
 
 	flags := qt.QTextDocument__FindFlag(0)
-	flags |= qt.QTextDocument__FindCaseSensitively // TODO: add a checkbox
+	// flags |= qt.QTextDocument__FindCaseSensitively // TODO: add a checkbox
 	found := view.Browser.Find2(query, flags)
 	if !found {
 		cursor := qt.NewQTextCursor2(view.Browser.Document())
