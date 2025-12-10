@@ -227,7 +227,7 @@ func (p *ScanPopup) init() {
 	if p.conf.ScanPopupHeaderIcons {
 		nextButton.SetText("▾") // ▾▼↓⬇⮯🔽⬇️
 		prevButton.SetText("▴") // ▴▲↑⬆⮭🔼⬆️
-		mainButton.SetText("📖")
+		mainButton.SetText("📖") // 📖📔📗↩️🔍
 		closeButton.SetText("❌")
 	}
 
