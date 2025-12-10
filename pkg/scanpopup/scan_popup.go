@@ -139,6 +139,22 @@ func (p *ScanPopup) configFontWithFactor(factor float64) *qt.QFont {
 	return &font
 }
 
+func (p *ScanPopup) newHeaderButton(text string) *qt.QPushButton {
+	button := qt.NewQPushButton3(text)
+	// buttons have no ContentsMargins by default
+	// setting "margin: 0px;" stylesheet mimimizes both the height and width
+	// margin: top, right, bottom, left
+	// "margin: 0px 5px 0px 5px;"
+	button.SetStyleSheet("margin: 0px;")
+	if p.conf.ScanPopupHeaderIcons {
+		button.OnResizeEvent(func(super func(*qt.QResizeEvent), event *qt.QResizeEvent) {
+			super(event)
+			button.SetFixedWidth(event.Size().Height())
+		})
+	}
+	return button
+}
+
 func (p *ScanPopup) init() {
 	font := p.configFontWithFactor(p.conf.ScanPopupFontSizeFactor)
 
@@ -177,12 +193,12 @@ func (p *ScanPopup) init() {
 
 	popupLayout := qt.NewQVBoxLayout(popup)
 
-	nextButton := qt.NewQPushButton3(" next ")
+	nextButton := p.newHeaderButton(" next ")
 	nextButton.OnClicked(p.gotoNextResult)
 	nextButton.SetToolTip("Next result (Alt+Down)")
 	p.nextButton = nextButton
 
-	prevButton := qt.NewQPushButton3(" prev ")
+	prevButton := p.newHeaderButton(" prev ")
 	prevButton.OnClicked(p.gotoPrevResult)
 	prevButton.SetToolTip("Previous result (Alt+Up)")
 	p.prevButton = prevButton
@@ -197,11 +213,11 @@ func (p *ScanPopup) init() {
 	)
 	p.favoriteButton = favoriteButton
 
-	mainButton := qt.NewQPushButton3(" main ")
+	mainButton := p.newHeaderButton(" main ")
 	mainButton.OnClicked(p.moveToMainWindow)
 	mainButton.SetToolTip("Open in main window (Enter)")
 
-	closeButton := qt.NewQPushButton3(" close ")
+	closeButton := p.newHeaderButton(" close ")
 	closeButton.OnClicked(func() {
 		_ = popup.Close()
 	})
@@ -229,20 +245,6 @@ func (p *ScanPopup) init() {
 		headerBox.AddWidget2(label.QWidget, 1)
 	}
 
-	// buttons have no ContentsMargins by default
-	// setting "margin: 0px;" stylesheet mimimizes both the height and width
-	// margin: top, right, bottom, left
-	// const smallButtonSS = "margin: 0px 5px 0px 5px;"
-	const smallButtonSS = "margin: 0px;"
-
-	for _, button := range []*qt.QPushButton{
-		nextButton,
-		prevButton,
-		mainButton,
-		closeButton,
-	} {
-		button.SetStyleSheet(smallButtonSS)
-	}
 	for _, button := range []*qt.QPushButton{
 		nextButton,
 		prevButton,
@@ -254,19 +256,6 @@ func (p *ScanPopup) init() {
 		button.SetFont(font)
 		button.SetFocusPolicy(qt.NoFocus)
 		headerBox.AddWidget(button.QWidget)
-	}
-	if p.conf.ScanPopupHeaderIcons {
-		for _, button := range []*qt.QPushButton{
-			nextButton,
-			prevButton,
-			mainButton,
-			closeButton,
-		} {
-			button.OnResizeEvent(func(super func(*qt.QResizeEvent), event *qt.QResizeEvent) {
-				super(event)
-				button.SetFixedWidth(event.Size().Height())
-			})
-		}
 	}
 
 	popupLayout.SetContentsMargins(5, 0, 5, 5)
