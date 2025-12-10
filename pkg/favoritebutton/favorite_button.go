@@ -18,6 +18,10 @@ type FavoriteButton struct {
 	activeTooltip   string
 }
 
+func (b *FavoriteButton) Button() *qt.QPushButton {
+	return b.QPushButton
+}
+
 func (b *FavoriteButton) SetChecked(checked bool) {
 	b.checked = checked
 	if checked {
@@ -61,6 +65,7 @@ func NewFavoriteButton(onClick func(bool)) *FavoriteButton {
 		qButton.SetIconSize(qt.NewQSize2(iconSize, iconSize))
 		qButton.SetFixedWidth(h)
 	})
+	qButton.SetStyleSheet("margin: 0px;")
 	button := &FavoriteButton{
 		QPushButton:  qButton,
 		activeIcon:   activeIcon,

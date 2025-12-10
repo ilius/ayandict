@@ -29,6 +29,12 @@ type QCloseEventFunc = func(super func(*qt.QCloseEvent), event *qt.QCloseEvent)
 
 var aboutToDragCursor = qt.PointingHandCursor
 
+type FavoriteButtonInterface interface {
+	SetChecked(bool)
+	SetToolTips(string, string)
+	Button() *qt.QPushButton
+}
+
 type ScanPopupAppInterface interface {
 	OnScanPopupShow()
 	OnScanPopupClose(super func(*qt.QCloseEvent), event *qt.QCloseEvent)
@@ -90,7 +96,7 @@ type ScanPopup struct {
 	articleView    *articleview.ArticleView
 	nextButton     *qt.QPushButton
 	prevButton     *qt.QPushButton
-	favoriteButton *favoritebutton.FavoriteButton
+	favoriteButton FavoriteButtonInterface
 
 	// set by doQuery
 	results []commons.SearchResultIface
@@ -181,7 +187,8 @@ func (p *ScanPopup) init() {
 	prevButton.SetToolTip("Previous result (Alt+Up)")
 	p.prevButton = prevButton
 
-	favoriteButton := favoritebutton.NewFavoriteButton(
+	var favoriteButton FavoriteButtonInterface
+	favoriteButton = favoritebutton.NewFavoriteButton(
 		p.favoriteButtonClicked,
 	)
 	favoriteButton.SetToolTips(
@@ -193,13 +200,6 @@ func (p *ScanPopup) init() {
 	mainButton := qt.NewQPushButton3(" main ")
 	mainButton.OnClicked(p.moveToMainWindow)
 	mainButton.SetToolTip("Open in main window (Enter)")
-
-	// favoriteButton := qt.NewQPushButton3("favorite")
-	// favoriteButton.SetCheckable(true)
-	// favoriteButton.OnToggled(func(checked bool) {
-	// 	// p.favoritesWidget.SetFavorite(term, checked)
-	// })
-	// favoriteButton.SetToolTip("Favorite")
 
 	closeButton := qt.NewQPushButton3(" close ")
 	closeButton.OnClicked(func() {
@@ -238,13 +238,20 @@ func (p *ScanPopup) init() {
 	for _, button := range []*qt.QPushButton{
 		nextButton,
 		prevButton,
-		favoriteButton.QPushButton,
+		mainButton,
+		closeButton,
+	} {
+		button.SetStyleSheet(smallButtonSS)
+	}
+	for _, button := range []*qt.QPushButton{
+		nextButton,
+		prevButton,
+		favoriteButton.Button(),
 		mainButton,
 		closeButton,
 	} {
 		button.SetSizePolicy2(qt.QSizePolicy__Minimum, qt.QSizePolicy__Expanding)
 		button.SetFont(font)
-		button.SetStyleSheet(smallButtonSS)
 		button.SetFocusPolicy(qt.NoFocus)
 		headerBox.AddWidget(button.QWidget)
 	}
