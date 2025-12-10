@@ -71,6 +71,7 @@ type Config struct {
 	MostFrequentAutoSave bool `toml:"most_frequent_auto_save" doc:"Auto-save Most Frequent queries"`
 	MostFrequentMaxSize  int  `toml:"most_frequent_max_size" doc:"Maximum size for Most Frequent queries"`
 
+	FavoriteButtonHue int  `toml:"favorite_button_hue" doc:"Color hue for favorite button (120=green, 240=blue, 0=red)"`
 	FavoritesAutoSave bool `toml:"favorites_auto_save" doc:"Auto-save Favorites on every new record"`
 
 	MaxResultsTotal int `toml:"max_results_total" doc:"Maximum number of search results"`
@@ -208,6 +209,7 @@ func Default() *Config {
 		MostFrequentAutoSave: true,
 		MostFrequentMaxSize:  100,
 
+		FavoriteButtonHue: 120,
 		FavoritesAutoSave: true,
 
 		MaxResultsTotal: 40,

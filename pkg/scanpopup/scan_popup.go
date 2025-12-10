@@ -204,6 +204,7 @@ func (p *ScanPopup) init() {
 	p.prevButton = prevButton
 
 	var favoriteButton FavoriteButtonInterface = favoritebutton.NewTextFavoriteButton(
+		p.conf,
 		p.favoriteButtonClicked,
 		p.conf.ScanPopupHeaderIcons,
 	)

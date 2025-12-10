@@ -4,15 +4,16 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/ilius/ayandict/v3/pkg/config"
 	qt "github.com/mappu/miqt/qt6"
 )
 
-const activeColorHue = 120 // green
-
 func NewTextFavoriteButton(
+	conf *config.Config,
 	onClick func(bool),
 	emoji bool,
 ) *TextFavoriteButton {
+	activeHue := conf.FavoriteButtonHue
 	qButton := qt.NewQPushButton2()
 	if emoji {
 		qButton.OnResizeEvent(func(super func(event *qt.QResizeEvent), event *qt.QResizeEvent) {
@@ -25,7 +26,7 @@ func NewTextFavoriteButton(
 	button := &TextFavoriteButton{
 		QPushButton: qButton,
 	}
-	activeColor, inactiveColor := getEmojiButtonColors(qButton.QWidget)
+	activeColor, inactiveColor := getEmojiButtonColors(qButton.QWidget, activeHue)
 	button.activeStyleSheet = fmt.Sprintf(
 		"QPushButton{color: %s; margin: 0px;}",
 		activeColor,
@@ -47,7 +48,7 @@ func hsvString(h int, s int, v int) string {
 }
 
 // returns activeColor, inactiveColor
-func getEmojiButtonColors(button *qt.QWidget) (string, string) {
+func getEmojiButtonColors(button *qt.QWidget, activeHue int) (string, string) {
 	bgColor := button.Palette().Color(
 		qt.QPalette__Normal,
 		qt.QPalette__Base,
@@ -60,7 +61,7 @@ func getEmojiButtonColors(button *qt.QWidget) (string, string) {
 	)
 	if bgValue < 128 { // dark theme
 		return hsvString(
-				activeColorHue,
+				activeHue,
 				100,
 				255,
 			), hsvString(
@@ -71,7 +72,7 @@ func getEmojiButtonColors(button *qt.QWidget) (string, string) {
 	}
 	// light theme
 	return hsvString(
-			activeColorHue,
+			activeHue,
 			100,
 			bgValue*3/4,
 		), hsvString(
