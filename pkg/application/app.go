@@ -77,8 +77,8 @@ type Application struct {
 	favoritesWidget *qfavorites.FavoritesWidget
 	frequencyTable  *frequencytable.FrequencyTable
 
-	favoriteButton       *favoritebutton.FavoriteButton
-	queryFavoriteButton  *favoritebutton.FavoriteButton
+	favoriteButton       FavoriteButtonInterface
+	queryFavoriteButton  FavoriteButtonInterface
 	reloadDictsButton    *qt.QPushButton
 	closeDictsButton     *qt.QPushButton
 	openConfigButton     *qt.QPushButton
@@ -286,14 +286,18 @@ func (app *Application) Run(query string) {
 
 	okButton := qt.NewQPushButton3(" OK ")
 
-	app.queryFavoriteButton = favoritebutton.NewFavoriteButton(app.queryFavoriteButtonClicked)
+	app.queryFavoriteButton = favoritebutton.NewFavoriteButton(
+		app.queryFavoriteButtonClicked,
+	)
 	app.queryFavoriteButton.SetToolTips(
 		"Add this query to favorites",
 		"Remove this query from favorites",
 	)
 
 	// favoriteButtonVBox := qt.NewQVBoxLayout()
-	app.favoriteButton = favoritebutton.NewFavoriteButton(app.favoriteButtonClicked)
+	app.favoriteButton = favoritebutton.NewFavoriteButton(
+		app.favoriteButtonClicked,
+	)
 
 	app.favoriteButton.SetToolTips(
 		"Add this term to favorites",
@@ -312,7 +316,7 @@ func (app *Application) Run(query string) {
 	queryBoxLayout.AddWidget(queryLabel.QWidget)
 	queryBoxLayout.AddWidget(entry.QWidget)
 	queryBoxLayout.AddWidget(searchModeCombo.QWidget)
-	queryBoxLayout.AddWidget(app.queryFavoriteButton.QWidget)
+	queryBoxLayout.AddWidget(app.queryFavoriteButton.Button().QWidget)
 	queryBoxLayout.AddWidget(okButton.QWidget)
 
 	headerLabel := NewHeaderLabel(app.Query)
@@ -327,7 +331,7 @@ func (app *Application) Run(query string) {
 	headerBoxLayout.AddSpacing(basePxHalf)
 	headerBoxLayout.AddWidget3(headerLabel.QWidget, 1, 0)
 	// headerBoxLayout.AddLayout(favoriteButtonVBox, 0)
-	headerBoxLayout.AddWidget3(app.favoriteButton.QWidget, 0, qt.AlignRight)
+	headerBoxLayout.AddWidget3(app.favoriteButton.Button().QWidget, 0, qt.AlignRight)
 	headerBoxLayout.AddSpacing(int(basePx * 1.5))
 	headerBox.SetSizePolicy2(expanding, qt.QSizePolicy__Minimum)
 
