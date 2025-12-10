@@ -203,8 +203,7 @@ func (p *ScanPopup) init() {
 	prevButton.SetToolTip("Previous result (Alt+Up)")
 	p.prevButton = prevButton
 
-	var favoriteButton FavoriteButtonInterface
-	favoriteButton = favoritebutton.NewTextFavoriteButton(
+	var favoriteButton FavoriteButtonInterface = favoritebutton.NewTextFavoriteButton(
 		p.favoriteButtonClicked,
 		p.conf.ScanPopupHeaderIcons,
 	)
