@@ -204,8 +204,9 @@ func (p *ScanPopup) init() {
 	p.prevButton = prevButton
 
 	var favoriteButton FavoriteButtonInterface
-	favoriteButton = favoritebutton.NewFavoriteButton(
+	favoriteButton = favoritebutton.NewTextFavoriteButton(
 		p.favoriteButtonClicked,
+		p.conf.ScanPopupHeaderIcons,
 	)
 	favoriteButton.SetToolTips(
 		"Add this term to favorites",
