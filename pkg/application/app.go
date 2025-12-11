@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"os/signal"
 	"sync/atomic"
-	"syscall"
 	"time"
 
 	"github.com/ilius/ayandict/v3/pkg/about"
@@ -50,6 +48,8 @@ var searchModeByDesc = map[string]dictmgr.SearchMode{
 	"Word Match": dictmgr.SearchModeWordMatch,
 	s_Soundex:    dictmgr.SearchModeSoundex,
 }
+
+var exitSignalChan = make(chan os.Signal, 1)
 
 type Application struct {
 	*qt.QApplication
@@ -216,10 +216,8 @@ func (app *Application) Run(query string) {
 	}()
 	app.OnAboutToQuit(app.onExit)
 	{
-		sigs := make(chan os.Signal, 1)
-		signal.Notify(sigs, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 		go func() {
-			<-sigs
+			<-exitSignalChan
 			app.Exit()
 		}()
 	}
