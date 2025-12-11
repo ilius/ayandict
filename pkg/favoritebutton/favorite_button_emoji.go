@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/qtutils"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -57,22 +58,22 @@ func getEmojiButtonColors(button *qt.QWidget, activeHue int) (string, string) {
 	)
 	// "dusk" color scheme: bg.V=127 fg.V=0 bg.L=127 fg.L=0 bg=#7f7f7f fg=#000000
 	if bg.Value() < 130 { // dark BG
-		return hsvString(
+		return qtutils.HSVString(
 				activeHue,
 				110,
 				255-bg.Value()/6,
-			), hsvString(
+			), qtutils.HSVString(
 				0,
 				0,
 				fg.Value()*94/100,
 			)
 	}
 	// light BG
-	return hsvString(
+	return qtutils.HSVString(
 			activeHue,
 			100,
 			bg.Value()*3/4,
-		), hsvString(
+		), qtutils.HSVString(
 			0,
 			0,
 			bg.Value()/2,
