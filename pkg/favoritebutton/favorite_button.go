@@ -11,9 +11,9 @@ func NewImageFavoriteButton(
 	_ *config.Config,
 	onClick func(bool),
 ) *ImageFavoriteButton {
-	activeIcon, err := loadPNGIcon("favorite-active-64.png")
+	activeIcon, err := loadPNGIcon("favorite-green-64.png")
 	if err != nil {
-		slog.Error("error loading icon favorite-active-64.png: " + err.Error())
+		slog.Error("error loading icon favorite-green-64.png: " + err.Error())
 		panic(err)
 	}
 	inactiveIcon, err := loadPNGIcon("favorite-64.png")
