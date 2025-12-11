@@ -6,7 +6,7 @@ import (
 )
 
 func NewMinimalFavoriteButton(
-	_conf *config.Config,
+	_ *config.Config,
 	onClick func(bool),
 ) *MinimalFavoriteButton {
 	qButton := qt.NewQPushButton2()

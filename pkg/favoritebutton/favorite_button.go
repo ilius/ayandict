@@ -8,7 +8,7 @@ import (
 )
 
 func NewImageFavoriteButton(
-	_conf *config.Config,
+	_ *config.Config,
 	onClick func(bool),
 ) *ImageFavoriteButton {
 	activeIcon, err := loadPNGIcon("favorite-active-64.png")

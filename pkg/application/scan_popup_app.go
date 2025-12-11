@@ -23,7 +23,7 @@ func (app *Application) setupScanPopup() {
 	})
 }
 
-func (app *Application) OnScanPopupClose(super func(*qt.QCloseEvent), event *qt.QCloseEvent) {
+func (app *Application) OnScanPopupClose(_ func(*qt.QCloseEvent), _ *qt.QCloseEvent) {
 	app.scanPopupCount.Add(-1)
 }
 
@@ -76,7 +76,7 @@ func (app *Application) randomFavoritePopup(onClose func()) {
 		return
 	}
 
-	onCloseNew := func(super func(event *qt.QCloseEvent), event *qt.QCloseEvent) {
+	onCloseNew := func(_ func(event *qt.QCloseEvent), _ *qt.QCloseEvent) {
 		app.scanPopupCount.Add(-1)
 		onClose()
 	}

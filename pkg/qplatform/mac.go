@@ -8,7 +8,7 @@ import (
 )
 
 // Remove a Qt/miqt window from the taskbar and pager on X11.
-func HideWindowFromTaskbar(widget *qt.QWidget) {}
+func HideWindowFromTaskbar(_ *qt.QWidget) {}
 
 func CanMoveWindow() bool {
 	return true

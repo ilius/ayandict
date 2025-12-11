@@ -10,7 +10,7 @@ import (
 
 func main() {
 	_ = qt.NewQApplication(os.Args)
-	onActivate := func(event *qt.QMouseEvent) {
+	onActivate := func(_ *qt.QMouseEvent) {
 		slog.Info("----- desktopwidget.main: onActivate")
 	}
 	actions := []*qt.QAction{}
