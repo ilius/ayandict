@@ -234,6 +234,16 @@ func (p *ScanPopup) init() {
 		prevButton.SetText("▴") // ▴▲↑⬆⮭🔼⬆️
 		mainButton.SetText("📖") // 📖📔📗↩️🔍
 		closeButton.SetText("❌")
+		bg := p.popup.Palette().Color(qt.QPalette__Normal, qt.QPalette__Base)
+		fg := p.popup.Palette().Color(qt.QPalette__Normal, qt.QPalette__ButtonText)
+		c := qt.NewQColor()
+		if bg.Value() < 130 { // dark BG
+			c.SetHsv(0, 0, fg.Value()*92/100)
+		} else {
+			c.SetHsv(0, 0, bg.Value()/2)
+		}
+		nextButton.Palette().SetColor(qt.QPalette__All, qt.QPalette__ButtonText, c)
+		prevButton.Palette().SetColor(qt.QPalette__All, qt.QPalette__ButtonText, c)
 	}
 
 	headerBox := qt.NewQHBoxLayout2()
