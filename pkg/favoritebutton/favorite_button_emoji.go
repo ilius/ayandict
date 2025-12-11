@@ -8,21 +8,16 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
-func NewTextFavoriteButton(
+func NewColoredEmojiFavoriteButton(
 	conf *config.Config,
 	onClick func(bool),
-	emoji bool,
 ) *TextFavoriteButton {
 	activeHue := conf.FavoriteButtonHue
 	qButton := qt.NewQPushButton2()
-	if emoji {
-		qButton.OnResizeEvent(func(super func(event *qt.QResizeEvent), event *qt.QResizeEvent) {
-			qButton.SetFixedWidth(event.Size().Height())
-		})
-		qButton.SetText("★") // ★ ⭑ ✯ ☆ ⭐
-	} else {
-		qButton.SetText(" fav ")
-	}
+	qButton.OnResizeEvent(func(super func(event *qt.QResizeEvent), event *qt.QResizeEvent) {
+		qButton.SetFixedWidth(event.Size().Height())
+	})
+	qButton.SetText("★") // ★ ⭑ ✯ ☆ ⭐
 	button := &TextFavoriteButton{
 		QPushButton: qButton,
 	}
@@ -39,12 +34,6 @@ func NewTextFavoriteButton(
 		onClick(button.ToggleChecked())
 	})
 	return button
-}
-
-func hsvString(h int, s int, v int) string {
-	color := qt.NewQColor()
-	color.SetHsv(h, s, v)
-	return color.ToQVariant().ToString()
 }
 
 // returns activeColor, inactiveColor
@@ -93,8 +82,8 @@ type TextFavoriteButton struct {
 	activeTooltip   string
 }
 
-func (b *TextFavoriteButton) Button() *qt.QPushButton {
-	return b.QPushButton
+func (b *TextFavoriteButton) QWidget() *qt.QWidget {
+	return b.QPushButton.QWidget
 }
 
 func (b *TextFavoriteButton) SetChecked(checked bool) {

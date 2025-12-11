@@ -5,7 +5,7 @@ import qt "github.com/mappu/miqt/qt6"
 type FavoriteButtonInterface interface {
 	SetChecked(bool)
 	SetToolTips(string, string)
-	Button() *qt.QPushButton
+	QWidget() *qt.QWidget
 	Hide()
 	Show()
 	SetDisabled(bool)

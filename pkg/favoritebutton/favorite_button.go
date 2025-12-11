@@ -3,51 +3,14 @@ package favoritebutton
 import (
 	"log/slog"
 
-	"github.com/ilius/ayandict/v3/pkg/resources"
-	"github.com/ilius/ayandict/v3/pkg/resourceutil"
+	"github.com/ilius/ayandict/v3/pkg/config"
 	qt "github.com/mappu/miqt/qt6"
 )
 
-type FavoriteButton struct {
-	*qt.QPushButton
-	checked      bool
-	activeIcon   *qt.QIcon
-	inactiveIcon *qt.QIcon
-
-	inactiveTooltip string
-	activeTooltip   string
-}
-
-func (b *FavoriteButton) Button() *qt.QPushButton {
-	return b.QPushButton
-}
-
-func (b *FavoriteButton) SetChecked(checked bool) {
-	b.checked = checked
-	if checked {
-		b.SetIcon(b.activeIcon)
-		b.SetToolTip(b.activeTooltip)
-	} else {
-		b.SetIcon(b.inactiveIcon)
-		b.SetToolTip(b.inactiveTooltip)
-	}
-}
-
-func (b *FavoriteButton) ToggleChecked() {
-	b.SetChecked(!b.checked)
-}
-
-func (b *FavoriteButton) SetToolTips(inactive string, active string) {
-	b.inactiveTooltip = inactive
-	b.activeTooltip = active
-	b.SetToolTip(inactive)
-}
-
-func loadPNGIcon(filename string) (*qt.QIcon, error) {
-	return resourceutil.LoadPNGIcon(resources.Res, filename)
-}
-
-func NewFavoriteButton(onClick func(bool)) *FavoriteButton {
+func NewImageFavoriteButton(
+	_conf *config.Config,
+	onClick func(bool),
+) *ImageFavoriteButton {
 	activeIcon, err := loadPNGIcon("favorite-active-64.png")
 	if err != nil {
 		slog.Error("error loading icon favorite-active-64.png: " + err.Error())
@@ -66,14 +29,49 @@ func NewFavoriteButton(onClick func(bool)) *FavoriteButton {
 		qButton.SetFixedWidth(h)
 	})
 	qButton.SetStyleSheet("margin: 0px;")
-	button := &FavoriteButton{
+	button := &ImageFavoriteButton{
 		QPushButton:  qButton,
 		activeIcon:   activeIcon,
 		inactiveIcon: inactiveIcon,
 	}
 	button.OnClicked(func() {
-		button.ToggleChecked()
-		onClick(button.checked)
+		onClick(button.ToggleChecked())
 	})
 	return button
+}
+
+type ImageFavoriteButton struct {
+	*qt.QPushButton
+	checked      bool
+	activeIcon   *qt.QIcon
+	inactiveIcon *qt.QIcon
+
+	inactiveTooltip string
+	activeTooltip   string
+}
+
+func (b *ImageFavoriteButton) QWidget() *qt.QWidget {
+	return b.QPushButton.QWidget
+}
+
+func (b *ImageFavoriteButton) SetChecked(checked bool) {
+	b.checked = checked
+	if checked {
+		b.SetIcon(b.activeIcon)
+		b.SetToolTip(b.activeTooltip)
+	} else {
+		b.SetIcon(b.inactiveIcon)
+		b.SetToolTip(b.inactiveTooltip)
+	}
+}
+
+func (b *ImageFavoriteButton) ToggleChecked() bool {
+	b.SetChecked(!b.checked)
+	return b.checked
+}
+
+func (b *ImageFavoriteButton) SetToolTips(inactive string, active string) {
+	b.inactiveTooltip = inactive
+	b.activeTooltip = active
+	b.SetToolTip(inactive)
 }

@@ -32,7 +32,7 @@ var aboutToDragCursor = qt.PointingHandCursor
 type FavoriteButtonInterface interface {
 	SetChecked(bool)
 	SetToolTips(string, string)
-	Button() *qt.QPushButton
+	QWidget() *qt.QWidget
 }
 
 type ScanPopupAppInterface interface {
@@ -203,16 +203,21 @@ func (p *ScanPopup) init() {
 	prevButton.SetToolTip("Previous result (Alt+Up)")
 	p.prevButton = prevButton
 
-	var favoriteButton FavoriteButtonInterface = favoritebutton.NewTextFavoriteButton(
-		p.conf,
-		p.favoriteButtonClicked,
-		p.conf.ScanPopupHeaderIcons,
-	)
-	favoriteButton.SetToolTips(
+	if p.conf.ScanPopupHeaderIcons {
+		p.favoriteButton = favoritebutton.NewColoredEmojiFavoriteButton(
+			p.conf,
+			p.favoriteButtonClicked,
+		)
+	} else {
+		p.favoriteButton = favoritebutton.NewMinimalFavoriteButton(
+			p.conf,
+			p.favoriteButtonClicked,
+		)
+	}
+	p.favoriteButton.SetToolTips(
 		"Add this term to favorites",
 		"Remove this term from favorites",
 	)
-	p.favoriteButton = favoriteButton
 
 	mainButton := p.newHeaderButton(" main ")
 	mainButton.OnClicked(p.moveToMainWindow)
@@ -246,17 +251,17 @@ func (p *ScanPopup) init() {
 		headerBox.AddWidget2(label.QWidget, 1)
 	}
 
-	for _, button := range []*qt.QPushButton{
-		nextButton,
-		prevButton,
-		favoriteButton.Button(),
-		mainButton,
-		closeButton,
+	for _, button := range []*qt.QWidget{
+		nextButton.QWidget,
+		prevButton.QWidget,
+		p.favoriteButton.QWidget(),
+		mainButton.QWidget,
+		closeButton.QWidget,
 	} {
 		button.SetSizePolicy2(qt.QSizePolicy__Minimum, qt.QSizePolicy__Expanding)
 		button.SetFont(font)
 		button.SetFocusPolicy(qt.NoFocus)
-		headerBox.AddWidget(button.QWidget)
+		headerBox.AddWidget(button)
 	}
 
 	popupLayout.SetContentsMargins(5, 0, 5, 5)

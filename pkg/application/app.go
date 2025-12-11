@@ -286,7 +286,8 @@ func (app *Application) Run(query string) {
 
 	okButton := qt.NewQPushButton3(" OK ")
 
-	app.queryFavoriteButton = favoritebutton.NewFavoriteButton(
+	app.queryFavoriteButton = favoritebutton.NewImageFavoriteButton(
+		conf,
 		app.queryFavoriteButtonClicked,
 	)
 	app.queryFavoriteButton.SetToolTips(
@@ -295,7 +296,8 @@ func (app *Application) Run(query string) {
 	)
 
 	// favoriteButtonVBox := qt.NewQVBoxLayout()
-	app.favoriteButton = favoritebutton.NewFavoriteButton(
+	app.favoriteButton = favoritebutton.NewImageFavoriteButton(
+		conf,
 		app.favoriteButtonClicked,
 	)
 
@@ -316,7 +318,7 @@ func (app *Application) Run(query string) {
 	queryBoxLayout.AddWidget(queryLabel.QWidget)
 	queryBoxLayout.AddWidget(entry.QWidget)
 	queryBoxLayout.AddWidget(searchModeCombo.QWidget)
-	queryBoxLayout.AddWidget(app.queryFavoriteButton.Button().QWidget)
+	queryBoxLayout.AddWidget(app.queryFavoriteButton.QWidget())
 	queryBoxLayout.AddWidget(okButton.QWidget)
 
 	headerLabel := NewHeaderLabel(app.Query)
@@ -331,7 +333,7 @@ func (app *Application) Run(query string) {
 	headerBoxLayout.AddSpacing(basePxHalf)
 	headerBoxLayout.AddWidget3(headerLabel.QWidget, 1, 0)
 	// headerBoxLayout.AddLayout(favoriteButtonVBox, 0)
-	headerBoxLayout.AddWidget3(app.favoriteButton.Button().QWidget, 0, qt.AlignRight)
+	headerBoxLayout.AddWidget3(app.favoriteButton.QWidget(), 0, qt.AlignRight)
 	headerBoxLayout.AddSpacing(int(basePx * 1.5))
 	headerBox.SetSizePolicy2(expanding, qt.QSizePolicy__Minimum)
 
