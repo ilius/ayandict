@@ -38,36 +38,44 @@ func NewColoredEmojiFavoriteButton(
 
 // returns activeColor, inactiveColor
 func getEmojiButtonColors(button *qt.QWidget, activeHue int) (string, string) {
-	bgColor := button.Palette().Color(
+	bg := button.Palette().Color(
 		qt.QPalette__Normal,
 		qt.QPalette__Base,
 	)
-	bgValue := bgColor.Value()
+	fg := button.Palette().Color(
+		qt.QPalette__Normal,
+		qt.QPalette__Text,
+	)
 	slog.Debug(
 		"EmojiFavoriteButton",
-		"bgValue", bgValue,
-		"bgColor", bgColor.ToQVariant().ToString(),
+		"bg.V", bg.Value(),
+		"fg.V", fg.Value(),
+		"bg.L", bg.Lightness(),
+		"fg.L", fg.Lightness(),
+		"bg", bg.ToQVariant().ToString(),
+		"fg", fg.ToQVariant().ToString(),
 	)
-	if bgValue < 128 { // dark theme
+	// "dusk" color scheme: bg.V=127 fg.V=0 bg.L=127 fg.L=0 bg=#7f7f7f fg=#000000
+	if bg.Value() < 130 { // dark BG
 		return hsvString(
 				activeHue,
 				110,
-				255,
+				255-bg.Value()/6,
 			), hsvString(
 				0,
 				0,
-				240,
+				fg.Value()*94/100,
 			)
 	}
-	// light theme
+	// light BG
 	return hsvString(
 			activeHue,
 			100,
-			bgValue*3/4,
+			bg.Value()*3/4,
 		), hsvString(
 			0,
 			0,
-			bgValue/2,
+			bg.Value()/2,
 		)
 }
 
