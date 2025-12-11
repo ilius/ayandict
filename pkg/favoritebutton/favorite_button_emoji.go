@@ -51,7 +51,7 @@ func getEmojiButtonColors(button *qt.QWidget, activeHue int) (string, string) {
 	if bgValue < 128 { // dark theme
 		return hsvString(
 				activeHue,
-				100,
+				110,
 				255,
 			), hsvString(
 				0,
