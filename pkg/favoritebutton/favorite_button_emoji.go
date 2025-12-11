@@ -45,7 +45,7 @@ func getEmojiButtonColors(button *qt.QWidget, activeHue int) (string, string) {
 	)
 	fg := button.Palette().Color(
 		qt.QPalette__Normal,
-		qt.QPalette__Text,
+		qt.QPalette__ButtonText,
 	)
 	slog.Debug(
 		"EmojiFavoriteButton",
