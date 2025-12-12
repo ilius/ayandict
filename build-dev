@@ -6,7 +6,9 @@ export CGO_ENABLED=1
 
 FLAGS=(-ldflags '-s -w' -trimpath)
 
-export GOMAXPROCS=4
-# also can use: go build -p 4
+export GOMAXPROCS=6
+# also can use: go build -p 6
 
 time go build -o ayandict "${FLAGS[@]}" "$@"
+
+date
