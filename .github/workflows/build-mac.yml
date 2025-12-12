@@ -43,7 +43,7 @@ jobs:
         run: |
           brew update >/dev/null
           brew upgrade
-          brew install gcc cmake ninja openssl@3 zlib qt6 pkg-config
+          brew install gcc cmake ninja openssl@3 zlib qt6 pkg-config sevenzip
 
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -53,13 +53,17 @@ jobs:
       - name: Build
         run: CGO_ENABLED=1 CGO_CXXFLAGS=-std=c++17 go build -ldflags '-s -w' -trimpath
 
+      - name: Compress binary with 7zip
+        run: 7zz a ayandict.7z ayandict
+
       - name: CLICK HERE TO DOWNLOAD BINARY
         uses: actions/upload-artifact@v4
         with:
           name: ayandict-mac-arm64-${{ github.sha }}
           if-no-files-found: error
           retention-days: 7
-          path: ayandict
+          path: ayandict.7z
+          compression-level: 0
 
       - name: Upload Go build cache
         uses: actions/upload-artifact@v4
