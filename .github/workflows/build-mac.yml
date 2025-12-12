@@ -56,10 +56,14 @@ jobs:
       - name: Compress binary with 7zip
         run: 7zz a ayandict.7z ayandict
 
+      - name: Set output vars
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: CLICK HERE TO DOWNLOAD BINARY
         uses: actions/upload-artifact@v4
         with:
-          name: ayandict-mac-arm64-${{ github.sha }}
+          name: ayandict-mac-arm64-${{ steps.vars.outputs.sha_short }}
           if-no-files-found: error
           retention-days: 7
           path: ayandict.7z
