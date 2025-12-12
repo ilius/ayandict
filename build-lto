@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+set -x
+
+# both LTO and -linkmode=external disable cache, so it takes a long time
+# -O3 makes the binary %0.3 bigger, not smaller
+
+export CGO_ENABLED=1
+
+export CGO_CFLAGS="-O3 -flto -w"
+export CGO_LDFLAGS="-flto"
+
+export CGO_CPPFLAGS="-O3 -flto -w"
+export CGO_CXXFLAGS="-O3 -flto -w"
+
+LDFLAGS="-s -w -linkmode=external -extldflags='-flto'"
+FLAGS=(-ldflags "$LDFLAGS" -trimpath)
+
+# VERSION=$(go run pkg/version/version.go)
+VERSION=$(git describe --tags)
+
+export GOMAXPROCS=4
+# also can use: go build -p 4
+
+time go build -o ayandict-$VERSION "${FLAGS[@]}" "$@"
+
+date
