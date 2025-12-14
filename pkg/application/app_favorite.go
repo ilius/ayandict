@@ -4,6 +4,7 @@ import qt "github.com/mappu/miqt/qt6"
 
 type FavoriteButtonInterface interface {
 	SetChecked(bool)
+	ToggleChecked() bool
 	SetToolTips(string, string)
 	QWidget() *qt.QWidget
 	Hide()

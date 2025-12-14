@@ -131,6 +131,8 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 			} else {
 				super(event)
 			}
+		case int(qt.Key_F):
+			app.favoriteButtonClicked(app.favoriteButton.ToggleChecked())
 		default:
 			super(event)
 		}
@@ -169,6 +171,8 @@ func (app *Application) onArticleViewKeyPressEvent(super func(event *qt.QKeyEven
 		} else {
 			super(event)
 		}
+	case int(qt.Key_F):
+		app.favoriteButtonClicked(app.favoriteButton.ToggleChecked())
 	default:
 		super(event)
 	}

@@ -32,6 +32,7 @@ var aboutToDragCursor = qt.PointingHandCursor
 
 type FavoriteButtonInterface interface {
 	SetChecked(bool)
+	ToggleChecked() bool
 	SetToolTips(string, string)
 	QWidget() *qt.QWidget
 }
@@ -216,8 +217,8 @@ func (p *ScanPopup) init() {
 		)
 	}
 	p.favoriteButton.SetToolTips(
-		"Add this term to favorites",
-		"Remove this term from favorites",
+		"Add this term to favorites (F)",
+		"Remove this term from favorites (F)",
 	)
 
 	mainButton := p.newHeaderButton(" main ")
@@ -428,6 +429,8 @@ func (p *ScanPopup) onKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
 		} else {
 			p.moveToMainWindow()
 		}
+	case int(qt.Key_F):
+		p.favoriteButtonClicked(p.favoriteButton.ToggleChecked())
 	default:
 		super(event)
 	}
@@ -450,6 +453,8 @@ func (p *ScanPopup) onArticleViewKeyPressEvent(super func(event *qt.QKeyEvent), 
 	case int(qt.Key_F1):
 		p.popup.Close()
 		p.app.ShowAbout()
+	case int(qt.Key_F):
+		p.favoriteButtonClicked(p.favoriteButton.ToggleChecked())
 	default:
 		super(event)
 	}

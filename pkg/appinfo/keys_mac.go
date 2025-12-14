@@ -24,6 +24,8 @@ func init() {
 
 		{"⌘ Ｑ", "", "Quit / exit application"},
 		{"F1", "", "Show About window"},
+		{"F", "", "Add/Remove Favorite"},
+
 		{"Enter", "Scan popup", "Query in main window"},
 	}
 }

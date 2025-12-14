@@ -300,8 +300,8 @@ func (app *Application) Run(query string) {
 	)
 
 	app.favoriteButton.SetToolTips(
-		"Add this term to favorites",
-		"Remove this term from favorites",
+		"Add this term to favorites (F)",
+		"Remove this term from favorites (F)",
 	)
 	app.favoriteButton.Hide()
 	// favoriteButtonVBox.AddWidget(favoriteButton, 0, qt.AlignBottom)
@@ -370,6 +370,7 @@ func (app *Application) Run(query string) {
 	// TODO: save and restore the width of 2 columns
 
 	app.favoritesWidget = qfavorites.NewFavoritesWidget(conf)
+	app.favoritesWidget.SetFocusPolicy(qt.NoFocus)
 	{
 		err := app.favoritesWidget.Load()
 		if err != nil {
