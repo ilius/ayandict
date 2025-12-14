@@ -8,6 +8,7 @@ import (
 
 	common "codeberg.org/ilius/go-dict-commons"
 	commons "codeberg.org/ilius/go-dict-commons"
+	"github.com/ilius/ayandict/v3/pkg/appinfo"
 	"github.com/ilius/ayandict/v3/pkg/articleview"
 	"github.com/ilius/ayandict/v3/pkg/audiocache"
 	"github.com/ilius/ayandict/v3/pkg/config"
@@ -306,6 +307,7 @@ func (p *ScanPopup) outlineHeaderLayout(layout *qt.QLayout) *qt.QWidget {
 }
 
 func (p *ScanPopup) onQueryNoResult(message string, args ...any) {
+	p.headerLabel.SetText(appinfo.APP_DESC)
 	p.articleView.SetHtml(fmt.Sprintf(message, args...))
 	p.nextButton.Hide()
 	p.prevButton.Hide()
