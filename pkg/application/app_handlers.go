@@ -305,5 +305,5 @@ func (app *Application) randomFavoriteClicked() {
 	}
 
 	queryArgs.AddHistoryAndFrequency(term)
-	queryArgs.PostQuery(term)
+	app.postQuery(term)
 }

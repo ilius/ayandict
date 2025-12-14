@@ -487,7 +487,6 @@ func (app *Application) Run(query string) {
 		ResultList:     resultList,
 		HeaderLabel:    headerLabel,
 		HistoryView:    historyView,
-		PostQuery:      app.postQuery,
 		Entry:          entry,
 		ModeCombo:      searchModeCombo,
 		FrequencyTable: frequencyTable,

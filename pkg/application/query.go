@@ -24,7 +24,6 @@ type QueryArgs struct {
 	ResultList     *ResultListWidget
 	HeaderLabel    *HeaderLabel
 	HistoryView    *HistoryView
-	PostQuery      func(string)
 	Entry          *qt.QLineEdit
 	ModeCombo      *qt.QComboBox
 	FrequencyTable *frequencytable.FrequencyTable
@@ -93,7 +92,7 @@ func (app *Application) onQuery(query string, isAuto bool) {
 	if queryArgs.historyOnQuery(isAuto, results) {
 		queryArgs.AddHistoryAndFrequency(query)
 	}
-	queryArgs.PostQuery(query)
+	app.postQuery(query)
 }
 
 func (q *QueryArgs) historyOnQuery(isAuto bool, results []common.SearchResultIface) bool {
