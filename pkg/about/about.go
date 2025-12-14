@@ -7,7 +7,7 @@ import (
 
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
 	"github.com/ilius/ayandict/v3/pkg/resources"
-	"github.com/ilius/ayandict/v3/pkg/resourceutil"
+	"github.com/ilius/ayandict/v3/pkg/resources/resourceutil"
 	"github.com/ilius/ayandict/v3/pkg/utils"
 	qt "github.com/mappu/miqt/qt6"
 )

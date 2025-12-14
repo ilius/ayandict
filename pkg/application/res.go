@@ -2,7 +2,7 @@ package application
 
 import (
 	"github.com/ilius/ayandict/v3/pkg/resources"
-	"github.com/ilius/ayandict/v3/pkg/resourceutil"
+	"github.com/ilius/ayandict/v3/pkg/resources/resourceutil"
 	qt "github.com/mappu/miqt/qt6"
 )
 
