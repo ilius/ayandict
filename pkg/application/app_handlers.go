@@ -23,7 +23,6 @@ func (app *Application) setupHandlers() {
 	app.articleView.OnKeyPressEvent(app.onArticleViewKeyPressEvent)
 
 	entry := app.entry
-	queryArgs := app.queryArgs
 	frequencyTable := app.frequencyTable
 
 	frequencyTable.OnItemActivated(func(item *qt.QTableWidgetItem) {
@@ -44,14 +43,14 @@ func (app *Application) setupHandlers() {
 	app.reloadDictsButton.OnClicked(func() {
 		qdictmgr.InitDicts(conf, true)
 		app.dictManager = nil
-		queryArgs.onQuery(entry.Text(), false)
+		app.onQuery(entry.Text(), false)
 	})
 	app.closeDictsButton.OnClicked(dictmgr.CloseDicts)
 	app.openConfigButton.OnClicked(OpenConfig)
 	app.reloadConfigButton.OnClicked(app.ReloadConfig)
 	app.reloadStyleButton.OnClicked(func() {
 		app.LoadUserStyle()
-		queryArgs.onQuery(entry.Text(), false)
+		app.onQuery(entry.Text(), false)
 	})
 	app.saveHistoryButton.OnClicked(func() {
 		app.historyView.Save()
@@ -204,7 +203,7 @@ func (app *Application) onEntryKeyPress(super func(*qt.QKeyEvent), event *qt.QKe
 		app.window.SetFocus()
 		return
 	case int(qt.Key_Return), int(qt.Key_Enter): // event.Text()="\r"
-		app.queryArgs.onQuery(app.entry.Text(), false)
+		app.onQuery(app.entry.Text(), false)
 		return
 	}
 
@@ -216,7 +215,7 @@ func (app *Application) onEntryKeyPress(super func(*qt.QKeyEvent), event *qt.QKe
 		if int(event.Modifiers())&searchOnTypeNotModifierMask == 0 {
 			text := app.entry.Text()
 			if len(text) >= conf.SearchOnTypeMinLength {
-				app.queryArgs.onQuery(text, true)
+				app.onQuery(text, true)
 			}
 			return
 		}
@@ -268,7 +267,7 @@ func (app *Application) saveFavoritesClicked() {
 
 func (app *Application) dictsButtonClicked() {
 	if app.runDictManager() {
-		app.queryArgs.onQuery(app.entry.Text(), false)
+		app.onQuery(app.entry.Text(), false)
 	}
 }
 

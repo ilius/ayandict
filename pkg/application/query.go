@@ -50,7 +50,8 @@ func (w *QueryArgs) SetNoResult(query string) {
 	w.AddHistoryAndFrequency(query)
 }
 
-func (queryArgs *QueryArgs) onQuery(query string, isAuto bool) {
+func (app *Application) onQuery(query string, isAuto bool) {
+	queryArgs := app.queryArgs
 	if query == "" {
 		if !isAuto {
 			queryArgs.ArticleView.SetHtml("")

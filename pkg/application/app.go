@@ -122,7 +122,7 @@ func (app *Application) IsPopup() bool {
 }
 
 func (app *Application) Query(query string) {
-	app.queryArgs.onQuery(query, false)
+	app.onQuery(query, false)
 	app.entry.SetText(query)
 }
 
@@ -517,7 +517,7 @@ func (app *Application) Run(query string) {
 	app.ReloadFont()
 
 	okButton.OnClicked(func() {
-		app.queryArgs.onQuery(entry.Text(), false)
+		app.onQuery(entry.Text(), false)
 	})
 
 	// --------------------------------------------------
@@ -564,7 +564,7 @@ func (app *Application) setupSettings(mainSplitter *qt.QSplitter) {
 	app.searchModeCombo.OnCurrentIndexChanged(func(i int) {
 		text := app.entry.Text()
 		if text != "" {
-			app.queryArgs.onQuery(text, false)
+			app.onQuery(text, false)
 		}
 		app.mainWindowSettingsChan <- time.Now()
 	})
