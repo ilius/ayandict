@@ -8,12 +8,13 @@ import (
 )
 
 func NewImageFavoriteButton(
-	_ *config.Config,
+	conf *config.Config,
 	onClick func(bool),
 ) *ImageFavoriteButton {
-	activeIcon, err := loadPNGIcon("favorite-green-64.png")
+	filename := conf.FavoriteButtonImage
+	activeIcon, err := loadPNGIcon(filename)
 	if err != nil {
-		slog.Error("error loading icon favorite-green-64.png: " + err.Error())
+		slog.Error("error loading icon " + filename + ": " + err.Error())
 		panic(err)
 	}
 	inactiveIcon, err := loadPNGIcon("favorite-64.png")

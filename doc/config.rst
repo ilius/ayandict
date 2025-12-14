@@ -100,9 +100,15 @@ Maximum size for Most Frequent queries
 
 Default value: ``100``
 
+``favorite_button_image``
+-------------------------
+Image file name for favorite button. Try favorite-blue-64.png for color blindness
+
+Default value: ``"favorite-green-64.png"``
+
 ``favorite_button_hue``
 -----------------------
-Color hue for favorite button (120=green, 240=blue, 0=red)
+Color hue for favorite button in scan popup (120=green, 240=blue, 0=red)
 
 Default value: ``120``
 
