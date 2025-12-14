@@ -44,10 +44,17 @@ func (w *QueryArgs) AddHistoryAndFrequency(query string) {
 	}
 }
 
-func (w *QueryArgs) SetNoResult(query string) {
-	w.ArticleView.SetHtml(fmt.Sprintf("No results for %#v", query))
-	w.HeaderLabel.SetText("")
-	w.AddHistoryAndFrequency(query)
+func (app *Application) SetNoResult(query string) {
+	a := app.queryArgs
+	a.ArticleView.SetHtml(fmt.Sprintf("No results for %#v", query))
+	a.HeaderLabel.SetText("")
+	app.favoriteButton.Hide()
+	a.AddHistoryAndFrequency(query)
+}
+
+func (app *Application) SetResults(results []common.SearchResultIface) {
+	app.queryArgs.ResultsLabel.SetText(fmt.Sprintf("Results: %d", len(results)))
+	app.resultList.SetResults(results)
 }
 
 func (app *Application) onQuery(query string, isAuto bool) {
@@ -77,11 +84,10 @@ func (app *Application) onQuery(query string, isAuto bool) {
 	}
 	results := dictmgr.LookupHTML(query, conf, mode, resultFlags, 0)
 	slog.Debug("LookupHTML running time", "dt", time.Since(t), "query", query)
-	queryArgs.ResultList.SetResults(results)
-	queryArgs.ResultsLabel.SetText(fmt.Sprintf("Results: %d", len(results)))
+	app.SetResults(results)
 	if len(results) == 0 {
 		if !isAuto {
-			queryArgs.SetNoResult(query)
+			app.SetNoResult(query)
 		}
 	}
 	if queryArgs.historyOnQuery(isAuto, results) {

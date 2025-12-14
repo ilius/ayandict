@@ -152,10 +152,6 @@ func (app *Application) postQuery(query string) {
 	app.queryFavoriteButton.SetChecked(app.favoritesWidget.HasFavorite(query))
 }
 
-func (app *Application) OnNoResultDisplay() {
-	app.favoriteButton.Hide()
-}
-
 func (app *Application) OnResultDisplay(terms []string) {
 	app.favoriteButton.Show()
 	app.favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(terms[0]))

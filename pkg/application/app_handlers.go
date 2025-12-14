@@ -1,7 +1,6 @@
 package application
 
 import (
-	"fmt"
 	"log/slog"
 	"time"
 
@@ -278,8 +277,7 @@ func (app *Application) randomEntryClicked() {
 	}
 	query := res.F_Terms[0]
 	app.entry.SetText(query)
-	app.queryArgs.ResultsLabel.SetText("Results: 1")
-	app.queryArgs.ResultList.SetResults([]common.SearchResultIface{res})
+	app.SetResults([]common.SearchResultIface{res})
 	app.queryArgs.AddHistoryAndFrequency(query)
 	app.postQuery(query)
 }
@@ -301,10 +299,9 @@ func (app *Application) randomFavoriteClicked() {
 	}
 	results := dictmgr.LookupHTML(term, conf, mode, resultFlags, 0)
 	slog.Debug("LookupHTML running time", "dt", time.Since(t), "query", term)
-	queryArgs.ResultList.SetResults(results)
-	queryArgs.ResultsLabel.SetText(fmt.Sprintf("Results: %d", len(results)))
+	app.SetResults(results)
 	if len(results) == 0 {
-		queryArgs.SetNoResult(term)
+		app.SetNoResult(term)
 	}
 
 	queryArgs.AddHistoryAndFrequency(term)

@@ -12,7 +12,6 @@ import (
 )
 
 type ResultListAppIface interface {
-	OnNoResultDisplay()
 	OnResultDisplay(terms []string)
 }
 
@@ -61,7 +60,6 @@ func (w *ResultListWidget) SetResults(results []common.SearchResultIface) {
 	w.QListWidget.Clear()
 	w.results = results
 	if len(results) == 0 {
-		w.app.OnNoResultDisplay()
 		return
 	}
 	for _, res := range results {
