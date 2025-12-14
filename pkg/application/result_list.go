@@ -11,17 +11,22 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
+type ResultListAppIface interface {
+	OnNoResultDisplay()
+	OnResultDisplay(terms []string)
+}
+
 func NewResultListWidget(
 	articleView *articleview.ArticleView,
 	headerLabel *HeaderLabel,
-	onResultDisplay func(terms []string),
+	app ResultListAppIface,
 ) *ResultListWidget {
 	widget := qt.NewQListWidget(nil)
 	resultList := &ResultListWidget{
-		QListWidget:     widget,
-		HeaderLabel:     headerLabel,
-		ArticleView:     articleView,
-		onResultDisplay: onResultDisplay,
+		QListWidget: widget,
+		HeaderLabel: headerLabel,
+		ArticleView: articleView,
+		app:         app,
 	}
 	widget.OnCurrentRowChanged(func(row int) {
 		if row < 0 {
@@ -49,12 +54,16 @@ type ResultListWidget struct {
 	HeaderLabel *HeaderLabel
 	ArticleView *articleview.ArticleView
 
-	onResultDisplay func(terms []string)
+	app ResultListAppIface
 }
 
 func (w *ResultListWidget) SetResults(results []common.SearchResultIface) {
 	w.QListWidget.Clear()
 	w.results = results
+	if len(results) == 0 {
+		w.app.OnNoResultDisplay()
+		return
+	}
 	for _, res := range results {
 		if res == nil {
 			slog.Warn("ResultListWidget: SetResults: res == nil")
@@ -79,9 +88,7 @@ func (w *ResultListWidget) SetResults(results []common.SearchResultIface) {
 		}
 		w.AddItem(text)
 	}
-	if len(results) > 0 {
-		w.SetCurrentRow(0)
-	}
+	w.SetCurrentRow(0)
 }
 
 func (w *ResultListWidget) OnActivate(row int) {
@@ -98,7 +105,7 @@ func (w *ResultListWidget) OnActivate(row int) {
 	} else {
 		w.ArticleView.SetSearchPaths([]string{resDir})
 	}
-	w.onResultDisplay(res.Terms())
+	w.app.OnResultDisplay(res.Terms())
 	w.Active = res
 }
 

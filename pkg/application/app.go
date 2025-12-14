@@ -152,7 +152,11 @@ func (app *Application) postQuery(query string) {
 	app.queryFavoriteButton.SetChecked(app.favoritesWidget.HasFavorite(query))
 }
 
-func (app *Application) onResultDisplay(terms []string) {
+func (app *Application) OnNoResultDisplay() {
+	app.favoriteButton.Hide()
+}
+
+func (app *Application) OnResultDisplay(terms []string) {
 	app.favoriteButton.Show()
 	app.favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(terms[0]))
 }
@@ -476,7 +480,7 @@ func (app *Application) Run(query string) {
 	resultList := NewResultListWidget(
 		articleView,
 		headerLabel,
-		app.onResultDisplay,
+		app,
 	)
 	app.resultList = resultList
 	leftPanelLayout.AddWidget(app.resultList.QWidget)
