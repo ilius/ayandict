@@ -309,6 +309,7 @@ func (p *ScanPopup) onQueryNoResult(message string, args ...any) {
 	p.articleView.SetHtml(fmt.Sprintf(message, args...))
 	p.nextButton.Hide()
 	p.prevButton.Hide()
+	p.favoriteButton.QWidget().Hide()
 	p.popup.Show()
 	p.popup.ActivateWindow()
 }
@@ -364,6 +365,7 @@ func (p *ScanPopup) Query(query string) {
 	}
 	p.nextButton.Show()
 	p.prevButton.Show()
+	p.favoriteButton.QWidget().Show()
 	playTimer := p.setResult(res)
 	p.autoResize()
 	if p.conf.ScanPopupHistory {
