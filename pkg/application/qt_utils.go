@@ -8,12 +8,6 @@ type KeyPressIface interface {
 	OnKeyPressEvent(func(func(event *qt.QKeyEvent), *qt.QKeyEvent))
 }
 
-func plaintextFromHTML(htext string) string {
-	doc := qt.NewQTextDocument()
-	doc.SetHtml(htext)
-	return doc.ToPlainText()
-}
-
 // func posStr(pos *qt.QPoint) string {
 // 	if pos == nil {
 // 		return "nil"

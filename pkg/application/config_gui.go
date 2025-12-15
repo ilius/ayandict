@@ -83,7 +83,7 @@ func (app *Application) ReloadConfig() {
 		qdictmgr.InitDicts(conf, true)
 		app.dictManager = nil
 	}
-	app.headerLabel.ReloadConfig()
+	app.headerLabel.SetWordWrap(conf.HeaderWordWrap)
 	app.audioCache.ReloadConfig()
 
 	app.onQuery(app.entry.Text(), false)

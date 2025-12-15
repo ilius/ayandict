@@ -1,10 +1,12 @@
-package application
+package headerlabel
 
 import (
+	"html/template"
 	"log/slog"
 	"strings"
 
 	common "codeberg.org/ilius/go-dict-commons"
+	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/headerlib"
 	"github.com/ilius/ayandict/v3/pkg/utils"
 	qt "github.com/mappu/miqt/qt6"
@@ -18,18 +20,25 @@ type HeaderLabel struct {
 	text string
 
 	doQuery func(string)
+
+	headerTpl *template.Template
 }
 
-func NewHeaderLabel(doQuery func(string)) *HeaderLabel {
+func NewHeaderLabel(
+	conf *config.Config,
+	doQuery func(string),
+	headerTpl *template.Template,
+) *HeaderLabel {
 	qLabel := qt.NewQLabel2()
 	qLabel.SetTextInteractionFlags(qt.TextSelectableByMouse)
 	// | qt.TextSelectableByKeyboard
 	qLabel.SetContentsMargins(0, 0, 0, 0)
 	qLabel.SetTextFormat(qt.RichText)
 	qLabel.SetWordWrap(conf.HeaderWordWrap)
-	qLabel.SetSizePolicy2(expanding, qt.QSizePolicy__Minimum)
+	qLabel.SetSizePolicy2(qt.QSizePolicy__Expanding, qt.QSizePolicy__Minimum)
 	label := &HeaderLabel{
-		QLabel: qLabel,
+		QLabel:    qLabel,
+		headerTpl: headerTpl,
 	}
 	qLabel.OnContextMenuEvent(func(super func(*qt.QContextMenuEvent), event *qt.QContextMenuEvent) {
 		event.Ignore()
@@ -38,10 +47,6 @@ func NewHeaderLabel(doQuery func(string)) *HeaderLabel {
 	})
 	label.doQuery = doQuery
 	return label
-}
-
-func (label *HeaderLabel) ReloadConfig() {
-	label.SetWordWrap(conf.HeaderWordWrap)
 }
 
 func (label *HeaderLabel) SetText(text string) {
@@ -57,7 +62,7 @@ func (label *HeaderLabel) SetText(text string) {
 
 func (label *HeaderLabel) SetResult(res common.SearchResultIface) {
 	label.result = res
-	header, err := headerlib.GetHeader(headerTpl, res, 200)
+	header, err := headerlib.GetHeader(label.headerTpl, res, 200)
 	if err != nil {
 		slog.Error("error formatting header label: " + err.Error())
 		return
@@ -114,4 +119,10 @@ func (label *HeaderLabel) createContextMenu(selection bool) *qt.QMenu {
 	})
 
 	return menu
+}
+
+func plaintextFromHTML(htext string) string {
+	doc := qt.NewQTextDocument()
+	doc.SetHtml(htext)
+	return doc.ToPlainText()
 }

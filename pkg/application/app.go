@@ -17,11 +17,13 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/qdictmgr"
 	"github.com/ilius/ayandict/v3/pkg/favoritebutton"
 	"github.com/ilius/ayandict/v3/pkg/frequencytable"
+	"github.com/ilius/ayandict/v3/pkg/headerlabel"
 	"github.com/ilius/ayandict/v3/pkg/logging"
 	"github.com/ilius/ayandict/v3/pkg/qfavorites"
 	"github.com/ilius/ayandict/v3/pkg/qlocalserver"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
+	"github.com/ilius/ayandict/v3/pkg/resultlist"
 	"github.com/ilius/ayandict/v3/pkg/utils"
 	"github.com/ilius/ayandict/v3/pkg/webclient"
 	"github.com/ilius/ayandict/v3/pkg/webserver"
@@ -68,9 +70,9 @@ type Application struct {
 	dictManager *qdictmgr.DictManager
 
 	queryArgs       *QueryArgs
-	headerLabel     *HeaderLabel
+	headerLabel     *headerlabel.HeaderLabel
 	articleView     *articleview.ArticleView
-	resultList      *ResultListWidget
+	resultList      *resultlist.ResultListWidget
 	historyView     *HistoryView
 	entry           *qt.QLineEdit
 	searchModeCombo *qt.QComboBox
@@ -319,7 +321,7 @@ func (app *Application) Run(query string) {
 	queryBoxLayout.AddWidget(app.queryFavoriteButton.QWidget())
 	queryBoxLayout.AddWidget(okButton.QWidget)
 
-	headerLabel := NewHeaderLabel(app.Query)
+	headerLabel := headerlabel.NewHeaderLabel(conf, app.Query, headerTpl)
 	app.headerLabel = headerLabel
 	app.headerLabel.SetAlignment(qt.AlignLeft)
 
@@ -474,7 +476,7 @@ func (app *Application) Run(query string) {
 	leftPanelLayout := qt.NewQVBoxLayout(leftPanel)
 	resultsLabel := qt.NewQLabel3("Results")
 	leftPanelLayout.AddWidget(resultsLabel.QWidget)
-	resultList := NewResultListWidget(
+	resultList := resultlist.NewResultListWidget(
 		articleView,
 		headerLabel,
 		app,

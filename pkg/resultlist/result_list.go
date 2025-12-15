@@ -1,4 +1,4 @@
-package application
+package resultlist
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v3/pkg/articleview"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
+	"github.com/ilius/ayandict/v3/pkg/headerlabel"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -17,7 +18,7 @@ type ResultListAppIface interface {
 
 func NewResultListWidget(
 	articleView *articleview.ArticleView,
-	headerLabel *HeaderLabel,
+	headerLabel *headerlabel.HeaderLabel,
 	app ResultListAppIface,
 ) *ResultListWidget {
 	widget := qt.NewQListWidget(nil)
@@ -50,7 +51,7 @@ type ResultListWidget struct {
 
 	Active common.SearchResultIface
 
-	HeaderLabel *HeaderLabel
+	HeaderLabel *headerlabel.HeaderLabel
 	ArticleView *articleview.ArticleView
 
 	app ResultListAppIface
