@@ -12,6 +12,7 @@ import (
 
 type ApplicationIface interface {
 	OnResultDisplay(terms []string)
+	HasFavorite(term string) bool
 }
 
 type HeaderLabelIface interface {
@@ -91,6 +92,9 @@ func (w *ResultListWidget) SetResults(results []common.SearchResultIface) {
 		symbol := dictmgr.DictSymbol(res.DictName())
 		if symbol != "" {
 			text = fmt.Sprintf("%s %s", text, symbol)
+		}
+		if w.app.HasFavorite(terms[0]) {
+			text += " ★"
 		}
 		w.AddItem(text)
 	}
