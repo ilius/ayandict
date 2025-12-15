@@ -6,20 +6,27 @@ import (
 	"strings"
 
 	common "codeberg.org/ilius/go-dict-commons"
-	"github.com/ilius/ayandict/v3/pkg/articleview"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
-	"github.com/ilius/ayandict/v3/pkg/headerlabel"
 	qt "github.com/mappu/miqt/qt6"
 )
 
-type ResultListAppIface interface {
+type ApplicationIface interface {
 	OnResultDisplay(terms []string)
 }
 
+type HeaderLabelIface interface {
+	SetResult(common.SearchResultIface)
+}
+
+type ArticleViewIface interface {
+	SetResult(common.SearchResultIface)
+	SetSearchPaths([]string)
+}
+
 func NewResultListWidget(
-	articleView *articleview.ArticleView,
-	headerLabel *headerlabel.HeaderLabel,
-	app ResultListAppIface,
+	articleView ArticleViewIface,
+	headerLabel HeaderLabelIface,
+	app ApplicationIface,
 ) *ResultListWidget {
 	widget := qt.NewQListWidget(nil)
 	resultList := &ResultListWidget{
@@ -51,10 +58,10 @@ type ResultListWidget struct {
 
 	Active common.SearchResultIface
 
-	HeaderLabel *headerlabel.HeaderLabel
-	ArticleView *articleview.ArticleView
+	HeaderLabel HeaderLabelIface
+	ArticleView ArticleViewIface
 
-	app ResultListAppIface
+	app ApplicationIface
 }
 
 func (w *ResultListWidget) SetResults(results []common.SearchResultIface) {
