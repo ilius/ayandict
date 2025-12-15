@@ -101,6 +101,12 @@ func (w *ResultListWidget) SetResults(results []common.SearchResultIface) {
 	w.SetCurrentRow(0)
 }
 
+func (w *ResultListWidget) ReloadList() {
+	row := w.CurrentRow()
+	w.SetResults(w.results)
+	w.SetCurrentRow(row)
+}
+
 func (w *ResultListWidget) OnActivate(row int) {
 	if row >= len(w.results) {
 		slog.Error("ResultListWidget: OnActivate: row index out of range", "row", row)
