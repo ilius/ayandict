@@ -390,22 +390,27 @@ func (app *Application) Run() {
 	}
 	app.dictsButton = app.newIconTextButton(dictsButtonLabel, widgets.QStyle__SP_FileDialogDetailedView)
 	buttonBox.AddWidget(app.dictsButton, 0, core.Qt__AlignLeft)
+	app.dictsButton.SetToolTip("Manage dictionaries")
 
 	aboutButton := app.makeAboutButton(conf)
 	buttonBox.AddWidget(aboutButton, 0, core.Qt__AlignLeft)
+	aboutButton.SetToolTip("Show About window")
 
 	buttonBox.AddStretch(1)
 
 	app.openConfigButton = NewPNGIconTextButton("Config", "preferences-system-22.png")
 	buttonBox.AddWidget(app.openConfigButton, 0, 0)
+	app.openConfigButton.SetToolTip("Open config file in your default editor")
 
 	app.reloadConfigButton = app.newIconTextButton("Reload", widgets.QStyle__SP_BrowserReload)
 	buttonBox.AddWidget(app.reloadConfigButton, 0, 0)
+	app.reloadConfigButton.SetToolTip("Reload config file")
 
 	buttonBox.AddStretch(1)
 
 	app.clearButton = widgets.NewQPushButton2(" Clear ", nil)
 	buttonBox.AddWidget(app.clearButton, 0, core.Qt__AlignRight)
+	app.clearButton.SetToolTip("Clear query and results")
 
 	leftMainWidget := widgets.NewQWidget(nil, 0)
 	leftMainLayout := widgets.NewQVBoxLayout2(leftMainWidget)
