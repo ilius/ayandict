@@ -418,21 +418,9 @@ Show Save Favorites button
 
 Default value: ``true``
 
-``misc_buttons.reload_dicts``
------------------------------
-Show Reload Dicts button
-
-Default value: ``true``
-
 ``misc_buttons.close_dicts``
 ----------------------------
 Show Close Dicts button
-
-Default value: ``true``
-
-``misc_buttons.reload_style``
------------------------------
-Show Reload Style button
 
 Default value: ``true``
 
