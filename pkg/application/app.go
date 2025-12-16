@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"runtime"
 	"sync/atomic"
 	"time"
 
@@ -32,6 +33,8 @@ import (
 )
 
 const s_Soundex = "Soundex"
+
+var isMac = runtime.GOOS == "darwin"
 
 var searchModes = []string{
 	"Fuzzy",
@@ -448,10 +451,15 @@ func (app *Application) Run(query string) {
 	buttonBox.AddStretch()
 
 	app.clearButton = qt.NewQPushButton3("Clear")
-	app.clearButton.SetToolTip(
-		"Clear query and results" +
+	if isMac {
+		app.clearButton.SetToolTip("Clear query and results" +
+			"\nHold Command to also clear history",
+		)
+	} else {
+		app.clearButton.SetToolTip("Clear query and results" +
 			"\nHold Ctrl to also clear history",
-	)
+		)
+	}
 	buttonBox.AddWidget3(app.clearButton.QWidget, 0, qt.AlignRight)
 
 	leftMainWidget := qt.NewQWidget(nil)
