@@ -90,7 +90,6 @@ type Application struct {
 
 	favoriteButton       FavoriteButtonInterface
 	queryFavoriteButton  FavoriteButtonInterface
-	closeDictsButton     *qt.QPushButton
 	openConfigButton     *qt.QPushButton
 	reloadButton         *qt.QPushButton
 	saveHistoryButton    *qt.QPushButton
@@ -401,9 +400,6 @@ func (app *Application) Run(query string) {
 	app.saveFavoritesButton = qt.NewQPushButton3("Save Favorites")
 	miscLayout.AddWidget(app.saveFavoritesButton.QWidget)
 
-	app.closeDictsButton = qt.NewQPushButton3("Close Dicts")
-	miscLayout.AddWidget(app.closeDictsButton.QWidget)
-
 	app.randomEntryButton = qt.NewQPushButton3("Random Entry")
 	miscLayout.AddWidget(app.randomEntryButton.QWidget)
 
@@ -599,7 +595,6 @@ func (app *Application) updateMiscButtonsVisibility() {
 	app.saveHistoryButton.SetVisible(conf.MiscButtons.SaveHistory)
 	app.clearHistoryButton.SetVisible(conf.MiscButtons.ClearHistory)
 	app.saveFavoritesButton.SetVisible(conf.MiscButtons.SaveFavorites)
-	app.closeDictsButton.SetVisible(conf.MiscButtons.CloseDicts)
 	app.randomEntryButton.SetVisible(conf.MiscButtons.RandomEntry)
 	app.randomFavoriteButton.SetVisible(conf.MiscButtons.RandomFavorite)
 }
@@ -611,7 +606,6 @@ func (app *Application) updateMiscButtonsPadding() {
 	app.saveHistoryButton.SetStyleSheet(stylesheet)
 	app.clearHistoryButton.SetStyleSheet(stylesheet)
 	app.saveFavoritesButton.SetStyleSheet(stylesheet)
-	app.closeDictsButton.SetStyleSheet(stylesheet)
 	app.randomEntryButton.SetStyleSheet(stylesheet)
 	app.randomFavoriteButton.SetStyleSheet(stylesheet)
 }

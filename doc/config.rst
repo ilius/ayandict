@@ -418,12 +418,6 @@ Show Save Favorites button
 
 Default value: ``true``
 
-``misc_buttons.close_dicts``
-----------------------------
-Show Close Dicts button
-
-Default value: ``true``
-
 ``misc_buttons.random_entry``
 -----------------------------
 Show Random Entry button

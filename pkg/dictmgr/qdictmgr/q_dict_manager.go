@@ -8,6 +8,7 @@ import (
 
 	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v3/pkg/config"
+	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/internal/dicts"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
@@ -315,6 +316,12 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 		icon := style.StandardIcon(qt.QStyle__SP_DirOpenIcon, tbOpt.QStyleOption, nil)
 		action := toolbar.AddAction2(icon, "Open Directories")
 		action.OnTriggered(func() { dm.openFolder(conf) })
+	}
+	_ = toolbar.AddSeparator()
+	{
+		icon := style.StandardIcon(qt.QStyle__SP_DialogCloseButton, tbOpt.QStyleOption, nil)
+		action := toolbar.AddAction2(icon, "Close All Dictionaries")
+		action.OnTriggered(dictmgr.CloseDicts)
 	}
 
 	table.OnCurrentCellChanged(func(row, column, prevRow, prevColumn int) {

@@ -39,7 +39,6 @@ func (app *Application) setupHandlers() {
 		app.Query(item.Text())
 	})
 
-	app.closeDictsButton.OnClicked(dictmgr.CloseDicts)
 	app.openConfigButton.OnClicked(OpenConfig)
 	app.reloadButton.OnClicked(app.reloadButtonClicked)
 	app.saveHistoryButton.OnClicked(func() {
