@@ -39,11 +39,6 @@ func (app *Application) setupHandlers() {
 		app.Query(item.Text())
 	})
 
-	app.reloadDictsButton.OnClicked(func() {
-		qdictmgr.InitDicts(conf, true)
-		app.dictManager = nil
-		app.onQuery(entry.Text(), false)
-	})
 	app.closeDictsButton.OnClicked(dictmgr.CloseDicts)
 	app.openConfigButton.OnClicked(OpenConfig)
 	app.reloadButton.OnClicked(app.reloadButtonClicked)

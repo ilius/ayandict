@@ -33,7 +33,6 @@ type MiscButtonsConfig struct {
 	SaveHistory    bool `toml:"save_history" doc:"Show Save History button"`
 	ClearHistory   bool `toml:"clear_history" doc:"Show Clear History button"`
 	SaveFavorites  bool `toml:"save_favorites" doc:"Show Save Favorites button"`
-	ReloadDicts    bool `toml:"reload_dicts" doc:"Show Reload Dicts button"`
 	CloseDicts     bool `toml:"close_dicts" doc:"Show Close Dicts button"`
 	ReloadStyle    bool `toml:"reload_style" doc:"Show Reload Style button"`
 	RandomEntry    bool `toml:"random_entry" doc:"Show Random Entry button"`
@@ -179,7 +178,6 @@ func Default() *Config {
 			SaveHistory:    true,
 			ClearHistory:   true,
 			SaveFavorites:  true,
-			ReloadDicts:    true,
 			CloseDicts:     true,
 			ReloadStyle:    true,
 			RandomEntry:    true,
