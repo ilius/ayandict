@@ -76,6 +76,8 @@ func NewDictManager(
 	volumeInput := widgets.NewQSpinBox(nil)
 	toolbar := widgets.NewQToolBar2(nil)
 
+	table.SetSelectionMode(widgets.QAbstractItemView__SingleSelection)
+
 	buttonBox := widgets.NewQDialogButtonBox(nil)
 	okButton := buttonBox.AddButton2("OK", widgets.QDialogButtonBox__AcceptRole)
 	cancelButton := buttonBox.AddButton2("Cancel", widgets.QDialogButtonBox__RejectRole)
