@@ -37,6 +37,8 @@ type DictManager struct {
 
 	app *qt.QApplication
 
+	conf *config.Config
+
 	toolbar   *qt.QToolBar
 	buttonBox *qt.QDialogButtonBox
 }
@@ -86,10 +88,11 @@ func NewDictManager(
 		},
 		infoMap:   infoMap,
 		app:       app,
+		conf:      conf,
 		toolbar:   toolbar,
 		buttonBox: buttonBox,
 	}
-	dictMgr.prepareWidgets(conf)
+	dictMgr.prepareWidgets()
 	return dictMgr
 }
 
@@ -197,13 +200,13 @@ func (dm *DictManager) openInfoFile() {
 	_ = qt.QDesktopServices_OpenUrl(url)
 }
 
-func (dm *DictManager) openFolder(conf *config.Config) {
+func (dm *DictManager) openFolder() {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		slog.Error("error in os.UserHomeDir: " + err.Error())
 		return
 	}
-	for _, p := range conf.DirectoryList {
+	for _, p := range dm.conf.DirectoryList {
 		if !filepath.IsAbs(p) {
 			p = filepath.Join(homeDir, p)
 		}
@@ -214,13 +217,8 @@ func (dm *DictManager) openFolder(conf *config.Config) {
 	}
 }
 
-func (dm *DictManager) prepareWidgets(conf *config.Config) {
-	var selectedDictSettings *dicts.DictionarySettings
-
+func (dm *DictManager) setupTableColumns() {
 	table := dm.TableWidget
-	volumeInput := dm.VolumeInput
-
-	table.SetColumnCount(columns)
 
 	table.SetHorizontalHeaderItem(
 		dm_col_enable,
@@ -250,6 +248,17 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 	header.SetSectionResizeMode2(dm_col_entries, qt.QHeaderView__ResizeToContents)
 	header.SetSectionResizeMode2(dm_col_dictName, qt.QHeaderView__Stretch)
 	header.ResizeSections(qt.QHeaderView__ResizeToContents)
+}
+
+func (dm *DictManager) prepareWidgets() {
+	var selectedDictSettings *dicts.DictionarySettings
+
+	table := dm.TableWidget
+	volumeInput := dm.VolumeInput
+
+	table.SetColumnCount(columns)
+
+	dm.setupTableColumns()
 
 	extraOptionsWidget := qt.NewQWidget2()
 	extraOptionsVBox := qt.NewQVBoxLayout2()
@@ -315,7 +324,13 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 	{
 		icon := style.StandardIcon(qt.QStyle__SP_DirOpenIcon, tbOpt.QStyleOption, nil)
 		action := toolbar.AddAction2(icon, "Open Directories")
-		action.OnTriggered(func() { dm.openFolder(conf) })
+		action.OnTriggered(dm.openFolder)
+	}
+	_ = toolbar.AddSeparator()
+	{
+		icon := style.StandardIcon(qt.QStyle__SP_BrowserReload, tbOpt.QStyleOption, nil)
+		action := toolbar.AddAction2(icon, "Reload Dictionaries")
+		action.OnTriggered(dm.reloadDictsClicked)
 	}
 	_ = toolbar.AddSeparator()
 	{
@@ -345,6 +360,13 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 	mainBox.AddLayout2(mainHBox.Layout(), 1)
 	mainBox.AddWidget(dm.buttonBox.QWidget)
 
+	dm.addTableItems()
+
+	qsettings.SetupWindowGeometrySave(dm.Dialog, QS_dictManager)
+}
+
+func (dm *DictManager) addTableItems() {
+	table := dm.TableWidget
 	table.SetRowCount(len(dicts.DictList))
 	for index, dic := range dicts.DictList {
 		dictName := dic.DictName()
@@ -357,8 +379,14 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 		}
 		dm.setItem(index, dictName, ds)
 	}
+}
 
-	qsettings.SetupWindowGeometrySave(dm.Dialog, QS_dictManager)
+func (dm *DictManager) reloadDictsClicked() {
+	slog.Info("Reloading dictionaries")
+	InitDicts(dm.conf, true)
+	dm.TableWidget.Clear()
+	dm.setupTableColumns()
+	dm.addTableItems()
 }
 
 // updates global var dictSettingsMap
