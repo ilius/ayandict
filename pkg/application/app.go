@@ -429,17 +429,21 @@ func (app *Application) Run(query string) {
 	}
 	app.dictsButton = app.newIconTextButton(dictsButtonLabel, qt.QStyle__SP_FileDialogDetailedView)
 	buttonBox.AddWidget3(app.dictsButton.QWidget, 0, qt.AlignLeft)
+	app.dictsButton.SetToolTip("Manage dictionaries")
 
 	aboutButton := app.makeAboutButton(conf)
 	buttonBox.AddWidget3(aboutButton.QWidget, 0, qt.AlignLeft)
+	aboutButton.SetToolTip("Show About window")
 
 	buttonBox.AddStretch()
 
 	app.openConfigButton = NewPNGIconTextButton("Config", "preferences-system-22.png")
 	buttonBox.AddWidget3(app.openConfigButton.QWidget, 0, 0)
+	app.openConfigButton.SetToolTip("Open config file in your default editor")
 
 	app.reloadConfigButton = app.newIconTextButton("Reload", qt.QStyle__SP_BrowserReload)
 	buttonBox.AddWidget3(app.reloadConfigButton.QWidget, 0, 0)
+	app.reloadConfigButton.SetToolTip("Reload config file")
 
 	buttonBox.AddStretch()
 
