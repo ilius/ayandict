@@ -34,7 +34,13 @@ import (
 
 const s_Soundex = "Soundex"
 
-var isMac = runtime.GOOS == "darwin"
+var sCtrl = "Ctrl"
+
+func init() {
+	if runtime.GOOS == "darwin" {
+		sCtrl = "Command"
+	}
+}
 
 var searchModes = []string{
 	"Fuzzy",
@@ -435,26 +441,17 @@ func (app *Application) Run(query string) {
 
 	app.reloadButton = app.newIconTextButton("Reload", qt.QStyle__SP_BrowserReload)
 	buttonBox.AddWidget3(app.reloadButton.QWidget, 0, 0)
-	if isMac {
-		app.reloadButton.SetToolTip("Reload config file" +
-			"\nHold Command to also reload dictionaries and style")
-	} else {
-		app.reloadButton.SetToolTip("Reload config file" +
-			"\nHold Ctrl to also reload dictionaries and style")
-	}
+	app.reloadButton.SetToolTip("Reload config file" +
+		"\nHold " + sCtrl + " to also reload dictionaries and style" +
+		"\nHold Shift to reload config and style",
+	)
 
 	buttonBox.AddStretch()
 
 	app.clearButton = qt.NewQPushButton3("Clear")
-	if isMac {
-		app.clearButton.SetToolTip("Clear query and results" +
-			"\nHold Command to also clear history",
-		)
-	} else {
-		app.clearButton.SetToolTip("Clear query and results" +
-			"\nHold Ctrl to also clear history",
-		)
-	}
+	app.clearButton.SetToolTip("Clear query and results" +
+		"\nHold " + sCtrl + " to also clear history",
+	)
 	buttonBox.AddWidget3(app.clearButton.QWidget, 0, qt.AlignRight)
 
 	leftMainWidget := qt.NewQWidget(nil)
@@ -530,7 +527,7 @@ func (app *Application) Run(query string) {
 
 	qt.QApplication_SetFont(qtcommon.ConfigFont(conf))
 
-	app.ReloadFont()
+	app.reloadFont()
 
 	okButton.OnClicked(func() {
 		app.onQuery(entry.Text(), false)

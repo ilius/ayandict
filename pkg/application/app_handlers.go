@@ -315,13 +315,19 @@ func (app *Application) clearButtonClicked() {
 }
 
 func (app *Application) reloadButtonClicked() {
-	app.ReloadConfig()
-	if qt.QGuiApplication_KeyboardModifiers()&qt.ControlModifier != 0 {
+	app.reloadConfig()
+	modifiers := qt.QGuiApplication_KeyboardModifiers()
+	if modifiers == 0 {
+		return
+	}
+	if modifiers&qt.ControlModifier != 0 {
 		slog.Info("Reloading dictionaries")
 		qdictmgr.InitDicts(conf, true)
 		app.dictManager = nil
+	}
+	if modifiers&(qt.ControlModifier|qt.ShiftModifier) != 0 {
 		slog.Info("Reloading user style")
 		app.LoadUserStyle()
-		app.onQuery(app.entry.Text(), false)
 	}
+	app.onQuery(app.entry.Text(), false)
 }

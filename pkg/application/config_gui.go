@@ -53,7 +53,7 @@ func shouldReloadDicts(currentList []string, newList []string) bool {
 	return !reflect.DeepEqual(newList, currentList)
 }
 
-func (app *Application) ReloadFont() {
+func (app *Application) reloadFont() {
 	font := qtcommon.ConfigFont(conf)
 	// app.SetFont only applies to future widgets (DictManager for example)
 	qt.QApplication_SetFont(font)
@@ -62,7 +62,7 @@ func (app *Application) ReloadFont() {
 	}
 }
 
-func (app *Application) ReloadConfig() {
+func (app *Application) reloadConfig() {
 	slog.Info("Reloading config")
 	currentDirList := conf.DirectoryList
 	fontFamily := conf.FontFamily
@@ -73,7 +73,7 @@ func (app *Application) ReloadConfig() {
 	}
 
 	if conf.FontFamily != fontFamily || conf.FontSize != fontSize {
-		app.ReloadFont()
+		app.reloadFont()
 	}
 	app.articleView.LoadUserStyle()
 
@@ -86,8 +86,6 @@ func (app *Application) ReloadConfig() {
 	}
 	app.headerLabel.SetWordWrap(conf.HeaderWordWrap)
 	app.audioCache.ReloadConfig()
-
-	app.onQuery(app.entry.Text(), false)
 
 	app.updateMiscButtonsVisibility()
 	app.updateMiscButtonsPadding()
