@@ -10,9 +10,7 @@ import (
 
 func NewFavoritesWidget(conf *config.Config) *FavoritesWidget {
 	widget := qt.NewQListWidget(nil)
-	widget.OnItemClicked(func(item *qt.QListWidgetItem) {
-		widget.ItemActivated(item)
-	})
+	widget.OnItemClicked(widget.ItemActivated)
 	return &FavoritesWidget{
 		QListWidget: widget,
 		Data: &favorites.Favorites{
