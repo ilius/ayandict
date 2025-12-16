@@ -87,7 +87,7 @@ type Application struct {
 	reloadDictsButton    *qt.QPushButton
 	closeDictsButton     *qt.QPushButton
 	openConfigButton     *qt.QPushButton
-	reloadConfigButton   *qt.QPushButton
+	reloadButton         *qt.QPushButton
 	reloadStyleButton    *qt.QPushButton
 	saveHistoryButton    *qt.QPushButton
 	randomEntryButton    *qt.QPushButton
@@ -136,13 +136,6 @@ func (app *Application) runDictManager() bool {
 		app.dictManager = qdictmgr.NewDictManager(app.QApplication, app.window.QWidget, conf)
 	}
 	return app.dictManager.Run()
-}
-
-func (app *Application) clearButtonClicked() {
-	if qt.QGuiApplication_KeyboardModifiers()&qt.ControlModifier != 0 {
-		app.clearHistoryClicked()
-	}
-	app.resetQuery()
 }
 
 func (app *Application) resetQuery() {
@@ -444,9 +437,15 @@ func (app *Application) Run(query string) {
 	buttonBox.AddWidget3(app.openConfigButton.QWidget, 0, 0)
 	app.openConfigButton.SetToolTip("Open config file in your default editor")
 
-	app.reloadConfigButton = app.newIconTextButton("Reload", qt.QStyle__SP_BrowserReload)
-	buttonBox.AddWidget3(app.reloadConfigButton.QWidget, 0, 0)
-	app.reloadConfigButton.SetToolTip("Reload config file")
+	app.reloadButton = app.newIconTextButton("Reload", qt.QStyle__SP_BrowserReload)
+	buttonBox.AddWidget3(app.reloadButton.QWidget, 0, 0)
+	if isMac {
+		app.reloadButton.SetToolTip("Reload config file" +
+			"\nHold Command to also reload dictionaries and style")
+	} else {
+		app.reloadButton.SetToolTip("Reload config file" +
+			"\nHold Ctrl to also reload dictionaries and style")
+	}
 
 	buttonBox.AddStretch()
 

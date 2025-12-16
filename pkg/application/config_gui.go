@@ -63,6 +63,7 @@ func (app *Application) ReloadFont() {
 }
 
 func (app *Application) ReloadConfig() {
+	slog.Info("Reloading config")
 	currentDirList := conf.DirectoryList
 	fontFamily := conf.FontFamily
 	fontSize := conf.FontSize

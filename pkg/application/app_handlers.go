@@ -46,7 +46,7 @@ func (app *Application) setupHandlers() {
 	})
 	app.closeDictsButton.OnClicked(dictmgr.CloseDicts)
 	app.openConfigButton.OnClicked(OpenConfig)
-	app.reloadConfigButton.OnClicked(app.ReloadConfig)
+	app.reloadButton.OnClicked(app.reloadButtonClicked)
 	app.reloadStyleButton.OnClicked(func() {
 		app.LoadUserStyle()
 		app.onQuery(entry.Text(), false)
@@ -310,4 +310,23 @@ func (app *Application) randomFavoriteClicked() {
 
 	queryArgs.AddHistoryAndFrequency(term)
 	app.postQuery(term)
+}
+
+func (app *Application) clearButtonClicked() {
+	if qt.QGuiApplication_KeyboardModifiers()&qt.ControlModifier != 0 {
+		app.clearHistoryClicked()
+	}
+	app.resetQuery()
+}
+
+func (app *Application) reloadButtonClicked() {
+	app.ReloadConfig()
+	if qt.QGuiApplication_KeyboardModifiers()&qt.ControlModifier != 0 {
+		slog.Info("Reloading dictionaries")
+		qdictmgr.InitDicts(conf, true)
+		app.dictManager = nil
+		slog.Info("Reloading user style")
+		app.LoadUserStyle()
+		app.onQuery(app.entry.Text(), false)
+	}
 }
