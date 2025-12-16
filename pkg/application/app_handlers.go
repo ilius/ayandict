@@ -42,10 +42,6 @@ func (app *Application) setupHandlers() {
 	app.closeDictsButton.OnClicked(dictmgr.CloseDicts)
 	app.openConfigButton.OnClicked(OpenConfig)
 	app.reloadButton.OnClicked(app.reloadButtonClicked)
-	app.reloadStyleButton.OnClicked(func() {
-		app.LoadUserStyle()
-		app.onQuery(entry.Text(), false)
-	})
 	app.saveHistoryButton.OnClicked(func() {
 		app.historyView.Save()
 		frequencyTable.SaveNoError()

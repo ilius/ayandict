@@ -34,7 +34,6 @@ type MiscButtonsConfig struct {
 	ClearHistory   bool `toml:"clear_history" doc:"Show Clear History button"`
 	SaveFavorites  bool `toml:"save_favorites" doc:"Show Save Favorites button"`
 	CloseDicts     bool `toml:"close_dicts" doc:"Show Close Dicts button"`
-	ReloadStyle    bool `toml:"reload_style" doc:"Show Reload Style button"`
 	RandomEntry    bool `toml:"random_entry" doc:"Show Random Entry button"`
 	RandomFavorite bool `toml:"random_favorite" doc:"Show Random Favorite button"`
 }
@@ -179,7 +178,6 @@ func Default() *Config {
 			ClearHistory:   true,
 			SaveFavorites:  true,
 			CloseDicts:     true,
-			ReloadStyle:    true,
 			RandomEntry:    true,
 			RandomFavorite: true,
 		},
