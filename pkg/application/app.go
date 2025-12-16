@@ -135,6 +135,13 @@ func (app *Application) runDictManager() bool {
 	return app.dictManager.Run()
 }
 
+func (app *Application) clearButtonClicked() {
+	if qt.QGuiApplication_KeyboardModifiers()&qt.ControlModifier != 0 {
+		app.clearHistoryClicked()
+	}
+	app.resetQuery()
+}
+
 func (app *Application) resetQuery() {
 	app.entry.SetText("")
 	app.queryArgs.ResultsLabel.SetText("Results")
@@ -437,6 +444,10 @@ func (app *Application) Run(query string) {
 	buttonBox.AddStretch()
 
 	app.clearButton = qt.NewQPushButton3("Clear")
+	app.clearButton.SetToolTip(
+		"Clear query and results" +
+			"\nHold Ctrl to also clear history",
+	)
 	buttonBox.AddWidget3(app.clearButton.QWidget, 0, qt.AlignRight)
 
 	leftMainWidget := qt.NewQWidget(nil)

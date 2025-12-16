@@ -57,7 +57,7 @@ func (app *Application) setupHandlers() {
 	})
 	app.clearHistoryButton.OnClicked(app.clearHistoryClicked)
 	app.saveFavoritesButton.OnClicked(app.saveFavoritesClicked)
-	app.clearButton.OnClicked(app.resetQuery)
+	app.clearButton.OnClicked(app.clearButtonClicked)
 	app.dictsButton.OnClicked(app.dictsButtonClicked)
 	app.randomEntryButton.OnClicked(app.randomEntryClicked)
 	app.randomFavoriteButton.OnClicked(app.randomFavoriteClicked)
