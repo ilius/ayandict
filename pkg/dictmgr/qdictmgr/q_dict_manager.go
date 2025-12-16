@@ -23,11 +23,6 @@ const (
 	dm_col_entries  = 3
 	dm_col_dictName = 4
 
-	dictManager_up       = "Up"
-	dictManager_down     = "Down"
-	dictManager_openInfo = "Open Info File"
-	dictManager_openDirs = "Open Directories"
-
 	columns = 5
 )
 
@@ -297,38 +292,30 @@ func (dm *DictManager) prepareWidgets(conf *config.Config) {
 	style := qt.QApplication_Style()
 	tbOpt := qt.NewQStyleOptionToolBar()
 	toolbar.SetIconSize(qt.NewQSize2(48, 48))
+
 	{
 		icon := style.StandardIcon(qt.QStyle__SP_ArrowUp, tbOpt.QStyleOption, nil)
-		_ = toolbar.AddAction2(icon, dictManager_up)
+		action := toolbar.AddAction2(icon, "Up")
+		action.OnTriggered(dm.toolbarUp)
 	}
 	_ = toolbar.AddSeparator()
 	{
 		icon := style.StandardIcon(qt.QStyle__SP_ArrowDown, tbOpt.QStyleOption, nil)
-		_ = toolbar.AddAction2(icon, dictManager_down)
+		action := toolbar.AddAction2(icon, "Down")
+		action.OnTriggered(dm.toolbarDown)
 	}
 	_ = toolbar.AddSeparator()
 	{
 		icon := style.StandardIcon(qt.QStyle__SP_FileIcon, tbOpt.QStyleOption, nil)
-		_ = toolbar.AddAction2(icon, dictManager_openInfo)
+		action := toolbar.AddAction2(icon, "Open Info File")
+		action.OnTriggered(dm.openInfoFile)
 	}
 	_ = toolbar.AddSeparator()
 	{
 		icon := style.StandardIcon(qt.QStyle__SP_DirOpenIcon, tbOpt.QStyleOption, nil)
-		_ = toolbar.AddAction2(icon, dictManager_openDirs)
+		action := toolbar.AddAction2(icon, "Open Directories")
+		action.OnTriggered(func() { dm.openFolder(conf) })
 	}
-
-	toolbar.OnActionTriggered(func(action *qt.QAction) {
-		switch action.Text() {
-		case dictManager_up:
-			dm.toolbarUp()
-		case dictManager_down:
-			dm.toolbarDown()
-		case dictManager_openInfo:
-			dm.openInfoFile()
-		case dictManager_openDirs:
-			dm.openFolder(conf)
-		}
-	})
 
 	table.OnCurrentCellChanged(func(row, column, prevRow, prevColumn int) {
 		if column < 3 {
