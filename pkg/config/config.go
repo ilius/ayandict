@@ -32,7 +32,6 @@ type LoggingConfig struct {
 type MiscButtonsConfig struct {
 	SaveHistory    bool `toml:"save_history" doc:"Show Save History button"`
 	ClearHistory   bool `toml:"clear_history" doc:"Show Clear History button"`
-	SaveFavorites  bool `toml:"save_favorites" doc:"Show Save Favorites button"`
 	RandomEntry    bool `toml:"random_entry" doc:"Show Random Entry button"`
 	RandomFavorite bool `toml:"random_favorite" doc:"Show Random Favorite button"`
 }
@@ -174,7 +173,6 @@ func Default() *Config {
 		MiscButtons: MiscButtonsConfig{
 			SaveHistory:    true,
 			ClearHistory:   true,
-			SaveFavorites:  true,
 			RandomEntry:    true,
 			RandomFavorite: true,
 		},

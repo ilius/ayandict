@@ -45,7 +45,6 @@ func (app *Application) setupHandlers() {
 		frequencyTable.SaveNoError()
 	})
 	app.clearHistoryButton.OnClicked(app.clearHistoryClicked)
-	app.saveFavoritesButton.OnClicked(app.saveFavoritesClicked)
 	app.clearButton.OnClicked(app.clearButtonClicked)
 	app.dictsButton.OnClicked(app.dictsButtonClicked)
 	app.randomEntryButton.OnClicked(app.randomEntryClicked)
@@ -244,13 +243,6 @@ func (app *Application) clearHistoryClicked() {
 	app.historyView.ClearHistory()
 	app.frequencyTable.Clear()
 	app.frequencyTable.SaveNoError()
-}
-
-func (app *Application) saveFavoritesClicked() {
-	err := app.favoritesWidget.Save()
-	if err != nil {
-		slog.Error("error saving favorites: " + err.Error())
-	}
 }
 
 func (app *Application) dictsButtonClicked() {
