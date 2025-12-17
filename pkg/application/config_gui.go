@@ -87,7 +87,6 @@ func (app *Application) reloadConfig() {
 	app.headerLabel.SetWordWrap(conf.HeaderWordWrap)
 	app.audioCache.ReloadConfig()
 
-	app.updateMiscButtonsVisibility()
 	app.updateMiscButtonsPadding()
 	app.updateTrayMenu()
 }

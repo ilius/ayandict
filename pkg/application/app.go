@@ -406,7 +406,6 @@ func (app *Application) Run(query string) {
 	app.randomFavoriteButton = qt.NewQPushButton3("Random Favorite")
 	miscLayout.AddWidget(app.randomFavoriteButton.QWidget)
 
-	app.updateMiscButtonsVisibility()
 	app.updateMiscButtonsPadding()
 
 	buttonBox := qt.NewQHBoxLayout2()
@@ -589,13 +588,6 @@ func (app *Application) setupSettings(mainSplitter *qt.QSplitter) {
 	})
 
 	qsettings.SetupSplitterSizesSave(mainSplitter, QS_mainSplitter)
-}
-
-func (app *Application) updateMiscButtonsVisibility() {
-	app.saveHistoryButton.SetVisible(conf.MiscButtons.SaveHistory)
-	app.clearHistoryButton.SetVisible(conf.MiscButtons.ClearHistory)
-	app.randomEntryButton.SetVisible(conf.MiscButtons.RandomEntry)
-	app.randomFavoriteButton.SetVisible(conf.MiscButtons.RandomFavorite)
 }
 
 func (app *Application) updateMiscButtonsPadding() {
