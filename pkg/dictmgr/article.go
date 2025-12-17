@@ -507,10 +507,15 @@ func (p *DictProcessor) FixDefiHTML(defi string) string {
 	if _fixAudio {
 		defi = p.fixAudioTag(defi, playImage)
 	}
-	if strings.Contains(defi, "<link ") && !strings.Contains(defi, "</link>") {
-		defi = linkUnclosedRE.ReplaceAllStringFunc(defi, func(match string) string {
-			return match[:len(match)-1] + "/>"
-		})
+	if flags&common.ResultFlag_QTextBrowser > 0 {
+		if strings.Contains(defi, "<link ") && !strings.Contains(defi, "</link>") {
+			defi = linkUnclosedRE.ReplaceAllStringFunc(
+				defi,
+				func(match string) string {
+					return match[:len(match)-1] + "/>"
+				},
+			)
+		}
 	}
 	if conf.EmbedExternalStylesheet {
 		defi = p.embedExternalStyle(defi)

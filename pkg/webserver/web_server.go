@@ -108,7 +108,10 @@ func api_query(w http.ResponseWriter, r *http.Request) {
 	switch r.FormValue("qt") {
 	case "":
 	case "5", "6":
-		flags = flags | common.ResultFlag_FixWordLink | common.ResultFlag_ColorMapping
+		flags = (flags |
+			common.ResultFlag_FixWordLink |
+			common.ResultFlag_ColorMapping |
+			common.ResultFlag_QTextBrowser)
 	default:
 		badRequest(w, "invalid qt version, must be 5 or 6")
 		return

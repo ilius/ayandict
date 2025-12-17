@@ -1,5 +1,5 @@
-codeberg.org/ilius/go-dict-commons v0.7.0 h1:NrE5pfnMCenvqNYex2zik+lWu/XW1mJrEfLFYptbhNQ=
-codeberg.org/ilius/go-dict-commons v0.7.0/go.mod h1:BUl3oh0AjP8vW4oDaNSrzjArPeHAf80tRYZzGRhqTxo=
+codeberg.org/ilius/go-dict-commons v0.7.1 h1:7/ZvTa+qeRNb/S6Fn75c/A148uxF89rsOIjQMQpuzE8=
+codeberg.org/ilius/go-dict-commons v0.7.1/go.mod h1:BUl3oh0AjP8vW4oDaNSrzjArPeHAf80tRYZzGRhqTxo=
 codeberg.org/ilius/go-stardict/v2 v2.7.1 h1:6bcmw4koBAmC2xTQsCtc4j3o4pzbZ1JNSHrUyUbc/yU=
 codeberg.org/ilius/go-stardict/v2 v2.7.1/go.mod h1:efo510lb2xPg3R1MjZN0EtGpa+uWxlz2S9bfSsLNtsY=
 github.com/BurntSushi/toml v1.5.0 h1:W5quZX/G/csjUnuI8SUYlsHs9M38FC7znL0lIO+DvMg=
