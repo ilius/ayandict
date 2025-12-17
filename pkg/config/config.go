@@ -70,8 +70,7 @@ type Config struct {
 
 	FavoriteButtonImage string `toml:"favorite_button_image" doc:"Image file name for favorite button. Try favorite-blue-64.png for color blindness"`
 
-	FavoriteButtonHue int  `toml:"favorite_button_hue" doc:"Color hue for favorite button in scan popup (120=green, 240=blue, 0=red)"`
-	FavoritesAutoSave bool `toml:"favorites_auto_save" doc:"Auto-save Favorites on every new record"`
+	FavoriteButtonHue int `toml:"favorite_button_hue" doc:"Color hue for favorite button in scan popup (120=green, 240=blue, 0=red)"`
 
 	MaxResultsTotal int `toml:"max_results_total" doc:"Maximum number of search results"`
 
@@ -208,7 +207,6 @@ func Default() *Config {
 		FavoriteButtonImage: "favorite-green-64.png",
 
 		FavoriteButtonHue: 120,
-		FavoritesAutoSave: true,
 
 		MaxResultsTotal: 40,
 

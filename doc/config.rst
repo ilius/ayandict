@@ -112,12 +112,6 @@ Color hue for favorite button in scan popup (120=green, 240=blue, 0=red)
 
 Default value: ``120``
 
-``favorites_auto_save``
------------------------
-Auto-save Favorites on every new record
-
-Default value: ``true``
-
 ``max_results_total``
 ---------------------
 Maximum number of search results

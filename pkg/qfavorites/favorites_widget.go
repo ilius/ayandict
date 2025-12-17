@@ -55,11 +55,9 @@ func (w *FavoritesWidget) AddFavorite(item string) {
 	}
 	w.Data.Add(item)
 	w.InsertItem2(0, item)
-	if w.conf.FavoritesAutoSave {
-		err := w.Save()
-		if err != nil {
-			slog.Error("error saving favorites: " + err.Error())
-		}
+	err := w.Save()
+	if err != nil {
+		slog.Error("error saving favorites: " + err.Error())
 	}
 }
 
@@ -74,11 +72,9 @@ func (w *FavoritesWidget) RemoveFavorite(item string) {
 	// the widget order is reversed, so our widget index
 	// is N-index-1
 	_ = w.TakeItem(w.Count() - index - 1)
-	if w.conf.FavoritesAutoSave {
-		err := w.Save()
-		if err != nil {
-			slog.Error("error saving favorites: " + err.Error())
-		}
+	err := w.Save()
+	if err != nil {
+		slog.Error("error saving favorites: " + err.Error())
 	}
 }
 
