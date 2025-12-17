@@ -14,6 +14,10 @@ func Run(query string) {
 	qt.QCoreApplication_SetApplicationName(appinfo.APP_DESC)
 	qt.QGuiApplication_SetDesktopFileName(appinfo.APP_NAME)
 
+	if config.PrivateMode {
+		qt.QCoreApplication_SetApplicationName(appinfo.APP_DESC + " (private mode)")
+	}
+
 	// following line changes window title to "AyanDict — ayandict" on Linux
 	// (not tested on Mac or Windows)
 	// qt.QGuiApplication_SetApplicationDisplayName(appinfo.APP_NAME)

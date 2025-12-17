@@ -248,7 +248,11 @@ func (app *Application) Run(query string) {
 	// icon := qt.NewQIcon5("./img/icon.png")
 
 	window := app.window
-	window.SetWindowTitle(appinfo.APP_DESC)
+	if config.PrivateMode {
+		window.SetWindowTitle(appinfo.APP_DESC + " (private mode)")
+	} else {
+		window.SetWindowTitle(appinfo.APP_DESC)
+	}
 	window.OnCloseEvent(func(super func(*qt.QCloseEvent), event *qt.QCloseEvent) {
 		if app.trayIcon != nil && app.trayIcon.IsVisible() {
 			event.Ignore()
