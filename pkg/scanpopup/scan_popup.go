@@ -290,6 +290,9 @@ func (p *ScanPopup) AudioCache() *audiocache.AudioCache {
 }
 
 func (p *ScanPopup) favoriteButtonClicked(checked bool) {
+	if config.PrivateMode {
+		return
+	}
 	p.app.SetFavoriteFromPopup(
 		p.results[p.resultIndex].Terms()[0],
 		checked,

@@ -25,9 +25,11 @@ func NewColoredEmojiFavoriteButton(
 		activeColor:   activeColor,
 		inactiveColor: inactiveColor,
 	}
-	button.OnClicked(func() {
-		onClick(button.ToggleChecked())
-	})
+	if !config.PrivateMode {
+		button.OnClicked(func() {
+			onClick(button.ToggleChecked())
+		})
+	}
 	return button
 }
 

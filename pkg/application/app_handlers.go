@@ -5,7 +5,6 @@ import (
 	"time"
 
 	common "codeberg.org/ilius/go-dict-commons"
-	"github.com/ilius/ayandict/v3/pkg/config"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/qdictmgr"
 	qt "github.com/mappu/miqt/qt6"
@@ -53,10 +52,6 @@ func (app *Application) setupHandlers() {
 	app.randomFavoriteButton.OnClicked(app.randomFavoriteClicked)
 	entry.OnKeyPressEvent(app.onEntryKeyPress)
 
-	if config.PrivateMode {
-		app.favoriteButton.SetDisabled(true)
-		app.queryFavoriteButton.SetDisabled(true)
-	}
 	// slog.Error("test error", "s", "hello", "n", 2, "b", true)
 }
 

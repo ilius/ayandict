@@ -1,6 +1,9 @@
 package application
 
-import qt "github.com/mappu/miqt/qt6"
+import (
+	"github.com/ilius/ayandict/v3/pkg/config"
+	qt "github.com/mappu/miqt/qt6"
+)
 
 type FavoriteButtonInterface interface {
 	SetChecked(bool)
@@ -29,6 +32,9 @@ func (app *Application) SetFavoriteFromPopup(term string, checked bool) {
 }
 
 func (app *Application) queryFavoriteButtonClicked(checked bool) {
+	if config.PrivateMode {
+		return
+	}
 	term := app.entry.Text()
 	if term == "" {
 		app.queryFavoriteButton.SetChecked(false)
@@ -42,6 +48,9 @@ func (app *Application) queryFavoriteButtonClicked(checked bool) {
 }
 
 func (app *Application) favoriteButtonClicked(checked bool) {
+	if config.PrivateMode {
+		return
+	}
 	if app.resultList.Active == nil {
 		app.favoriteButton.SetChecked(false)
 		return

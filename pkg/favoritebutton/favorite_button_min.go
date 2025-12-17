@@ -15,9 +15,11 @@ func NewMinimalFavoriteButton(
 		inactiveText: " fav",
 		activeText:   "✔fav",
 	}
-	button.OnClicked(func() {
-		onClick(button.ToggleChecked())
-	})
+	if !config.PrivateMode {
+		button.OnClicked(func() {
+			onClick(button.ToggleChecked())
+		})
+	}
 	button.SetChecked(false)
 	return button
 }

@@ -35,9 +35,11 @@ func NewImageFavoriteButton(
 		activeIcon:   activeIcon,
 		inactiveIcon: inactiveIcon,
 	}
-	button.OnClicked(func() {
-		onClick(button.ToggleChecked())
-	})
+	if !config.PrivateMode {
+		button.OnClicked(func() {
+			onClick(button.ToggleChecked())
+		})
+	}
 	return button
 }
 
