@@ -31,6 +31,8 @@ var (
 	hrefSoundRE  = regexp.MustCompile(` href="sound://[^<>"]*?"`)
 	audioRE      = regexp.MustCompile(`<audio[ >].*?</audio>`)
 
+	linkUnclosedRE = regexp.MustCompile(`<link [^<>]+[^/<>]>`)
+
 	linkRE = regexp.MustCompile(`<link [^<>]+>`)
 
 	colorRE      = regexp.MustCompile(` color=["']#?[a-zA-Z0-9]+["']`)
@@ -391,8 +393,10 @@ func (p *DictProcessor) embedExternalStyle(defi string) string {
 		}
 		data, err := os.ReadFile(filepath.Join(resDir, href))
 		if err != nil {
-			if !os.IsNotExist(err) {
-				slog.Error("external style file not found", "err", err)
+			if os.IsNotExist(err) {
+				slog.Warn("external style file not found", "err", err)
+			} else {
+				slog.Error("error loading external style file", "err", err)
 			}
 			return match
 		}
@@ -502,6 +506,11 @@ func (p *DictProcessor) FixDefiHTML(defi string) string {
 	}
 	if _fixAudio {
 		defi = p.fixAudioTag(defi, playImage)
+	}
+	if strings.Contains(defi, "<link ") && !strings.Contains(defi, "</link>") {
+		defi = linkUnclosedRE.ReplaceAllStringFunc(defi, func(match string) string {
+			return match[:len(match)-1] + "/>"
+		})
 	}
 	if conf.EmbedExternalStylesheet {
 		defi = p.embedExternalStyle(defi)
