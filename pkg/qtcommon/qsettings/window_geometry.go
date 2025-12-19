@@ -10,8 +10,8 @@ import (
 // we need this because passing dialog.QWidget to SetupWindowGeometrySave causes:
 // panic: miqt: can only override virtual methods for directly constructed types [recovered]
 type windowSaveInterface interface {
-	OnMoveEvent(func(super func(*qt.QMoveEvent), event *qt.QMoveEvent))
-	OnResizeEvent(func(super func(*qt.QResizeEvent), event *qt.QResizeEvent))
+	OnMoveEvent(func(func(*qt.QMoveEvent), *qt.QMoveEvent))
+	OnResizeEvent(func(func(*qt.QResizeEvent), *qt.QResizeEvent))
 	Pos() *qt.QPoint
 	Size() *qt.QSize
 }

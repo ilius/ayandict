@@ -34,13 +34,13 @@ var aboutToDragCursor = qt.PointingHandCursor
 type FavoriteButtonInterface interface {
 	SetChecked(bool)
 	ToggleChecked() bool
-	SetToolTips(string, string)
+	SetToolTips(inactive string, active string)
 	QWidget() *qt.QWidget
 }
 
 type ScanPopupAppInterface interface {
 	OnScanPopupShow()
-	OnScanPopupClose(super func(*qt.QCloseEvent), event *qt.QCloseEvent)
+	OnScanPopupClose(func(*qt.QCloseEvent), *qt.QCloseEvent)
 	ShowWindowAndQuery(query string)
 	AddHistoryAndFrequency(query string)
 	HasFavorite(term string) bool

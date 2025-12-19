@@ -6,16 +6,16 @@ import (
 )
 
 type KeyPressIface interface {
-	OnKeyPressEvent(func(func(event *qt.QKeyEvent), *qt.QKeyEvent))
+	OnKeyPressEvent(func(func(*qt.QKeyEvent), *qt.QKeyEvent))
 }
 
 type ResultsIface interface {
 	Clear()
 	QWidget() *qt.QWidget
-	SetResults(results []common.SearchResultIface)
+	SetResults([]common.SearchResultIface)
 	Active() common.SearchResultIface
 	ReloadList()
-	OnKeyPressEvent(func(func(event *qt.QKeyEvent), *qt.QKeyEvent))
+	OnKeyPressEvent(func(func(*qt.QKeyEvent), *qt.QKeyEvent))
 	GoPrevious()
 	GoNext()
 }
@@ -23,7 +23,7 @@ type ResultsIface interface {
 type FavoriteButtonInterface interface {
 	SetChecked(bool)
 	ToggleChecked() bool
-	SetToolTips(string, string)
+	SetToolTips(inactive string, active string)
 	QWidget() *qt.QWidget
 	Hide()
 	Show()
