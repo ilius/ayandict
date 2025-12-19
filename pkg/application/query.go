@@ -24,7 +24,7 @@ const resultFlags = uint32(
 type QueryArgs struct {
 	ArticleView    *articleview.ArticleView
 	ResultsLabel   *qt.QLabel
-	ResultList     *resultlist.ResultListWidget
+	ResultList     *resultlist.ResultList
 	HeaderLabel    *headerlabel.HeaderLabel
 	HistoryView    *HistoryView
 	Entry          *qt.QLineEdit

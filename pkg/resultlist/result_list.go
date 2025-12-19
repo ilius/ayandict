@@ -24,13 +24,13 @@ type ArticleViewIface interface {
 	SetSearchPaths([]string)
 }
 
-func NewResultListWidget(
+func NewResultList(
 	articleView ArticleViewIface,
 	headerLabel HeaderLabelIface,
 	app ApplicationIface,
-) *ResultListWidget {
+) *ResultList {
 	widget := qt.NewQListWidget(nil)
-	resultList := &ResultListWidget{
+	resultList := &ResultList{
 		QListWidget: widget,
 		HeaderLabel: headerLabel,
 		ArticleView: articleView,
@@ -52,7 +52,7 @@ func NewResultListWidget(
 	return resultList
 }
 
-type ResultListWidget struct {
+type ResultList struct {
 	*qt.QListWidget
 
 	results []common.SearchResultIface
@@ -65,7 +65,7 @@ type ResultListWidget struct {
 	app ApplicationIface
 }
 
-func (w *ResultListWidget) SetResults(results []common.SearchResultIface) {
+func (w *ResultList) SetResults(results []common.SearchResultIface) {
 	w.QListWidget.Clear()
 	w.results = results
 	if len(results) == 0 {
@@ -101,13 +101,13 @@ func (w *ResultListWidget) SetResults(results []common.SearchResultIface) {
 	w.SetCurrentRow(0)
 }
 
-func (w *ResultListWidget) ReloadList() {
+func (w *ResultList) ReloadList() {
 	row := w.CurrentRow()
 	w.SetResults(w.results)
 	w.SetCurrentRow(row)
 }
 
-func (w *ResultListWidget) OnActivate(row int) {
+func (w *ResultList) OnActivate(row int) {
 	if row >= len(w.results) {
 		slog.Error("ResultListWidget: OnActivate: row index out of range", "row", row)
 		return
@@ -125,12 +125,12 @@ func (w *ResultListWidget) OnActivate(row int) {
 	w.Active = res
 }
 
-func (w *ResultListWidget) Clear() {
+func (w *ResultList) Clear() {
 	w.QListWidget.Clear()
 	w.results = nil
 }
 
-func (w *ResultListWidget) GoNext() {
+func (w *ResultList) GoNext() {
 	row := w.QListWidget.CurrentRow() + 1
 	if row >= len(w.results) {
 		return
@@ -138,7 +138,7 @@ func (w *ResultListWidget) GoNext() {
 	w.SetCurrentRow(row)
 }
 
-func (w *ResultListWidget) GoPrevious() {
+func (w *ResultList) GoPrevious() {
 	row := w.QListWidget.CurrentRow() - 1
 	if row < 0 {
 		return

@@ -81,7 +81,7 @@ type Application struct {
 	queryArgs       *QueryArgs
 	headerLabel     *headerlabel.HeaderLabel
 	articleView     *articleview.ArticleView
-	resultList      *resultlist.ResultListWidget
+	resultList      *resultlist.ResultList
 	historyView     *HistoryView
 	entry           *qt.QLineEdit
 	searchModeCombo *qt.QComboBox
@@ -482,7 +482,7 @@ func (app *Application) Run(query string) {
 	leftPanelLayout := qt.NewQVBoxLayout(leftPanel)
 	resultsLabel := qt.NewQLabel3("Results")
 	leftPanelLayout.AddWidget(resultsLabel.QWidget)
-	resultList := resultlist.NewResultListWidget(
+	resultList := resultlist.NewResultList(
 		articleView,
 		headerLabel,
 		app,
