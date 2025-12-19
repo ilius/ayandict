@@ -15,7 +15,7 @@ func (app *Application) setupHandlers() {
 	// that's why I separated setupArticleViewKeyPressEvent from setupKeyPressEvent
 
 	app.setupKeyPressEvent(app.window)
-	app.setupKeyPressEvent(app.resultList.QListWidget)
+	app.setupKeyPressEvent(app.resultList)
 	app.setupKeyPressEvent(app.historyView.QListWidget)
 
 	app.articleView.OnKeyPressEvent(app.onArticleViewKeyPressEvent)

@@ -10,7 +10,6 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/frequencytable"
 	"github.com/ilius/ayandict/v3/pkg/headerlabel"
-	"github.com/ilius/ayandict/v3/pkg/resultlist"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -24,7 +23,6 @@ const resultFlags = uint32(
 type QueryArgs struct {
 	ArticleView    *articleview.ArticleView
 	ResultsLabel   *qt.QLabel
-	ResultList     *resultlist.ResultList
 	HeaderLabel    *headerlabel.HeaderLabel
 	HistoryView    *HistoryView
 	Entry          *qt.QLineEdit

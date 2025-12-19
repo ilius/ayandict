@@ -57,12 +57,20 @@ type ResultList struct {
 
 	results []common.SearchResultIface
 
-	Active common.SearchResultIface
+	active common.SearchResultIface
 
 	HeaderLabel HeaderLabelIface
 	ArticleView ArticleViewIface
 
 	app ApplicationIface
+}
+
+func (w *ResultList) QWidget() *qt.QWidget {
+	return w.QListWidget.QWidget
+}
+
+func (w *ResultList) Active() common.SearchResultIface {
+	return w.active
 }
 
 func (w *ResultList) SetResults(results []common.SearchResultIface) {
@@ -122,7 +130,7 @@ func (w *ResultList) OnActivate(row int) {
 		w.ArticleView.SetSearchPaths([]string{resDir})
 	}
 	w.app.OnResultDisplay(res.Terms())
-	w.Active = res
+	w.active = res
 }
 
 func (w *ResultList) Clear() {
