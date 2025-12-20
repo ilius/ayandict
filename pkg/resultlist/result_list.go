@@ -109,7 +109,7 @@ func (w *ResultList) SetResults(results []common.SearchResultIface) {
 	w.SetCurrentRow(0)
 }
 
-func (w *ResultList) ReloadList() {
+func (w *ResultList) Reload() {
 	row := w.CurrentRow()
 	w.SetResults(w.results)
 	w.SetCurrentRow(row)

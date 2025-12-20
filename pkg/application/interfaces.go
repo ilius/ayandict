@@ -14,7 +14,7 @@ type ResultsIface interface {
 	QWidget() *qt.QWidget
 	SetResults([]common.SearchResultIface)
 	Active() common.SearchResultIface
-	ReloadList()
+	Reload()
 	OnKeyPressEvent(func(func(*qt.QKeyEvent), *qt.QKeyEvent))
 	GoPrevious()
 	GoNext()

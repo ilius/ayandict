@@ -17,7 +17,7 @@ func (app *Application) SetFavoriteFromPopup(term string, checked bool) {
 	if active != nil && term == active.Terms()[0] {
 		app.favoriteButton.SetChecked(checked)
 	}
-	app.resultList.ReloadList()
+	app.resultList.Reload()
 }
 
 func (app *Application) queryFavoriteButtonClicked(checked bool) {
@@ -34,7 +34,7 @@ func (app *Application) queryFavoriteButtonClicked(checked bool) {
 	if active != nil && term == active.Terms()[0] {
 		app.favoriteButton.SetChecked(checked)
 	}
-	app.resultList.ReloadList()
+	app.resultList.Reload()
 }
 
 func (app *Application) favoriteButtonClicked(checked bool) {
@@ -50,5 +50,5 @@ func (app *Application) favoriteButtonClicked(checked bool) {
 	if term == app.entry.Text() {
 		app.queryFavoriteButton.SetChecked(checked)
 	}
-	app.resultList.ReloadList()
+	app.resultList.Reload()
 }

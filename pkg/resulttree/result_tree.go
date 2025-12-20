@@ -113,7 +113,7 @@ func (w *ResultTree) SetResults(results []common.SearchResultIface) {
 	w.SetCurrentItem(w.TopLevelItem(0))
 }
 
-func (w *ResultTree) ReloadList() {
+func (w *ResultTree) Reload() {
 	count := w.TopLevelItemCount()
 	expanded := map[int]struct{}{}
 	for index := range count {
