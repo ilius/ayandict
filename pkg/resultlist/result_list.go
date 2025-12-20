@@ -115,6 +115,10 @@ func (w *ResultList) Reload() {
 	w.SetCurrentRow(row)
 }
 
+func (w *ResultList) SetCurrentResult(resultIndex int) {
+	w.SetCurrentRow(resultIndex)
+}
+
 func (w *ResultList) onActivate(row int) {
 	if row >= len(w.results) {
 		slog.Error("ResultListWidget: OnActivate: row index out of range", "row", row)

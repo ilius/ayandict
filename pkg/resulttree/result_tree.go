@@ -129,6 +129,10 @@ func (w *ResultTree) Reload() {
 	}
 }
 
+func (w *ResultTree) SetCurrentResult(resultIndex int) {
+	w.SetCurrentItem(w.TopLevelItem(resultIndex))
+}
+
 func (w *ResultTree) onActivate(row int) {
 	if row >= len(w.results) {
 		slog.Error("ResultTreeWidget: OnActivate: row index out of range", "row", row)
