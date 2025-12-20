@@ -25,6 +25,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/qtcommon"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
 	"github.com/ilius/ayandict/v3/pkg/resultlist"
+	"github.com/ilius/ayandict/v3/pkg/resulttree"
 	"github.com/ilius/ayandict/v3/pkg/utils"
 	"github.com/ilius/ayandict/v3/pkg/webclient"
 	"github.com/ilius/ayandict/v3/pkg/webserver"
@@ -482,12 +483,19 @@ func (app *Application) Run(query string) {
 	leftPanelLayout := qt.NewQVBoxLayout(leftPanel)
 	resultsLabel := qt.NewQLabel3("Results")
 	leftPanelLayout.AddWidget(resultsLabel.QWidget)
-	resultList := resultlist.NewResultList(
-		articleView,
-		headerLabel,
-		app,
-	)
-	app.resultList = resultList
+	if conf.ResultTree {
+		app.resultList = resulttree.NewResultTree(
+			articleView,
+			headerLabel,
+			app,
+		)
+	} else {
+		app.resultList = resultlist.NewResultList(
+			articleView,
+			headerLabel,
+			app,
+		)
+	}
 	leftPanelLayout.AddWidget(app.resultList.QWidget())
 
 	app.queryArgs = &QueryArgs{

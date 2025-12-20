@@ -64,6 +64,8 @@ type Config struct {
 
 	MaxResultsTotal int `toml:"max_results_total" doc:"Maximum number of search results"`
 
+	ResultTree bool `toml:"result_tree" doc:"Use a tree (instead of list) to show results (terms as children)"`
+
 	RandomFavoriteSearchMode string `toml:"random_favorite_search_mode" doc:"Search mode for Random Favorite"`
 
 	StartHidden bool `toml:"start_hidden" doc:"Hide main window on startup (if tray icon is available)"`
@@ -192,6 +194,8 @@ func Default() *Config {
 		FavoriteButtonHue: 120,
 
 		MaxResultsTotal: 40,
+
+		ResultTree: false,
 
 		RandomFavoriteSearchMode: "wordMatch",
 

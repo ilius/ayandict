@@ -118,6 +118,12 @@ Maximum number of search results
 
 Default value: ``40``
 
+``result_tree``
+---------------
+Use a tree (instead of list) to show results (terms as children)
+
+Default value: ``false``
+
 ``random_favorite_search_mode``
 -------------------------------
 Search mode for Random Favorite
