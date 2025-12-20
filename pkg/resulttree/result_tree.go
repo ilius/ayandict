@@ -61,7 +61,7 @@ type ResultTree struct {
 
 	results []common.SearchResultIface
 
-	active common.SearchResultIface
+	currentResult common.SearchResultIface
 
 	HeaderLabel HeaderLabelIface
 	ArticleView ArticleViewIface
@@ -73,8 +73,8 @@ func (w *ResultTree) QWidget() *qt.QWidget {
 	return w.QTreeWidget.QWidget
 }
 
-func (w *ResultTree) Active() common.SearchResultIface {
-	return w.active
+func (w *ResultTree) CurrentResult() common.SearchResultIface {
+	return w.currentResult
 }
 
 func (w *ResultTree) SetResults(results []common.SearchResultIface) {
@@ -148,7 +148,7 @@ func (w *ResultTree) onActivate(row int) {
 		w.ArticleView.SetSearchPaths([]string{resDir})
 	}
 	w.app.OnResultDisplay(res.Terms())
-	w.active = res
+	w.currentResult = res
 }
 
 func (w *ResultTree) Clear() {

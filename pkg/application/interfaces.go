@@ -13,7 +13,7 @@ type ResultsIface interface {
 	Clear()
 	QWidget() *qt.QWidget
 	SetResults([]common.SearchResultIface)
-	Active() common.SearchResultIface
+	CurrentResult() common.SearchResultIface
 	SetCurrentResult(int)
 	Reload()
 	OnKeyPressEvent(func(func(*qt.QKeyEvent), *qt.QKeyEvent))

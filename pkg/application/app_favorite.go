@@ -13,7 +13,7 @@ func (app *Application) SetFavoriteFromPopup(term string, checked bool) {
 	if term == app.entry.Text() {
 		app.queryFavoriteButton.SetChecked(checked)
 	}
-	active := app.resultList.Active()
+	active := app.resultList.CurrentResult()
 	if active != nil && term == active.Terms()[0] {
 		app.favoriteButton.SetChecked(checked)
 	}
@@ -30,7 +30,7 @@ func (app *Application) queryFavoriteButtonClicked(checked bool) {
 		return
 	}
 	app.favoritesWidget.SetFavorite(term, checked)
-	active := app.resultList.Active()
+	active := app.resultList.CurrentResult()
 	if active != nil && term == active.Terms()[0] {
 		app.favoriteButton.SetChecked(checked)
 	}
@@ -41,11 +41,12 @@ func (app *Application) favoriteButtonClicked(checked bool) {
 	if config.PrivateMode {
 		return
 	}
-	if app.resultList.Active() == nil {
+	result := app.resultList.CurrentResult()
+	if result == nil {
 		app.favoriteButton.SetChecked(false)
 		return
 	}
-	term := app.resultList.Active().Terms()[0]
+	term := result.Terms()[0]
 	app.favoritesWidget.SetFavorite(term, checked)
 	if term == app.entry.Text() {
 		app.queryFavoriteButton.SetChecked(checked)
