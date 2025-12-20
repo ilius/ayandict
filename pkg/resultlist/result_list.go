@@ -40,14 +40,14 @@ func NewResultList(
 		if row < 0 {
 			return
 		}
-		resultList.OnActivate(row)
+		resultList.onActivate(row)
 	})
 	widget.OnItemActivated(func(item *qt.QListWidgetItem) {
 		row := widget.Row(item)
 		if row < 0 {
 			return
 		}
-		resultList.OnActivate(row)
+		resultList.onActivate(row)
 	})
 	return resultList
 }
@@ -115,7 +115,7 @@ func (w *ResultList) ReloadList() {
 	w.SetCurrentRow(row)
 }
 
-func (w *ResultList) OnActivate(row int) {
+func (w *ResultList) onActivate(row int) {
 	if row >= len(w.results) {
 		slog.Error("ResultListWidget: OnActivate: row index out of range", "row", row)
 		return
