@@ -41,7 +41,7 @@ func (app *Application) favoriteButtonClicked(checked bool) {
 	if config.PrivateMode {
 		return
 	}
-	if app.resultList.Active == nil {
+	if app.resultList.Active() == nil {
 		app.favoriteButton.SetChecked(false)
 		return
 	}
