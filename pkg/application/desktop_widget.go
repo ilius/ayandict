@@ -74,11 +74,19 @@ func (w *DesktopWidget) init() {
 }
 
 func (w *DesktopWidget) popupMenu(event *qt.QMouseEvent) {
-	menu := qt.NewQMenu2()
+	menu := qt.NewQMenu(w.QWidget)
+	menu.SetSeparatorsCollapsible(false)
+	menuWidth := 0
+	fm := w.FontMetrics()
 	for _, action := range w.app.statusIconActions {
 		menu.AddAction(action)
+		width := fm.HorizontalAdvance(action.Text())
+		if width > menuWidth {
+			menuWidth = width
+		}
 	}
-	// menu.SetFont(app.systemDefaultFont)
+	menuWidth += fm.HorizontalAdvance("M") + 32
+	menu.SetMinimumWidth(menuWidth)
 	menu.Popup(event.GlobalPos())
 }
 
