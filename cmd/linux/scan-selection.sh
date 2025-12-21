@@ -23,7 +23,7 @@ clip_get() {
 
 set -x
 
-if which socat 2>/dev/null ; then
+if command -v socat 2>/dev/null ; then
     echo scanpopup:$(clip_get) | socat - UNIX-CONNECT:/tmp/ayandict-$UID
 else
     echo scanpopup:$(clip_get) | nc -U /tmp/ayandict-$UID -q 2
