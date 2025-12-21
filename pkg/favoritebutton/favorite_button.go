@@ -133,5 +133,8 @@ QMenu::item {
 		menuWidth = maxMenuWidth
 	}
 	menu.SetMinimumWidth(menuWidth)
-	menu.Popup(event.GlobalPos())
+
+	pos := b.Pos()
+	pos.SetY(pos.Y() + b.Height())
+	menu.Popup(b.ParentWidget().MapToGlobalWithQPoint(pos))
 }
