@@ -75,7 +75,9 @@ func (app *Application) restoreMainWindowSettings() {
 	if s.Maximized {
 		window.ShowMaximized()
 	}
-	app.searchModeCombo.SetCurrentIndex(s.SearchMode)
+	if s.SearchMode > 0 {
+		app.searchModeCombo.SetCurrentIndex(s.SearchMode)
+	}
 	app.activityTypeCombo.SetCurrentIndex(s.ActivityType)
 }
 
