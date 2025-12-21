@@ -57,15 +57,7 @@ func (w *DictFlagsCheckboxes) SetActiveDictSetting(ds *dicts.DictionarySettings)
 func (w *DictFlagsCheckboxes) addCheckBox(label string, flag uint16) {
 	check := qt.NewQCheckBox3(label)
 	check.SetChecked(true)
-	check.SetStyleSheet(`
-	QCheckBox {
-		spacing: 0.2em;
-	}
-	QCheckBox::indicator {
-		width: 1em;
-		height: 1em;
-	}
-	`)
+	makeCheckMarkBig(check)
 	w.hbox.AddWidget3(check.QWidget, 1, 0)
 	w.checkList = append(w.checkList, check)
 	w.checkConnectClicked(check, flag)

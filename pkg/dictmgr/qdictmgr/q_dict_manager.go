@@ -270,13 +270,14 @@ func (dm *DictManager) prepareWidgets() {
 	flagsCBWidget := NewDictFlagsCheckboxes(extraOptionsWidget.Hide)
 	extraOptionsVBox.AddWidget(flagsCBWidget.QWidget)
 
-	volumeHBox := qt.NewQHBoxLayout2()
-	volumeHBox.AddWidget(qt.NewQLabel3("Audio Volume:").QWidget)
+	audioHBox := qt.NewQHBoxLayout2()
+	audioHBox.AddSpacing(30)
+	audioHBox.AddWidget(qt.NewQLabel3("Audio Volume:").QWidget)
 	volumeInput.SetMinimum(0)
 	volumeInput.SetMaximum(999)
-	volumeHBox.AddWidget(volumeInput.QWidget)
-	volumeHBox.AddWidget(qt.NewQLabel3("").QWidget)
-	extraOptionsVBox.AddLayout(volumeHBox.Layout())
+	audioHBox.AddWidget(volumeInput.QWidget)
+	audioHBox.AddStretchWithStretch(3)
+	extraOptionsVBox.AddLayout(audioHBox.Layout())
 	volumeInput.OnValueChanged(func(value int) {
 		if selectedDictSettings == nil {
 			slog.Warn("ConnectValueChanged: selectedDictSettings == nil")
