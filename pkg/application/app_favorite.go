@@ -20,6 +20,14 @@ func (app *Application) SetFavoriteFromPopup(term string, checked bool) {
 	app.resultList.Reload()
 }
 
+func (app *Application) SetFavoriteFromFavoriteButtonMenu(term string, checked bool) {
+	app.favoritesWidget.SetFavorite(term, checked)
+	if term == app.entry.Text() {
+		app.queryFavoriteButton.SetChecked(checked)
+	}
+	app.resultList.Reload()
+}
+
 func (app *Application) queryFavoriteButtonClicked(checked bool) {
 	if config.PrivateMode {
 		return

@@ -163,6 +163,7 @@ func (app *Application) postQuery(query string) {
 func (app *Application) OnResultDisplay(terms []string) {
 	app.favoriteButton.Show()
 	app.favoriteButton.SetChecked(app.favoritesWidget.HasFavorite(terms[0]))
+	app.favoriteButton.SetTerms(terms)
 }
 
 func (app *Application) onExit() {
@@ -299,6 +300,7 @@ func (app *Application) Run(query string) {
 	app.queryFavoriteButton = favoritebutton.NewImageFavoriteButton(
 		conf,
 		app.queryFavoriteButtonClicked,
+		app,
 	)
 	app.queryFavoriteButton.SetToolTips(
 		"Add this query to favorites",
@@ -309,6 +311,7 @@ func (app *Application) Run(query string) {
 	app.favoriteButton = favoritebutton.NewImageFavoriteButton(
 		conf,
 		app.favoriteButtonClicked,
+		app,
 	)
 
 	app.favoriteButton.SetToolTips(

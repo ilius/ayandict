@@ -23,6 +23,7 @@ type ResultsIface interface {
 
 type FavoriteButtonInterface interface {
 	SetChecked(bool)
+	SetTerms(terms []string)
 	ToggleChecked() bool
 	SetToolTips(inactive string, active string)
 	QWidget() *qt.QWidget
