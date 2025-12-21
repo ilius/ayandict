@@ -66,3 +66,12 @@ func AudioVolume(dictName string) int {
 	}
 	return ds.AudioVolume
 }
+
+func AudioAutoPlay(dictName string) bool {
+	ds := dicts.DictSettingsMap[dictName]
+	if ds == nil {
+		slog.Error("AudioVolume: no Settings value", "dictName", dictName)
+		return false
+	}
+	return !ds.AudioAutoPlayDisable
+}

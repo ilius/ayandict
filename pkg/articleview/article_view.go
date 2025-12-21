@@ -379,7 +379,7 @@ func (view *ArticleView) SetResult(res common.SearchResultIface) {
 		text2 = view.definitionStyleString + text2
 	}
 	view.Browser.SetHtml(text2)
-	if res.Score()/2 >= view.conf.AudioAutoPlayMinScore {
+	if dictmgr.AudioAutoPlay(res.DictName()) && res.Score()/2 >= view.conf.AudioAutoPlayMinScore {
 		timer := view.autoPlayOnResult(text)
 		if timer != nil {
 			timer.Start(0)

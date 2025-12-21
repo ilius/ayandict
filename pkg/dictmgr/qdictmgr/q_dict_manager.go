@@ -272,6 +272,20 @@ func (dm *DictManager) prepareWidgets() {
 
 	audioHBox := qt.NewQHBoxLayout2()
 	audioHBox.AddSpacing(30)
+
+	audioAutoPlayCheckbox := qt.NewQCheckBox3("Audio Auto-play")
+	makeCheckMarkBig(audioAutoPlayCheckbox)
+	audioHBox.AddWidget(audioAutoPlayCheckbox.QWidget)
+	audioAutoPlayCheckbox.OnClickedWithChecked(func(checked bool) {
+		if selectedDictSettings == nil {
+			slog.Warn("OnClickedWithChecked: selectedDictSettings == nil")
+			return
+		}
+		selectedDictSettings.AudioAutoPlayDisable = !checked
+	})
+
+	audioHBox.AddStretchWithStretch(1)
+
 	audioHBox.AddWidget(qt.NewQLabel3("Audio Volume:").QWidget)
 	volumeInput.SetMinimum(0)
 	volumeInput.SetMaximum(999)
@@ -355,6 +369,7 @@ func (dm *DictManager) prepareWidgets() {
 		}
 		selectedDictSettings = ds
 		flagsCBWidget.SetActiveDictSetting(ds)
+		audioAutoPlayCheckbox.SetChecked(!ds.AudioAutoPlayDisable)
 		volumeInput.SetValue(ds.AudioVolume)
 		extraOptionsWidget.Show()
 	})

@@ -21,6 +21,8 @@ type DictionarySettings struct {
 
 	HideTermsHeader bool `json:"hide_terms_header,omitempty"`
 
+	AudioAutoPlayDisable bool `json:"audio_auto_play_disable,omitempty"`
+
 	AudioVolume int `json:"audio_volume,omitempty"`
 }
 
