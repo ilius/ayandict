@@ -31,7 +31,7 @@ func NewImageFavoriteButton(
 		panic(err)
 	}
 	qButton := qt.NewQPushButton4(inactiveIcon, "")
-	qButton.OnResizeEvent(func(super func(event *qt.QResizeEvent), event *qt.QResizeEvent) {
+	qButton.OnResizeEvent(func(_ func(*qt.QResizeEvent), event *qt.QResizeEvent) {
 		h := event.Size().Height()
 		iconSize := h * 2 / 3
 		qButton.SetIconSize(qt.NewQSize2(iconSize, iconSize))
@@ -98,7 +98,7 @@ func (b *ImageFavoriteButton) SetToolTips(inactive string, active string) {
 	b.SetToolTip(inactive)
 }
 
-func (b *ImageFavoriteButton) onContextMenu(super func(event *qt.QContextMenuEvent), event *qt.QContextMenuEvent) {
+func (b *ImageFavoriteButton) onContextMenu(_ func(*qt.QContextMenuEvent), _ *qt.QContextMenuEvent) {
 	if len(b.terms) == 0 {
 		return
 	}

@@ -420,7 +420,7 @@ func (view *ArticleView) SetPopupResult(
 	return view.autoPlayOnResult(text)
 }
 
-func (view *ArticleView) onContextMenuEvent(_ func(event *qt.QContextMenuEvent), event *qt.QContextMenuEvent) {
+func (view *ArticleView) onContextMenuEvent(_ func(*qt.QContextMenuEvent), event *qt.QContextMenuEvent) {
 	event.Ignore()
 	menu := view.createContextMenu(event.Pos())
 	menu.Popup(event.GlobalPos())

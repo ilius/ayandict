@@ -9,7 +9,7 @@ import (
 const iconPixName = "ayandict-64px.png"
 
 func NewDekstopWidget(
-	onActivate func(event *qt.QMouseEvent),
+	onActivate func(*qt.QMouseEvent),
 	actions []*qt.QAction,
 ) *DesktopWidget {
 	pixmap, err := loadPNGPixmap(iconPixName)
@@ -49,7 +49,7 @@ type DesktopWidget struct {
 	*qt.QWidget
 
 	// set by factory:
-	onActivate func(event *qt.QMouseEvent)
+	onActivate func(*qt.QMouseEvent)
 	actions    []*qt.QAction
 
 	// dragPos: position of mouse relative to window, when drag starts
@@ -115,7 +115,7 @@ func absInt(x int) int {
 	return x
 }
 
-func (w *DesktopWidget) onDragMouseRelease(super func(event *qt.QMouseEvent), event *qt.QMouseEvent) {
+func (w *DesktopWidget) onDragMouseRelease(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	if event.Button() != qt.LeftButton {
 		super(event)
 		return

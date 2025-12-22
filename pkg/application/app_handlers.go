@@ -73,7 +73,7 @@ func (app *Application) sendKeyEventToArticleView(event *qt.QKeyEvent) {
 }
 
 func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
-	widget.OnKeyPressEvent(func(super func(event *qt.QKeyEvent), event *qt.QKeyEvent) {
+	widget.OnKeyPressEvent(func(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
 		switch event.Key() {
 		case int(qt.Key_Space): // " "
 			app.entry.SetFocusWithReason(qt.ShortcutFocusReason)
@@ -123,7 +123,7 @@ func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 	})
 }
 
-func (app *Application) onArticleViewKeyPressEvent(super func(event *qt.QKeyEvent), event *qt.QKeyEvent) {
+func (app *Application) onArticleViewKeyPressEvent(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
 	switch event.Key() {
 	case int(qt.Key_Space): // " "
 		app.entry.SetFocusWithReason(qt.ShortcutFocusReason)

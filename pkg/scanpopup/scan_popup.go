@@ -440,7 +440,7 @@ func (p *ScanPopup) onKeyPress(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
 	}
 }
 
-func (p *ScanPopup) onArticleViewKeyPressEvent(super func(event *qt.QKeyEvent), event *qt.QKeyEvent) {
+func (p *ScanPopup) onArticleViewKeyPressEvent(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
 	switch event.Key() {
 	case int(qt.Key_Up):
 		if event.Modifiers()&qt.AltModifier > 0 {

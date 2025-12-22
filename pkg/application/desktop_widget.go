@@ -143,7 +143,7 @@ func absInt(x int) int {
 	return x
 }
 
-func (w *DesktopWidget) onMouseRelease(super func(event *qt.QMouseEvent), event *qt.QMouseEvent) {
+func (w *DesktopWidget) onMouseRelease(super func(*qt.QMouseEvent), event *qt.QMouseEvent) {
 	if event.Button() != qt.LeftButton {
 		super(event)
 		return

@@ -14,7 +14,7 @@ func NewColoredEmojiFavoriteButton(
 ) *TextFavoriteButton {
 	activeHue := conf.FavoriteButtonHue
 	qButton := qt.NewQPushButton2()
-	qButton.OnResizeEvent(func(super func(event *qt.QResizeEvent), event *qt.QResizeEvent) {
+	qButton.OnResizeEvent(func(super func(*qt.QResizeEvent), event *qt.QResizeEvent) {
 		qButton.SetFixedWidth(event.Size().Height())
 	})
 	qButton.SetText("★") // ★ ⭑ ✯ ☆ ⭐

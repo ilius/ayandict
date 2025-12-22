@@ -76,7 +76,7 @@ func (app *Application) randomFavoritePopup(onClose func()) {
 		return
 	}
 
-	onCloseNew := func(_ func(event *qt.QCloseEvent), _ *qt.QCloseEvent) {
+	onCloseNew := func(_ func(*qt.QCloseEvent), _ *qt.QCloseEvent) {
 		app.scanPopupCount.Add(-1)
 		onClose()
 	}
