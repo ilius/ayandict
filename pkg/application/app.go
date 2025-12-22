@@ -315,8 +315,8 @@ func (app *Application) Run(query string) {
 	)
 
 	app.favoriteButton.SetToolTips(
-		"Add this term to favorites (F)",
-		"Remove this term from favorites (F)",
+		"Add this term to favorites (F)\nRight-click for multiple terms",
+		"Remove this term from favorites (F)\nRight-click for multiple terms",
 	)
 	app.favoriteButton.Hide()
 	// favoriteButtonVBox.AddWidget(favoriteButton, 0, qt.AlignBottom)
