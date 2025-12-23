@@ -162,6 +162,9 @@ func (w *ResultTree) Clear() {
 }
 
 func (w *ResultTree) indexListFromItem(item *qt.QTreeWidgetItem) []int {
+	if item == nil {
+		return nil
+	}
 	indexList := []int{}
 	for item.Parent() != nil {
 		parent := item.Parent()
@@ -174,6 +177,9 @@ func (w *ResultTree) indexListFromItem(item *qt.QTreeWidgetItem) []int {
 }
 
 func (w *ResultTree) indexListToItem(indexList []int) *qt.QTreeWidgetItem {
+	if indexList == nil {
+		return nil
+	}
 	item := w.TopLevelItem(indexList[0])
 	indexList = indexList[1:]
 	for index := range indexList {
