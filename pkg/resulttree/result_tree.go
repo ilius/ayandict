@@ -13,6 +13,7 @@ import (
 type ApplicationIface interface {
 	OnResultDisplay(terms []string)
 	HasFavorite(term string) bool
+	ResultsLabel() *qt.QLabel
 }
 
 type HeaderLabelIface interface {
@@ -149,6 +150,10 @@ func (w *ResultTree) onActivate(row int) {
 	}
 	w.app.OnResultDisplay(res.Terms())
 	w.currentResult = res
+	label := w.app.ResultsLabel()
+	if label != nil {
+		label.SetText(fmt.Sprintf("Results: %2d / %d", row+1, len(w.results)))
+	}
 }
 
 func (w *ResultTree) Clear() {

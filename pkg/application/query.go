@@ -52,8 +52,11 @@ func (app *Application) SetNoResult(query string) {
 	a.AddHistoryAndFrequency(query)
 }
 
+func (app *Application) ResultsLabel() *qt.QLabel {
+	return app.queryArgs.ResultsLabel
+}
+
 func (app *Application) SetResults(results []common.SearchResultIface) {
-	app.queryArgs.ResultsLabel.SetText(fmt.Sprintf("Results: %d", len(results)))
 	app.resultList.SetResults(results)
 }
 
