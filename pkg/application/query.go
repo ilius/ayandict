@@ -48,6 +48,7 @@ func (app *Application) SetNoResult(query string) {
 	a := app.queryArgs
 	a.ArticleView.SetHtml(fmt.Sprintf("No results for %#v", query))
 	a.HeaderLabel.SetText("")
+	a.ResultsLabel.SetText("Results: none")
 	app.favoriteButton.Hide()
 	a.AddHistoryAndFrequency(query)
 }
