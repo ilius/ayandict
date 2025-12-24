@@ -45,14 +45,16 @@ func NewResultTree(
 		if item == nil {
 			return
 		}
+		termIndex := 0
 		for item.Parent() != nil {
+			termIndex = item.Parent().IndexOfChild(item) + 1
 			item = item.Parent()
 		}
-		row := widget.IndexOfTopLevelItem(item)
-		if row < 0 {
+		resultIndex := widget.IndexOfTopLevelItem(item)
+		if resultIndex < 0 {
 			return
 		}
-		resultTree.onActivate(row)
+		resultTree.onActivate(resultIndex, termIndex)
 	})
 	return resultTree
 }
@@ -95,6 +97,9 @@ func (w *ResultTree) SetResults(results []common.SearchResultIface) {
 			continue
 		}
 		text := terms[0]
+		if len(terms) > 1 {
+			text = fmt.Sprintf("%s (+%d)", text, len(terms)-1)
+		}
 		symbol := dictmgr.DictSymbol(res.DictName())
 		if symbol != "" {
 			text = fmt.Sprintf("%s %s", text, symbol)
@@ -134,12 +139,12 @@ func (w *ResultTree) SetCurrentResult(resultIndex int) {
 	w.SetCurrentItem(w.TopLevelItem(resultIndex))
 }
 
-func (w *ResultTree) onActivate(row int) {
-	if row >= len(w.results) {
-		slog.Error("ResultTreeWidget: OnActivate: row index out of range", "row", row)
+func (w *ResultTree) onActivate(resultIndex int, termIndex int) {
+	if resultIndex >= len(w.results) {
+		slog.Error("ResultTreeWidget: OnActivate: row index out of range", "row", resultIndex)
 		return
 	}
-	res := w.results[row]
+	res := w.results[resultIndex]
 	w.HeaderLabel.SetResult(res)
 	w.ArticleView.SetResult(res)
 	resDir := res.ResourceDir()
@@ -152,7 +157,17 @@ func (w *ResultTree) onActivate(row int) {
 	w.currentResult = res
 	label := w.app.ResultsLabel()
 	if label != nil {
-		label.SetText(fmt.Sprintf("Results: %2d / %d", row+1, len(w.results)))
+		if termIndex > 0 {
+			label.SetText(fmt.Sprintf(
+				"Results: %2d / %d (term %d)",
+				resultIndex+1, len(w.results), termIndex+1,
+			))
+		} else {
+			label.SetText(fmt.Sprintf(
+				"Results: %2d / %d",
+				resultIndex+1, len(w.results),
+			))
+		}
 	}
 }
 
