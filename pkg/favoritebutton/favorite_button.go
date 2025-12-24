@@ -7,8 +7,10 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
-const maxMenuWidth = 400
-const maxMenuTermCount = 30
+const (
+	maxMenuWidth     = 400
+	maxMenuTermCount = 30
+)
 
 type ApplicationIface interface {
 	HasFavorite(term string) bool
@@ -117,16 +119,21 @@ QMenu::item {
 		terms = terms[:maxMenuTermCount]
 	}
 	mainTerm := terms[0]
+	onMainTermTriggered := func(checked bool) {
+		b.SetChecked(checked)
+		b.app.SetFavoriteFromFavoriteButtonMenu(mainTerm, checked)
+	}
 	for _, term := range terms {
 		action := qt.NewQAction2(term)
 		action.SetCheckable(true)
 		action.SetChecked(b.app.HasFavorite(term))
-		action.OnTriggeredWithChecked(func(checked bool) {
-			if term == mainTerm {
-				b.SetChecked(checked)
-			}
-			b.app.SetFavoriteFromFavoriteButtonMenu(term, checked)
-		})
+		if term == mainTerm {
+			action.OnTriggeredWithChecked(onMainTermTriggered)
+		} else {
+			action.OnTriggeredWithChecked(func(checked bool) {
+				b.app.SetFavoriteFromFavoriteButtonMenu(term, checked)
+			})
+		}
 		menu.AddAction(action)
 		width := fm.HorizontalAdvance(term)
 		if width > menuWidth {
