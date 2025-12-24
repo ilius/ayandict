@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -o errexit -o pipefail
 
 # Get clipboard or primary text regardless of Wayland/X11

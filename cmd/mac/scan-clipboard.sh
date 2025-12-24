@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Capture copied text on macOS and send it to AyanDict
 # via UNIX socket for Scan Popup
 
