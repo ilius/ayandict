@@ -8,6 +8,7 @@ import (
 )
 
 const maxMenuWidth = 400
+const maxMenuTermCount = 30
 
 type ApplicationIface interface {
 	HasFavorite(term string) bool
@@ -111,8 +112,12 @@ QMenu::item {
     padding-right: 0.25em;
 }`)
 	menuWidth := 0
-	mainTerm := b.terms[0]
-	for _, term := range b.terms {
+	terms := b.terms
+	if len(terms) > maxMenuTermCount {
+		terms = terms[:maxMenuTermCount]
+	}
+	mainTerm := terms[0]
+	for _, term := range terms {
 		action := qt.NewQAction2(term)
 		action.SetCheckable(true)
 		action.SetChecked(b.app.HasFavorite(term))
