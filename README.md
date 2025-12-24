@@ -150,6 +150,14 @@ There are tons of web pages that let you download various usable dictionaries, b
 - **Ctrl + Q**: Quit / exit application
 - **F1**: Show About window
 
+# Some useful (nonobvious) features
+
+- Click **Clear** while holding **Ctrl / Command** to clear history (and query)
+- Click **Reload** while holding **Ctrl / Command** to reload config, dictionaries and user style
+- Click **Reload** while holding **Shift**  to reload config and user style
+- **Right-click on Favorite** icon (under OK) to see multiple terms and add/remove favorite
+- Click **About** then click **Keyboard Shortcuts** to view the shortcuts
+
 # Search Algorithm
 
 The default search is fuzzy, and it is based on similarity scores that are calculated from [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance). We also split entry terms into words, for example if you type "language" (or with with a few misspelled letters, like "languge"), it first shows "language", and then terms like "language learning", but may also show terms like "sign language".
@@ -160,12 +168,14 @@ Anything with at least %70 similarity score is listed (for example "languge" is 
 
 This works pretty well in most cases, but the only catch is that first letter of your query must match the first letter of one of your target words. For example if you type "symmetry", it will not match term "asymmetry" even though they are close enough (high similarity score), because their first letter is different.
 
-But we also have 3 other search modes added in v2.0.0:
+But we also have these search modes:
 
-- Start with, shows all terms that start with given query string
-- Regex (regular expression), for example `symm.*y`
-- Glob, for example `symm*y`
-
-Also a new mode "Word Match" is added recently (versions `v2.2.4` and `v3.0.0`).
+- Start with, shows all terms that start with given query string (added in v2.0)
+- Regex (regular expression), for example `symm.*y` (added in v2.0)
+- Glob, for example `symm*y` (added in v2.0)
+- Word Match (added in v2.2.4 and v3.0)
+  - Exactly matches any word in a term against (single-word) query
 
 In all of these modes, shorter matched terms are given higher score. For example in Regex mode with query `symm.*y`, term "symmetry" comes before "symmetrically" because of smaller length and higher score.
+
+And an additional search mode "Soundex" is enabled if you set [soundex_words_file](./doc/config.rst#soundex_words_file) config parameter. This is to find sound-alike words (mostly for English). Like words that you've heard but didn't figure out how to spell close enough to find with Fuzzy or other modes. More on [Wikipedia](https://en.wikipedia.org/wiki/Soundex).
