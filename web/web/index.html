@@ -89,6 +89,7 @@
 					if target.endswith((".mp3", ".wav", ".ogg")):
 						a.attrs["onclick"] = "playAudioA(this); return false"
 						continue
+					# browsers don't play spx!
 					if not is_word_link(target):
 						continue
 					a.attrs["dict_target"] = target
