@@ -85,9 +85,7 @@ func (app *Application) setTrayMenu() {
 	// icon will not align with checkboxes! so forget it!
 	menu := qt.NewQMenu2()
 	// TODO: reverse order of actions if tray icon is closer to top of screen
-	for _, action := range app.statusIconActions {
-		menu.AddAction(action)
-	}
+	menu.AddActions(app.statusIconActions)
 	app.trayIcon.SetContextMenu(menu)
 }
 

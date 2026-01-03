@@ -78,8 +78,8 @@ func (w *DesktopWidget) popupMenu(event *qt.QMouseEvent) {
 	menu.SetSeparatorsCollapsible(false)
 	menuWidth := 0
 	fm := w.FontMetrics()
+	menu.AddActions(w.app.statusIconActions)
 	for _, action := range w.app.statusIconActions {
-		menu.AddAction(action)
 		width := fm.HorizontalAdvance(action.Text())
 		if width > menuWidth {
 			menuWidth = width

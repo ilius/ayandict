@@ -78,9 +78,7 @@ func (w *DesktopWidget) popupMenu(event *qt.QMouseEvent) {
 		return
 	}
 	menu := qt.NewQMenu2()
-	for _, action := range w.actions {
-		menu.AddAction(action)
-	}
+	menu.AddActions(w.actions)
 	// menu.SetFont(app.systemDefaultFont)
 	menu.Popup(event.Pos())
 }
