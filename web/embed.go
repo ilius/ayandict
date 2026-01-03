@@ -2,5 +2,5 @@ package web
 
 import "embed"
 
-//go:embed */*.html */*.css */*.png */*/*.js
+//go:embed web/*.html web/*.css web/*.png web/brython@*/*.js
 var FS embed.FS
