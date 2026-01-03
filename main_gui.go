@@ -13,6 +13,8 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/dictmgr"
 	"github.com/ilius/ayandict/v3/pkg/logging"
 	"github.com/ilius/ayandict/v3/pkg/webserver"
+
+	_ "net/http/pprof"
 )
 
 func runServerOnly(createConfig bool) {
