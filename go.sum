@@ -1,7 +1,7 @@
 codeberg.org/ilius/go-dict-commons v0.7.1 h1:7/ZvTa+qeRNb/S6Fn75c/A148uxF89rsOIjQMQpuzE8=
 codeberg.org/ilius/go-dict-commons v0.7.1/go.mod h1:BUl3oh0AjP8vW4oDaNSrzjArPeHAf80tRYZzGRhqTxo=
-codeberg.org/ilius/go-stardict/v2 v2.7.1 h1:6bcmw4koBAmC2xTQsCtc4j3o4pzbZ1JNSHrUyUbc/yU=
-codeberg.org/ilius/go-stardict/v2 v2.7.1/go.mod h1:efo510lb2xPg3R1MjZN0EtGpa+uWxlz2S9bfSsLNtsY=
+codeberg.org/ilius/go-stardict/v2 v2.8.0 h1:LokpFeKTCXeJVc3VsO161zI8pd8wissK4bIwc2zmSAA=
+codeberg.org/ilius/go-stardict/v2 v2.8.0/go.mod h1:efo510lb2xPg3R1MjZN0EtGpa+uWxlz2S9bfSsLNtsY=
 github.com/BurntSushi/toml v1.5.0 h1:W5quZX/G/csjUnuI8SUYlsHs9M38FC7znL0lIO+DvMg=
 github.com/BurntSushi/toml v1.5.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2lLoLwho=
 github.com/ilius/glob v0.0.0-20250212111036-4c41f838a304 h1:hrjENbAZEBbffGaAhD6Wd4t1pKUp54wXtKQ4FsMXh/4=
