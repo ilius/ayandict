@@ -12,40 +12,42 @@ package qplatform
 #include <stdlib.h>
 #include <string.h>
 
-void hide_from_taskbar(unsigned long wid) {
+static const long WM_EVENT_MASK = SubstructureRedirectMask | SubstructureNotifyMask;
+
+void hide_from_taskbar(Window wid) {
     Display *dpy = XOpenDisplay(NULL);
     if (!dpy) {
         fprintf(stderr, "Cannot open display\n");
         return;
     }
 
-    Window root = DefaultRootWindow(dpy);
+    XWindowAttributes attr;
+    if (!XGetWindowAttributes(dpy, wid, &attr)) {
+        XCloseDisplay(dpy);
+        return;
+    }
+
     Atom net_wm_state = XInternAtom(dpy, "_NET_WM_STATE", False);
     Atom skip_taskbar = XInternAtom(dpy, "_NET_WM_STATE_SKIP_TASKBAR", False);
     Atom skip_pager   = XInternAtom(dpy, "_NET_WM_STATE_SKIP_PAGER", False);
 
-    XEvent e;
-    memset(&e, 0, sizeof(e));
-    e.xclient.type = ClientMessage;
-    e.xclient.serial = 0;
-    e.xclient.send_event = True;
-    e.xclient.message_type = net_wm_state;
-    e.xclient.window = (Window)wid;
-    e.xclient.format = 32;
-    e.xclient.data.l[0] = 1; // _NET_WM_STATE_ADD
-    e.xclient.data.l[1] = skip_taskbar;
-    e.xclient.data.l[2] = skip_pager;
-    e.xclient.data.l[3] = 0;
-    e.xclient.data.l[4] = 0;
+    if (!net_wm_state || !skip_taskbar || !skip_pager) {
+        XCloseDisplay(dpy);
+        return;
+    }
 
-    // Send the request to the root window
-    XSendEvent(
-        dpy,
-        root,
-        False,
-        SubstructureRedirectMask | SubstructureNotifyMask,
-        &e
-    );
+    XEvent e = {0};
+    e.xclient.type = ClientMessage;
+    e.xclient.message_type = net_wm_state;
+    e.xclient.window = wid;
+    e.xclient.format = 32;
+    e.xclient.data.l[0] = 1;
+
+    e.xclient.data.l[1] = skip_taskbar;
+    XSendEvent(dpy, attr.root, False, WM_EVENT_MASK, &e);
+
+    e.xclient.data.l[1] = skip_pager;
+    XSendEvent(dpy, attr.root, False, WM_EVENT_MASK, &e);
 
     XFlush(dpy);
     XCloseDisplay(dpy);
