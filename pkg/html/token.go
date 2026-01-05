@@ -231,7 +231,7 @@ func (z *Tokenizer) readByte() byte {
 // It returns io.ErrNoProgress if the underlying r.Read method returns (0, nil)
 // too many times in succession.
 func readAtLeastOneByte(r io.Reader, b []byte) (int, error) {
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		if n, err := r.Read(b); n != 0 || err != nil {
 			return n, err
 		}
@@ -447,7 +447,7 @@ scriptDataEscapedEndTagOpen:
 
 scriptDataDoubleEscapeStart:
 	z.raw.end--
-	for i := 0; i < len("script"); i++ {
+	for i := range len("script") {
 		c = z.readByte()
 		if z.err != nil {
 			return
@@ -636,7 +636,7 @@ func (z *Tokenizer) readUntilCloseAngle() {
 func (z *Tokenizer) readMarkupDeclaration() TokenType {
 	z.data.start = z.raw.end
 	var c [2]byte
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		c[i] = z.readByte()
 		if z.err != nil {
 			z.data.end = z.raw.end
@@ -664,7 +664,7 @@ func (z *Tokenizer) readMarkupDeclaration() TokenType {
 // successful. The opening "<!" has already been consumed.
 func (z *Tokenizer) readDoctype() bool {
 	const s = "DOCTYPE"
-	for i := 0; i < len(s); i++ {
+	for i := range len(s) {
 		c := z.readByte()
 		if z.err != nil {
 			z.data.end = z.raw.end
@@ -689,7 +689,7 @@ func (z *Tokenizer) readDoctype() bool {
 // successful. The opening "<!" has already been consumed.
 func (z *Tokenizer) readCDATA() bool {
 	const s = "[CDATA["
-	for i := 0; i < len(s); i++ {
+	for i := range len(s) {
 		c := z.readByte()
 		if z.err != nil {
 			z.data.end = z.raw.end

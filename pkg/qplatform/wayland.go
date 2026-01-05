@@ -1,5 +1,4 @@
 //go:build linux && wayland
-// +build linux,wayland
 
 package qplatform
 

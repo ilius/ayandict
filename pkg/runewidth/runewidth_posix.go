@@ -1,5 +1,4 @@
 //go:build !windows && !js && !appengine
-// +build !windows,!js,!appengine
 
 package runewidth
 

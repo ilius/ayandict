@@ -32,8 +32,7 @@ func getDocTag(s string) string {
 }
 
 func printCommentTemplate() {
-	conf := config.Default()
-	typ := reflect.TypeOf(conf).Elem()
+	typ := reflect.TypeFor[config.Config]()
 	for i := range typ.NumField() {
 		fieldType := typ.Field(i)
 		tomlTag := getTomlTag(string(fieldType.Tag))
@@ -68,7 +67,7 @@ func printStruct(typ reflect.Type, val reflect.Value, keyPrefix string) {
 
 func printAll() {
 	conf := config.Default()
-	typ := reflect.TypeOf(conf).Elem()
+	typ := reflect.TypeFor[config.Config]()
 	val := reflect.ValueOf(conf).Elem()
 	printStruct(typ, val, "")
 }
@@ -118,7 +117,7 @@ func printMarkdownStruct(spec ConfigStructSpec) {
 func printMarkdown() {
 	conf := config.Default()
 	printMarkdownStruct(ConfigStructSpec{
-		Type:  reflect.TypeOf(conf).Elem(),
+		Type:  reflect.TypeFor[config.Config](),
 		Value: reflect.ValueOf(conf).Elem(),
 	})
 }

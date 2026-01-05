@@ -376,11 +376,11 @@ func (p *DictProcessor) embedExternalStyle(defi string) string {
 	resDir := p.ResourceDir()
 
 	subFunc := func(match string) string {
-		i := strings.Index(match, ` href=`)
-		if i < 0 {
+		_, after, ok := strings.Cut(match, ` href=`)
+		if !ok {
 			return match
 		}
-		q_href := match[i+pre:]
+		q_href := after
 		j := strings.Index(q_href[1:], q_href[:1])
 		if j < 0 {
 			slog.Error("linkSub: did not find quote end in q_href", "q_href", q_href)

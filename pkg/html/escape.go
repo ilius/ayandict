@@ -144,10 +144,7 @@ func unescapeEntity(b []byte, dst, src int, attribute bool) (dst1, src1 int) {
 		dst1 := dst + utf8.EncodeRune(b[dst:], x[0])
 		return dst1 + utf8.EncodeRune(b[dst1:], x[1]), src + i
 	} else if !attribute {
-		maxLen := len(entityName) - 1
-		if maxLen > longestEntityWithoutSemicolon {
-			maxLen = longestEntityWithoutSemicolon
-		}
+		maxLen := min(len(entityName)-1, longestEntityWithoutSemicolon)
 		for j := maxLen; j > 1; j-- {
 			if x := entity[entityName[:j]]; x != 0 {
 				return dst + utf8.EncodeRune(b[dst:], x), src + j + 1

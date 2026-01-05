@@ -1,5 +1,4 @@
 //go:build generate
-// +build generate
 
 // This program generates a property file in Go file from Unicode Character
 // Database auxiliary data files. The command line arguments are as follows:

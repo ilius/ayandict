@@ -6,6 +6,7 @@ package html
 
 import (
 	"io"
+	"slices"
 	"strings"
 
 	a "github.com/ilius/ayandict/v3/pkg/html/atom"
@@ -109,10 +110,8 @@ func (p *parser) indexOfElementInScope(s scope, matchTags ...a.Atom) int {
 	for i := len(p.oe) - 1; i >= 0; i-- {
 		tagAtom := p.oe[i].DataAtom
 		if p.oe[i].Namespace == "" {
-			for _, t := range matchTags {
-				if t == tagAtom {
-					return i
-				}
+			if slices.Contains(matchTags, tagAtom) {
+				return i
 			}
 			switch s {
 			case defaultScope:
@@ -139,10 +138,8 @@ func (p *parser) indexOfElementInScope(s scope, matchTags ...a.Atom) int {
 		}
 		switch s {
 		case defaultScope, listItemScope, buttonScope:
-			for _, t := range defaultScopeStopTags[p.oe[i].Namespace] {
-				if t == tagAtom {
-					return -1
-				}
+			if slices.Contains(defaultScopeStopTags[p.oe[i].Namespace], tagAtom) {
+				return -1
 			}
 		}
 	}
@@ -1221,7 +1218,7 @@ func (p *parser) inBodyEndTagFormatting(tagAtom a.Atom, tagName string) {
 	}
 
 	// Steps 3-5. The outer loop.
-	for i := 0; i < 8; i++ {
+	for range 8 {
 		// Step 6. Find the formatting element.
 		var formattingElement *Node
 		for j := len(p.afe) - 1; j >= 0; j-- {

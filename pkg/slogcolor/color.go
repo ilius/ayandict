@@ -95,12 +95,12 @@ func (c *Color) Add(value ...Attribute) *Color {
 }
 
 // Sprint is just like Print, but returns a string instead of printing it.
-func (c *Color) Sprint(a ...interface{}) string {
+func (c *Color) Sprint(a ...any) string {
 	return c.wrap(fmt.Sprint(a...))
 }
 
 // Sprintf is just like Printf, but returns a string instead of printing it.
-func (c *Color) Sprintf(format string, a ...interface{}) string {
+func (c *Color) Sprintf(format string, a ...any) string {
 	return c.wrap(fmt.Sprintf(format, a...))
 }
 
@@ -110,8 +110,8 @@ func (c *Color) Sprintf(format string, a ...interface{}) string {
 //
 //	put := New(FgYellow).SprintFunc()
 //	fmt.Fprintf(Output, "This is a %s", put("warning"))
-func (c *Color) SprintFunc() func(a ...interface{}) string {
-	return func(a ...interface{}) string {
+func (c *Color) SprintFunc() func(a ...any) string {
+	return func(a ...any) string {
 		return c.wrap(fmt.Sprint(a...))
 	}
 }

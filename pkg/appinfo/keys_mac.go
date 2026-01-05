@@ -1,5 +1,4 @@
 //go:build darwin || mackeybindings
-// +build darwin mackeybindings
 
 package appinfo
 
