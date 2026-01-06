@@ -16,7 +16,7 @@ const WEBSITE = "https://github.com/ilius/ayandict"
 
 const ABOUT = `A simple cross-platform desktop dictionary application based on Qt framework and written in Go that uses StarDict dictionary format.
 
-Copyleft © 2025 Saeed Rasooli
+Copyleft © 2026 Saeed Rasooli
 AyanDict is licensed by the GNU Affero General Public License version 3 (or later)
 `
 
@@ -24,7 +24,7 @@ const AUTHORS = `Saeed Rasooli <saeed.gnu@gmail.com> (ilius)`
 
 const LICENSE = `AyanDict - A simple dictionary application
 
-Copyright © 2025 Saeed Rasooli
+Copyright © 2026 Saeed Rasooli
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
