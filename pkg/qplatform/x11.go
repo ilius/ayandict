@@ -1,5 +1,4 @@
 //go:build !(windows || darwin) && !wayland
-// +build !windows,!darwin,!wayland
 
 package qplatform
 

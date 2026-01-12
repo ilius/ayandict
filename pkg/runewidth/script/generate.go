@@ -1,5 +1,4 @@
 //go:build ignore
-// +build ignore
 
 // Generate runewidth_table.go from data at https://unicode.org/
 

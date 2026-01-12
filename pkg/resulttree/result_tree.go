@@ -187,7 +187,7 @@ func (w *ResultTree) indexListFromItem(item *qt.QTreeWidgetItem) []int {
 		item = parent
 	}
 	indexList = append(indexList, w.IndexOfTopLevelItem(item))
-	slices.Reverse[[]int, int](indexList)
+	slices.Reverse(indexList)
 	return indexList
 }
 
