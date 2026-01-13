@@ -40,7 +40,6 @@ const (
 )
 
 type (
-	wchar uint16
 	short int16
 	dword uint32
 	word  uint16
@@ -815,15 +814,16 @@ loop:
 		case 'h':
 			var ci consoleCursorInfo
 			cs := buf.String()
-			if cs == "5>" {
+			switch cs {
+			case "5>":
 				procGetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&ci)))
 				ci.visible = 0
 				procSetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&ci)))
-			} else if cs == "?25" {
+			case "?25":
 				procGetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&ci)))
 				ci.visible = 1
 				procSetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&ci)))
-			} else if cs == "?1049" {
+			case "?1049":
 				if w.althandle == 0 {
 					h, _, _ := procCreateConsoleScreenBuffer.Call(uintptr(genericRead|genericWrite), 0, 0, uintptr(consoleTextmodeBuffer), 0, 0)
 					w.althandle = syscall.Handle(h)
@@ -835,21 +835,23 @@ loop:
 		case 'l':
 			var ci consoleCursorInfo
 			cs := buf.String()
-			if cs == "5>" {
+			switch cs {
+			case "5>":
 				procGetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&ci)))
 				ci.visible = 1
 				procSetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&ci)))
-			} else if cs == "?25" {
+			case "?25":
 				procGetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&ci)))
 				ci.visible = 0
 				procSetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&ci)))
-			} else if cs == "?1049" {
+			case "?1049":
 				if w.althandle != 0 {
 					syscall.CloseHandle(w.althandle)
 					w.althandle = 0
 					handle = w.handle
 				}
 			}
+
 		case 's':
 			procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
 			w.oldpos = csbi.cursorPosition
@@ -941,26 +943,28 @@ func toHSV(rgb int) hsv {
 	r, g, b := float32((rgb&0xFF0000)>>16)/256.0,
 		float32((rgb&0x00FF00)>>8)/256.0,
 		float32(rgb&0x0000FF)/256.0
-	min, max := minmax3f(r, g, b)
-	h := max - min
+	minC := min(r, g, b)
+	maxC := max(r, g, b)
+	h := maxC - minC
 	if h > 0 {
-		if max == r {
+		switch maxC {
+		case r:
 			h = (g - b) / h
 			if h < 0 {
 				h += 6
 			}
-		} else if max == g {
+		case g:
 			h = 2 + (b-r)/h
-		} else {
+		default:
 			h = 4 + (r-g)/h
 		}
 	}
 	h /= 6.0
-	s := max - min
-	if max != 0 {
-		s /= max
+	s := maxC - minC
+	if maxC != 0 {
+		s /= maxC
 	}
-	v := max
+	v := maxC
 	return hsv{h: h, s: s, v: v}
 }
 
@@ -985,26 +989,6 @@ func (t hsvTable) find(rgb int) consoleColor {
 		}
 	}
 	return color16[n]
-}
-
-func minmax3f(a, b, c float32) (min, max float32) {
-	if a < b {
-		if b < c {
-			return a, c
-		} else if a < c {
-			return a, b
-		} else {
-			return c, b
-		}
-	} else {
-		if a < c {
-			return b, c
-		} else if b < c {
-			return b, a
-		} else {
-			return c, a
-		}
-	}
 }
 
 var (
