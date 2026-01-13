@@ -30,6 +30,8 @@ import (
 // https://bugreports.qt.io/browse/QTBUG-52751
 
 const (
+	maxMenuWidth = 400
+
 	startFrag = "<!--StartFragment-->"
 	endFrag   = "<!--EndFragment-->"
 )
@@ -483,6 +485,14 @@ func (view *ArticleView) createContextMenuNoSelection(menu *qt.QMenu, pos *qt.QP
 
 func (view *ArticleView) createContextMenu(pos *qt.QPoint) *qt.QMenu {
 	menu := qt.NewQMenu(view.Browser.QWidget)
+	menuWidth := 0
+	fm := menu.FontMetrics()
+	updateMenuWidth := func(text string) {
+		width := fm.HorizontalAdvance(text)
+		if width > menuWidth {
+			menuWidth = width
+		}
+	}
 
 	selected := view.Browser.TextCursor().SelectedText()
 
@@ -492,19 +502,33 @@ func (view *ArticleView) createContextMenu(pos *qt.QPoint) *qt.QMenu {
 		view.createContextMenuWithSelection(menu, selected)
 	}
 
-	menu.AddActionWithText("Copy All (HTML)").OnTriggered(func() {
+	for _, action := range menu.Actions() {
+		updateMenuWidth(action.Text())
+	}
+
+	addActionWithText := func(text string, onTrigger func()) {
+		menu.AddActionWithText(text).OnTriggered(onTrigger)
+		updateMenuWidth(text)
+	}
+
+	addActionWithText("Copy All (HTML)", func() {
 		qt.QGuiApplication_Clipboard().SetText2(
 			view.Browser.ToHtml(),
 			qt.QClipboard__Clipboard,
 		)
 	})
-	menu.AddActionWithText("Copy All (Plaintext)").OnTriggered(func() {
+	addActionWithText("Copy All (Plaintext)", func() {
 		qt.QGuiApplication_Clipboard().SetText2(
 			view.Browser.ToPlainText(),
 			qt.QClipboard__Clipboard,
 		)
 	})
 
+	menuWidth += fm.HorizontalAdvance("M")/2 + 60
+	if menuWidth > maxMenuWidth {
+		menuWidth = maxMenuWidth
+	}
+	menu.SetMinimumWidth(menuWidth)
 	return menu
 }
 
@@ -562,7 +586,6 @@ func (view *ArticleView) findLinkOnCursor(cursor *qt.QTextCursor) string {
 	}
 	start = strings.Index(text, "href=")
 	if start < 0 {
-		slog.Warn("findLinkOnCursor: did not find end href=")
 		return ""
 	}
 	text = text[start+5:]
