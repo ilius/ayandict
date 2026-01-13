@@ -12,6 +12,8 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
+const maxMenuWidth = 400
+
 type HeaderLabel struct {
 	*qt.QLabel
 
@@ -82,14 +84,26 @@ func (label *HeaderLabel) addQueryAction(menu *qt.QMenu, term string) {
 
 func (label *HeaderLabel) createContextMenu(selection bool) *qt.QMenu {
 	menu := qt.NewQMenu(label.QLabel.QWidget)
+	menuWidth := 0
+	fm := menu.FontMetrics()
+	updateMenuWidth := func(text string) {
+		width := fm.HorizontalAdvance(text)
+		if width > menuWidth {
+			menuWidth = width
+		}
+	}
+	addActionWithText := func(text string, onTrigger func()) {
+		menu.AddActionWithText(text).OnTriggered(onTrigger)
+		updateMenuWidth(text)
+	}
 	if selection {
-		menu.AddActionWithText("Query Selected").OnTriggered(func() {
+		addActionWithText("Query Selected", func() {
 			text := label.SelectedText()
 			if text != "" {
 				label.doQuery(strings.Trim(text, utils.QueryForceTrimChars))
 			}
 		})
-		menu.AddActionWithText("Copy Selected").OnTriggered(func() {
+		addActionWithText("Copy Selected", func() {
 			text := label.SelectedText()
 			if text == "" {
 				return
@@ -103,20 +117,27 @@ func (label *HeaderLabel) createContextMenu(selection bool) *qt.QMenu {
 	}
 	for _, term := range terms {
 		label.addQueryAction(menu, term)
+		updateMenuWidth("Query: " + term)
 	}
 
-	menu.AddActionWithText("Copy All (Plaintext)").OnTriggered(func() {
+	addActionWithText("Copy All (Plaintext)", func() {
 		qt.QGuiApplication_Clipboard().SetText2(
 			plaintextFromHTML(label.Text()),
 			qt.QClipboard__Clipboard,
 		)
 	})
-	menu.AddActionWithText("Copy All (HTML)").OnTriggered(func() {
+	addActionWithText("Copy All (HTML)", func() {
 		qt.QGuiApplication_Clipboard().SetText2(
 			label.Text(),
 			qt.QClipboard__Clipboard,
 		)
 	})
+
+	menuWidth += fm.HorizontalAdvance("M")/2 + 60
+	if menuWidth > maxMenuWidth {
+		menuWidth = maxMenuWidth
+	}
+	menu.SetMinimumWidth(menuWidth)
 
 	return menu
 }
