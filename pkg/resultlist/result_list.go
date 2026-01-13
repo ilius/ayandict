@@ -126,6 +126,10 @@ func (w *ResultList) onActivate(row int) {
 		return
 	}
 	res := w.results[row]
+	if res == w.currentResult {
+		slog.Debug("ResultList.onActivate: ignoring same result")
+		return
+	}
 	w.HeaderLabel.SetResult(res)
 	w.ArticleView.SetResult(res)
 	resDir := res.ResourceDir()

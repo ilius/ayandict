@@ -145,6 +145,10 @@ func (w *ResultTree) onActivate(resultIndex int, termIndex int) {
 		return
 	}
 	res := w.results[resultIndex]
+	if res == w.currentResult {
+		slog.Debug("ResultTree.onActivate: ignoring same result")
+		return
+	}
 	w.HeaderLabel.SetResult(res)
 	w.ArticleView.SetResult(res)
 	resDir := res.ResourceDir()
