@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"sort"
 	"strings"
+	"unicode"
 
 	common "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v3/pkg/config"
@@ -39,6 +40,19 @@ func SearchModeByName(name string) (SearchMode, bool) {
 	return SearchMode(0), false
 }
 
+func searchAdjustCase(
+	query string,
+	results []*common.SearchResultLow,
+) []*common.SearchResultLow {
+	queryIsCap := unicode.IsUpper([]rune(query)[0])
+	for _, res := range results {
+		if queryIsCap != unicode.IsUpper([]rune(res.F_Terms[0])[0]) {
+			res.F_Score--
+		}
+	}
+	return results
+}
+
 func search(
 	dic common.Dictionary,
 	conf *config.Config,
@@ -57,7 +71,7 @@ func search(
 		if !ds.StartWith() {
 			return nil
 		}
-		return dic.SearchStartWith(query, workerCount, timeout)
+		return searchAdjustCase(query, dic.SearchStartWith(query, workerCount, timeout))
 	case SearchModeRegex:
 		if !ds.Regex() {
 			return nil
@@ -87,7 +101,7 @@ func search(
 	if !ds.Fuzzy() {
 		return nil
 	}
-	return dic.SearchFuzzy(query, workerCount, timeout)
+	return searchAdjustCase(query, dic.SearchFuzzy(query, workerCount, timeout))
 }
 
 func sortResults(results []common.SearchResultIface) {
