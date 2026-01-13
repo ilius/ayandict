@@ -19,7 +19,7 @@ var ShowErrorDialog = func(_ string) {}
 
 func SetupGUILogger(noColor bool, level slog.Level) {
 	handler := NewColoredHandler(noColor, level)
-	slog.SetDefault(slog.New(&CustomHandler{
+	slog.SetDefault(slog.New(CustomHandler{
 		Handler: handler,
 	}))
 }
@@ -38,7 +38,7 @@ type CustomHandler struct {
 	slog.Handler
 }
 
-func (h *CustomHandler) showRecordInGUI(record slog.Record) {
+func (CustomHandler) showRecordInGUI(record slog.Record) {
 	msg := record.Message
 	if msg != "" {
 		msg = strings.ToUpper(msg[:1]) + msg[1:] // capitalize first character
@@ -57,7 +57,7 @@ func (h *CustomHandler) showRecordInGUI(record slog.Record) {
 	ShowErrorDialog(msg)
 }
 
-func (h *CustomHandler) Handle(ctx context.Context, record slog.Record) error {
+func (h CustomHandler) Handle(ctx context.Context, record slog.Record) error {
 	err := h.Handler.Handle(ctx, record)
 	if record.Level == slog.LevelError {
 		h.showRecordInGUI(record)

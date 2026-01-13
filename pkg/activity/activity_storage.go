@@ -48,7 +48,7 @@ func (s *ActivityStorage) ClearFrequency() {
 	s.frequencyMap = map[string]int{}
 }
 
-func (s *ActivityStorage) LoadFrequency() ([]*FrequencyItem, error) {
+func (s *ActivityStorage) LoadFrequency() ([]FrequencyItem, error) {
 	pathStr := s.frequencyFilePath
 	jsonBytes, err := os.ReadFile(pathStr)
 	if err != nil {
@@ -63,9 +63,9 @@ func (s *ActivityStorage) LoadFrequency() ([]*FrequencyItem, error) {
 		return nil, fmt.Errorf("bad frequency file %#v: %w", pathStr, err)
 	}
 	s.frequencyMap = countMap
-	countList := []*FrequencyItem{}
+	countList := []FrequencyItem{}
 	for key, count := range countMap {
-		countList = append(countList, &FrequencyItem{Word: key, Count: count})
+		countList = append(countList, FrequencyItem{Word: key, Count: count})
 	}
 	sort.Slice(countList, func(i, j int) bool {
 		return countList[i].Count > countList[j].Count

@@ -27,5 +27,5 @@ func (f *httpFileSystem) Open(name string) (http.File, error) {
 		logger.Error("file is not a seeker", "name", name)
 		return nil, os.ErrNotExist
 	}
-	return &httpFile{file2}, nil
+	return httpFile{file2}, nil
 }
