@@ -12,13 +12,27 @@ import (
 
 func (app *Application) setupHandlers() {
 	// MUST not call OnKeyPressEvent multiple times on the same widget
-	// that's why I separated setupArticleViewKeyPressEvent from setupKeyPressEvent
+
+	qobj := app.window.QObject
+	qt.NewQShortcut2(qt.NewQKeySequence2("Escape"), qobj).OnActivated(app.onEscape)
+	qt.NewQShortcut2(qt.NewQKeySequence2("Space"), qobj).OnActivated(app.onSpaceKey)
+	qt.NewQShortcut2(qt.NewQKeySequence2("+"), qobj).OnActivated(app.articleView.ZoomIn)
+	qt.NewQShortcut2(qt.NewQKeySequence2("="), qobj).OnActivated(app.articleView.ZoomIn)
+	qt.NewQShortcut2(qt.NewQKeySequence2("-"), qobj).OnActivated(app.articleView.ZoomOut)
+	qt.NewQShortcut2(qt.NewQKeySequence2("F"), qobj).OnActivated(app.onFKey)
+	qt.NewQShortcut2(qt.NewQKeySequence2("F1"), qobj).OnActivated(app.ShowAbout)
+	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+Q"), qobj).OnActivated(app.Exit)
+	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+D"), qobj).OnActivated(app.dictsButtonClicked)
+	qt.NewQShortcut2(qt.NewQKeySequence2("Alt+Left"), qobj).OnActivated(app.goBackInHistory)
+	qt.NewQShortcut2(qt.NewQKeySequence2("Alt+Right"), qobj).OnActivated(app.goForwardInHistory)
+	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+Left"), qobj).OnActivated(app.goBackInHistory)
+	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+Right"), qobj).OnActivated(app.goForwardInHistory)
+	qt.NewQShortcut2(qt.NewQKeySequence2("Alt+Up"), qobj).OnActivated(app.resultList.GoPrevious)
+	qt.NewQShortcut2(qt.NewQKeySequence2("Alt+Down"), qobj).OnActivated(app.resultList.GoNext)
 
 	app.setupKeyPressEvent(app.window)
 	app.setupKeyPressEvent(app.resultList)
 	app.setupKeyPressEvent(app.historyView.QListWidget)
-
-	app.articleView.OnKeyPressEvent(app.onArticleViewKeyPressEvent)
 
 	entry := app.entry
 	frequencyTable := app.frequencyTable
@@ -58,6 +72,10 @@ func (app *Application) onEscape() {
 	if app.articleView.OnEscape() {
 		return
 	}
+	if app.queryArgs.Entry.HasFocus() {
+		app.window.SetFocus()
+		return
+	}
 	app.resetQuery()
 }
 
@@ -75,91 +93,24 @@ func (app *Application) sendKeyEventToArticleView(event *qt.QKeyEvent) {
 func (app *Application) setupKeyPressEvent(widget KeyPressIface) {
 	widget.OnKeyPressEvent(func(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
 		switch event.Key() {
-		case int(qt.Key_Space): // " "
-			app.entry.SetFocusWithReason(qt.ShortcutFocusReason)
-		case int(qt.Key_Plus), int(qt.Key_Equal): // "+", "="
-			app.articleView.ZoomIn()
-		case int(qt.Key_Minus): // "-"
-			app.articleView.ZoomOut()
-		case escape: // event.Text()="\x1b"
-			app.onEscape()
-		case int(qt.Key_F1):
-			app.ShowAbout()
 		case int(qt.Key_PageUp), int(qt.Key_PageDown):
 			if event.Modifiers() == 0 {
 				app.sendKeyEventToArticleView(event)
 			} else {
 				super(event)
 			}
-		case int(qt.Key_Q):
-			if event.Modifiers()&qt.ControlModifier > 0 {
-				app.Exit()
-			}
-		case int(qt.Key_Left):
-			if event.Modifiers()&altCtrlModifier > 0 {
-				app.goBackInHistory()
-			}
-		case int(qt.Key_Right):
-			if event.Modifiers()&altCtrlModifier > 0 {
-				app.goForwardInHistory()
-			}
-		case int(qt.Key_Up):
-			if event.Modifiers()&qt.AltModifier > 0 {
-				app.resultList.GoPrevious()
-			} else {
-				super(event)
-			}
-		case int(qt.Key_Down):
-			if event.Modifiers()&qt.AltModifier > 0 {
-				app.resultList.GoNext()
-			} else {
-				super(event)
-			}
-		case int(qt.Key_F):
-			app.favoriteButtonClicked(app.favoriteButton.ToggleChecked())
 		default:
 			super(event)
 		}
 	})
 }
 
-func (app *Application) onArticleViewKeyPressEvent(super func(*qt.QKeyEvent), event *qt.QKeyEvent) {
-	switch event.Key() {
-	case int(qt.Key_Space): // " "
-		app.entry.SetFocusWithReason(qt.ShortcutFocusReason)
-	case escape: // event.Text()="\x1b"
-		app.onEscape()
-	case int(qt.Key_F1):
-		app.ShowAbout()
-	case int(qt.Key_Q):
-		if event.Modifiers()&qt.ControlModifier > 0 {
-			app.Exit()
-		}
-	case int(qt.Key_Left):
-		if event.Modifiers()&altCtrlModifier > 0 {
-			app.goBackInHistory()
-		}
-	case int(qt.Key_Right):
-		if event.Modifiers()&altCtrlModifier > 0 {
-			app.goForwardInHistory()
-		}
-	case int(qt.Key_Up):
-		if event.Modifiers()&qt.AltModifier > 0 {
-			app.resultList.GoPrevious()
-		} else {
-			super(event)
-		}
-	case int(qt.Key_Down):
-		if event.Modifiers()&qt.AltModifier > 0 {
-			app.resultList.GoNext()
-		} else {
-			super(event)
-		}
-	case int(qt.Key_F):
-		app.favoriteButtonClicked(app.favoriteButton.ToggleChecked())
-	default:
-		super(event)
-	}
+func (app *Application) onSpaceKey() {
+	app.entry.SetFocusWithReason(qt.ShortcutFocusReason)
+}
+
+func (app *Application) onFKey() {
+	app.favoriteButtonClicked(app.favoriteButton.ToggleChecked())
 }
 
 func (app *Application) goBackInHistory() {
@@ -186,9 +137,6 @@ func (app *Application) onEntryKeyPress(super func(*qt.QKeyEvent), event *qt.QKe
 	// )
 	key := event.Key()
 	switch key {
-	case escape: // event.Text()="\x1b"
-		app.window.SetFocus()
-		return
 	case int(qt.Key_Return), int(qt.Key_Enter): // event.Text()="\r"
 		app.onQuery(app.entry.Text(), false)
 		return

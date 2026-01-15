@@ -7,8 +7,6 @@ import (
 
 const expanding = qt.QSizePolicy__Expanding
 
-const altCtrlModifier = qt.AltModifier | qt.ControlModifier
-
 const (
 	QS_mainSplitter   = "main_splitter"
 	QS_frequencyTable = "frequencytable"

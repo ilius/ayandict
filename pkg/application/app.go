@@ -572,9 +572,6 @@ func (app *Application) Run(query string) {
 		onClose()
 	}
 
-	qobj := app.window.QObject
-	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+D"), qobj).OnActivated(app.dictsButtonClicked)
-
 	_ = qt.QApplication_Exec()
 }
 
