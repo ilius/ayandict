@@ -423,16 +423,19 @@ func (app *Application) Run(query string) {
 	app.dictsButton = app.newIconTextButton(dictsButtonLabel, qt.QStyle__SP_FileDialogDetailedView)
 	buttonBox.AddWidget3(app.dictsButton.QWidget, 0, qt.AlignLeft)
 	app.dictsButton.SetToolTip("Manage dictionaries")
+	app.dictsButton.SetFocusPolicy(qt.NoFocus)
 
 	aboutButton := app.makeAboutButton(conf)
 	buttonBox.AddWidget3(aboutButton.QWidget, 0, qt.AlignLeft)
 	aboutButton.SetToolTip("Show About window")
+	aboutButton.SetFocusPolicy(qt.NoFocus)
 
 	buttonBox.AddStretch()
 
 	app.openConfigButton = NewPNGIconTextButton("Config", "preferences-system-22.png")
 	buttonBox.AddWidget3(app.openConfigButton.QWidget, 0, 0)
 	app.openConfigButton.SetToolTip("Open config file in your default editor")
+	app.openConfigButton.SetFocusPolicy(qt.NoFocus)
 
 	app.reloadButton = app.newIconTextButton("Reload", qt.QStyle__SP_BrowserReload)
 	buttonBox.AddWidget3(app.reloadButton.QWidget, 0, 0)
@@ -440,6 +443,7 @@ func (app *Application) Run(query string) {
 		"\nHold " + sCtrl + " to also reload dictionaries and style" +
 		"\nHold Shift to reload config and style",
 	)
+	app.reloadButton.SetFocusPolicy(qt.NoFocus)
 
 	buttonBox.AddStretch()
 
@@ -448,6 +452,7 @@ func (app *Application) Run(query string) {
 		"\nHold " + sCtrl + " to also clear history",
 	)
 	buttonBox.AddWidget3(app.clearButton.QWidget, 0, qt.AlignRight)
+	app.clearButton.SetFocusPolicy(qt.NoFocus)
 
 	leftMainWidget := qt.NewQWidget(nil)
 	leftMainLayout := qt.NewQVBoxLayout(leftMainWidget)
