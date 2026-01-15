@@ -422,7 +422,7 @@ func (app *Application) Run(query string) {
 	}
 	app.dictsButton = app.newIconTextButton(dictsButtonLabel, qt.QStyle__SP_FileDialogDetailedView)
 	buttonBox.AddWidget3(app.dictsButton.QWidget, 0, qt.AlignLeft)
-	app.dictsButton.SetToolTip("Manage dictionaries")
+	app.dictsButton.SetToolTip(fmt.Sprintf("Manage Dictionaries (%s+D)", sCtrl))
 	app.dictsButton.SetFocusPolicy(qt.NoFocus)
 
 	aboutButton := app.makeAboutButton(conf)
@@ -571,6 +571,9 @@ func (app *Application) Run(query string) {
 		})
 		onClose()
 	}
+
+	qobj := app.window.QObject
+	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+D"), qobj).OnActivated(app.dictsButtonClicked)
 
 	_ = qt.QApplication_Exec()
 }

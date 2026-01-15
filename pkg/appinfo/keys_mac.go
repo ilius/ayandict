@@ -21,9 +21,10 @@ func init() {
 		{"⌥ ↓", "", "Goto next result"},
 		{"⌥ ↑", "", "Goto previous result"},
 
-		{"⌘ Ｑ", "", "Quit / exit application"},
-		{"F1", "", "Show About window"},
 		{"F", "", "Add/Remove Favorite"},
+		{"F1", "", "Show About window"},
+		{"⌘ Ｄ", "", "Manage Dictionaries"},
+		{"⌘ Ｑ", "", "Quit / exit application"},
 
 		{"Enter", "Scan popup", "Query in main window"},
 	}

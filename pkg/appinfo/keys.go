@@ -18,9 +18,10 @@ var KeyBindings = [][3]string{
 	{"Alt﹢Down", "", "Goto next result"},
 	{"Alt﹢Up", "", "Goto previous result"},
 
-	{"Ctrl﹢Ｑ", "", "Quit / exit application"},
-	{"F1", "", "Show About window"},
 	{"F", "", "Add/Remove Favorite"},
+	{"F1", "", "Show About window"},
+	{"Ctrl﹢Ｄ", "", "Manage Dictionaries"},
+	{"Ctrl﹢Ｑ", "", "Quit / exit application"},
 
 	{"Enter", "Scan popup", "Query in main window"},
 }
