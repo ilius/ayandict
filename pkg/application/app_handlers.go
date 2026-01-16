@@ -24,6 +24,7 @@ func (app *Application) setupHandlers() {
 	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+Q"), qobj).OnActivated(app.Exit)
 	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+D"), qobj).OnActivated(app.dictsButtonClicked)
 	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+R"), qobj).OnActivated(app.reloadConfigByShortcut)
+	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+Del"), qobj).OnActivated(app.clearHistoryClicked)
 	qt.NewQShortcut2(qt.NewQKeySequence2("Alt+Left"), qobj).OnActivated(app.goBackInHistory)
 	qt.NewQShortcut2(qt.NewQKeySequence2("Alt+Right"), qobj).OnActivated(app.goForwardInHistory)
 	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+Left"), qobj).OnActivated(app.goBackInHistory)

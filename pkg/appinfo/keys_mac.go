@@ -25,6 +25,7 @@ func init() {
 		{"F1", "", "Show About window"},
 		{"⌘ Ｄ", "", "Manage Dictionaries"},
 		{"⌘ Ｒ", "", "Reload Config"},
+		{"⌘ Delete", "", "Clear History"},
 		{"⌘ Ｑ", "", "Quit / exit application"},
 
 		{"Enter", "Scan popup", "Query in main window"},

@@ -22,6 +22,7 @@ var KeyBindings = [][3]string{
 	{"F1", "", "Show About window"},
 	{"Ctrl﹢Ｄ", "", "Manage Dictionaries"},
 	{"Ctrl﹢Ｒ", "", "Reload Config"},
+	{"Ctrl﹢Delete", "", "Clear History"},
 	{"Ctrl﹢Ｑ", "", "Quit / exit application"},
 
 	{"Enter", "Scan popup", "Query in main window"},
