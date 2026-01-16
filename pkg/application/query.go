@@ -108,7 +108,7 @@ func (app *Application) onQueryAuto(query string) {
 	results := dictmgr.LookupHTML(query, conf, mode, resultFlags, 0)
 	slog.Debug("LookupHTML running time", "dt", time.Since(startTime), "query", query)
 	app.SetResults(results)
-	if len(results) > 0 && results[0].Score() == 200 {
+	if len(results) > 0 && results[0].Score() > 198 {
 		app.queryArgs.AddHistoryAndFrequency(query)
 	}
 	app.postQuery(query)
