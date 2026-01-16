@@ -32,6 +32,15 @@ type QueryArgs struct {
 	DisableHistory bool // temporarily disable history
 }
 
+func (a *QueryArgs) Mode() dictmgr.SearchMode {
+	modeDesc := a.ModeCombo.CurrentText()
+	mode, ok := searchModeByDesc[modeDesc]
+	if !ok {
+		slog.Error("invalid serarch mode", "modeDesc", modeDesc)
+	}
+	return mode
+}
+
 func (a *QueryArgs) AddHistoryAndFrequency(query string) {
 	if a.DisableHistory {
 		return
@@ -71,11 +80,7 @@ func (app *Application) onQuery(query string) {
 		args.HeaderLabel.SetText("")
 		return
 	}
-	modeDesc := args.ModeCombo.CurrentText()
-	mode, ok := searchModeByDesc[modeDesc]
-	if !ok {
-		slog.Error("invalid serarch mode", "modeDesc", modeDesc)
-	}
+	mode := args.Mode()
 	startTime := time.Now()
 	results := dictmgr.LookupHTML(query, conf, mode, resultFlags, 0)
 	slog.Debug("LookupHTML running time", "dt", time.Since(startTime), "query", query)
@@ -91,11 +96,7 @@ func (app *Application) onQueryAuto(query string) {
 	if query == "" {
 		return
 	}
-	modeDesc := app.queryArgs.ModeCombo.CurrentText()
-	mode, ok := searchModeByDesc[modeDesc]
-	if !ok {
-		slog.Error("invalid serarch mode", "modeDesc", modeDesc)
-	}
+	mode := app.queryArgs.Mode()
 	switch mode {
 	case dictmgr.SearchModeRegex:
 		if !conf.SearchOnTypeOnRegex {
