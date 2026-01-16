@@ -23,6 +23,7 @@ func (app *Application) setupHandlers() {
 	qt.NewQShortcut2(qt.NewQKeySequence2("F1"), qobj).OnActivated(app.ShowAbout)
 	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+Q"), qobj).OnActivated(app.Exit)
 	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+D"), qobj).OnActivated(app.dictsButtonClicked)
+	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+R"), qobj).OnActivated(app.reloadConfigByShortcut)
 	qt.NewQShortcut2(qt.NewQKeySequence2("Alt+Left"), qobj).OnActivated(app.goBackInHistory)
 	qt.NewQShortcut2(qt.NewQKeySequence2("Alt+Right"), qobj).OnActivated(app.goForwardInHistory)
 	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+Left"), qobj).OnActivated(app.goBackInHistory)
@@ -242,6 +243,11 @@ func (app *Application) clearButtonClicked() {
 		app.clearHistoryClicked()
 	}
 	app.resetQuery()
+}
+
+func (app *Application) reloadConfigByShortcut() {
+	app.reloadConfig()
+	app.onQuery(app.entry.Text(), false)
 }
 
 func (app *Application) reloadButtonClicked() {
