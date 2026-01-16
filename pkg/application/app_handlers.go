@@ -29,6 +29,7 @@ func (app *Application) setupHandlers() {
 	app.addShortcut("Ctrl+Q", app.Exit)
 	app.addShortcut("Ctrl+D", app.dictsButtonClicked)
 	app.addShortcut("Ctrl+R", app.reloadConfigByShortcut)
+	app.addShortcut("Ctrl+Shift+R", app.reloadAllByShortcut)
 	app.addShortcut("Ctrl+Del", app.clearHistoryClicked)
 
 	app.addShortcut("Alt+Left", app.goBackInHistory)
@@ -256,6 +257,18 @@ func (app *Application) clearButtonClicked() {
 
 func (app *Application) reloadConfigByShortcut() {
 	app.reloadConfig()
+	app.onQuery(app.entry.Text(), false)
+}
+
+func (app *Application) reloadAllByShortcut() {
+	app.reloadConfig()
+
+	slog.Info("Reloading dictionaries")
+	qdictmgr.InitDicts(conf, true)
+
+	slog.Info("Reloading user style")
+	app.LoadUserStyle()
+
 	app.onQuery(app.entry.Text(), false)
 }
 
