@@ -33,6 +33,9 @@ type QueryArgs struct {
 }
 
 func (w *QueryArgs) AddHistoryAndFrequency(query string) {
+	if w.DisableHistory {
+		return
+	}
 	if !conf.HistoryDisable {
 		w.HistoryView.Add(query)
 	}
@@ -61,57 +64,52 @@ func (app *Application) SetResults(results []common.SearchResultIface) {
 	app.resultList.SetResults(results)
 }
 
-func (app *Application) onQuery(query string, isAuto bool) {
-	queryArgs := app.queryArgs
+func (app *Application) onQuery(query string) {
+	args := app.queryArgs
 	if query == "" {
-		if !isAuto {
-			queryArgs.ArticleView.SetHtml("")
-			queryArgs.HeaderLabel.SetText("")
-		}
+		args.ArticleView.SetHtml("")
+		args.HeaderLabel.SetText("")
 		return
 	}
-	t := time.Now()
-	modeDesc := queryArgs.ModeCombo.CurrentText()
+	modeDesc := args.ModeCombo.CurrentText()
 	mode, ok := searchModeByDesc[modeDesc]
 	if !ok {
 		slog.Error("invalid serarch mode", "modeDesc", modeDesc)
 	}
-	if isAuto {
-		switch mode {
-		case dictmgr.SearchModeRegex:
-			if !conf.SearchOnTypeOnRegex {
-				return
-			}
-		case dictmgr.SearchModeSoundex:
-			return
-		}
-	}
+	startTime := time.Now()
 	results := dictmgr.LookupHTML(query, conf, mode, resultFlags, 0)
-	slog.Debug("LookupHTML running time", "dt", time.Since(t), "query", query)
+	slog.Debug("LookupHTML running time", "dt", time.Since(startTime), "query", query)
 	app.SetResults(results)
 	if len(results) == 0 {
-		if !isAuto {
-			app.SetNoResult(query)
-		}
+		app.SetNoResult(query)
 	}
-	if queryArgs.historyOnQuery(isAuto, results) {
-		queryArgs.AddHistoryAndFrequency(query)
-	}
+	args.AddHistoryAndFrequency(query)
 	app.postQuery(query)
 }
 
-func (q *QueryArgs) historyOnQuery(isAuto bool, results []common.SearchResultIface) bool {
-	if q.DisableHistory {
-		return false
+func (app *Application) onQueryAuto(query string) {
+	if query == "" {
+		return
 	}
-	if !isAuto {
-		return true
+	modeDesc := app.queryArgs.ModeCombo.CurrentText()
+	mode, ok := searchModeByDesc[modeDesc]
+	if !ok {
+		slog.Error("invalid serarch mode", "modeDesc", modeDesc)
 	}
-	// isAuto=true (search-on-type)
-	if len(results) > 0 {
-		if results[0].Score() == 200 {
-			return true
+	switch mode {
+	case dictmgr.SearchModeRegex:
+		if !conf.SearchOnTypeOnRegex {
+			return
 		}
+	case dictmgr.SearchModeSoundex:
+		return
 	}
-	return false
+	startTime := time.Now()
+	results := dictmgr.LookupHTML(query, conf, mode, resultFlags, 0)
+	slog.Debug("LookupHTML running time", "dt", time.Since(startTime), "query", query)
+	app.SetResults(results)
+	if len(results) > 0 && results[0].Score() == 200 {
+		app.queryArgs.AddHistoryAndFrequency(query)
+	}
+	app.postQuery(query)
 }

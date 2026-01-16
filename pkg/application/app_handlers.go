@@ -149,7 +149,7 @@ func (app *Application) onEntryKeyPress(super func(*qt.QKeyEvent), event *qt.QKe
 	key := event.Key()
 	switch key {
 	case int(qt.Key_Return), int(qt.Key_Enter): // event.Text()="\r"
-		app.onQuery(app.entry.Text(), false)
+		app.onQuery(app.entry.Text())
 		return
 	}
 
@@ -161,7 +161,7 @@ func (app *Application) onEntryKeyPress(super func(*qt.QKeyEvent), event *qt.QKe
 		if int(event.Modifiers())&searchOnTypeNotModifierMask == 0 {
 			text := app.entry.Text()
 			if len(text) >= conf.SearchOnTypeMinLength {
-				app.onQuery(text, true)
+				app.onQueryAuto(text)
 			}
 			return
 		}
@@ -206,7 +206,7 @@ func (app *Application) clearHistoryClicked() {
 
 func (app *Application) dictsButtonClicked() {
 	if app.runDictManager() {
-		app.onQuery(app.entry.Text(), false)
+		app.onQuery(app.entry.Text())
 	}
 }
 
@@ -257,7 +257,7 @@ func (app *Application) clearButtonClicked() {
 
 func (app *Application) reloadConfigByShortcut() {
 	app.reloadConfig()
-	app.onQuery(app.entry.Text(), false)
+	app.onQuery(app.entry.Text())
 }
 
 func (app *Application) reloadAllByShortcut() {
@@ -269,7 +269,7 @@ func (app *Application) reloadAllByShortcut() {
 	slog.Info("Reloading user style")
 	app.LoadUserStyle()
 
-	app.onQuery(app.entry.Text(), false)
+	app.onQuery(app.entry.Text())
 }
 
 func (app *Application) reloadButtonClicked() {
@@ -287,5 +287,5 @@ func (app *Application) reloadButtonClicked() {
 		slog.Info("Reloading user style")
 		app.LoadUserStyle()
 	}
-	app.onQuery(app.entry.Text(), false)
+	app.onQuery(app.entry.Text())
 }
