@@ -32,17 +32,17 @@ type QueryArgs struct {
 	DisableHistory bool // temporarily disable history
 }
 
-func (w *QueryArgs) AddHistoryAndFrequency(query string) {
-	if w.DisableHistory {
+func (a *QueryArgs) AddHistoryAndFrequency(query string) {
+	if a.DisableHistory {
 		return
 	}
 	if !conf.HistoryDisable {
-		w.HistoryView.Add(query)
+		a.HistoryView.Add(query)
 	}
 	if !conf.MostFrequentDisable {
-		w.FrequencyTable.Add(query, 1)
+		a.FrequencyTable.Add(query, 1)
 		if conf.MostFrequentAutoSave {
-			w.FrequencyTable.SaveNoError()
+			a.FrequencyTable.SaveNoError()
 		}
 	}
 }
