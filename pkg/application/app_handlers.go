@@ -10,27 +10,35 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
+func (app *Application) addShortcut(keyDesc string, slot func()) {
+	qt.NewQShortcut2(qt.NewQKeySequence2(keyDesc), app.window.QObject).OnActivated(slot)
+}
+
 func (app *Application) setupHandlers() {
 	// MUST not call OnKeyPressEvent multiple times on the same widget
 
-	qobj := app.window.QObject
-	qt.NewQShortcut2(qt.NewQKeySequence2("Escape"), qobj).OnActivated(app.onEscape)
-	qt.NewQShortcut2(qt.NewQKeySequence2("Space"), qobj).OnActivated(app.onSpaceKey)
-	qt.NewQShortcut2(qt.NewQKeySequence2("+"), qobj).OnActivated(app.articleView.ZoomIn)
-	qt.NewQShortcut2(qt.NewQKeySequence2("="), qobj).OnActivated(app.articleView.ZoomIn)
-	qt.NewQShortcut2(qt.NewQKeySequence2("-"), qobj).OnActivated(app.articleView.ZoomOut)
-	qt.NewQShortcut2(qt.NewQKeySequence2("F"), qobj).OnActivated(app.onFKey)
-	qt.NewQShortcut2(qt.NewQKeySequence2("F1"), qobj).OnActivated(app.ShowAbout)
-	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+Q"), qobj).OnActivated(app.Exit)
-	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+D"), qobj).OnActivated(app.dictsButtonClicked)
-	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+R"), qobj).OnActivated(app.reloadConfigByShortcut)
-	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+Del"), qobj).OnActivated(app.clearHistoryClicked)
-	qt.NewQShortcut2(qt.NewQKeySequence2("Alt+Left"), qobj).OnActivated(app.goBackInHistory)
-	qt.NewQShortcut2(qt.NewQKeySequence2("Alt+Right"), qobj).OnActivated(app.goForwardInHistory)
-	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+Left"), qobj).OnActivated(app.goBackInHistory)
-	qt.NewQShortcut2(qt.NewQKeySequence2("Ctrl+Right"), qobj).OnActivated(app.goForwardInHistory)
-	qt.NewQShortcut2(qt.NewQKeySequence2("Alt+Up"), qobj).OnActivated(app.resultList.GoPrevious)
-	qt.NewQShortcut2(qt.NewQKeySequence2("Alt+Down"), qobj).OnActivated(app.resultList.GoNext)
+	app.addShortcut("Escape", app.onEscape)
+	app.addShortcut("Space", app.onSpaceKey)
+
+	app.addShortcut("+", app.articleView.ZoomIn)
+	app.addShortcut("=", app.articleView.ZoomIn)
+	app.addShortcut("-", app.articleView.ZoomOut)
+
+	app.addShortcut("F", app.onFKey)
+	app.addShortcut("F1", app.ShowAbout)
+	app.addShortcut("Ctrl+Q", app.Exit)
+	app.addShortcut("Ctrl+D", app.dictsButtonClicked)
+	app.addShortcut("Ctrl+R", app.reloadConfigByShortcut)
+	app.addShortcut("Ctrl+Del", app.clearHistoryClicked)
+
+	app.addShortcut("Alt+Left", app.goBackInHistory)
+	app.addShortcut("Ctrl+Left", app.goBackInHistory)
+
+	app.addShortcut("Alt+Right", app.goForwardInHistory)
+	app.addShortcut("Ctrl+Right", app.goForwardInHistory)
+
+	app.addShortcut("Alt+Up", app.resultList.GoPrevious)
+	app.addShortcut("Alt+Down", app.resultList.GoNext)
 
 	app.setupKeyPressEvent(app.window)
 	app.setupKeyPressEvent(app.resultList)
