@@ -49,9 +49,7 @@ func LookupSoundexHTML(
 				if delta < 0 {
 					delta = -delta
 				}
-				if delta > 10 {
-					delta = 10
-				}
+				delta = min(10, delta)
 				score := search_utils.ScoreFuzzy(
 					resLow.F_Terms,
 					args,
