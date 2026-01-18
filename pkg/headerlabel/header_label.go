@@ -78,14 +78,24 @@ func (label *HeaderLabel) SetResult(res common.SearchResultIface) {
 	label.SetText(header)
 }
 
-func (label *HeaderLabel) addQueryAction(menu *qt.QMenu, term string) {
-	menu.AddActionWithText("Query: " + term).OnTriggered(func() {
+func (label *HeaderLabel) addQueryAction(menu *qt.QMenu, term string) string {
+	text := "Query: " + term
+	menu.AddActionWithText(text).OnTriggered(func() {
 		res := label.result
 		if res == nil {
 			return
 		}
 		label.owner.Query(term)
 	})
+	return text
+}
+
+func (label *HeaderLabel) addPopupAction(menu *qt.QMenu, term string) string {
+	text := "Popup: " + term
+	menu.AddActionWithText(text).OnTriggered(func() {
+		label.owner.QueryPopup(term)
+	})
+	return text
 }
 
 func (label *HeaderLabel) createContextMenu(selection bool) *qt.QMenu {
@@ -122,8 +132,8 @@ func (label *HeaderLabel) createContextMenu(selection bool) *qt.QMenu {
 		terms = terms[:10]
 	}
 	for _, term := range terms {
-		label.addQueryAction(menu, term)
-		updateMenuWidth("Query: " + term)
+		updateMenuWidth(label.addQueryAction(menu, term))
+		updateMenuWidth(label.addPopupAction(menu, term))
 	}
 
 	addActionWithText("Copy All (Plaintext)", func() {
