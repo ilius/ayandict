@@ -334,7 +334,7 @@ func (app *Application) Run(query string) {
 	queryBoxLayout.AddWidget(app.queryFavoriteButton.QWidget())
 	queryBoxLayout.AddWidget(okButton.QWidget)
 
-	headerLabel := headerlabel.NewHeaderLabel(conf, app.Query, headerTpl)
+	headerLabel := headerlabel.NewHeaderLabel(conf, app, headerTpl)
 	app.headerLabel = headerLabel
 	app.headerLabel.SetAlignment(qt.AlignLeft)
 

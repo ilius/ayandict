@@ -14,6 +14,12 @@ import (
 
 const maxMenuWidth = 400
 
+type Owner interface {
+	Query(string)
+	// IsPopup() bool
+	QueryPopup(query string)
+}
+
 type HeaderLabel struct {
 	*qt.QLabel
 
@@ -21,14 +27,14 @@ type HeaderLabel struct {
 
 	text string
 
-	doQuery func(string)
+	owner Owner
 
 	headerTpl *template.Template
 }
 
 func NewHeaderLabel(
 	conf *config.Config,
-	doQuery func(string),
+	owner Owner,
 	headerTpl *template.Template,
 ) *HeaderLabel {
 	qLabel := qt.NewQLabel2()
@@ -47,7 +53,7 @@ func NewHeaderLabel(
 		menu := label.createContextMenu(qLabel.SelectedText() != "")
 		menu.Popup(event.GlobalPos())
 	})
-	label.doQuery = doQuery
+	label.owner = owner
 	return label
 }
 
@@ -78,7 +84,7 @@ func (label *HeaderLabel) addQueryAction(menu *qt.QMenu, term string) {
 		if res == nil {
 			return
 		}
-		label.doQuery(term)
+		label.owner.Query(term)
 	})
 }
 
@@ -100,7 +106,7 @@ func (label *HeaderLabel) createContextMenu(selection bool) *qt.QMenu {
 		addActionWithText("Query Selected", func() {
 			text := label.SelectedText()
 			if text != "" {
-				label.doQuery(strings.Trim(text, utils.QueryForceTrimChars))
+				label.owner.Query(strings.Trim(text, utils.QueryForceTrimChars))
 			}
 		})
 		addActionWithText("Copy Selected", func() {
