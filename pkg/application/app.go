@@ -403,6 +403,7 @@ func (app *Application) Run(query string) {
 
 	app.clearHistoryButton = qt.NewQPushButton3("Clear History")
 	miscLayout.AddWidget(app.clearHistoryButton.QWidget)
+	app.clearHistoryButton.SetToolTip("Shortcut: Ctrl﹢Delete")
 
 	app.randomEntryButton = qt.NewQPushButton3("Random Entry")
 	miscLayout.AddWidget(app.randomEntryButton.QWidget)
