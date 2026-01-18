@@ -80,7 +80,7 @@ func (w *ResultTree) CurrentResult() common.SearchResultIface {
 	return w.currentResult
 }
 
-func (w *ResultTree) SetResults(results []common.SearchResultIface) {
+func (w *ResultTree) setResults(results []common.SearchResultIface) {
 	w.QTreeWidget.Clear()
 	w.results = results
 	if len(results) == 0 {
@@ -116,6 +116,10 @@ func (w *ResultTree) SetResults(results []common.SearchResultIface) {
 			toplevelItem.AddChild(qt.NewQTreeWidgetItem2([]string{term}))
 		}
 	}
+}
+
+func (w *ResultTree) SetResults(results []common.SearchResultIface) {
+	w.setResults(results)
 	w.SetCurrentItem(w.TopLevelItem(0))
 }
 
@@ -128,7 +132,7 @@ func (w *ResultTree) Reload() {
 		}
 	}
 	current := w.indexListFromItem(w.CurrentItem())
-	w.SetResults(w.results)
+	w.setResults(w.results)
 	w.SetCurrentItem(w.indexListToItem(current))
 	for index := range expanded {
 		w.TopLevelItem(index).SetExpanded(true)

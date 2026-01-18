@@ -74,7 +74,7 @@ func (w *ResultList) CurrentResult() common.SearchResultIface {
 	return w.currentResult
 }
 
-func (w *ResultList) SetResults(results []common.SearchResultIface) {
+func (w *ResultList) setResults(results []common.SearchResultIface) {
 	w.QListWidget.Clear()
 	w.results = results
 	if len(results) == 0 {
@@ -107,12 +107,16 @@ func (w *ResultList) SetResults(results []common.SearchResultIface) {
 		}
 		w.AddItem(text)
 	}
+}
+
+func (w *ResultList) SetResults(results []common.SearchResultIface) {
+	w.setResults(results)
 	w.SetCurrentRow(0)
 }
 
 func (w *ResultList) Reload() {
 	row := w.CurrentRow()
-	w.SetResults(w.results)
+	w.setResults(w.results)
 	w.SetCurrentRow(row)
 }
 
