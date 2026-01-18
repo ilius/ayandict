@@ -429,10 +429,14 @@ func (view *ArticleView) onContextMenuEvent(_ func(*qt.QContextMenuEvent), event
 }
 
 func (view *ArticleView) createContextMenuWithSelection(menu *qt.QMenu, selected string) {
-	trimmed := strings.Trim(selected, utils.QueryForceTrimChars)
+	// LINE SEPARATOR and PARAGRAPH SEPARATOR appear instead of newline
+	selected = strings.ReplaceAll(selected, "\u2028", " ")
+	selected = strings.ReplaceAll(selected, "\u2029", " ")
+	trimmed := strings.Trim(selected, utils.QueryForceTrimChars+" ")
 	if trimmed != "" {
 		selected = trimmed
 	}
+	// slog.Info(fmt.Sprintf("%#v", selected))
 	{
 		label := "Query Selection"
 		if len(selected) < 20 {
