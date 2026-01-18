@@ -469,7 +469,7 @@ func (app *Application) Run(query string) {
 	activityTypeCombo := qt.NewQComboBox2()
 	app.activityTypeCombo = activityTypeCombo
 	activityTypeCombo.AddItems([]string{
-		"Recent",
+		"History",
 		"Most Frequent",
 		"Favorites",
 	})
