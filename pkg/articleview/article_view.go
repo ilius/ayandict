@@ -57,7 +57,7 @@ func filePathFromQUrl(qUrl *qt.QUrl) string {
 	return fpath
 }
 
-type ArticleViewOwner interface {
+type Owner interface {
 	Query(string)
 	IsPopup() bool
 	QueryPopup(query string)
@@ -84,7 +84,7 @@ type ArticleView struct {
 	definitionStyleString string
 
 	dpi   float64
-	owner ArticleViewOwner
+	owner Owner
 
 	mediaPlayer *multimedia.QMediaPlayer
 
@@ -93,7 +93,7 @@ type ArticleView struct {
 	dictName string
 }
 
-func NewArticleView(conf *config.Config, owner ArticleViewOwner) *ArticleView {
+func NewArticleView(conf *config.Config, owner Owner) *ArticleView {
 	browser := qt.NewQTextBrowser(nil)
 	// widget := webengine.NewQWebEngineView(nil)
 	browser.SetReadOnly(true)
