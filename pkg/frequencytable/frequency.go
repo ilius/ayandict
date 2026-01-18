@@ -124,17 +124,11 @@ func (view *FrequencyTable) Load() error {
 }
 
 func (view *FrequencyTable) Trim() {
-	if len(view.Counts) <= view.maxSize {
+	// to avoid trimming on every new item
+	if len(view.Counts)-view.maxSize < 10 {
 		return
 	}
-	maxSize := view.maxSize
-	// to avoid trimming on every new item
-	if maxSize > 20 {
-		maxSize -= 10
-	} else {
-		maxSize -= maxSize / 3
-	}
-	newKeys := view.Keys[:maxSize]
+	newKeys := view.Keys[:view.maxSize]
 	newKeyMap := map[string]int{}
 	newCounts := map[string]int{}
 	for _, key := range newKeys {
@@ -144,7 +138,7 @@ func (view *FrequencyTable) Trim() {
 	view.Keys = newKeys
 	view.KeyMap = newKeyMap
 	view.Counts = newCounts
-	view.SetRowCount(maxSize)
+	view.SetRowCount(view.maxSize)
 }
 
 func (view *FrequencyTable) Save() error {
