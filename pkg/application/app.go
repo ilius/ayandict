@@ -35,11 +35,15 @@ import (
 
 const s_Soundex = "Soundex"
 
-var sCtrl = "Ctrl"
+var (
+	tipCtrl     = "Ctrl"
+	tipCtrlPlus = "Ctrl﹢"
+)
 
 func init() {
 	if runtime.GOOS == "darwin" {
-		sCtrl = "Command"
+		tipCtrl = "Command"
+		tipCtrlPlus = "⌘ "
 	}
 }
 
@@ -403,7 +407,7 @@ func (app *Application) Run(query string) {
 
 	app.clearHistoryButton = qt.NewQPushButton3("Clear History")
 	miscLayout.AddWidget(app.clearHistoryButton.QWidget)
-	app.clearHistoryButton.SetToolTip("Shortcut: Ctrl﹢Delete")
+	app.clearHistoryButton.SetToolTip("Shortcut: " + tipCtrlPlus + "Delete")
 
 	app.randomEntryButton = qt.NewQPushButton3("Random Entry")
 	miscLayout.AddWidget(app.randomEntryButton.QWidget)
@@ -423,7 +427,7 @@ func (app *Application) Run(query string) {
 	}
 	app.dictsButton = app.newIconTextButton(dictsButtonLabel, qt.QStyle__SP_FileDialogDetailedView)
 	buttonBox.AddWidget3(app.dictsButton.QWidget, 0, qt.AlignLeft)
-	app.dictsButton.SetToolTip(fmt.Sprintf("Manage Dictionaries (%s+D)", sCtrl))
+	app.dictsButton.SetToolTip(fmt.Sprintf("Manage Dictionaries (%sD)", tipCtrlPlus))
 	app.dictsButton.SetFocusPolicy(qt.NoFocus)
 
 	aboutButton := app.makeAboutButton(conf)
@@ -441,7 +445,7 @@ func (app *Application) Run(query string) {
 	app.reloadButton = app.newIconTextButton("Reload", qt.QStyle__SP_BrowserReload)
 	buttonBox.AddWidget3(app.reloadButton.QWidget, 0, 0)
 	app.reloadButton.SetToolTip("Reload config file" +
-		"\nHold " + sCtrl + " to also reload dictionaries and style" +
+		"\nHold " + tipCtrl + " to also reload dictionaries and style" +
 		"\nHold Shift to reload config and style",
 	)
 	app.reloadButton.SetFocusPolicy(qt.NoFocus)
@@ -450,7 +454,7 @@ func (app *Application) Run(query string) {
 
 	app.clearButton = qt.NewQPushButton3("Clear")
 	app.clearButton.SetToolTip("Clear query and results" +
-		"\nHold " + sCtrl + " to also clear history",
+		"\nHold " + tipCtrl + " to also clear history",
 	)
 	buttonBox.AddWidget3(app.clearButton.QWidget, 0, qt.AlignRight)
 	app.clearButton.SetFocusPolicy(qt.NoFocus)
