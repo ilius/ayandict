@@ -70,7 +70,7 @@ func (app *Application) restoreMainWindowSettings() {
 	s := &MainWindowSettings{}
 	s.Load()
 	window := app.window
-	qtutils.SetWinPosition(window.QWidget, qt.NewQPoint2(s.X, s.Y))
+	qtutils.SetWinPosition(window.QWidget, s.X, s.Y)
 	qtutils.SetWinSize(window.QWidget, qt.NewQSize2(s.Width, s.Height))
 	if s.Maximized {
 		window.ShowMaximized()

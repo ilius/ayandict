@@ -6,10 +6,8 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
-func SetWinPosition(window *qt.QWidget, pos *qt.QPoint) {
+func SetWinPosition(window *qt.QWidget, x int, y int) {
 	screenSize := qt.QGuiApplication_PrimaryScreen().AvailableGeometry()
-	x := pos.X()
-	y := pos.Y()
 	switch {
 	case x < 0:
 		x = 0
@@ -19,7 +17,7 @@ func SetWinPosition(window *qt.QWidget, pos *qt.QPoint) {
 	}
 	switch {
 	case y < 0:
-		pos.SetY(0)
+		y = 0
 	case y > screenSize.Height():
 		slog.Warn("SetWinPosition: exceeds screen", "y", y, "height", screenSize.Height())
 		y = screenSize.Height() - 100

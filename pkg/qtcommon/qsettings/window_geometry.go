@@ -32,7 +32,7 @@ func SaveWindowGeometry(window windowSaveInterface, mainKey string) {
 func RestoreWindowGeometry(window *qt.QWidget, mainKey string) {
 	s := &WindowSettings{}
 	s.Load(mainKey)
-	qtutils.SetWinPosition(window, qt.NewQPoint2(s.X, s.Y))
+	qtutils.SetWinPosition(window, s.X, s.Y)
 	qtutils.SetWinSize(window, qt.NewQSize2(s.Width, s.Height))
 	if s.Maximized {
 		window.ShowMaximized()
