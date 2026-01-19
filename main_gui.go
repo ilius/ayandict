@@ -59,7 +59,7 @@ func main() {
 	queryFlag := flag.String(
 		"query",
 		"",
-		"Open AyanDict with given query",
+		"Open "+appinfo.APP_DESC+" with given query",
 	)
 	flag.Parse()
 

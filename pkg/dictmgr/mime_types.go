@@ -6,7 +6,7 @@ var extByMimeTypeMap = map[string]string{
 	"image/gif":     "gif",
 	"image/svg+xml": "svg",
 	"image/webp":    "webp",
-	"image/tiff":    "tiff",
+	"image/tiff":    "tiff", // also tif
 	"image/bmp":     "bmp",
 	"image/x-icon":  "ico",
 
