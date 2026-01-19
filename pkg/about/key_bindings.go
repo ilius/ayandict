@@ -18,12 +18,7 @@ func linedLabel(text string, right int, bottom int) *qt.QWidget {
 	return frame.QWidget
 }
 
-func showKeyBindings(parent *qt.QWidget, icon *qt.QIcon) {
-	dialog := qt.NewQDialog(parent)
-	dialog.SetWindowIcon(icon)
-	dialog.SetWindowTitle("Keyboard Shortcuts")
-	qtutils.SetWinSize(dialog.QWidget, 800, 600)
-
+func newKeyBindingsGrid(keyBindings [][3]string, hasWhile bool) *qt.QGridLayout {
 	layout := qt.NewQGridLayout2()
 
 	layout.SetVerticalSpacing(0)
@@ -33,13 +28,17 @@ func showKeyBindings(parent *qt.QWidget, icon *qt.QIcon) {
 	layout.SetColumnStretch(1, 0)
 	layout.SetColumnStretch(2, 1)
 
-	layout.AddWidget4(qt.NewQLabel3("Key").QWidget, 0, 0, qt.AlignCenter)
-	layout.AddWidget4(qt.NewQLabel3("[while]").QWidget, 0, 1, qt.AlignCenter)
+	if hasWhile {
+		layout.AddWidget4(qt.NewQLabel3("Key").QWidget, 0, 0, qt.AlignCenter)
+		layout.AddWidget4(qt.NewQLabel3("[while]").QWidget, 0, 1, qt.AlignCenter)
+	} else {
+		layout.AddWidget5(qt.NewQLabel3("Key").QWidget, 0, 0, 1, 2, qt.AlignCenter)
+	}
 	layout.AddWidget4(qt.NewQLabel3("Action").QWidget, 0, 2, qt.AlignCenter)
 
-	for rowI, data := range appinfo.KeyBindings {
+	for rowI, data := range keyBindings {
 		bottom := 0
-		if rowI == len(appinfo.KeyBindings)-1 {
+		if rowI == len(keyBindings)-1 {
 			bottom = 1
 		}
 		widget1 := linedLabel(data[0], 0, bottom)
@@ -52,6 +51,23 @@ func showKeyBindings(parent *qt.QWidget, icon *qt.QIcon) {
 		}
 		layout.AddWidget3(linedLabel(data[2], 1, bottom), rowI+1, 2, 1, 1)
 	}
+
+	return layout
+}
+
+func showKeyBindings(parent *qt.QWidget, icon *qt.QIcon) {
+	dialog := qt.NewQDialog(parent)
+	dialog.SetWindowIcon(icon)
+	dialog.SetWindowTitle("Keyboard Shortcuts")
+	qtutils.SetWinSize(dialog.QWidget, 800, 400)
+
+	grid1 := newKeyBindingsGrid(appinfo.KeyBindings1, false)
+	grid2 := newKeyBindingsGrid(appinfo.KeyBindings2, true)
+
+	mainHBox := qt.NewQHBoxLayout2()
+	mainHBox.AddLayout2(grid1.QLayout, 1)
+	mainHBox.AddSpacing(10)
+	mainHBox.AddLayout2(grid2.QLayout, 1)
 
 	dialog.OnKeyPressEvent(func(super func(e *qt.QKeyEvent), e *qt.QKeyEvent) {
 		if e.Key() == int(qt.Key_Escape) {
@@ -70,7 +86,7 @@ func showKeyBindings(parent *qt.QWidget, icon *qt.QIcon) {
 	})
 
 	mainBox := qt.NewQVBoxLayout2()
-	mainBox.AddLayout2(layout.Layout(), 1)
+	mainBox.AddLayout2(mainHBox.Layout(), 1)
 	mainBox.AddSpacing(10)
 	mainBox.AddWidget(buttonBox.QWidget)
 	dialog.SetLayout(mainBox.Layout())
