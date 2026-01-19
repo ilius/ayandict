@@ -7,7 +7,6 @@ import (
 	"log/slog"
 
 	common "codeberg.org/ilius/go-dict-commons"
-	commons "codeberg.org/ilius/go-dict-commons"
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
 	"github.com/ilius/ayandict/v3/pkg/articleview"
 	"github.com/ilius/ayandict/v3/pkg/audiocache"
@@ -102,7 +101,7 @@ type ScanPopup struct {
 	favoriteButton FavoriteButtonInterface
 
 	// set by doQuery
-	results []commons.SearchResultIface
+	results []common.SearchResultIface
 
 	// set by doQuery, gotoNextResult, gotoPrevResult
 	resultIndex int
