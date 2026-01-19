@@ -25,13 +25,13 @@ func SetWinPosition(window *qt.QWidget, x int, y int) {
 	window.Move(x, y)
 }
 
-func SetWinSize(window *qt.QWidget, size *qt.QSize) {
+func SetWinSize(window *qt.QWidget, width int, height int) {
 	screenSize := qt.QGuiApplication_PrimaryScreen().AvailableGeometry()
-	if size.Width() > screenSize.Width() {
-		size.SetWidth(screenSize.Width())
+	if width > screenSize.Width() {
+		width = screenSize.Width()
 	}
-	if size.Height() > screenSize.Height() {
-		size.SetHeight(screenSize.Height())
+	if height > screenSize.Height() {
+		height = screenSize.Height()
 	}
-	window.ResizeWithQSize(size)
+	window.Resize(width, height)
 }
