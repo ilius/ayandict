@@ -2,6 +2,7 @@ package about
 
 import (
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
+	"github.com/ilius/ayandict/v3/pkg/qtutils"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -21,7 +22,7 @@ func showKeyBindings(parent *qt.QWidget, icon *qt.QIcon) {
 	dialog := qt.NewQDialog(parent)
 	dialog.SetWindowIcon(icon)
 	dialog.SetWindowTitle("Keyboard Shortcuts")
-	dialog.Resize(800, 600)
+	qtutils.SetWinSize(dialog.QWidget, 800, 600)
 
 	layout := qt.NewQGridLayout2()
 

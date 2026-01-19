@@ -6,6 +6,7 @@ import (
 	"runtime"
 
 	"github.com/ilius/ayandict/v3/pkg/appinfo"
+	"github.com/ilius/ayandict/v3/pkg/qtutils"
 	"github.com/ilius/ayandict/v3/pkg/resources"
 	"github.com/ilius/ayandict/v3/pkg/resources/resourceutil"
 	"github.com/ilius/ayandict/v3/pkg/utils"
@@ -37,7 +38,7 @@ func addTabWithIcon(
 
 func ShowAbout(widget *qt.QWidget, icon *qt.QIcon) {
 	widget.SetWindowTitle("About " + appinfo.APP_DESC)
-	widget.Resize(700, 500)
+	qtutils.SetWinSize(widget, 700, 500)
 	widget.SetWindowIcon(icon)
 
 	topHBox := qt.NewQFrame(nil)

@@ -12,6 +12,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/dictmgr/internal/dicts"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
+	"github.com/ilius/ayandict/v3/pkg/qtutils"
 	qt "github.com/mappu/miqt/qt6"
 )
 
@@ -59,7 +60,7 @@ func NewDictManager(
 ) *DictManager {
 	window := qt.NewQDialog(parent)
 	window.SetWindowTitle("Dictionaries")
-	window.Resize(900, 800)
+	qtutils.SetWinSize(window.QWidget, 900, 800)
 
 	infoMap := makeDictInfoMap(dicts.DictList)
 

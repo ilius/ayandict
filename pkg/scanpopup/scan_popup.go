@@ -495,5 +495,5 @@ func (p *ScanPopup) onMouseRelease(super func(*qt.QMouseEvent), event *qt.QMouse
 }
 
 func (p *ScanPopup) autoResize() {
-	p.popup.Resize(p.conf.ScanPopupWidth, p.conf.ScanPopupHeight)
+	qtutils.SetWinSize(p.popup, p.conf.ScanPopupWidth, p.conf.ScanPopupHeight)
 }

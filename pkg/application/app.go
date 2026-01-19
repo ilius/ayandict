@@ -24,6 +24,7 @@ import (
 	"github.com/ilius/ayandict/v3/pkg/qlocalserver"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon"
 	"github.com/ilius/ayandict/v3/pkg/qtcommon/qsettings"
+	"github.com/ilius/ayandict/v3/pkg/qtutils"
 	"github.com/ilius/ayandict/v3/pkg/resultlist"
 	"github.com/ilius/ayandict/v3/pkg/resulttree"
 	"github.com/ilius/ayandict/v3/pkg/utils"
@@ -285,7 +286,7 @@ func (app *Application) Run(query string) {
 		app.setupTrayIcon(icon)
 	}
 
-	window.Resize(600, 400)
+	qtutils.SetWinSize(window.QWidget, 600, 400)
 
 	entry := qt.NewQLineEdit2()
 	app.entry = entry
