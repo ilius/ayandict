@@ -408,7 +408,7 @@ func (app *Application) Run(query string) {
 
 	app.clearHistoryButton = qt.NewQPushButton3("Clear History")
 	miscLayout.AddWidget(app.clearHistoryButton.QWidget)
-	app.clearHistoryButton.SetToolTip("Shortcut: " + tipCtrlPlus + "Delete")
+	app.clearHistoryButton.SetToolTip(fmt.Sprintf("Shortcut: %sDelete", tipCtrlPlus))
 
 	app.randomEntryButton = qt.NewQPushButton3("Random Entry")
 	miscLayout.AddWidget(app.randomEntryButton.QWidget)
@@ -454,9 +454,10 @@ func (app *Application) Run(query string) {
 	buttonBox.AddStretch()
 
 	app.clearButton = qt.NewQPushButton3("Clear")
-	app.clearButton.SetToolTip("Clear query and results" +
-		"\nHold " + tipCtrl + " to also clear history",
-	)
+	app.clearButton.SetToolTip(fmt.Sprintf(
+		"Clear query and results\nHold %s to also clear history",
+		tipCtrl,
+	))
 	buttonBox.AddWidget3(app.clearButton.QWidget, 0, qt.AlignRight)
 	app.clearButton.SetFocusPolicy(qt.NoFocus)
 

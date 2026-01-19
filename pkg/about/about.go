@@ -37,7 +37,7 @@ func addTabWithIcon(
 }
 
 func ShowAbout(widget *qt.QWidget, icon *qt.QIcon) {
-	widget.SetWindowTitle("About " + appinfo.APP_DESC)
+	widget.SetWindowTitle(fmt.Sprintf("About %s", appinfo.APP_DESC))
 	qtutils.SetWinSize(widget, 700, 500)
 	widget.SetWindowIcon(icon)
 
