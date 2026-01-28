@@ -3,9 +3,9 @@ module github.com/ilius/ayandict/v3
 go 1.24
 
 require (
-	codeberg.org/ilius/go-dict-commons v0.7.1
+	codeberg.org/ilius/go-dict-commons v0.8.0
 	codeberg.org/ilius/go-stardict/v2 v2.8.0
-	github.com/BurntSushi/toml v1.5.0
+	github.com/BurntSushi/toml v1.6.0
 	github.com/ilius/is/v2 v2.3.2
 	github.com/mappu/miqt v0.12.0
 	github.com/xrash/smetrics v0.0.0-20250705151800-55b8f293f342
