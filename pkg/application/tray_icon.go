@@ -48,6 +48,16 @@ func (app *Application) createStatusIconActions() []*qt.QAction {
 		})
 		actions = append(actions, action)
 	}
+	{
+		action := qt.NewQAction2("Random Favorite")
+		action.OnTriggered(app.randomFavoritePopupManual)
+		actions = append(actions, action)
+	}
+	{
+		action := qt.NewQAction2("Random Entry")
+		action.OnTriggered(app.randomEntryPopupManual)
+		actions = append(actions, action)
+	}
 	if qt.QGuiApplication_Clipboard().SupportsSelection() {
 		action := qt.NewQAction2("Scan Selection")
 		action.SetCheckable(true)

@@ -574,7 +574,7 @@ func (app *Application) Run(query string) {
 			timer.Start(1000 * conf.RandomFavoritePopupIntervalSeconds)
 		}
 		timer.OnTimeout(func() {
-			app.randomFavoritePopup(onClose)
+			app.randomFavoritePopupAuto(onClose)
 		})
 		onClose()
 	}

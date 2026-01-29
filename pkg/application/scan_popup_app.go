@@ -66,7 +66,7 @@ func (app *Application) QueryPopup(query string) {
 	p.Run(qt.QCursor_Pos(), app.icon)
 }
 
-func (app *Application) randomFavoritePopup(onClose func()) {
+func (app *Application) randomFavoritePopupAuto(onClose func()) {
 	term := app.favoritesWidget.Data.Random()
 	if term == "" {
 		// show "No Favorites" error?
@@ -86,6 +86,38 @@ func (app *Application) randomFavoritePopup(onClose func()) {
 		term,
 		dictmgr.SearchModeStartWith,
 		onCloseNew,
+		app,
+	)
+	p.Run(nil, app.icon) // on center of primary screen
+}
+
+func (app *Application) randomFavoritePopupManual() {
+	term := app.favoritesWidget.Data.Random()
+	if term == "" {
+		// show "No Favorites" error?
+		return
+	}
+	p := scanpopup.NewScanPopup(
+		conf,
+		term,
+		dictmgr.SearchModeStartWith,
+		nil,
+		app,
+	)
+	p.Run(nil, app.icon) // on center of primary screen
+}
+
+func (app *Application) randomEntryPopupManual() {
+	res := dictmgr.RandomEntry(conf, resultFlags)
+	if res == nil {
+		return
+	}
+	term := res.F_Terms[0]
+	p := scanpopup.NewScanPopup(
+		conf,
+		term,
+		dictmgr.SearchModeStartWith,
+		nil,
 		app,
 	)
 	p.Run(nil, app.icon) // on center of primary screen

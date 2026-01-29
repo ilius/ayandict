@@ -56,7 +56,9 @@ func NewScanPopup(
 	appIface ScanPopupAppInterface,
 ) *ScanPopup {
 	popup := qt.NewQWidget2()
-	popup.OnCloseEvent(onCloseEvent)
+	if onCloseEvent != nil {
+		popup.OnCloseEvent(onCloseEvent)
+	}
 
 	p := &ScanPopup{
 		conf:  conf,
