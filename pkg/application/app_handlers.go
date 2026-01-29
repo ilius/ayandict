@@ -215,11 +215,11 @@ func (app *Application) randomEntryClicked() {
 	if res == nil {
 		return
 	}
-	query := res.F_Terms[0]
-	app.entry.SetText(query)
+	term := res.F_Terms[0]
+	app.entry.SetText(term)
 	app.SetResults([]common.SearchResultIface{res})
-	app.queryArgs.AddHistoryAndFrequency(query)
-	app.postQuery(query)
+	app.queryArgs.AddHistoryAndFrequency(term)
+	app.postQuery(term)
 }
 
 func (app *Application) randomFavoriteClicked() {
