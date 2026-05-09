@@ -79,10 +79,10 @@ func skipID3(buffer []byte) int {
 		z2 = buffer[8]
 		z3 = buffer[9]
 		if ((z0 & 0x80) == 0) && ((z1 & 0x80) == 0) && ((z2 & 0x80) == 0) && ((z3 & 0x80) == 0) {
-			tagSize = (((int)(z0 & 0x7f)) * 2097152) +
-				(((int)(z1 & 0x7f)) * 16384) +
-				(((int)(z2 & 0x7f)) * 128) +
-				((int)(z3 & 0x7f))
+			tagSize = (int(z0&0x7f) * 2097152) +
+				(int(z1&0x7f) * 16384) +
+				(int(z2&0x7f) * 128) +
+				int(z3&0x7f)
 			return 10 + tagSize + footerSize
 		}
 	}
