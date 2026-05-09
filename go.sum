@@ -8,7 +8,7 @@ github.com/ilius/glob v0.0.0-20250212111036-4c41f838a304 h1:hrjENbAZEBbffGaAhD6W
 github.com/ilius/glob v0.0.0-20250212111036-4c41f838a304/go.mod h1:hp4bF1pIJfwcFirp8JaYh3xPs6DPQ/yP1BsTkpVNAg8=
 github.com/ilius/is/v2 v2.3.2 h1:14u2j/UTKeIHKlcp/48dabf7+7QJ9JJaaoeHVvfyAOk=
 github.com/ilius/is/v2 v2.3.2/go.mod h1:OMGTmQDDc3Svaj3EoQHeNnXHP0R1HCb5u/Hfm7kuYIM=
-github.com/mappu/miqt v0.12.0 h1:bBMBDeACmV8TbdLfoN51la7kF6QT3sNAcG+ZdRDgmxU=
-github.com/mappu/miqt v0.12.0/go.mod h1:xFg7ADaO1QSkmXPsPODoKe/bydJpRG9fgCYyIDl/h1U=
+github.com/mappu/miqt v0.13.0 h1:Dzvclso1BwAUVNem7giSYCmh4Rx08j2gqt6j4SCy098=
+github.com/mappu/miqt v0.13.0/go.mod h1:xFg7ADaO1QSkmXPsPODoKe/bydJpRG9fgCYyIDl/h1U=
 github.com/xrash/smetrics v0.0.0-20250705151800-55b8f293f342 h1:FnBeRrxr7OU4VvAzt5X7s6266i6cSVkkFPS0TuXWbIg=
 github.com/xrash/smetrics v0.0.0-20250705151800-55b8f293f342/go.mod h1:Ohn+xnUBiLI6FVj/9LpzZWtj1/D6lUovWYBkxHVV3aM=
