@@ -445,9 +445,10 @@ func (app *Application) Run(query string) {
 
 	app.reloadButton = app.newIconTextButton("Reload", qt.QStyle__SP_BrowserReload)
 	buttonBox.AddWidget3(app.reloadButton.QWidget, 0, 0)
-	app.reloadButton.SetToolTip("Reload config file" +
-		"\nHold " + tipCtrl + " to also reload dictionaries and style" +
-		"\nHold Shift to reload config and style",
+	app.reloadButton.SetToolTip(
+		"Reload config file" +
+			"\nHold " + tipCtrl + " to also reload dictionaries and style" +
+			"\nHold Shift to reload config and style",
 	)
 	app.reloadButton.SetFocusPolicy(qt.NoFocus)
 

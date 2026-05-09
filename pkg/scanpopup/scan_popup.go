@@ -24,7 +24,8 @@ const resultFlags = uint32(
 		common.ResultFlag_FixFileSrc |
 		common.ResultFlag_FixWordLink |
 		common.ResultFlag_ColorMapping |
-		common.ResultFlag_QTextBrowser)
+		common.ResultFlag_QTextBrowser,
+)
 
 type QCloseEventFunc = func(super func(*qt.QCloseEvent), event *qt.QCloseEvent)
 
