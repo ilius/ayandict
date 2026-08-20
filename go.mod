@@ -7,7 +7,7 @@ require (
 	codeberg.org/ilius/go-stardict/v2 v2.8.0
 	github.com/BurntSushi/toml v1.6.0
 	github.com/ilius/is/v2 v2.3.2
-	github.com/mappu/miqt v0.13.0
+	github.com/mappu/miqt v0.14.0
 	github.com/xrash/smetrics v0.0.0-20250705151800-55b8f293f342
 )
 
