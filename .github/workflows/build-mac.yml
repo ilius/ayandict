@@ -40,10 +40,9 @@ jobs:
         run: uname -a
 
       - name: Install Qt6
-        run: |
-          brew update >/dev/null
-          brew upgrade
-          brew install gcc cmake ninja openssl@3 zlib qt6 pkg-config sevenzip
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+        run: brew install gcc cmake ninja openssl@3 zlib qt6 pkg-config sevenzip
 
       - name: Set up Go
         uses: actions/setup-go@v7
