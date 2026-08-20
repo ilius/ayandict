@@ -7,3 +7,7 @@
 - When a Qt-related change needs a build, use `./build-agent`. This avoids an unnecessary MiQt rebuild by copying only existing MiQt artifacts into the sandbox-writable Go build cache before building.
 - Do not run `go test` on packages that have no `_test.go` files.
 - When asked to commit, never run `go fmt`, `gofmt` or `go test`.
+
+## Workflow maintenance
+
+- When the Go version in `go.mod` changes, automatically update every `go-version` value in `.github/workflows/` to match it.
