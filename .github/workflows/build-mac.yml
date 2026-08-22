@@ -117,12 +117,14 @@ jobs:
           qt_include=$qt_prefix/include
           export CGO_CPPFLAGS="\
             -I$qt_include \
-            -I$qt_include/QtCore \
-            -I$qt_include/QtGui \
-            -I$qt_include/QtWidgets \
-            -I$qt_include/QtNetwork \
-            -I$qt_include/QtMultimedia \
-            -I$qt_include/QtMultimediaWidgets"
+            -F$qt_prefix/lib \
+            -iframework $qt_prefix/lib \
+            -isystem $qt_prefix/lib/QtCore.framework/Headers \
+            -isystem $qt_prefix/lib/QtGui.framework/Headers \
+            -isystem $qt_prefix/lib/QtWidgets.framework/Headers \
+            -isystem $qt_prefix/lib/QtNetwork.framework/Headers \
+            -isystem $qt_prefix/lib/QtMultimedia.framework/Headers \
+            -isystem $qt_prefix/lib/QtMultimediaWidgets.framework/Headers"
           export CGO_CXXFLAGS="-std=c++17"
           qt_probe=/tmp/ayandict-qt-link-probe
           rm -rf "$qt_probe"
