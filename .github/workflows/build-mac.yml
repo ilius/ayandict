@@ -165,6 +165,9 @@ jobs:
           qt_cgo_ldflags=""
           skip_link_output=false
           for arg in $qt_link_args; do
+            if [[ "$arg" == "&&" || "$arg" == ":" ]]; then
+              continue
+            fi
             if [[ "$arg" == "-o" ]]; then
               skip_link_output=true
               continue
