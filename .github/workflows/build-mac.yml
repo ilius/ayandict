@@ -52,7 +52,7 @@ jobs:
         with:
           path: /Users/runner/Qt/6.11.2-static
           # v5 patches Qt to emit pkg-config metadata for static builds.
-          key: qt6.11.2-static-macos-v5-pkgconfig
+          key: qt6.11.2-static-macos-v6-pkgconfig
 
       - name: Build Qt statically (if cache miss)
         if: steps.cache-qt.outputs.cache-hit != 'true'
@@ -82,7 +82,7 @@ jobs:
             -no-dbus \
             -no-gtk \
             -no-feature-zstd \
-            -skip qtwebengine -skip qtquick3d -skip qtgraphs -skip qtquick3dphysics \
+            -skip qtwebengine -skip qtquick3d -skip qtgraphs -skip qtquick3dphysics -skip qtcanvaspainter \
             -skip qtdeclarative -skip qtquicktimeline -skip qtdoc -skip qtlocation \
             -skip qtlottie -skip qtmqtt -skip qtopcua -skip qtquickeffectmaker \
             -skip qtvirtualkeyboard -skip qtwebview \
