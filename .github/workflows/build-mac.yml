@@ -93,6 +93,22 @@ jobs:
           cmake --build . --parallel "$(sysctl -n hw.logicalcpu)"
           cmake --install .
 
+      - name: Normalize static Qt pkg-config libraries
+        env:
+          PKG_CONFIG_PATH: /Users/runner/Qt/6.11.2-static/lib/pkgconfig
+        run: |
+          qt_prefix=/Users/runner/Qt/6.11.2-static
+          for pc_file in "$qt_prefix"/lib/pkgconfig/Qt6*.pc; do
+            package_name="$(basename "$pc_file" .pc)"
+            framework_name="Qt${package_name#Qt6}"
+            framework_binary="$qt_prefix/lib/$framework_name.framework/Versions/A/$framework_name"
+            if [[ -f "$framework_binary" ]]; then
+              sed -E -i '' \
+                "s|-l${package_name}([[:space:]]|$)|${framework_binary}\\1|g" \
+                "$pc_file"
+            fi
+          done
+
       - name: Verify static Qt
         env:
           PKG_CONFIG_PATH: /Users/runner/Qt/6.11.2-static/lib/pkgconfig
