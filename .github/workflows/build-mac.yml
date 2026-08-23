@@ -79,6 +79,9 @@ jobs:
       - name: Build Go project (linking static Qt)
         run: ./ci/mac/build-go.py
 
+      - name: Verify binary has no Homebrew dependencies
+        run: ./ci/mac/verify-binary.py ayandict
+
       - name: Compress binary with 7zip
         run: 7zz a ayandict.7z ayandict
 

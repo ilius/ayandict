@@ -5,15 +5,8 @@ from __future__ import annotations
 import subprocess
 
 DEPENDENCIES = (
-	"brotli",
-	"gcc",
 	"cmake",
 	"ninja",
-	"openssl@3",
-	"harfbuzz",
-	"libpng",
-	"pcre2",
-	"zlib",
 	"pkg-config",
 	"sevenzip",
 )

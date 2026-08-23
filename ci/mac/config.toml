@@ -1,7 +1,7 @@
 qt_version = "6.11.2"
 qt_source_url = "https://download.qt.io/archive/qt/6.11/6.11.2/single/qt-everywhere-src-6.11.2.tar.xz"
 qt_root = "/Users/runner/Qt"
-qt_cache_revision = "v6-pkgconfig"
+qt_cache_revision = "v8-no-system-libraries"
 
 go_version = "1.24"
 go_cache_root = "/Users/runner/Library/Caches/go-build"
