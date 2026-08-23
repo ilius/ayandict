@@ -179,7 +179,17 @@ jobs:
             echo 'Could not extract the Qt CMake link interface' >&2
             exit 1
           fi
-          qt_generated_objects="$(find "$qt_probe/build/CMakeFiles" -type f -name '*.o' ! -name 'main.cpp.o' -print | tr '\n' ' ')"
+          qt_generated_objects=()
+          for arg in $qt_link_line; do
+            if [[ "$arg" == *.o && "$arg" != *main.cpp.o ]]; then
+              if [[ "$arg" != /* ]]; then
+                arg="$qt_probe/build/$arg"
+              fi
+              qt_generated_objects+=("$arg")
+            fi
+          done
+          qt_generated_archive="$qt_probe/libqt-generated.a"
+          /usr/bin/libtool -static -o "$qt_generated_archive" "${qt_generated_objects[@]}"
           qt_cgo_ldflags=""
           skip_link_output=false
           for arg in $qt_link_args; do
@@ -196,7 +206,20 @@ jobs:
             fi
             [[ "$arg" == *.o ]] || qt_cgo_ldflags+=" $arg"
           done
-          export CGO_LDFLAGS="-L$qt_prefix/lib $qt_generated_objects $qt_cgo_ldflags"
+
+          # MIQT invokes pkg-config itself. Its redundant -lQt6* flags do not
+          # understand macOS static frameworks; CMake already supplied the
+          # exact framework binaries above, so remove only those Qt aliases.
+          real_pkg_config="$(command -v pkg-config)"
+          pkg_config_wrapper="$qt_probe/pkg-config-for-cgo"
+          printf '%s\n' \
+            '#!/bin/bash' \
+            'set -o pipefail' \
+            "\"$real_pkg_config\" \"\$@\" | sed -E 's#(^|[[:space:]])-lQt6[^[:space:]]+##g'" \
+            > "$pkg_config_wrapper"
+          chmod +x "$pkg_config_wrapper"
+          export PKG_CONFIG="$pkg_config_wrapper"
+          export CGO_LDFLAGS="-L$qt_prefix/lib -Wl,-force_load,$qt_generated_archive $qt_cgo_ldflags"
           go build -ldflags '-s -w' -trimpath
 
       - name: Compress binary with 7zip
