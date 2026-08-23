@@ -1,4 +1,4 @@
-name: Mac Build
+name: Mac Build (Static Qt)
 
 on:
   push:
@@ -14,6 +14,17 @@ jobs:
   build:
     runs-on: macos-14
     steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Load macOS build config
+        id: config
+        run: ./ci/mac/export-config.py
+
       - name: Download Go build cache
         if: ${{ github.ref != 'refs/heads/release-macos' }}
         id: download-go-build-cache-mac
@@ -24,7 +35,7 @@ jobs:
           workflow_conclusion: success
           event: push
           name: go-build-cache-mac
-          path: /Users/runner/Library/Caches/go-build
+          path: ${{ steps.config.outputs.go-cache-root }}
           if_no_artifact_found: ignore
           use_unzip: true
           github_token: ${{ github.token }}
@@ -32,39 +43,54 @@ jobs:
           search_artifacts: true
 
       - name: Check Go build cache
-        run: ls -l /Users/runner/Library/Caches/go-build || true
-
-      - uses: actions/checkout@v7
+        run: ls -l "${{ steps.config.outputs.go-cache-root }}" || true
 
       - name: Show kernel info
         run: uname -a
 
-      - name: Install Qt6
+      - name: Install dependencies
         env:
           HOMEBREW_NO_AUTO_UPDATE: 1
-        run: brew install gcc cmake ninja openssl@3 zlib qt6 pkg-config sevenzip
+        run: ./ci/mac/install-dependencies.py
+
+      # Caches the static Qt build to avoid recompiling every time
+      - name: Cache static Qt6
+        id: cache-qt
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.config.outputs.qt-prefix }}
+          key: ${{ steps.config.outputs.qt-cache-key }}
+
+      - name: Build Qt statically (if cache miss)
+        if: steps.cache-qt.outputs.cache-hit != 'true'
+        run: ./ci/mac/build-qt.py
+
+      - name: Normalize static Qt pkg-config libraries
+        run: ./ci/mac/normalize-pkgconfig.py
+
+      - name: Verify static Qt
+        run: ./ci/mac/verify-qt.py
 
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
-          go-version: 1.24
+          go-version: ${{ steps.config.outputs.go-version }}
 
-      - name: Build
-        run: CGO_ENABLED=1 CGO_CXXFLAGS=-std=c++17 go build -ldflags '-s -w' -trimpath
+      - name: Build Go project (linking static Qt)
+        run: ./ci/mac/build-go.py
 
       - name: Compress binary with 7zip
         run: 7zz a ayandict.7z ayandict
 
       - name: Set output vars
         id: vars
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: CLICK HERE TO DOWNLOAD BINARY
         uses: actions/upload-artifact@v7
         with:
-          name: ayandict-mac-arm64-${{ steps.vars.outputs.sha_short }}
+          name: ayandict-mac-arm64-static-${{ steps.vars.outputs.sha_short }}
           if-no-files-found: error
-          retention-days: 7
           path: ayandict.7z
           compression-level: 0
 
@@ -73,5 +99,4 @@ jobs:
         with:
           name: go-build-cache-mac
           if-no-files-found: error
-          retention-days: 7
-          path: /Users/runner/Library/Caches/go-build
+          path: ${{ steps.config.outputs.go-cache-root }}
