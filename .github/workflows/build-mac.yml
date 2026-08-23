@@ -14,6 +14,12 @@ jobs:
   build:
     runs-on: macos-14
     steps:
+      - uses: actions/checkout@v7
+
+      - name: Load macOS build config
+        id: mac-config
+        run: ./ci/mac/export-config.sh
+
       - name: Download Go build cache
         if: ${{ github.ref != 'refs/heads/release-macos' }}
         id: download-go-build-cache-mac
@@ -24,7 +30,7 @@ jobs:
           workflow_conclusion: success
           event: push
           name: go-build-cache-mac
-          path: /Users/runner/Library/Caches/go-build
+          path: ${{ steps.mac-config.outputs.go-cache-root }}
           if_no_artifact_found: ignore
           use_unzip: true
           github_token: ${{ github.token }}
@@ -32,9 +38,7 @@ jobs:
           search_artifacts: true
 
       - name: Check Go build cache
-        run: ls -l /Users/runner/Library/Caches/go-build || true
-
-      - uses: actions/checkout@v7
+        run: ls -l "${{ steps.mac-config.outputs.go-cache-root }}" || true
 
       - name: Show kernel info
         run: uname -a
@@ -42,185 +46,33 @@ jobs:
       - name: Install dependencies
         env:
           HOMEBREW_NO_AUTO_UPDATE: 1
-        run: |
-          brew install brotli gcc cmake ninja openssl@3 harfbuzz libpng pcre2 zlib pkg-config sevenzip
+        run: ./ci/mac/install-dependencies.sh
 
       # Caches the static Qt build to avoid recompiling every time
       - name: Cache static Qt6
         id: cache-qt
         uses: actions/cache@v4
         with:
-          path: /Users/runner/Qt/6.11.2-static
-          # v5 patches Qt to emit pkg-config metadata for static builds.
-          key: qt6.11.2-static-macos-v6-pkgconfig
+          path: ${{ steps.mac-config.outputs.qt-prefix }}
+          key: ${{ steps.mac-config.outputs.qt-cache-key }}
 
       - name: Build Qt statically (if cache miss)
         if: steps.cache-qt.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p /Users/runner/Qt
-          cd /Users/runner/Qt
-          curl -LO https://download.qt.io/archive/qt/6.11/6.11.2/single/qt-everywhere-src-6.11.2.tar.xz
-          tar xf qt-everywhere-src-6.11.2.tar.xz
-          cd qt-everywhere-src-6.11.2
-
-          # Qt normally generates pkg-config files only for shared builds,
-          # while MIQT requires them through its #cgo pkg-config directives.
-          sed -i '' \
-            '/^[[:space:]]*if(NOT BUILD_SHARED_LIBS)$/,/^[[:space:]]*endif()$/d' \
-            qtbase/cmake/QtPkgConfigHelpers.cmake
-
-          ./configure \
-            -prefix /Users/runner/Qt/6.11.2-static \
-            -release \
-            -static \
-            -static-runtime \
-            -opensource \
-            -confirm-license \
-            -nomake examples \
-            -nomake tests \
-            -no-opengl \
-            -no-dbus \
-            -no-gtk \
-            -no-feature-zstd \
-            -skip qtwebengine -skip qtquick3d -skip qtgraphs -skip qtquick3dphysics -skip qtcanvaspainter \
-            -skip qtdeclarative -skip qtquicktimeline -skip qtdoc -skip qtlocation \
-            -skip qtlottie -skip qtmqtt -skip qtopcua -skip qtquickeffectmaker \
-            -skip qtvirtualkeyboard -skip qtwebview \
-            -- \
-            -DCMAKE_POLICY_DEFAULT_CMP0177=NEW \
-            -DFEATURE_pkg_config=ON
-
-          cmake --build . --parallel "$(sysctl -n hw.logicalcpu)"
-          cmake --install .
+        run: ./ci/mac/build-qt.sh
 
       - name: Normalize static Qt pkg-config libraries
-        env:
-          PKG_CONFIG_PATH: /Users/runner/Qt/6.11.2-static/lib/pkgconfig
-        run: |
-          qt_prefix=/Users/runner/Qt/6.11.2-static
-          for pc_file in "$qt_prefix"/lib/pkgconfig/Qt6*.pc; do
-            package_name="$(basename "$pc_file" .pc)"
-            framework_name="Qt${package_name#Qt6}"
-            framework_binary="$qt_prefix/lib/$framework_name.framework/Versions/A/$framework_name"
-            if [[ -f "$framework_binary" ]]; then
-              sed -E -i '' \
-                "s#-l${package_name}([[:space:]]|$)#${framework_binary}\\1#g" \
-                "$pc_file"
-            fi
-          done
+        run: ./ci/mac/normalize-pkgconfig.sh
 
       - name: Verify static Qt
-        env:
-          PKG_CONFIG_PATH: /Users/runner/Qt/6.11.2-static/lib/pkgconfig
-        run: |
-          ls -l /Users/runner/Qt/6.11.2-static/lib
-          file /Users/runner/Qt/6.11.2-static/lib/libQt6Core.a
-          pkg-config --modversion Qt6Widgets Qt6Network Qt6MultimediaWidgets
-          pkg-config --cflags Qt6Widgets Qt6Network Qt6MultimediaWidgets
-          pkg-config --libs --static Qt6Widgets Qt6Network Qt6MultimediaWidgets
+        run: ./ci/mac/verify-qt.sh
 
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
-          go-version: 1.24
+          go-version: ${{ steps.mac-config.outputs.go-version }}
 
       - name: Build Go project (linking static Qt)
-        env:
-          PKG_CONFIG_PATH: /Users/runner/Qt/6.11.2-static/lib/pkgconfig
-          GOCACHE: /Users/runner/Library/Caches/go-build/qt-6.11.2-static
-        run: |
-          export CGO_ENABLED=1
-          qt_prefix=/Users/runner/Qt/6.11.2-static
-          qt_include=$qt_prefix/include
-          export LIBRARY_PATH="$qt_prefix/lib${LIBRARY_PATH:+:$LIBRARY_PATH}"
-          export CGO_CPPFLAGS="\
-            -I$qt_include \
-            -F$qt_prefix/lib \
-            -iframework $qt_prefix/lib \
-            -isystem $qt_prefix/lib/QtCore.framework/Headers \
-            -isystem $qt_prefix/lib/QtGui.framework/Headers \
-            -isystem $qt_prefix/lib/QtWidgets.framework/Headers \
-            -isystem $qt_prefix/lib/QtNetwork.framework/Headers \
-            -isystem $qt_prefix/lib/QtMultimedia.framework/Headers \
-            -isystem $qt_prefix/lib/QtMultimediaWidgets.framework/Headers"
-          export CGO_CXXFLAGS="-std=c++17"
-          qt_probe=/tmp/ayandict-qt-link-probe
-          rm -rf "$qt_probe"
-          mkdir -p "$qt_probe"
-          printf '%s\n' \
-            'cmake_minimum_required(VERSION 3.21)' \
-            'project(qt_link_probe LANGUAGES CXX)' \
-            'find_package(Qt6 REQUIRED COMPONENTS Widgets Network Multimedia MultimediaWidgets)' \
-            'qt_add_executable(qt_link_probe main.cpp)' \
-            'target_link_libraries(qt_link_probe PRIVATE Qt6::Widgets Qt6::Network Qt6::MultimediaWidgets)' \
-            > "$qt_probe/CMakeLists.txt"
-          printf '%s\n' \
-            '#include <QApplication>' \
-            '#include <QMediaPlayer>' \
-            '#include <QNetworkAccessManager>' \
-            '#include <QVideoWidget>' \
-            'int main(int argc, char **argv) {' \
-            '    QApplication app(argc, argv);' \
-            '    QMediaPlayer player;' \
-            '    QNetworkAccessManager network;' \
-            '    QVideoWidget video;' \
-            '    (void)player; (void)network; (void)video;' \
-            '    return 0;' \
-            '}' \
-            > "$qt_probe/main.cpp"
-          cmake -S "$qt_probe" -B "$qt_probe/build" -GNinja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_PREFIX_PATH="$qt_prefix"
-          cmake --build "$qt_probe/build" --verbose
-          qt_link_line="$(ninja -C "$qt_probe/build" -t commands qt_link_probe | tail -n 1)"
-          # Match the object by suffix: Ninja may print a relative or absolute path.
-          qt_link_args="${qt_link_line#*CMakeFiles/qt_link_probe.dir/main.cpp.o }"
-          if [[ "$qt_link_args" == "$qt_link_line" ]]; then
-            echo 'Could not extract the Qt CMake link interface' >&2
-            exit 1
-          fi
-          qt_generated_objects=()
-          for arg in $qt_link_line; do
-            if [[ "$arg" == *.o && "$arg" != *main.cpp.o ]]; then
-              if [[ "$arg" != /* ]]; then
-                arg="$qt_probe/build/$arg"
-              fi
-              qt_generated_objects+=("$arg")
-            fi
-          done
-          qt_generated_archive="$qt_probe/libqt-generated.a"
-          /usr/bin/libtool -static -o "$qt_generated_archive" "${qt_generated_objects[@]}"
-          qt_cgo_ldflags=""
-          skip_link_output=false
-          for arg in $qt_link_args; do
-            if [[ "$arg" == "&&" || "$arg" == ":" ]]; then
-              continue
-            fi
-            if [[ "$arg" == "-o" ]]; then
-              skip_link_output=true
-              continue
-            fi
-            if [[ "$skip_link_output" == true ]]; then
-              skip_link_output=false
-              continue
-            fi
-            [[ "$arg" == *.o ]] || qt_cgo_ldflags+=" $arg"
-          done
-
-          # MIQT invokes pkg-config itself. Its redundant -lQt6* flags do not
-          # understand macOS static frameworks; CMake already supplied the
-          # exact framework binaries above, so remove only those Qt aliases.
-          real_pkg_config="$(command -v pkg-config)"
-          pkg_config_wrapper="$qt_probe/pkg-config-for-cgo"
-          printf '%s\n' \
-            '#!/bin/bash' \
-            'set -o pipefail' \
-            "\"$real_pkg_config\" \"\$@\" | sed -E 's#(^|[[:space:]])-lQt6[^[:space:]]+##g'" \
-            > "$pkg_config_wrapper"
-          chmod +x "$pkg_config_wrapper"
-          export PKG_CONFIG="$pkg_config_wrapper"
-          export CGO_LDFLAGS="-L$qt_prefix/lib -Wl,-force_load,$qt_generated_archive $qt_cgo_ldflags"
-          go build -ldflags '-s -w' -trimpath
+        run: ./ci/mac/build-go.sh
 
       - name: Compress binary with 7zip
         run: 7zz a ayandict.7z ayandict
@@ -244,4 +96,4 @@ jobs:
           name: go-build-cache-mac
           if-no-files-found: error
           retention-days: 7
-          path: /Users/runner/Library/Caches/go-build
+          path: ${{ steps.mac-config.outputs.go-cache-root }}
