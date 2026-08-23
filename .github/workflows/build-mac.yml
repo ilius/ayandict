@@ -16,9 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
       - name: Load macOS build config
         id: mac-config
-        run: ./ci/mac/export-config.sh
+        run: ./ci/mac/export-config.py
 
       - name: Download Go build cache
         if: ${{ github.ref != 'refs/heads/release-macos' }}
@@ -46,7 +51,7 @@ jobs:
       - name: Install dependencies
         env:
           HOMEBREW_NO_AUTO_UPDATE: 1
-        run: ./ci/mac/install-dependencies.sh
+        run: ./ci/mac/install-dependencies.py
 
       # Caches the static Qt build to avoid recompiling every time
       - name: Cache static Qt6
@@ -58,13 +63,13 @@ jobs:
 
       - name: Build Qt statically (if cache miss)
         if: steps.cache-qt.outputs.cache-hit != 'true'
-        run: ./ci/mac/build-qt.sh
+        run: ./ci/mac/build-qt.py
 
       - name: Normalize static Qt pkg-config libraries
-        run: ./ci/mac/normalize-pkgconfig.sh
+        run: ./ci/mac/normalize-pkgconfig.py
 
       - name: Verify static Qt
-        run: ./ci/mac/verify-qt.sh
+        run: ./ci/mac/verify-qt.py
 
       - name: Set up Go
         uses: actions/setup-go@v7
@@ -72,7 +77,7 @@ jobs:
           go-version: ${{ steps.mac-config.outputs.go-version }}
 
       - name: Build Go project (linking static Qt)
-        run: ./ci/mac/build-go.sh
+        run: ./ci/mac/build-go.py
 
       - name: Compress binary with 7zip
         run: 7zz a ayandict.7z ayandict
