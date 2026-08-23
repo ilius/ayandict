@@ -127,10 +127,12 @@ jobs:
       - name: Build Go project (linking static Qt)
         env:
           PKG_CONFIG_PATH: /Users/runner/Qt/6.11.2-static/lib/pkgconfig
+          GOCACHE: /Users/runner/Library/Caches/go-build/qt-6.11.2-static
         run: |
           export CGO_ENABLED=1
           qt_prefix=/Users/runner/Qt/6.11.2-static
           qt_include=$qt_prefix/include
+          export LIBRARY_PATH="$qt_prefix/lib${LIBRARY_PATH:+:$LIBRARY_PATH}"
           export CGO_CPPFLAGS="\
             -I$qt_include \
             -F$qt_prefix/lib \
@@ -194,7 +196,7 @@ jobs:
             fi
             [[ "$arg" == *.o ]] || qt_cgo_ldflags+=" $arg"
           done
-          export CGO_LDFLAGS="$qt_generated_objects $qt_cgo_ldflags"
+          export CGO_LDFLAGS="-L$qt_prefix/lib $qt_generated_objects $qt_cgo_ldflags"
           go build -ldflags '-s -w' -trimpath
 
       - name: Compress binary with 7zip
