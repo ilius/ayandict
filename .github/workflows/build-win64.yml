@@ -2,7 +2,7 @@ name: Windows Build (Portable)
 
 on:
   push:
-    branches: ["build-windows"]
+    branches: ["build-windows*"]
   pull_request:
     branches: ["v3"]
   workflow_dispatch:
