@@ -105,7 +105,7 @@ type Config struct {
 
 	AudioAutoPlayWaitBetween time.Duration `toml:"audio_auto_play_wait_between" doc:"Wait time between multiple audio files on auto-play"`
 
-	AudioAutoPlayMinScore uint8 `toml:"audio_auto_play_min_socre" doc:"Minimum score for audio auto-play"`
+	AudioAutoPlayMinScore uint8 `toml:"audio_auto_play_min_score" doc:"Minimum score for audio auto-play"`
 
 	AudioVolume int `toml:"audio_volume" doc:"Volume for playing audio, 0 to 100 (% multiplied by dict-specofic volume)"`
 

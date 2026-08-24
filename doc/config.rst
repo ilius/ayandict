@@ -268,7 +268,7 @@ Wait time between multiple audio files on auto-play
 
 Default value: ``"800ms"``
 
-``audio_auto_play_min_socre``
+``audio_auto_play_min_score``
 -----------------------------
 Minimum score for audio auto-play
 
