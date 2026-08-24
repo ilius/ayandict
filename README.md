@@ -1,12 +1,10 @@
 # AyanDict
 
-A simple cross-platform desktop dictionary application based on Qt framework and written in Go that uses StarDict dictionary format.
+A simple cross-platform desktop dictionary application based on the Qt framework, written in Go, that uses the StarDict dictionary format.
 
-It is designed for desktop and it should run on every desktop operating system that Qt supports. It is tested on Linux, Windows and Mac OS. I generally upload binaries for Linux, Windows and Mac OS on releases.
+AyanDict targets Linux, Windows, and macOS. Check each [release](https://github.com/ilius/ayandict/releases) for the binaries currently available for download.
 
-BSD family and other Unix-like systems are not currently supported (due to `qtbox` dependency) until release of version 3.x.
-
-If you use an unsupported operating system or platform, you can try compiling on `v3` branch with `CGO_ENABLED=1 go build` command.
+Other Qt 6 desktop platforms are not routinely tested, but may work when built from source with CGO enabled.
 
 StarDict is the only supported format for now, and by default, it reads all StarDict dictionaries in `~/.stardict/dic` folder. But you can change the folder or add more folders through [configuration](#configuration).
 
@@ -14,7 +12,21 @@ StarDict is the only supported format for now, and by default, it reads all Star
 
 If you don't have Go language on your system, you can check [Releases](https://github.com/ilius/ayandict/releases) and download the latest binary for your platform if available.
 
-If you have Go, you can compile and install the latest code with
+The Linux x86-64 GUI release artifact is dynamically linked. It requires glibc 2.35 or newer and Qt 6.4 or newer with the Widgets, Network, Multimedia, and Multimedia Widgets modules. On Ubuntu 24.04, install the required Qt runtime libraries with:
+
+```sh
+sudo apt install libqt6network6t64 libqt6multimediawidgets6
+```
+
+On other distributions, install the equivalent Qt runtime modules at compatible versions.
+
+Building the GUI from source requires Go 1.24 or newer, CGO, a C++ compiler, and the Qt 6 Base and Multimedia development files. On Ubuntu 24.04, install the native dependencies with:
+
+```sh
+sudo apt install build-essential qt6-base-dev qt6-multimedia-dev
+```
+
+You can then compile and install the latest code with:
 
 ```sh
 go install github.com/ilius/ayandict/v3@latest
@@ -22,15 +34,20 @@ go install github.com/ilius/ayandict/v3@latest
 
 Or clone the repository, `cd` to it and run `go build`, which will create the binary (`ayandict.exe` or `ayandict`) in this directory.
 
-It's good to know that the binary / executable file is completely portable, so you can copy it anywhere you want and run it from there (although on Unix the storage must support executable files).
-
 # Web Interface
 
 By setting `web_enable = true` in [config file](#configuration) and running the program, you can use the web interface. The port is set with `local_server_ports` value (first available port in that list), and the URL is printed in stdout.
 
 If you do not want to use Qt GUI at all and run in web-only mode, you can pass `-no-gui` flag in command line.
 
-You can also compile in web-only / non-GUI mode with `go build -v -tags nogui` command. This is specially useful for unsupported platforms if you could not compile with Qt.
+You can also build the standalone web or non-GUI commands without Qt:
+
+```sh
+go build ./cmd/ayandict-web/
+go build ./cmd/ayandict-nogui/
+```
+
+This is especially useful on systems where the Qt GUI cannot be built.
 
 # Screenshots
 
@@ -143,8 +160,8 @@ There are tons of web pages that let you download various usable dictionaries, b
   - While query entry is focused: focus leaves the entry
   - None of the above: clears the query and results
 - **Space**: (while query entry is not focused) change keyboard focus to query entry
-- **Alt + Left** or **Ctrl + Left**: Go back in history (tab "Recent")
-- **Alt + Right** or **Ctrl + Right**: Go forward in history (selected term in tab "Recent")
+- **Alt + Left** or **Ctrl + Left**: Go back in history (tab "History")
+- **Alt + Right** or **Ctrl + Right**: Go forward in history (selected term in tab "History")
 - **Alt + Down**: Goto next result
 - **Alt + Up**: Goto previous result
 - **Ctrl + Q**: Quit / exit application
