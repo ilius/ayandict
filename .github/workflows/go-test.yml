@@ -9,6 +9,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      TEST_PACKAGES: >-
+        ./pkg/dictmgr/internal/dicts/
+        ./pkg/headerlib/
+        ./pkg/html/atom/
+        ./pkg/ospaths/
+        ./pkg/runewidth/
+        ./pkg/slogcolor/
+        ./pkg/webserver/
+        ./pkg/wordwrap/
     steps:
       - uses: actions/checkout@v7
 
@@ -18,7 +28,11 @@ jobs:
           go-version: "1.24"
 
       - name: Test
-        run: CGO_ENABLED=1 go test -v ./pkg/dictmgr/internal/dicts/ ./pkg/wordwrap
+        run: |
+          read -r -a packages <<< "$TEST_PACKAGES"
+          CGO_ENABLED=1 go test -v "${packages[@]}"
 
-      # - name: Go vet
-      #   run: CGO_ENABLED=1 go vet
+      - name: Go vet
+        run: |
+          read -r -a packages <<< "$TEST_PACKAGES"
+          CGO_ENABLED=1 go vet "${packages[@]}"
