@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -311,13 +312,15 @@ func Load() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	if tomlBytes == nil {
-		return Default(), nil
-	}
 	conf := Default()
-	_, err = toml.Decode(string(tomlBytes), conf)
-	if err != nil {
-		return nil, err
+	if tomlBytes != nil {
+		_, err = toml.Decode(string(tomlBytes), conf)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if len(conf.LocalServerPorts) == 0 {
+		return nil, errors.New("config local_server_ports must contain at least one port")
 	}
 	return conf, nil
 }
