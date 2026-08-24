@@ -32,7 +32,7 @@ func runServerOnly(createConfig bool) {
 		slog.Warn("Web is not enabled, set web_enable = true in " + config.Path())
 	}
 	dictmgr.InitDicts(conf)
-	webserver.StartServer(conf.LocalServerPorts[0])
+	webserver.StartServer(conf, conf.LocalServerPorts[0])
 }
 
 func main() {

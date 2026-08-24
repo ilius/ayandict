@@ -53,5 +53,5 @@ func main() {
 	}
 
 	dictmgr.InitDicts(conf)
-	webserver.StartServer(conf.LocalServerPorts[0])
+	webserver.StartServer(conf, conf.LocalServerPorts[0])
 }

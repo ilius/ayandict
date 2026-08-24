@@ -220,7 +220,7 @@ func (app *Application) Run(query string) {
 			}
 			return
 		}
-		go webserver.StartServer(conf.LocalServerPorts[0])
+		go webserver.StartServer(conf, conf.LocalServerPorts[0])
 	}
 	defer func() {
 		if r := recover(); r != nil {

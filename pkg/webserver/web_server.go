@@ -28,12 +28,11 @@ const (
 	path_api_random = "api/random"
 )
 
-var (
-	conf = config.MustLoad()
-
+type webServer struct {
+	conf      *config.Config
 	homeTpl   *text_template.Template
 	headerTpl *html_template.Template
-)
+}
 
 // using a different logger here, so that it does not show errors in GUI
 // because there is a little risk in showing web-user-input values in GUI
@@ -66,10 +65,13 @@ func badRequest(w http.ResponseWriter, msg string) {
 	w.WriteHeader(http.StatusBadRequest)
 }
 
-func encodeResults(w http.ResponseWriter, raw_results []common.SearchResultIface) []jsonapi.Result {
+func (srv *webServer) encodeResults(
+	w http.ResponseWriter,
+	raw_results []common.SearchResultIface,
+) []jsonapi.Result {
 	results := make([]jsonapi.Result, len(raw_results))
 	for i, res := range raw_results {
-		header, err := headerlib.GetHeader(headerTpl, res, 200)
+		header, err := headerlib.GetHeader(srv.headerTpl, res, 200)
 		if err != nil {
 			logger.Error("Error formatting header label", "err", err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -88,7 +90,7 @@ func encodeResults(w http.ResponseWriter, raw_results []common.SearchResultIface
 	return results
 }
 
-func api_query(w http.ResponseWriter, r *http.Request) {
+func (srv *webServer) api_query(w http.ResponseWriter, r *http.Request) {
 	t := time.Now()
 
 	w.Header().Set("Content-Type", "application/json")
@@ -128,9 +130,9 @@ func api_query(w http.ResponseWriter, r *http.Request) {
 		limit = int(limitI64)
 	}
 
-	raw_results := dictmgr.LookupHTML(query, conf, mode, flags, limit)
+	raw_results := dictmgr.LookupHTML(query, srv.conf, mode, flags, limit)
 	// pass resultFlags to LookupHTML
-	results := encodeResults(w, raw_results)
+	results := srv.encodeResults(w, raw_results)
 	if results == nil {
 		return
 	}
@@ -148,11 +150,11 @@ func api_query(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func api_random(w http.ResponseWriter, _ *http.Request) {
+func (srv *webServer) api_random(w http.ResponseWriter, _ *http.Request) {
 	jsonEncoder := json.NewEncoder(w)
 	w.Header().Set("Content-Type", "application/json")
 
-	entry := dictmgr.RandomEntry(conf, resultFlags)
+	entry := dictmgr.RandomEntry(srv.conf, resultFlags)
 	err := jsonEncoder.Encode(jsonapi.Result{
 		DictName:        entry.DictName(),
 		Terms:           entry.Terms(),
@@ -175,9 +177,9 @@ type homeTemplateParams struct {
 	Config *config.Config
 }
 
-func home(w http.ResponseWriter, _ *http.Request) {
-	err := homeTpl.Execute(w, homeTemplateParams{
-		Config: conf,
+func (srv *webServer) home(w http.ResponseWriter, _ *http.Request) {
+	err := srv.homeTpl.Execute(w, homeTemplateParams{
+		Config: srv.conf,
 	})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -213,19 +215,19 @@ func dictRes(w http.ResponseWriter, r *http.Request) {
 	http.ServeContent(w, r, "", time.Now(), file)
 }
 
-func addWebHandlers() {
-	http.HandleFunc("/"+path_api_query, api_query)
-	http.HandleFunc("/"+path_api_random, api_random)
-	http.HandleFunc("/", home)
-	http.HandleFunc(dictmgr.DictResPathBase, dictRes)
+func (srv *webServer) addWebHandlers(mux *http.ServeMux) {
+	mux.HandleFunc("/"+path_api_query, srv.api_query)
+	mux.HandleFunc("/"+path_api_random, srv.api_random)
+	mux.HandleFunc("/", srv.home)
+	mux.HandleFunc(dictmgr.DictResPathBase, dictRes)
 
-	http.Handle("/web/", http.FileServer(&httpFileSystem{
+	mux.Handle("/web/", http.FileServer(&httpFileSystem{
 		fs:     web.FS,
 		prefix: "web",
 	}))
 }
 
-func loadIndexTemplate() error {
+func (srv *webServer) loadIndexTemplate() error {
 	file, err := web.FS.Open("web/index.html")
 	if err != nil {
 		return err
@@ -238,48 +240,65 @@ func loadIndexTemplate() error {
 	if err != nil {
 		return err
 	}
-	homeTpl = tpl
+	srv.homeTpl = tpl
 	return nil
 }
 
-func loadHeaderTemplate() error {
-	tpl, err := headerlib.LoadHeaderTemplate(conf)
+func (srv *webServer) loadHeaderTemplate() error {
+	tpl, err := headerlib.LoadHeaderTemplate(srv.conf)
 	if err != nil {
 		return err
 	}
-	headerTpl = tpl
+	srv.headerTpl = tpl
 	return nil
 }
 
-func loadWebTemplates() error {
-	err := loadIndexTemplate()
+func (srv *webServer) loadWebTemplates() error {
+	err := srv.loadIndexTemplate()
 	if err != nil {
 		return err
 	}
-	err = loadHeaderTemplate()
+	err = srv.loadHeaderTemplate()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func StartServer(port string) {
-	http.HandleFunc("/"+path_appName, getAppName)
+func newServer(conf *config.Config, port string) (*http.Server, error) {
+	srv := &webServer{conf: conf}
+	mux := http.NewServeMux()
+	mux.HandleFunc("/"+path_appName, getAppName)
+	// Preserve debug handlers such as net/http/pprof when a caller registers them
+	// on the default mux.
+	mux.Handle("/debug/pprof/", http.DefaultServeMux)
 
 	if conf.WebEnable {
-		err := loadWebTemplates()
+		err := srv.loadWebTemplates()
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
-		addWebHandlers()
+		srv.addWebHandlers(mux)
 	}
 
-	logger.Info("Starting local server", "port", port)
-	addr := "127.0.0.1:" + port
+	addr := localhost + ":" + port
 	if conf.WebExpose {
 		addr = ":" + port
 	}
-	err := http.ListenAndServe(addr, nil)
+	return &http.Server{
+		Addr:    addr,
+		Handler: mux,
+	}, nil
+}
+
+func StartServer(conf *config.Config, port string) {
+	server, err := newServer(conf, port)
+	if err != nil {
+		panic(err)
+	}
+
+	logger.Info("Starting local server", "port", port)
+	err = server.ListenAndServe()
 	if err != nil {
 		logger.Error("error in ListenAndServe: " + err.Error())
 	}

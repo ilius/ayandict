@@ -66,5 +66,5 @@ func main() {
 	slog.Info("Web ports", "ports", conf.LocalServerPorts)
 
 	dictmgr.InitDicts(conf)
-	webserver.StartServer(conf.LocalServerPorts[0])
+	webserver.StartServer(conf, conf.LocalServerPorts[0])
 }
