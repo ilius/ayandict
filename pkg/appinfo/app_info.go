@@ -7,7 +7,7 @@ import (
 const (
 	APP_NAME = "ayandict"
 	APP_DESC = "AyanDict"
-	VERSION  = "v3.0.0beta5"
+	VERSION  = "v3.0.0"
 )
 
 var LOCAL_SOCKET_NAME = APP_NAME + "-" + userId()
