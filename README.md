@@ -12,18 +12,56 @@ StarDict is the only supported format for now, and by default, it reads all Star
 
 If you don't have Go language on your system, you can check [Releases](https://github.com/ilius/ayandict/releases) and download the latest binary for your platform if available.
 
-The Linux x86-64 GUI release artifact is dynamically linked. It requires glibc 2.35 or newer and Qt 6.4 or newer with the Widgets, Network, Multimedia, and Multimedia Widgets modules. On Ubuntu 24.04, install the required Qt runtime libraries with:
+The Linux x86-64 GUI release artifact is dynamically linked. It requires glibc 2.35 or newer and Qt 6.4 or newer with the Widgets, Network, Multimedia, and Multimedia Widgets modules. Install the required Qt runtime libraries with the command for your distribution:
+
+Ubuntu 24.04 or newer:
 
 ```sh
 sudo apt install libqt6network6t64 libqt6multimediawidgets6
 ```
 
-On other distributions, install the equivalent Qt runtime modules at compatible versions.
+Fedora:
 
-Building the GUI from source requires Go 1.24 or newer, CGO, a C++ compiler, and the Qt 6 Base and Multimedia development files. On Ubuntu 24.04, install the native dependencies with:
+```sh
+sudo dnf install qt6-qtbase-gui qt6-qtmultimedia
+```
+
+openSUSE Tumbleweed:
+
+```sh
+sudo zypper install libQt6Network6 libQt6MultimediaWidgets6
+```
+
+Arch Linux:
+
+```sh
+sudo pacman -S --needed qt6-base qt6-multimedia
+```
+
+Building the GUI from source requires Go 1.24 or newer, CGO, a C++ compiler, and the Qt 6 Base and Multimedia development files. Install the native dependencies with the command for your distribution:
+
+Ubuntu 24.04 or newer:
 
 ```sh
 sudo apt install build-essential qt6-base-dev qt6-multimedia-dev
+```
+
+Fedora:
+
+```sh
+sudo dnf install gcc-c++ qt6-qtbase-devel qt6-qtmultimedia-devel
+```
+
+openSUSE Tumbleweed:
+
+```sh
+sudo zypper install gcc-c++ qt6-base-devel qt6-multimedia-devel
+```
+
+Arch Linux:
+
+```sh
+sudo pacman -S --needed base-devel qt6-base qt6-multimedia
 ```
 
 You can then compile and install the latest code with:
