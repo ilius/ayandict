@@ -13,5 +13,4 @@ export CGO_ENABLED=1
 export GOOS=windows
 export GOARCH=amd64
 OUT=ayandict-$VERSION-windows-amd64.exe
-time go build -o $OUT "${FLAGS[@]}" "$@"
-
+time go build -o "$OUT" "${FLAGS[@]}" "$@"

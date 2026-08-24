@@ -11,19 +11,18 @@ VERSION=$(go run pkg/version/version.go)
 function run_zip() {
 	IN_PATH=$1
 	ZIP_PATH="${IN_PATH%.*}.zip"
-	if [ -f C:\\Windows\\System32\\tar.exe ] ; then
-		C:\\Windows\\System32\\tar.exe -a -c -f $ZIP_PATH $IN_PATH
-		rm $IN_PATH
+	if [ -f 'C:\Windows\System32\tar.exe' ] ; then
+		'C:\Windows\System32\tar.exe' -a -c -f "$ZIP_PATH" "$IN_PATH"
+		rm "$IN_PATH"
 		return
 	fi
-	if which zip ; then
-		zip $ZIP_PATH $IN_PATH
+	if command -v zip >/dev/null 2>&1 ; then
+		zip "$ZIP_PATH" "$IN_PATH"
 		return
 	fi
 }
 
 
 OUT=ayandict-$VERSION-windows-$(go env GOARCH).exe
-go build -o $OUT "${FLAGS[@]}" "$@"
-run_zip $OUT
-
+go build -o "$OUT" "${FLAGS[@]}" "$@"
+run_zip "$OUT"

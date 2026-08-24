@@ -11,15 +11,16 @@ export GOMAXPROCS=4
 # also can use: go build -p 4
 
 # LIB_DIR=/usr/lib/x86_64-linux-gnu
-LIB_DIR=$(dirname $(dirname $(gcc -print-libgcc-file-name)))
+LIBGCC_DIR=$(dirname "$(gcc -print-libgcc-file-name)")
+LIB_DIR=$(dirname "$LIBGCC_DIR")
 
 export CGO_CXXFLAGS="-I/usr/include/qt6"
 export CGO_LDFLAGS="-L$LIB_DIR -Wl,-rpath,$LIB_DIR"
-export PKG_CONFIG_PATH=$LIB_DIR/pkgconfig
+export PKG_CONFIG_PATH="$LIB_DIR/pkgconfig"
 
 #    -ldflags "-static-libgcc -static-libstdc++ -s -w" \
 
-time go build -o ayandict-$VERSION \
+time go build -o "ayandict-$VERSION" \
 	-ldflags '-extldflags "-static"' \
 	-trimpath \
 	"$@"

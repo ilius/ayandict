@@ -19,7 +19,7 @@ OLD_CLIP=$(pbpaste 2>/dev/null || echo "")
 osascript -e 'tell application "System Events" to keystroke "c" using command down'
 
 # Wait for clipboard to update (up to 1 s)
-for i in {1..20}; do
+for _ in {1..20}; do
     sleep 0.05
     SEL=$(pbpaste)
     [[ -n "$SEL" ]] && break

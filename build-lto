@@ -22,6 +22,6 @@ VERSION=$(git describe --tags)
 export GOMAXPROCS=4
 # also can use: go build -p 4
 
-time go build -o ayandict-$VERSION "${FLAGS[@]}" "$@"
+time go build -o "ayandict-$VERSION" "${FLAGS[@]}" "$@"
 
 date
