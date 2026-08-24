@@ -144,7 +144,7 @@ Default value: ``true``
 
 ``desktop_widget_click_time``
 -----------------------------
-Dektop Widget: max click time in millisecond
+Desktop Widget: max click time in millisecond
 
 Default value: ``100``
 
@@ -276,7 +276,7 @@ Default value: ``100``
 
 ``audio_volume``
 ----------------
-Volume for playing audio, 0 to 100 (% multiplied by dict-specofic volume)
+Volume for playing audio, 0 to 100 (% multiplied by dict-specific volume)
 
 Default value: ``70``
 

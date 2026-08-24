@@ -74,7 +74,7 @@ type Config struct {
 	DesktopWidget bool `toml:"desktop_widget" doc:"Desktop Widget: enable"`
 	// DesktopWidgetBypassWindowManager bool `toml:"desktop_widget_bypass_window_manager" doc:"Desktop Widget: bypass window manager"`
 
-	DesktopWidgetClickTime int `toml:"desktop_widget_click_time" doc:"Dektop Widget: max click time in millisecond"`
+	DesktopWidgetClickTime int `toml:"desktop_widget_click_time" doc:"Desktop Widget: max click time in millisecond"`
 
 	ScanPopupClipboard bool   `toml:"scan_popup_clipboard" doc:"Scan Popup: activate on copy to clipboard"`
 	ScanPopupSelection bool   `toml:"scan_popup_selection" doc:"Scan Popup: activate on selection"`
@@ -108,7 +108,7 @@ type Config struct {
 
 	AudioAutoPlayMinScore uint8 `toml:"audio_auto_play_min_score" doc:"Minimum score for audio auto-play"`
 
-	AudioVolume int `toml:"audio_volume" doc:"Volume for playing audio, 0 to 100 (% multiplied by dict-specofic volume)"`
+	AudioVolume int `toml:"audio_volume" doc:"Volume for playing audio, 0 to 100 (% multiplied by dict-specific volume)"`
 
 	EmbedExternalStylesheet bool `toml:"embed_external_stylesheet" doc:"Embed external stylesheet/css in article"`
 

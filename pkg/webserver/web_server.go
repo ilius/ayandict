@@ -37,7 +37,7 @@ type webServer struct {
 // using a different logger here, so that it does not show errors in GUI
 // because there is a little risk in showing web-user-input values in GUI
 var logger = slog.New(logging.NewColoredHandler(
-	os.Getenv("NO_COLOLR") != "",
+	os.Getenv("NO_COLOR") != "",
 	logging.DefaultLevel,
 ))
 

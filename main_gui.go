@@ -54,7 +54,7 @@ func main() {
 	privateFlag := flag.Bool(
 		"private",
 		false,
-		"Enable private mode: do not save activity (history, most frequest, favorites)",
+		"Enable private mode: do not save activity (history, most frequent, favorites)",
 	)
 	queryFlag := flag.String(
 		"query",
