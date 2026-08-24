@@ -20,6 +20,7 @@ import (
 func runServerOnly(createConfig bool) {
 	conf, err := config.Load()
 	if err != nil {
+		// Keep the panic so command-line users see the stack trace and line numbers.
 		panic(err)
 	}
 	if createConfig {
