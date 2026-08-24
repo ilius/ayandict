@@ -1,11 +1,21 @@
-FROM golang:1.21-bookworm
+FROM golang:1.24-bookworm AS build
+
+WORKDIR /src
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" \
+    -o /out/ayandict-web ./cmd/ayandict-web
+
+FROM debian:bookworm-slim
 
 WORKDIR /app
 
-COPY . /app
+COPY --from=build /out/ayandict-web /usr/local/bin/ayandict-web
 
-#RUN apt-get update
+EXPOSE 8357
 
-RUN go build -tags nogui
-
-CMD ./ayandict
+ENTRYPOINT ["/usr/local/bin/ayandict-web"]
+CMD ["--expose"]

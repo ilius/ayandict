@@ -1,0 +1,6 @@
+.git
+.github
+.agent-go-*
+.agents
+ayandict
+*.7z
