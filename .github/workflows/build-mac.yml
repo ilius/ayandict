@@ -2,7 +2,7 @@ name: Mac Build (Static Qt)
 
 on:
   push:
-    branches: ["v3", "build-mac*"]
+    branches: ["build-mac*"]
   pull_request:
     branches: ["v3"]
 
