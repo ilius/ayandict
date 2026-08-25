@@ -266,7 +266,7 @@ def compile_interface(
 	cpp_flags = [*(f"-D{definition}" for definition in sorted(definitions))]
 	cpp_flags.extend(compile_includes(group, build_dir))
 	cxx_flags = compile_command_flags(group)
-	cxx_flags[:0] = ["-O1", "-g0"]
+	cxx_flags[:0] = ["-O1", "-g"]
 	if not any(flag.startswith("-std=") for flag in cxx_flags):
 		standard = group.get("languageStandard")
 		version = standard.get("standard") if isinstance(standard, dict) else None
@@ -410,7 +410,7 @@ def main() -> None:
 		environment.update(
 			{
 				"CC": normalized_path(gcc),
-				"CGO_CFLAGS": "-O1 -g0 -Wa,-mbig-obj",
+				"CGO_CFLAGS": "-O1 -g -Wa,-mbig-obj",
 				"CGO_CPPFLAGS": environment_flags(cpp_flags),
 				"CGO_CXXFLAGS": environment_flags(cxx_flags),
 				"CGO_ENABLED": "1",

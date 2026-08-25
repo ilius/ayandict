@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GO_VERSION: "1.24.7"
+  GO_VERSION: "1.26.7"
   QT_VERSION: "6.11.2"
   QT_PACKAGE_RELEASE: "1"
   QT_PACKAGE_FILE: mingw-w64-ucrt-x86_64-qt6-static-6.11.2-1-any.pkg.tar.zst
