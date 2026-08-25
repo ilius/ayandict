@@ -12,6 +12,10 @@ StarDict is the only supported format for now, and by default, it reads all Star
 
 If you don't have Go language on your system, you can check [Releases](https://github.com/ilius/ayandict/releases) and download the latest binary for your platform if available.
 
+The Windows x86-64 artifact is a standalone executable for Windows 10 1809 or
+newer and Windows 11. Qt 6.11.2 and the required plugins are linked into
+`ayandict.exe`, so a separate Qt installation is not required.
+
 The Linux x86-64 GUI release artifact is dynamically linked. It requires glibc 2.35 or newer and Qt 6.4 or newer with the Widgets, Network, Multimedia, and Multimedia Widgets modules. Install the required Qt runtime libraries with the command for your distribution:
 
 Ubuntu 24.04 or newer:
