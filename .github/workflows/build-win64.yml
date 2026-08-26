@@ -38,6 +38,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Read application version
+        shell: pwsh
+        run: |
+          $source = Get-Content -Raw "pkg/appinfo/app_info.go"
+          $match = [regex]::Match(
+            $source,
+            '(?m)^\s*VERSION\s*=\s*"(?<version>v\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?)"'
+          )
+          if (-not $match.Success) {
+            throw "Could not read appinfo.VERSION"
+          }
+
+          $version = $match.Groups["version"].Value
+          "WINDOWS_ARTIFACT=ayandict-$version-windows-x64" |
+            Out-File -FilePath $env:GITHUB_ENV -Append
+
       - name: Install Go
         uses: actions/setup-go@v5
         with:
@@ -124,16 +140,18 @@ jobs:
         run: |
           set -euxo pipefail
           python ci/windows/verify-binary.py ayandict-unstripped.exe
-          strip --strip-all -o ayandict.exe ayandict-unstripped.exe
-          python ci/windows/verify-binary.py --imports-only ayandict.exe
-          ./ayandict.exe -version
-          sha256sum ayandict.exe
-          ls -lh ayandict.exe
+          strip --strip-all -o "$WINDOWS_ARTIFACT.exe" ayandict-unstripped.exe
+          python ci/windows/verify-binary.py --imports-only "$WINDOWS_ARTIFACT.exe"
+          "./$WINDOWS_ARTIFACT.exe" -version
+          sha256sum "$WINDOWS_ARTIFACT.exe"
+          ls -lh "$WINDOWS_ARTIFACT.exe"
 
       - name: CLICK HERE TO DOWNLOAD BINARY
         uses: actions/upload-artifact@v4
         with:
-          name: ayandict-win64-qt-${{ env.QT_VERSION }}-${{ github.sha }}
-          path: ayandict.exe
+          # GitHub serves this artifact as WINDOWS_ARTIFACT.zip containing
+          # the executable with the same basename.
+          name: ${{ env.WINDOWS_ARTIFACT }}
+          path: ${{ env.WINDOWS_ARTIFACT }}.exe
           if-no-files-found: error
           retention-days: 7
