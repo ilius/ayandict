@@ -1,4 +1,4 @@
-name: Mac Build (Static Qt)
+name: Mac Build (static)
 
 on:
   push:
@@ -76,25 +76,78 @@ jobs:
         with:
           go-version: ${{ steps.config.outputs.go-version }}
 
+      - name: Read application version
+        run: |
+          version="$(go run pkg/version/version.go)"
+          if [[ ! "${version}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Could not read a valid appinfo.VERSION: ${version}" >&2
+            exit 1
+          fi
+          echo "APP_VERSION=${version}" >> "${GITHUB_ENV}"
+          echo "MAC_ARTIFACT=ayandict-${version}-mac-arm64" >> "${GITHUB_ENV}"
+
       - name: Build Go project (linking static Qt)
-        run: ./ci/mac/build-go.py
+        run: |
+          ./ci/mac/build-go.py
+          mv ayandict "${MAC_ARTIFACT}"
 
       - name: Verify binary has no Homebrew dependencies
-        run: ./ci/mac/verify-binary.py ayandict
+        run: ./ci/mac/verify-binary.py "${MAC_ARTIFACT}"
 
       - name: Compress binary with 7zip
-        run: 7zz a ayandict.7z ayandict
+        run: 7zz a "${MAC_ARTIFACT}.7z" "${MAC_ARTIFACT}"
 
-      - name: Set output vars
-        id: vars
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Create macOS app bundle and DMG
+        run: |
+          dmg_root="$(mktemp -d "${RUNNER_TEMP}/ayandict-dmg.XXXXXX")"
+          app_dir="${dmg_root}/AyanDict.app"
+          plist="${app_dir}/Contents/Info.plist"
+          version="${APP_VERSION#v}"
+          short_version="${version%%[!0-9.]*}"
+          if [[ ! "${short_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid macOS bundle version: ${version}" >&2
+            exit 1
+          fi
+
+          mkdir -p "${app_dir}/Contents/MacOS"
+          install -m 0755 \
+            "${MAC_ARTIFACT}" \
+            "${app_dir}/Contents/MacOS/${MAC_ARTIFACT}"
+
+          plutil -create xml1 "${plist}"
+          plutil -insert CFBundleDisplayName -string AyanDict "${plist}"
+          plutil -insert CFBundleExecutable -string "${MAC_ARTIFACT}" "${plist}"
+          plutil -insert CFBundleIdentifier -string io.github.ilius.ayandict "${plist}"
+          plutil -insert CFBundleInfoDictionaryVersion -string 6.0 "${plist}"
+          plutil -insert CFBundleName -string AyanDict "${plist}"
+          plutil -insert CFBundlePackageType -string APPL "${plist}"
+          plutil -insert CFBundleShortVersionString -string "${short_version}" "${plist}"
+          plutil -insert CFBundleVersion -string "${GITHUB_RUN_NUMBER}" "${plist}"
+          plutil -insert NSHighResolutionCapable -bool true "${plist}"
+          plutil -insert NSPrincipalClass -string NSApplication "${plist}"
+          plutil -lint "${plist}"
+
+          ln -s /Applications "${dmg_root}/Applications"
+          codesign --force --sign - "${app_dir}"
+          codesign --verify --strict --verbose=2 "${app_dir}"
+
+          hdiutil create \
+            -volname AyanDict \
+            -srcfolder "${dmg_root}" \
+            -fs HFS+ \
+            -format UDZO \
+            -ov \
+            "${GITHUB_WORKSPACE}/${MAC_ARTIFACT}.dmg"
+          hdiutil verify "${GITHUB_WORKSPACE}/${MAC_ARTIFACT}.dmg"
 
       - name: CLICK HERE TO DOWNLOAD BINARY
         uses: actions/upload-artifact@v7
         with:
-          name: ayandict-mac-arm64-static-${{ steps.vars.outputs.sha_short }}
+          name: ${{ env.MAC_ARTIFACT }}
           if-no-files-found: error
-          path: ayandict.7z
+          path: |
+            ${{ env.MAC_ARTIFACT }}.7z
+            ${{ env.MAC_ARTIFACT }}.dmg
           compression-level: 0
 
       - name: Upload Go build cache
