@@ -410,7 +410,10 @@ def main() -> None:
 		environment.update(
 			{
 				"CC": normalized_path(gcc),
-				"CGO_CFLAGS": "-O1 -g -Wa,-mbig-obj",
+				# CGo parses its C-only DWARF inference objects with Go's debug/pe
+				# package, which does not recognize MinGW's bigobj COFF variant.
+				# Keep -Wa,-mbig-obj confined to the large Miqt C++ sources.
+				"CGO_CFLAGS": "-O1 -g",
 				"CGO_CPPFLAGS": environment_flags(cpp_flags),
 				"CGO_CXXFLAGS": environment_flags(cxx_flags),
 				"CGO_ENABLED": "1",
