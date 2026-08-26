@@ -1,0 +1,157 @@
+name: Build static Windows executable
+
+on:
+  push:
+    branches: ["build-windows*"]
+  pull_request:
+    branches: ["v3"]
+  workflow_dispatch:
+
+concurrency:
+  group: windows-static-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GO_VERSION: "1.26.7"
+  QT_VERSION: "6.11.2"
+  QT_PACKAGE_RELEASE: "1"
+  QT_PACKAGE_FILE: mingw-w64-ucrt-x86_64-qt6-static-6.11.2-1-any.pkg.tar.zst
+  QT_PACKAGE_SHA256: f204b0c2f8c1c455dfda71d02b67b919eb980f2523af63d7420b2e89170b779d
+  QT_PACKAGE_URL: https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-qt6-static-6.11.2-1-any.pkg.tar.zst
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Configure Windows page file
+        uses: al-cheb/configure-pagefile-action@9b6da52fb72a3c6147c1aad2df22d8d905681adc # v1.5
+        with:
+          minimum-size: 8GB
+          maximum-size: 16GB
+          disk-root: "D:"
+
+      - name: Preserve repository LF line endings
+        run: git config --global core.autocrlf input
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read application version
+        shell: pwsh
+        run: |
+          $source = Get-Content -Raw "pkg/appinfo/app_info.go"
+          $match = [regex]::Match(
+            $source,
+            '(?m)^\s*VERSION\s*=\s*"(?<version>v\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?)"'
+          )
+          if (-not $match.Success) {
+            throw "Could not read appinfo.VERSION"
+          }
+
+          $version = $match.Groups["version"].Value
+          "WINDOWS_ARTIFACT=ayandict-$version-windows-x64" |
+            Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: go.sum
+
+      - name: Set up MSYS2 UCRT64 toolchain
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          path-type: inherit
+          install: >-
+            mingw-w64-ucrt-x86_64-binutils
+            mingw-w64-ucrt-x86_64-brotli
+            mingw-w64-ucrt-x86_64-bzip2
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-dbus
+            mingw-w64-ucrt-x86_64-freetype
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-gettext-runtime
+            mingw-w64-ucrt-x86_64-glib2
+            mingw-w64-ucrt-x86_64-graphite2
+            mingw-w64-ucrt-x86_64-harfbuzz
+            mingw-w64-ucrt-x86_64-libiconv
+            mingw-w64-ucrt-x86_64-libjpeg-turbo
+            mingw-w64-ucrt-x86_64-libb2
+            mingw-w64-ucrt-x86_64-libpng
+            mingw-w64-ucrt-x86_64-libtiff
+            mingw-w64-ucrt-x86_64-libwebp
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-openssl
+            mingw-w64-ucrt-x86_64-pcre2
+            mingw-w64-ucrt-x86_64-pkgconf
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-vulkan-headers
+            mingw-w64-ucrt-x86_64-vulkan-loader
+            mingw-w64-ucrt-x86_64-zlib
+            mingw-w64-ucrt-x86_64-zstd
+
+      - name: Restore static Qt package
+        uses: actions/cache@v4
+        with:
+          path: .cache/qt-static
+          key: qt-static-${{ runner.os }}-${{ env.QT_VERSION }}-${{ env.QT_PACKAGE_RELEASE }}-${{ env.QT_PACKAGE_SHA256 }}
+
+      - name: Download pinned static Qt
+        shell: pwsh
+        run: |
+          $packageDir = Join-Path $env:GITHUB_WORKSPACE ".cache\qt-static"
+          $packagePath = Join-Path $packageDir $env:QT_PACKAGE_FILE
+          New-Item -ItemType Directory -Force -Path $packageDir | Out-Null
+
+          if (-not (Test-Path $packagePath)) {
+            curl.exe -L --fail --retry 3 $env:QT_PACKAGE_URL -o $packagePath
+          }
+
+          $actualHash = (Get-FileHash $packagePath -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actualHash -ne $env:QT_PACKAGE_SHA256) {
+            throw "Static Qt package checksum mismatch: $actualHash"
+          }
+
+          "QT_PACKAGE=$packagePath" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Install static Qt ${{ env.QT_VERSION }}
+        shell: msys2 {0}
+        run: |
+          set -euxo pipefail
+          pacman --noconfirm -U "$(cygpath -u "$QT_PACKAGE")"
+          test "$(/ucrt64/qt6-static/bin/qtpaths6.exe --qt-version)" = "$QT_VERSION"
+
+      - name: Build single-file Windows executable
+        shell: msys2 {0}
+        run: |
+          set -euxo pipefail
+          powershell.exe -NoProfile -Command \
+            "Get-CimInstance Win32_OperatingSystem | Select-Object FreePhysicalMemory,FreeVirtualMemory,TotalVirtualMemorySize | Format-List"
+          powershell.exe -NoProfile -Command \
+            "Get-CimInstance Win32_PageFileUsage | Select-Object Name,AllocatedBaseSize,CurrentUsage,PeakUsage | Format-List"
+          python ci/windows/build-go.py
+
+      - name: Verify and strip executable
+        shell: msys2 {0}
+        run: |
+          set -euxo pipefail
+          python ci/windows/verify-binary.py ayandict-unstripped.exe
+          strip --strip-all -o "$WINDOWS_ARTIFACT.exe" ayandict-unstripped.exe
+          python ci/windows/verify-binary.py --imports-only "$WINDOWS_ARTIFACT.exe"
+          "./$WINDOWS_ARTIFACT.exe" -version
+          sha256sum "$WINDOWS_ARTIFACT.exe"
+          ls -lh "$WINDOWS_ARTIFACT.exe"
+
+      - name: CLICK HERE TO DOWNLOAD BINARY
+        uses: actions/upload-artifact@v4
+        with:
+          # GitHub serves this artifact as WINDOWS_ARTIFACT.zip containing
+          # the executable with the same basename.
+          name: ${{ env.WINDOWS_ARTIFACT }}
+          path: ${{ env.WINDOWS_ARTIFACT }}.exe
+          if-no-files-found: error
+          retention-days: 7
