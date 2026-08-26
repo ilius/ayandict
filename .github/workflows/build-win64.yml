@@ -130,7 +130,7 @@ jobs:
           sha256sum ayandict.exe
           ls -lh ayandict.exe
 
-      - name: Upload executable
+      - name: CLICK HERE TO DOWNLOAD BINARY
         uses: actions/upload-artifact@v4
         with:
           name: ayandict-win64-qt-${{ env.QT_VERSION }}-${{ github.sha }}
