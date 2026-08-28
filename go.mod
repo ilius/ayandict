@@ -11,7 +11,7 @@ require (
 )
 
 require (
-	github.com/gopherjs/gopherjs v1.20.2 // indirect
+	github.com/gopherjs/gopherjs v1.21.0 // indirect
 	github.com/ilius/glob v0.0.0-20250212111036-4c41f838a304 // indirect
 )
 
