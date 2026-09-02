@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.ilius.ayandict</id>
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>AGPL-3.0-or-later</project_license>
+  <name>AyanDict</name>
+  <summary>A simple cross-platform desktop dictionary application</summary>
+  <description>
+    <p>
+      AyanDict is a simple cross-platform desktop dictionary application based
+      on the Qt framework and written in Go, that uses the StarDict dictionary
+      format.
+    </p>
+  </description>
+  <launchable type="desktop-id">ayandict.desktop</launchable>
+  <url type="homepage">https://github.com/ilius/ayandict</url>
+  <developer id="io.github.ilius">
+    <name>Saeed Rasooli</name>
+  </developer>
+  <content_rating type="oars-1.1" />
+  <screenshots>
+    <screenshot type="default">
+      <image type="source" width="1299" height="538">https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v30-linux-dark-wordnet.png</image>
+      <caption>Linux - dark style + Favorites</caption>
+    </screenshot>
+    <screenshot>
+      <image type="source" width="1250" height="563">https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v30-linux-light-wordnet.png</image>
+      <caption>Linux - light style</caption>
+    </screenshot>
+    <screenshot>
+      <image type="source" width="1299" height="538">https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v30-linux-dark-frequent-wordnet.png</image>
+      <caption>Linux - dark style + Most Frequent</caption>
+    </screenshot>
+    <screenshot>
+      <image type="source" width="930" height="857">https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v30-linux-dark-dict-manager.png</image>
+      <caption>Dictionary Manager</caption>
+    </screenshot>
+    <screenshot>
+      <image type="source" width="1299" height="605">https://raw.githubusercontent.com/wiki/ilius/ayandict/img/v30-linux-dark-misc-empty.png</image>
+      <caption>Linux - dark style</caption>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="3.0.0" date="2026-08-24" />
+  </releases>
+</component>

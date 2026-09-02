@@ -5,7 +5,7 @@ name: Linux Build
 
 on:
   push:
-    branches: ["v3", "release-linux"]
+    branches: ["v3", "build-linux"]
   pull_request:
     branches: ["v3"]
 
@@ -20,8 +20,21 @@ concurrency:
 
 jobs:
   build:
+    # GitHub-hosted runners only provide Ubuntu images, so the build runs inside
+    # a Debian bookworm container. Building on the oldest supported distro
+    # (glibc 2.36 / gcc 12 / Qt 6.4.2) makes the binary and .deb portable across
+    # Debian 12+ and Ubuntu 24.04+.
     runs-on: ubuntu-latest
+    env:
+      # Keep the Go build cache at a fixed location shared by the
+      # download/upload artifact steps.
+      GOCACHE: /home/runner/.cache/go-build
     steps:
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config git ca-certificates curl qt6-base-dev qt6-multimedia-dev
+
       - name: Download Go build cache
         if: ${{ github.ref != 'refs/heads/release-linux' }}
         id: download-go-build-cache-linux
@@ -34,7 +47,7 @@ jobs:
           workflow_conclusion: success
           event: push
           name: go-build-cache-linux
-          path: /home/runner/.cache/go-build
+          path: ${{ env.GOCACHE }}
           if_no_artifact_found: ignore
           use_unzip: true
           github_token: ${{ github.token }}
@@ -48,14 +61,9 @@ jobs:
           search_artifacts: true
 
       # - name: Check Go build cache
-      #   run: ls -l /home/runner/.cache/go-build || true
+      #   run: ls -l ${{ env.GOCACHE }} || true
 
       - uses: actions/checkout@v7
-
-      - name: Install Qt6
-        run: |
-          sudo apt-get update
-          sudo apt-get install qt6-base-dev qt6-multimedia-dev
 
       - name: Set up Go
         uses: actions/setup-go@v7
@@ -63,7 +71,23 @@ jobs:
           go-version: 1.24
 
       - name: Build
-        run: CGO_ENABLED=1 go build -ldflags '-s -w' -trimpath
+        run: |
+          CGO_ENABLED=1 go build -ldflags '-s -w' -trimpath
+          CGO_ENABLED=1 go build -ldflags '-s -w' -trimpath -o ayandict-nogui ./cmd/ayandict-nogui
+
+      - name: Install nfpm
+        run: |
+          curl -sSfL https://github.com/goreleaser/nfpm/releases/download/v2.47.0/nfpm_2.47.0_Linux_x86_64.tar.gz | tar -xz -C /usr/local/bin nfpm
+
+      - name: Build Debian package
+        run: |
+          # PKG_VERSION is the package version from pkg/appinfo (printed by
+          # pkg/version), not a git tag or a Go toolchain version. Debian
+          # versions must start with a digit, so strip the leading "v".
+          PKG_VERSION=$(go run ./pkg/version | sed 's/^v//')
+          echo "PKG_VERSION=$PKG_VERSION" >> "$GITHUB_ENV"
+          export PKG_VERSION
+          nfpm package --config packaging/nfpm.yaml --target ayandict_${PKG_VERSION}_amd64.deb
 
       - name: CLICK HERE TO DOWNLOAD BINARY
         uses: actions/upload-artifact@v7
@@ -73,10 +97,18 @@ jobs:
           retention-days: 7
           path: ayandict
 
+      - name: CLICK HERE TO DOWNLOAD DEBIAN PACKAGE
+        uses: actions/upload-artifact@v7
+        with:
+          name: ayandict_${{ env.PKG_VERSION }}_amd64.deb
+          if-no-files-found: error
+          retention-days: 7
+          path: ayandict_${{ env.PKG_VERSION }}_amd64.deb
+
       - name: Upload Go build cache
         uses: actions/upload-artifact@v7
         with:
           name: go-build-cache-linux
           if-no-files-found: error
           retention-days: 7
-          path: /home/runner/.cache/go-build
+          path: ${{ env.GOCACHE }}

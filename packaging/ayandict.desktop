@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=AyanDict
+Comment=A simple cross-platform desktop dictionary application based on Qt framework
+Exec=ayandict
+Icon=ayandict
+Terminal=false
+Categories=Office;Dictionary;Education;
