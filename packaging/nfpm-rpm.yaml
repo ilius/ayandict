@@ -1,0 +1,72 @@
+name: ayandict
+arch: amd64
+platform: linux
+version: ${PKG_VERSION}
+section: utils
+priority: optional
+maintainer: Saeed Rasooli <saeed.gnu@gmail.com>
+description: |
+  AyanDict - A simple cross-platform desktop dictionary application
+  based on Qt framework and written in Go that uses StarDict dictionary format.
+homepage: https://github.com/ilius/ayandict
+license: AGPL-3.0-or-later
+# Depend on Qt6 shared-library capabilities (sonames) rather than distro
+# package names: Fedora and AlmaLinux/RHEL (via EPEL) ship them as
+# qt6-qtbase / qt6-qtmultimedia, while openSUSE ships them as libQt6Core6 /
+# libQt6Multimedia6 etc. All provide these same libQt6*.so.6()(64bit)
+# capabilities, so dnf/zypper resolve the correct package on each distro.
+depends:
+  - glibc
+  - libQt6Core.so.6()(64bit)
+  - libQt6Gui.so.6()(64bit)
+  - libQt6Widgets.so.6()(64bit)
+  - libQt6Network.so.6()(64bit)
+  - libQt6Multimedia.so.6()(64bit)
+  - libQt6MultimediaWidgets.so.6()(64bit)
+rpm:
+  group: Applications/Text
+contents:
+  - src: ayandict
+    dst: /usr/bin/ayandict
+    file_info:
+      mode: 0755
+  - src: ayandict-nogui
+    dst: /usr/bin/ayandict-nogui
+    file_info:
+      mode: 0755
+  - src: cmd/linux/scan-clipboard.sh
+    dst: /usr/lib/ayandict/scan-clipboard.sh
+    file_info:
+      mode: 0755
+  - src: cmd/linux/scan-selection.sh
+    dst: /usr/lib/ayandict/scan-selection.sh
+    file_info:
+      mode: 0755
+  - src: cmd/linux/status-icon-activate.sh
+    dst: /usr/lib/ayandict/status-icon-activate.sh
+    file_info:
+      mode: 0755
+  - src: packaging/ayandict.desktop
+    dst: /usr/share/applications/ayandict.desktop
+    file_info:
+      mode: 0644
+  - src: packaging/io.github.ilius.ayandict.metainfo.xml
+    dst: /usr/share/metainfo/io.github.ilius.ayandict.metainfo.xml
+    file_info:
+      mode: 0644
+  - src: pkg/resources/res/ayandict-64px.png
+    dst: /usr/share/icons/hicolor/64x64/apps/ayandict.png
+    file_info:
+      mode: 0644
+  - src: doc/config.rst
+    dst: /usr/share/doc/packages/ayandict/config.rst
+    file_info:
+      mode: 0644
+  - src: README.md
+    dst: /usr/share/doc/packages/ayandict/README.md
+    file_info:
+      mode: 0644
+  - src: LICENSE
+    dst: /usr/share/licenses/ayandict/LICENSE
+    file_info:
+      mode: 0644

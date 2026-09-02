@@ -89,6 +89,11 @@ jobs:
           export PKG_VERSION
           nfpm package --config packaging/nfpm.yaml --target ayandict_${PKG_VERSION}_amd64.deb
 
+      - name: Build RPM package
+        run: |
+          export PKG_VERSION
+          nfpm package --config packaging/nfpm-rpm.yaml --target ayandict-${PKG_VERSION}.x86_64.rpm
+
       - name: CLICK HERE TO DOWNLOAD BINARY
         uses: actions/upload-artifact@v7
         with:
@@ -104,6 +109,14 @@ jobs:
           if-no-files-found: error
           retention-days: 7
           path: ayandict_${{ env.PKG_VERSION }}_amd64.deb
+
+      - name: CLICK HERE TO DOWNLOAD RPM PACKAGE
+        uses: actions/upload-artifact@v7
+        with:
+          name: ayandict-${{ env.PKG_VERSION }}.x86_64.rpm
+          if-no-files-found: error
+          retention-days: 7
+          path: ayandict-${{ env.PKG_VERSION }}.x86_64.rpm
 
       - name: Upload Go build cache
         uses: actions/upload-artifact@v7
