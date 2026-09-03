@@ -13,6 +13,13 @@ package qplatform
 
 static const long WM_EVENT_MASK = SubstructureRedirectMask | SubstructureNotifyMask;
 
+// Xlib's default error handler prints "X Error of failed request: ..." and
+// calls exit(), killing the process. This connection is opened solely for
+// setting the taskbar hints, so any X error here should be ignored.
+static int ignore_x_error(Display *dpy, XErrorEvent *ev) {
+    return 0;
+}
+
 void hide_from_taskbar(Window wid) {
     Display *dpy = XOpenDisplay(NULL);
     if (!dpy) {
@@ -20,8 +27,11 @@ void hide_from_taskbar(Window wid) {
         return;
     }
 
+    XErrorHandler old_handler = XSetErrorHandler(ignore_x_error);
+
     XWindowAttributes attr;
     if (!XGetWindowAttributes(dpy, wid, &attr)) {
+        XSetErrorHandler(old_handler);
         XCloseDisplay(dpy);
         return;
     }
@@ -31,6 +41,7 @@ void hide_from_taskbar(Window wid) {
     Atom skip_pager   = XInternAtom(dpy, "_NET_WM_STATE_SKIP_PAGER", False);
 
     if (!net_wm_state || !skip_taskbar || !skip_pager) {
+        XSetErrorHandler(old_handler);
         XCloseDisplay(dpy);
         return;
     }
@@ -49,6 +60,7 @@ void hide_from_taskbar(Window wid) {
     XSendEvent(dpy, attr.root, False, WM_EVENT_MASK, &e);
 
     XFlush(dpy);
+    XSetErrorHandler(old_handler);
     XCloseDisplay(dpy);
 }
 */
@@ -70,6 +82,10 @@ func HideWindowFromTaskbar(widget *qt.QWidget) {
 	}()
 	if os.Getenv("DISPLAY") == "" {
 		slog.Debug("No DISPLAY variable; X11 not available (probably pure Wayland)")
+		return
+	}
+	if os.Getenv("WAYLAND_DISPLAY") != "" {
+		slog.Debug("Running under Wayland; X11 window ID would be invalid")
 		return
 	}
 
