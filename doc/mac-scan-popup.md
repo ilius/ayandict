@@ -17,8 +17,8 @@ Using this requires:
 
 The repository provides these scripts in `cmd/mac/`:
 
-- [scan-selection.sh](/cmd/mac/scan-selection.sh): captures the currently selected text (by simulating Cmd+C) and scans it
-- [scan-clipboard.sh](/cmd/mac/scan-clipboard.sh): scans the text currently on the clipboard
+- [scan-selection.sh](https://github.com/ilius/ayandict/blob/v3/cmd/mac/scan-selection.sh): captures the currently selected text (by simulating Cmd+C) and scans it
+- [scan-clipboard.sh](https://github.com/ilius/ayandict/blob/v3/cmd/mac/scan-clipboard.sh): scans the text currently on the clipboard
 
 Run them from the repository with their absolute path, e.g.:
 
@@ -26,6 +26,8 @@ Run them from the repository with their absolute path, e.g.:
 /path/to/ayandict/cmd/mac/scan-selection.sh
 /path/to/ayandict/cmd/mac/scan-clipboard.sh
 ```
+
+These scripts are also bundled in the macOS `.dmg` inside the `Scripts/` folder, together with this document and the other docs in `Docs/`. The scripts are self-contained and can be run directly from the mounted DMG, but since a DMG mounts as read-only, copying `Scripts/` to a writable location (e.g. `/usr/local/bin/`) is recommended if you plan to use them with an Automator Quick Action (see below).
 
 ### Permissions
 

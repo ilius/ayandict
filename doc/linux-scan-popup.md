@@ -13,15 +13,15 @@ Using this requires:
 - `socat` or `netcat` (`nc`), to connect to the Unix socket
 - `wl-clipboard` (on Wayland) or `xclip` (on X11), to read the selection/clipboard
 
-On Ubuntu, `sudo apt install wl-clipboard socat` covers the Wayland clipboard and the Unix socket connection.
+On Ubuntu, `sudo apt install wl-clipboard socat` covers the Wayland clipboard and the Unix socket connection. Alternatively, install `netcat-openbsd` instead of `socat`.
 
 ## Helper scripts
 
 The repository provides these scripts in `cmd/linux/`:
 
-- [scan-selection.sh](/cmd/linux/scan-selection.sh): scans the currently selected text (the "primary selection")
-- [scan-clipboard.sh](/cmd/linux/scan-clipboard.sh): scans the text currently on the clipboard
-- [status-icon-activate.sh](/cmd/linux/status-icon-activate.sh): simulates a click on the tray icon (shows/hides the main window)
+- [scan-selection.sh](https://github.com/ilius/ayandict/blob/v3/cmd/linux/scan-selection.sh): scans the currently selected text (the "primary selection")
+- [scan-clipboard.sh](https://github.com/ilius/ayandict/blob/v3/cmd/linux/scan-clipboard.sh): scans the text currently on the clipboard
+- [status-icon-activate.sh](https://github.com/ilius/ayandict/blob/v3/cmd/linux/status-icon-activate.sh): simulates a click on the tray icon (shows/hides the main window)
 
 ### When installed from a deb/rpm package
 
