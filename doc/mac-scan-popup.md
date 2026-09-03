@@ -27,6 +27,8 @@ Run them from the repository with their absolute path, e.g.:
 /path/to/ayandict/cmd/mac/scan-clipboard.sh
 ```
 
+These scripts are also bundled in the macOS `.dmg` inside the `Scripts/` folder, together with this document and the other docs in `Docs/`. The scripts are self-contained and can be run directly from the mounted DMG, but since a DMG mounts as read-only, copying `Scripts/` to a writable location (e.g. `/usr/local/bin/`) is recommended if you plan to use them with an Automator Quick Action (see below).
+
 ### Permissions
 
 `scan-selection.sh` uses `osascript` to simulate the Cmd+C keystroke, so it needs **Accessibility** permission. Grant it in *System Settings → Privacy & Security → Accessibility* (the terminal app running the script must be enabled there).
