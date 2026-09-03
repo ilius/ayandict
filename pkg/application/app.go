@@ -282,7 +282,8 @@ func (app *Application) Run(query string) {
 		super(event)
 	})
 
-	if !qt.QSystemTrayIcon_IsSystemTrayAvailable() {
+	trayAvailable := qt.QSystemTrayIcon_IsSystemTrayAvailable()
+	if !trayAvailable {
 		if !conf.DesktopWidget {
 			slog.Warn("system tray is not available, enabling desktop widget")
 			conf.DesktopWidget = true
@@ -296,7 +297,9 @@ func (app *Application) Run(query string) {
 		}
 		app.icon = icon
 		window.SetWindowIcon(icon)
-		app.setupTrayIcon(icon)
+		if trayAvailable {
+			app.setupTrayIcon(icon)
+		}
 	}
 
 	qtutils.SetWinSize(window.QWidget, 600, 400)
