@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 set -o errexit -o pipefail -o nounset
 
-echo statusicon:activate | socat - UNIX-CONNECT:/tmp/ayandict-$UID
+if command -v socat >/dev/null 2>&1 ; then
+    printf 'statusicon:activate' | socat - "UNIX-CONNECT:/tmp/ayandict-$UID"
+else
+    printf 'statusicon:activate' | nc -U "/tmp/ayandict-$UID" -q 2
+fi
