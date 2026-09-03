@@ -298,6 +298,10 @@ func (view *ArticleView) playAudio(audioOutput *multimedia.QAudioOutput, qUrl *q
 		return
 	}
 	player := view.mediaPlayer
+	if player == nil {
+		player = multimedia.NewQMediaPlayer()
+		view.mediaPlayer = player
+	}
 	player.SetSource(qUrl)
 	player.SetAudioOutput(audioOutput)
 	player.Play() // does not block
@@ -685,8 +689,10 @@ func (view *ArticleView) setupCustomHandlers() {
 		panic("view.owner is not set")
 	}
 
-	mediaPlayer := multimedia.NewQMediaPlayer()
-	view.mediaPlayer = mediaPlayer
+	// mediaPlayer is created lazily in playAudio on first use:
+	// constructing QMediaPlayer eagerly would initialize Qt Multimedia
+	// (FFmpeg backend) at startup, which can crash the app on X11 systems
+	// without working GPU drivers (e.g. VMs) by hitting a fatal X11 error.
 
 	copyAction := qt.NewQAction5("Copy", view.Browser.QObject)
 	view.Browser.AddAction(copyAction)
