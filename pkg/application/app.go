@@ -195,22 +195,35 @@ func (app *Application) Run(query string) {
 		"cacheDir", config.Paths.CacheDir(),
 		"stateDir", config.Paths.StateDir(),
 	)
-	if !qlocalserver.StartLocalSocketServer(
-		conf,
-		app.ShowWindowAndQuery,
-		app.QueryPopup,
-		app.statusIconActivate,
-	) {
+	startSocketServer := func() bool {
+		return qlocalserver.StartLocalSocketServer(
+			conf,
+			app.ShowWindowAndQuery,
+			app.QueryPopup,
+			app.statusIconActivate,
+		)
+	}
+	if !startSocketServer() {
 		if qlocalserver.PingLocalServer() {
 			_ = qlocalserver.SendQueryToLocalServer(query)
-		} else {
+			return
+		}
+		// No server responded to ping, so the socket file is stale
+		// (left behind by a crashed previous process). Remove it and retry.
+		slog.Warn(
+			"socket exists but no server is running, removing stale socket (in /tmp)",
+			"filename",
+			appinfo.LOCAL_SOCKET_NAME,
+		)
+		network.QLocalServer_RemoveServer(appinfo.LOCAL_SOCKET_NAME)
+		if !startSocketServer() {
 			slog.Error(
 				"another instance is running, or dead socket (in /tmp)",
 				"filename",
 				appinfo.LOCAL_SOCKET_NAME,
 			)
+			return
 		}
-		return
 	}
 	if conf.WebEnable {
 		if ok, _ := webclient.FindLocalWebServer(conf.LocalServerPorts); ok {
