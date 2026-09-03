@@ -2,7 +2,7 @@ name: Mac Build (static)
 
 on:
   push:
-    branches: ["build-mac*"]
+    branches: ["build-mac*", "build-all"]
   pull_request:
     branches: ["v3"]
 

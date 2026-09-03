@@ -5,7 +5,7 @@ name: Linux Build
 
 on:
   push:
-    branches: ["v3", "build-linux"]
+    branches: ["v3", "build-linux", "build-all"]
   pull_request:
     branches: ["v3"]
 

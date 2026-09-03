@@ -2,7 +2,7 @@ name: Build static Windows executable
 
 on:
   push:
-    branches: ["build-windows*"]
+    branches: ["build-windows*", "build-all"]
   pull_request:
     branches: ["v3"]
   workflow_dispatch:
