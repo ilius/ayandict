@@ -6,7 +6,7 @@ AyanDict targets Linux, Windows, and macOS. Check each [release](https://github.
 
 Other Qt 6 desktop platforms are not routinely tested, but may work when built from source with CGO enabled.
 
-StarDict is the only supported format for now, and by default, it reads all StarDict dictionaries in `~/.stardict/dic` folder. But you can change the folder or add more folders through [configuration](#configuration).
+StarDict is the only supported format for now, and by default, it reads all StarDict dictionaries in the `~/.stardict/dic` directory. But you can change the folder or add more folders through [configuration](#configuration).
 
 # Installation
 
@@ -78,7 +78,7 @@ Or clone the repository, `cd` to it and run `go build`, which will create the bi
 
 # Web Interface
 
-By setting `web_enable = true` in [config file](#configuration) and running the program, you can use the web interface. The port is set with `local_server_ports` value (first available port in that list), and the URL is printed in stdout.
+By setting `web_enable = true` in [config file](#configuration) and running the program, you can use the web interface. The port is set with the `local_server_ports` value (the first available port in that list), and the URL is printed to standard output. If you launch AyanDict from a desktop shortcut, standard output may not be visible; in that case, run it from a terminal to see the URL.
 
 If you do not want to use Qt GUI at all and run in web-only mode, you can pass `-no-gui` flag in command line.
 
@@ -229,11 +229,11 @@ On Linux, the keyboard-shortcut approach uses the scripts in `cmd/linux/` (insta
 
 # Search Algorithm
 
-The default search is fuzzy, and it is based on similarity scores that are calculated from [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance). We also split entry terms into words, for example if you type "language" (or with with a few misspelled letters, like "languge"), it first shows "language", and then terms like "language learning", but may also show terms like "sign language".
+The default search is fuzzy, and it is based on similarity scores that are calculated from [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance). We also split entry terms into words; for example, if you type "language" (or with a few misspelled letters, like "languge"), it first shows "language", and then terms like "language learning", but may also show terms like "sign language".
 
 If you specifically want terms with "language" as the second word, you can type "\* language". Pattern matching is not supported in Fuzzy mode, and you can only use `*` alone (not as part of a pattern).
 
-Anything with at least %70 similarity score is listed (for example "languge" is %87 similar to "language"). But we have a limit of how many results are displayed, and by default it's 40 results. You can change this with config parameter [`max_results_total`](./doc/config.rst#max_results_total).
+Terms with at least %70 similarity are eligible to be listed (for example, "languge" is %87 similar to "language"). Other search rules may exclude a term, and there is also a limit on how many results are displayed; by default, it is 40 results. You can change this with the config parameter [`max_results_total`](./doc/config.rst#max_results_total).
 
 This works pretty well in most cases, but the only catch is that first letter of your query must match the first letter of one of your target words. For example if you type "symmetry", it will not match term "asymmetry" even though they are close enough (high similarity score), because their first letter is different.
 
