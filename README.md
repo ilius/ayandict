@@ -213,7 +213,7 @@ There are tons of web pages that let you download various usable dictionaries, b
 
 - Click **Clear** while holding **Ctrl / Command** to clear history (and query)
 - Click **Reload** while holding **Ctrl / Command** to reload config, dictionaries and user style
-- Click **Reload** while holding **Shift**  to reload config and user style
+- Click **Reload** while holding **Shift** to reload config and user style
 - **Right-click on Favorite** icon (under OK) to see multiple terms and add/remove favorite
 - Click **About** then click **Keyboard Shortcuts** to view the shortcuts
 
