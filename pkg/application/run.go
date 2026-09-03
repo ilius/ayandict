@@ -10,7 +10,26 @@ import (
 	qt "github.com/mappu/miqt/qt6"
 )
 
+// setFFmpegHwDisabled disables Qt Multimedia's FFmpeg hardware-acceleration
+// backends unless the user explicitly configured them. On startup the FFmpeg
+// backend probes VA-API/VDPAU, which opens its own X11 connection; on systems
+// without a working GPU driver (e.g. VMs) that probing can trigger a fatal
+// X11 error (BadWindow) and crash the app. ayandict only plays short audio
+// clips, where hardware acceleration is never beneficial anyway.
+func setFFmpegHwDisabled() {
+	for _, key := range []string{
+		"QT_FFMPEG_DECODING_HW_DEVICE_TYPES",
+		"QT_FFMPEG_ENCODING_HW_DEVICE_TYPES",
+	} {
+		if os.Getenv(key) == "" {
+			// empty list (",") disables all hardware backends
+			_ = os.Setenv(key, ",")
+		}
+	}
+}
+
 func Run(query string) {
+	setFFmpegHwDisabled()
 	qt.QCoreApplication_SetApplicationName(appinfo.APP_DESC)
 	qt.QGuiApplication_SetDesktopFileName(appinfo.APP_NAME)
 
