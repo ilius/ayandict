@@ -62,6 +62,10 @@ contents:
     dst: /usr/share/doc/packages/ayandict/config.rst
     file_info:
       mode: 0644
+  - src: doc/linux-scan-popup.md
+    dst: /usr/share/doc/packages/ayandict/linux-scan-popup.md
+    file_info:
+      mode: 0644
   - src: README.md
     dst: /usr/share/doc/packages/ayandict/README.md
     file_info:

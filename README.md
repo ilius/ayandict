@@ -217,6 +217,16 @@ There are tons of web pages that let you download various usable dictionaries, b
 - **Right-click on Favorite** icon (under OK) to see multiple terms and add/remove favorite
 - Click **About** then click **Keyboard Shortcuts** to view the shortcuts
 
+# Scan Popup
+
+"Scan Popup" is a small popup window that shows dictionary results for a word, without opening the main window. It can be triggered in three ways:
+
+- automatically when you select text (see `scan_popup_selection` in [configuration](#configuration))
+- automatically when you copy text to clipboard (see `scan_popup_clipboard`)
+- via a keyboard shortcut, using a helper script
+
+On Linux, the keyboard-shortcut approach uses the scripts in `cmd/linux/` (installed to `/usr/lib/ayandict/` in the deb/rpm packages). On macOS, it uses the scripts in `cmd/mac/`. See [Scan Popup on Linux](./doc/linux-scan-popup.md) and [Scan Popup on macOS](./doc/mac-scan-popup.md) for full setup instructions, including the OS-specific shortcut configuration.
+
 # Search Algorithm
 
 The default search is fuzzy, and it is based on similarity scores that are calculated from [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance). We also split entry terms into words, for example if you type "language" (or with with a few misspelled letters, like "languge"), it first shows "language", and then terms like "language learning", but may also show terms like "sign language".
